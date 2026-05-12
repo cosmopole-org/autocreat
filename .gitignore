@@ -1,0 +1,51 @@
+# Flutter
+client/.dart_tool/
+client/.packages
+client/build/
+client/.flutter-plugins
+client/.flutter-plugins-dependencies
+client/pubspec.lock
+client/.idea/
+client/*.iml
+client/android/.gradle/
+client/android/local.properties
+client/android/app/release.jks
+client/android/key.properties
+client/ios/Pods/
+client/ios/.symlinks/
+client/macos/Pods/
+client/linux/flutter/ephemeral/
+client/windows/flutter/ephemeral/
+client/web/.dart_tool/
+client/coverage/
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Go
+server/autocreat-server
+server/server
+server/vendor/
+server/*.out
+server/.env
+server/tmp/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Docker
+server/.docker/
+
+# Secrets
+*.pem
+*.key
+*.cert
+.env
+.env.local
+.env.production

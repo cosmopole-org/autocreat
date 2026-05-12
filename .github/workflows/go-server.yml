@@ -1,0 +1,140 @@
+name: Go Server - Build, Test & Deploy
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'server/**'
+      - '.github/workflows/go-server.yml'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'server/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build & Test Go Server
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: autocreat
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: autocreat_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: server/go.sum
+
+      - name: Download Go modules
+        working-directory: server
+        run: go mod download
+
+      - name: Verify Go modules
+        working-directory: server
+        run: go mod verify
+
+      - name: Run Go linter
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          working-directory: server
+          args: --timeout=5m
+
+      - name: Run tests
+        working-directory: server
+        env:
+          DATABASE_URL: postgres://autocreat:testpassword@localhost:5432/autocreat_test?sslmode=disable
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-jwt-secret-key-32-chars-min
+          JWT_REFRESH_SECRET: test-refresh-secret-key-32-chars
+          ENV: test
+        run: go test -v -race -coverprofile=coverage.out ./...
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        with:
+          files: server/coverage.out
+          flags: server
+        continue-on-error: true
+
+      - name: Build server binary
+        working-directory: server
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+            -ldflags="-w -s -X main.Version=${{ github.sha }}" \
+            -o autocreat-server \
+            ./cmd/server
+
+      - name: Upload server binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: autocreat-server-${{ github.sha }}
+          path: server/autocreat-server
+          retention-days: 30
+
+  docker-build:
+    name: Build & Push Docker Image
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/server
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: server
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
