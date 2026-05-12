@@ -64,7 +64,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
           Expanded(
             child: companiesAsync.when(
               loading: () => const LoadingGrid(),
-              error: (e, _) => ErrorWidget(
+              error: (e, _) => AppErrorWidget(
                   message: e.toString(),
                   onRetry: () =>
                       ref.read(companyNotifierProvider.notifier).refresh()),

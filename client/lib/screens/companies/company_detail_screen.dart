@@ -21,7 +21,7 @@ class CompanyDetailScreen extends ConsumerWidget {
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
-        body: ErrorWidget(message: e.toString()),
+        body: AppErrorWidget(message: e.toString()),
       ),
       data: (company) => Scaffold(
         body: SingleChildScrollView(

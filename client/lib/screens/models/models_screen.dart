@@ -63,7 +63,7 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
           Expanded(
             child: modelsAsync.when(
               loading: () => const LoadingGrid(),
-              error: (e, _) => ErrorWidget(message: e.toString()),
+              error: (e, _) => AppErrorWidget(message: e.toString()),
               data: (models) {
                 final filtered = _search.isEmpty
                     ? models

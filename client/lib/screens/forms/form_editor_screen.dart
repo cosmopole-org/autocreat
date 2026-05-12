@@ -70,7 +70,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
 
   void _addField(FormFieldType type) {
     const uuid = Uuid();
-    final field = FormField(
+    final field = AppFormField(
       id: uuid.v4(),
       type: type,
       label: type.displayName,
@@ -264,7 +264,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
 }
 
 class _FieldCard extends StatelessWidget {
-  final FormField field;
+  final AppFormField field;
   final bool isSelected;
   final VoidCallback onSelect;
   final VoidCallback onDelete;
@@ -345,8 +345,8 @@ class _FieldCard extends StatelessWidget {
 }
 
 class _FieldPropertiesPanel extends StatefulWidget {
-  final FormField field;
-  final ValueChanged<FormField> onUpdate;
+  final AppFormField field;
+  final ValueChanged<AppFormField> onUpdate;
 
   const _FieldPropertiesPanel({required this.field, required this.onUpdate});
 

@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants.dart';
 import '../data/repositories/company_repository.dart';
 import '../models/company.dart';
 import 'auth_provider.dart';
+import 'theme_provider.dart';
 
 final companyRepositoryProvider = Provider<CompanyRepository>((ref) {
   return CompanyRepository(ref.watch(apiClientProvider));

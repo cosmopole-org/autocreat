@@ -86,7 +86,7 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
           Expanded(
             child: flowsAsync.when(
               loading: () => const LoadingGrid(),
-              error: (e, _) => ErrorWidget(message: e.toString()),
+              error: (e, _) => AppErrorWidget(message: e.toString()),
               data: (flows) {
                 final filtered = _search.isEmpty
                     ? flows

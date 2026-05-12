@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../models/role.dart';
-import '../../providers/role_provider.dart';
+import '../../models/user.dart';
+import '../../providers/user_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 
-class RolesScreen extends ConsumerStatefulWidget {
-  const RolesScreen({super.key});
+class UsersScreen extends ConsumerStatefulWidget {
+  const UsersScreen({super.key});
 
   @override
-  ConsumerState<RolesScreen> createState() => _RolesScreenState();
+  ConsumerState<UsersScreen> createState() => _UsersScreenState();
 }
 
-class _RolesScreenState extends ConsumerState<RolesScreen> {
+class _UsersScreenState extends ConsumerState<UsersScreen> {
   final _searchController = TextEditingController();
   String _search = '';
 
@@ -26,7 +26,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final rolesAsync = ref.watch(roleNotifierProvider);
+    final usersAsync = ref.watch(userNotifierProvider);
 
     return Scaffold(
       body: Column(
@@ -38,42 +38,46 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                 Expanded(
                   child: SearchField(
                     controller: _searchController,
-                    hintText: 'Search roles...',
+                    hintText: 'Search users...',
                     onChanged: (v) => setState(() => _search = v),
                   ),
                 ),
                 const SizedBox(width: 12),
                 AppButton(
-                  label: 'New Role',
-                  icon: Icons.add,
-                  onPressed: () => context.go('/roles/new/edit'),
+                  label: 'New User',
+                  icon: Icons.person_add_outlined,
+                  onPressed: () => context.go('/users/new/edit'),
                 ),
               ],
             ),
           ),
           Expanded(
-            child: rolesAsync.when(
+            child: usersAsync.when(
               loading: () => const LoadingList(),
               error: (e, _) => AppErrorWidget(
                   message: e.toString(),
                   onRetry: () =>
-                      ref.read(roleNotifierProvider.notifier).refresh()),
-              data: (roles) {
+                      ref.read(userNotifierProvider.notifier).refresh()),
+              data: (users) {
                 final filtered = _search.isEmpty
-                    ? roles
-                    : roles
-                        .where((r) => r.name
-                            .toLowerCase()
-                            .contains(_search.toLowerCase()))
+                    ? users
+                    : users
+                        .where((u) =>
+                            u.fullName
+                                .toLowerCase()
+                                .contains(_search.toLowerCase()) ||
+                            u.email
+                                .toLowerCase()
+                                .contains(_search.toLowerCase()))
                         .toList();
 
                 if (filtered.isEmpty) {
                   return EmptyState(
-                    title: 'No roles yet',
-                    subtitle: 'Create roles to manage access control',
-                    icon: Icons.shield_outlined,
-                    actionLabel: 'Create Role',
-                    onAction: () => context.go('/roles/new/edit'),
+                    title: 'No users yet',
+                    subtitle: 'Add team members to your organization',
+                    icon: Icons.people_outline,
+                    actionLabel: 'Add User',
+                    onAction: () => context.go('/users/new/edit'),
                   );
                 }
 
@@ -82,21 +86,21 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                   itemCount: filtered.length,
                   itemBuilder: (context, i) => Padding(
                     padding: const EdgeInsets.only(bottom: 8),
-                    child: _RoleCard(
-                      role: filtered[i],
+                    child: _UserCard(
+                      user: filtered[i],
                       onEdit: () =>
-                          context.go('/roles/${filtered[i].id}/edit'),
+                          context.go('/users/${filtered[i].id}/edit'),
                       onDelete: () async {
                         final confirmed = await showDialog<bool>(
                           context: context,
                           builder: (_) => const ConfirmDialog(
-                            title: 'Delete Role',
-                            message: 'Delete this role permanently?',
+                            title: 'Remove User',
+                            message: 'Remove this user from the system?',
                           ),
                         );
                         if (confirmed == true) {
                           await ref
-                              .read(roleNotifierProvider.notifier)
+                              .read(userNotifierProvider.notifier)
                               .delete(filtered[i].id);
                         }
                       },
@@ -112,13 +116,13 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
   }
 }
 
-class _RoleCard extends StatelessWidget {
-  final Role role;
+class _UserCard extends StatelessWidget {
+  final User user;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  const _RoleCard({
-    required this.role,
+  const _UserCard({
+    required this.user,
     required this.onEdit,
     required this.onDelete,
   });
@@ -129,25 +133,22 @@ class _RoleCard extends StatelessWidget {
       onTap: onEdit,
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.success.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.shield_outlined,
-                color: AppColors.success, size: 22),
+          AvatarWidget(
+            imageUrl: user.avatar,
+            initials: user.initials,
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(user.fullName,
+                    style: Theme.of(context).textTheme.titleMedium),
+                Text(user.email,
+                    style: Theme.of(context).textTheme.bodySmall),
+                const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text(role.name,
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
@@ -155,28 +156,13 @@ class _RoleCard extends StatelessWidget {
                         color: AppColors.primarySurface,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Text(
-                        role.level,
-                        style: const TextStyle(
-                            fontSize: 10, color: AppColors.primary),
-                      ),
+                      child: Text(user.role,
+                          style: const TextStyle(
+                              fontSize: 10, color: AppColors.primary)),
                     ),
-                  ],
-                ),
-                if (role.description != null)
-                  Text(role.description!,
-                      style: Theme.of(context).textTheme.bodySmall,
-                      maxLines: 1),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    _PermChip(
-                        label: '${role.permissions.length} permissions'),
                     const SizedBox(width: 8),
-                    _PermChip(label: '${role.memberCount} members'),
-                    const Spacer(),
                     StatusChip(
-                        status: role.isActive ? 'active' : 'inactive'),
+                        status: user.isActive ? 'active' : 'inactive'),
                   ],
                 ),
               ],
@@ -188,7 +174,7 @@ class _RoleCard extends StatelessWidget {
               const PopupMenuItem(value: 'edit', child: Text('Edit')),
               const PopupMenuItem(
                   value: 'delete',
-                  child: Text('Delete',
+                  child: Text('Remove',
                       style: TextStyle(color: AppColors.error))),
             ],
             onSelected: (v) {
@@ -198,26 +184,6 @@ class _RoleCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _PermChip extends StatelessWidget {
-  final String label;
-
-  const _PermChip({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: AppColors.lightBorder.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(label,
-          style: const TextStyle(
-              fontSize: 10, color: AppColors.lightTextSecondary)),
     );
   }
 }

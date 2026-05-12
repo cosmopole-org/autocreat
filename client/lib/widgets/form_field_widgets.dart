@@ -4,7 +4,7 @@ import '../models/form_definition.dart';
 import '../theme/app_colors.dart';
 
 class FormFieldRenderer extends StatefulWidget {
-  final FormField field;
+  final AppFormField field;
   final dynamic value;
   final ValueChanged<dynamic>? onChanged;
   final bool readOnly;
@@ -399,7 +399,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
 }
 
 class _TableField extends StatefulWidget {
-  final FormField field;
+  final AppFormField field;
   final dynamic value;
   final ValueChanged<dynamic>? onChanged;
   final bool readOnly;

@@ -43,14 +43,14 @@ class FormEditorNotifier extends Notifier<FormEditorState> {
     );
   }
 
-  void addField(FormField field) {
+  void addField(AppFormField field) {
     state = state.copyWith(
       fields: [...state.fields, field],
       isDirty: true,
     );
   }
 
-  void updateField(FormField field) {
+  void updateField(AppFormField field) {
     state = state.copyWith(
       fields: state.fields.map((f) => f.id == field.id ? field : f).toList(),
       isDirty: true,
@@ -71,7 +71,7 @@ class FormEditorNotifier extends Notifier<FormEditorState> {
   }
 
   void reorderFields(int oldIndex, int newIndex) {
-    final fields = List<FormField>.from(state.fields);
+    final fields = List<AppFormField>.from(state.fields);
     final item = fields.removeAt(oldIndex);
     fields.insert(newIndex, item);
     state = state.copyWith(fields: fields, isDirty: true);
@@ -101,7 +101,7 @@ class FormEditorNotifier extends Notifier<FormEditorState> {
 
 class FormEditorState {
   final FormDefinition? form;
-  final List<FormField> fields;
+  final List<AppFormField> fields;
   final String? selectedFieldId;
   final bool isDirty;
 
@@ -119,7 +119,7 @@ class FormEditorState {
 
   FormEditorState copyWith({
     FormDefinition? form,
-    List<FormField>? fields,
+    List<AppFormField>? fields,
     String? selectedFieldId,
     bool? isDirty,
   }) {
@@ -131,7 +131,7 @@ class FormEditorState {
     );
   }
 
-  FormField? get selectedField {
+  AppFormField? get selectedField {
     if (selectedFieldId == null) return null;
     try {
       return fields.firstWhere((f) => f.id == selectedFieldId);

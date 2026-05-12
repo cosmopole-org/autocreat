@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../models/form_definition.dart';
-import '../../providers/form_provider.dart';
+import '../../models/letter_template.dart';
+import '../../providers/letter_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 
-class FormsScreen extends ConsumerStatefulWidget {
-  const FormsScreen({super.key});
+class LettersScreen extends ConsumerStatefulWidget {
+  const LettersScreen({super.key});
 
   @override
-  ConsumerState<FormsScreen> createState() => _FormsScreenState();
+  ConsumerState<LettersScreen> createState() => _LettersScreenState();
 }
 
-class _FormsScreenState extends ConsumerState<FormsScreen> {
+class _LettersScreenState extends ConsumerState<LettersScreen> {
   final _searchController = TextEditingController();
   String _search = '';
 
@@ -24,21 +24,20 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
     super.dispose();
   }
 
-  Future<void> _createForm(BuildContext context) async {
-    final repo = ref.read(formRepositoryProvider);
-    final form = await repo.createForm({
-      'name': 'New Form',
+  Future<void> _createLetter(BuildContext context) async {
+    final repo = ref.read(letterRepositoryProvider);
+    final letter = await repo.createLetter({
+      'name': 'New Letter Template',
       'status': 'draft',
-      'fields': [],
+      'content': '',
+      'deltaContent': {},
     });
-    if (context.mounted) {
-      context.go('/forms/${form.id}/edit');
-    }
+    if (context.mounted) context.go('/letters/${letter.id}/edit');
   }
 
   @override
   Widget build(BuildContext context) {
-    final formsAsync = ref.watch(formsProvider(null));
+    final lettersAsync = ref.watch(letterNotifierProvider);
 
     return Scaffold(
       body: Column(
@@ -50,39 +49,39 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
                 Expanded(
                   child: SearchField(
                     controller: _searchController,
-                    hintText: 'Search forms...',
+                    hintText: 'Search templates...',
                     onChanged: (v) => setState(() => _search = v),
                   ),
                 ),
                 const SizedBox(width: 12),
                 AppButton(
-                  label: 'New Form',
+                  label: 'New Template',
                   icon: Icons.add,
-                  onPressed: () => _createForm(context),
+                  onPressed: () => _createLetter(context),
                 ),
               ],
             ),
           ),
           Expanded(
-            child: formsAsync.when(
+            child: lettersAsync.when(
               loading: () => const LoadingGrid(),
               error: (e, _) => AppErrorWidget(message: e.toString()),
-              data: (forms) {
+              data: (letters) {
                 final filtered = _search.isEmpty
-                    ? forms
-                    : forms
-                        .where((f) => f.name
+                    ? letters
+                    : letters
+                        .where((l) => l.name
                             .toLowerCase()
                             .contains(_search.toLowerCase()))
                         .toList();
 
                 if (filtered.isEmpty) {
                   return EmptyState(
-                    title: 'No forms yet',
-                    subtitle: 'Create your first form definition',
-                    icon: Icons.dynamic_form_outlined,
-                    actionLabel: 'Create Form',
-                    onAction: () => _createForm(context),
+                    title: 'No letter templates',
+                    subtitle: 'Create reusable letter templates',
+                    icon: Icons.mail_outline,
+                    actionLabel: 'Create Template',
+                    onAction: () => _createLetter(context),
                   );
                 }
 
@@ -96,23 +95,22 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
                     mainAxisSpacing: 12,
                   ),
                   itemCount: filtered.length,
-                  itemBuilder: (context, i) => _FormCard(
-                    form: filtered[i],
+                  itemBuilder: (context, i) => _LetterCard(
+                    letter: filtered[i],
                     onEdit: () =>
-                        context.go('/forms/${filtered[i].id}/edit'),
+                        context.go('/letters/${filtered[i].id}/edit'),
                     onDelete: () async {
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (_) => const ConfirmDialog(
-                          title: 'Delete Form',
-                          message: 'This will delete the form permanently.',
+                          title: 'Delete Template',
+                          message: 'Delete this letter template?',
                         ),
                       );
                       if (confirmed == true) {
                         await ref
-                            .read(formRepositoryProvider)
-                            .deleteForm(filtered[i].id);
-                        ref.invalidate(formsProvider);
+                            .read(letterNotifierProvider.notifier)
+                            .delete(filtered[i].id);
                       }
                     },
                   ).animate().fadeIn(delay: Duration(milliseconds: i * 50)),
@@ -126,13 +124,13 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
   }
 }
 
-class _FormCard extends StatelessWidget {
-  final FormDefinition form;
+class _LetterCard extends StatelessWidget {
+  final LetterTemplate letter;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  const _FormCard({
-    required this.form,
+  const _LetterCard({
+    required this.letter,
     required this.onEdit,
     required this.onDelete,
   });
@@ -149,18 +147,17 @@ class _FormCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withOpacity(0.1),
+                  color: AppColors.warning.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.dynamic_form_outlined,
-                    color: AppColors.accent, size: 20),
+                child: const Icon(Icons.mail_outline,
+                    color: AppColors.warning, size: 20),
               ),
               const Spacer(),
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, size: 18),
                 itemBuilder: (_) => [
-                  const PopupMenuItem(
-                      value: 'edit', child: Text('Open Editor')),
+                  const PopupMenuItem(value: 'edit', child: Text('Edit')),
                   const PopupMenuItem(
                       value: 'delete',
                       child: Text('Delete',
@@ -175,27 +172,25 @@ class _FormCard extends StatelessWidget {
           ),
           const Spacer(),
           Text(
-            form.name,
+            letter.name,
             style: Theme.of(context).textTheme.titleMedium,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          if (form.description != null)
+          if (letter.description != null)
             Text(
-              form.description!,
+              letter.description!,
               style: Theme.of(context).textTheme.bodySmall,
               maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           const SizedBox(height: 8),
           Row(
             children: [
-              StatusChip(status: form.status),
+              StatusChip(status: letter.status),
               const Spacer(),
-              Text(
-                '${form.fields.length} fields',
-                style: Theme.of(context).textTheme.labelSmall,
-              ),
+              if (letter.category != null)
+                Text(letter.category!,
+                    style: Theme.of(context).textTheme.labelSmall),
             ],
           ),
         ],

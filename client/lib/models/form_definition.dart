@@ -75,8 +75,8 @@ class FormFieldValidation with _$FormFieldValidation {
 }
 
 @freezed
-class FormField with _$FormField {
-  const factory FormField({
+class AppFormField with _$AppFormField {
+  const factory AppFormField({
     required String id,
     required FormFieldType type,
     required String label,
@@ -91,10 +91,10 @@ class FormField with _$FormField {
     String? modelFieldBinding,
     int? order,
     Map<String, dynamic>? metadata,
-  }) = _FormField;
+  }) = _AppFormField;
 
-  factory FormField.fromJson(Map<String, dynamic> json) =>
-      _$FormFieldFromJson(json);
+  factory AppFormField.fromJson(Map<String, dynamic> json) =>
+      _$AppFormFieldFromJson(json);
 }
 
 @freezed
@@ -105,7 +105,7 @@ class FormDefinition with _$FormDefinition {
     String? description,
     String? companyId,
     String? modelId,
-    @Default([]) List<FormField> fields,
+    @Default([]) List<AppFormField> fields,
     @Default('draft') String status,
     DateTime? createdAt,
     DateTime? updatedAt,
