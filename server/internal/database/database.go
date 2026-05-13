@@ -1,6 +1,7 @@
 package database
 
 import (
+	_ "embed"
 	"fmt"
 	"os"
 	"strconv"
@@ -13,6 +14,9 @@ import (
 
 	"github.com/autocreat/server/internal/models"
 )
+
+//go:embed migrations/001_init.sql
+var bootstrapSQL string
 
 // maxDBRetries returns how many connection attempts to make.
 // Defaults to 1 (fail-fast) so Vercel serverless cold starts don't time out.
@@ -35,7 +39,8 @@ func Connect(dsn string, log *zap.Logger) (*gorm.DB, error) {
 	)
 
 	gormCfg := &gorm.Config{
-		Logger: gormlogger.Default.LogMode(gormlogger.Silent),
+		Logger:                                   gormlogger.Default.LogMode(gormlogger.Silent),
+		DisableForeignKeyConstraintWhenMigrating: true,
 	}
 
 	maxAttempts := maxDBRetries()
@@ -72,9 +77,11 @@ func Connect(dsn string, log *zap.Logger) (*gorm.DB, error) {
 	return db, nil
 }
 
-// Migrate runs GORM's AutoMigrate for all application models.
+// Migrate creates all tables via GORM AutoMigrate (no FK constraints, avoiding
+// circular-dependency errors), then applies the embedded SQL file which adds
+// extensions, indexes, CHECK constraints, and FK constraints idempotently.
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(
+	if err := db.AutoMigrate(
 		&models.User{},
 		&models.Session{},
 		&models.Company{},
@@ -94,5 +101,9 @@ func Migrate(db *gorm.DB) error {
 		&models.GeneratedLetter{},
 		&models.Ticket{},
 		&models.TicketMessage{},
-	)
+	); err != nil {
+		return err
+	}
+
+	return db.Exec(bootstrapSQL).Error
 }
