@@ -127,14 +127,14 @@ func (h *Hub) WritePump(c *Client) {
 	ticker := time.NewTicker(30 * time.Second)
 	defer func() {
 		ticker.Stop()
-		c.Conn.Close()
+		_ = c.Conn.Close()
 	}()
 	for {
 		select {
 		case msg, ok := <-c.Send:
-			c.Conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			_ = c.Conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if !ok {
-				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
+				_ = c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 			if err := c.Conn.WriteMessage(websocket.TextMessage, msg); err != nil {
@@ -142,7 +142,7 @@ func (h *Hub) WritePump(c *Client) {
 				return
 			}
 		case <-ticker.C:
-			c.Conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			_ = c.Conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
@@ -154,14 +154,16 @@ func (h *Hub) WritePump(c *Client) {
 func (h *Hub) ReadPump(c *Client) {
 	defer func() {
 		h.Unregister(c)
-		c.Conn.Close()
+		_ = c.Conn.Close()
 	}()
 	c.Conn.SetReadLimit(512 * 1024)
 	c.Conn.SetPongHandler(func(string) error {
-		c.Conn.SetReadDeadline(time.Now().Add(60 * time.Second))
-		return nil
+		return c.Conn.SetReadDeadline(time.Now().Add(60 * time.Second))
 	})
-	c.Conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+	if err := c.Conn.SetReadDeadline(time.Now().Add(60 * time.Second)); err != nil {
+		h.log.Warn("ws set read deadline error", zap.Error(err))
+		return
+	}
 	for {
 		_, _, err := c.Conn.ReadMessage()
 		if err != nil {
