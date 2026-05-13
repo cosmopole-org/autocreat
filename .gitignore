@@ -4,7 +4,6 @@ client/.packages
 client/build/
 client/.flutter-plugins
 client/.flutter-plugins-dependencies
-client/pubspec.lock
 client/.idea/
 client/*.iml
 client/android/.gradle/
