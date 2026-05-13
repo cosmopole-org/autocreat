@@ -38,7 +38,7 @@ func Load() (*Config, error) {
 		Env:               getEnv("ENV", "development"),
 		Port:              getEnv("PORT", "8080"),
 		DatabaseURL:       getEnv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/autocreat?sslmode=disable"),
-		RedisURL:          getEnv("REDIS_URL", "redis://localhost:6379"),
+		RedisURL:          getEnv("REDIS_URL", ""),
 		JWTSecret:         getEnv("JWT_SECRET", "change-me-in-production"),
 		JWTRefreshSecret:  getEnv("JWT_REFRESH_SECRET", "change-me-refresh-in-production"),
 		AccessTokenTTL:    getDurationEnv("ACCESS_TOKEN_TTL", 15*time.Minute),

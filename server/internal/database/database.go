@@ -2,6 +2,8 @@ package database
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"go.uber.org/zap"
@@ -11,6 +13,19 @@ import (
 
 	"github.com/autocreat/server/internal/models"
 )
+
+// maxDBRetries returns how many connection attempts to make.
+// Defaults to 1 (fail-fast) so Vercel serverless cold starts don't time out.
+// Set DB_CONNECT_RETRIES=10 in long-running server environments to restore the
+// original back-off behaviour for containers that start before the DB is ready.
+func maxDBRetries() int {
+	if v := os.Getenv("DB_CONNECT_RETRIES"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n > 0 {
+			return n
+		}
+	}
+	return 1
+}
 
 // Connect opens a PostgreSQL connection using GORM and configures the connection pool.
 func Connect(dsn string, log *zap.Logger) (*gorm.DB, error) {
@@ -23,11 +38,13 @@ func Connect(dsn string, log *zap.Logger) (*gorm.DB, error) {
 		Logger: gormlogger.Default.LogMode(gormlogger.Silent),
 	}
 
-	// Retry up to 10 times with exponential back-off to handle transient startup failures
-	// (e.g. the database container is still initializing).
-	for attempt := 1; attempt <= 10; attempt++ {
+	maxAttempts := maxDBRetries()
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		db, err = gorm.Open(postgres.Open(dsn), gormCfg)
 		if err == nil {
+			break
+		}
+		if attempt == maxAttempts {
 			break
 		}
 		wait := time.Duration(attempt) * 2 * time.Second
