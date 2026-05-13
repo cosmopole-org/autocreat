@@ -35,8 +35,10 @@ func init() {
 	}
 	initDB = db
 
-	// Redis is optional; Vercel environments may not have it.
-	rdb, _ := database.NewRedisClient(cfg.RedisURL, log)
+	rdb, err := database.NewRedisClient(cfg.RedisURL, log)
+	if err != nil {
+		log.Warn("redis not available, caching disabled", zap.Error(err))
+	}
 
 	ginApp = app.New(cfg, db, rdb, log)
 }
