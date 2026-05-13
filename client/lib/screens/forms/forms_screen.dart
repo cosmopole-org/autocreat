@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/form_definition.dart';
 import '../../providers/form_provider.dart';
+import '../../providers/realtime_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -39,6 +40,15 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
   @override
   Widget build(BuildContext context) {
     final formsAsync = ref.watch(formsProvider(null));
+
+    ref.listen(realtimeStreamProvider, (_, next) {
+      next.whenData((msg) {
+        final type = msg['type'] as String? ?? '';
+        if (type == 'form.created' || type == 'form.updated' || type == 'form.deleted') {
+          ref.invalidate(formsProvider);
+        }
+      });
+    });
 
     return Scaffold(
       body: Column(

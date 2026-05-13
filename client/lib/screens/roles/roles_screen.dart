@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/role.dart';
+import '../../providers/realtime_provider.dart';
 import '../../providers/role_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
@@ -27,6 +28,15 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
   @override
   Widget build(BuildContext context) {
     final rolesAsync = ref.watch(roleNotifierProvider);
+
+    ref.listen(realtimeStreamProvider, (_, next) {
+      next.whenData((msg) {
+        final type = msg['type'] as String? ?? '';
+        if (type == 'role.created' || type == 'role.updated' || type == 'role.deleted') {
+          ref.invalidate(roleNotifierProvider);
+        }
+      });
+    });
 
     return Scaffold(
       body: Column(

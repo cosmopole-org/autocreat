@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/flow.dart';
 import '../../providers/flow_provider.dart';
+import '../../providers/realtime_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -59,6 +60,17 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
   @override
   Widget build(BuildContext context) {
     final flowsAsync = ref.watch(flowsProvider(null));
+
+    ref.listen(realtimeStreamProvider, (_, next) {
+      next.whenData((msg) {
+        final type = msg['type'] as String? ?? '';
+        if (type == 'flow.graph_saved' ||
+            type == 'flow.instance_started' ||
+            type == 'flow.instance_advanced') {
+          ref.invalidate(flowsProvider);
+        }
+      });
+    });
 
     return Scaffold(
       body: Column(

@@ -86,6 +86,37 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     ref.read(flowEditorProvider.notifier).addNode(node);
   }
 
+  void _showLabelEditor(BuildContext ctx, FlowNode node) {
+    final ctrl = TextEditingController(text: node.label);
+    showDialog(
+      context: ctx,
+      builder: (_) => AlertDialog(
+        title: const Text('Edit node label'),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'Label'),
+          onSubmitted: (_) => Navigator.pop(ctx, ctrl.text),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, ctrl.text),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    ).then((result) {
+      if (result is String && result.isNotEmpty) {
+        ref.read(flowEditorProvider.notifier).updateNode(
+              node.copyWith(label: result),
+            );
+      }
+    });
+  }
+
   void _autoLayout() {
     final state = ref.read(flowEditorProvider);
     final nodes = List<FlowNode>.from(state.nodes);
@@ -261,33 +292,47 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                       nodes: editorState.nodes,
                       edges: editorState.edges,
                       selectedNodeId: editorState.selectedNodeId,
+                      selectedEdgeId: editorState.selectedEdgeId,
                       scale: editorState.scale,
                       offsetX: editorState.offsetX,
                       offsetY: editorState.offsetY,
                       onNodeTap: (node) {
                         if (node.id.isEmpty) {
-                          ref.read(flowEditorProvider.notifier).selectNode(null);
+                          ref
+                              .read(flowEditorProvider.notifier)
+                              .selectNode(null);
                         } else {
-                          ref.read(flowEditorProvider.notifier).selectNode(node.id);
+                          ref
+                              .read(flowEditorProvider.notifier)
+                              .selectNode(node.id);
                         }
                       },
-                      onNodeMoved: (node) {
-                        ref.read(flowEditorProvider.notifier).updateNodePosition(
-                              node.id,
-                              node.x,
-                              node.y,
-                            );
-                      },
-                      onEdgeCreate: (sourceId, targetId) {
+                      onEdgeTap: (edge) => ref
+                          .read(flowEditorProvider.notifier)
+                          .selectEdge(edge.id),
+                      onNodeMoved: (node) => ref
+                          .read(flowEditorProvider.notifier)
+                          .updateNodePosition(node.id, node.x, node.y),
+                      onEdgeCreate: (sourceId, targetId,
+                          {String? conditionLabel}) {
                         const uuid = Uuid();
                         ref.read(flowEditorProvider.notifier).addEdge(
                               FlowEdge(
                                 id: uuid.v4(),
                                 sourceNodeId: sourceId,
                                 targetNodeId: targetId,
+                                label: conditionLabel,
                               ),
                             );
                       },
+                      onEdgeDelete: (edgeId) => ref
+                          .read(flowEditorProvider.notifier)
+                          .deleteEdge(edgeId),
+                      onNodeDelete: (nodeId) => ref
+                          .read(flowEditorProvider.notifier)
+                          .deleteNode(nodeId),
+                      onNodeDoubleTap: (node) =>
+                          _showLabelEditor(context, node),
                       onScaleChanged: (s) =>
                           ref.read(flowEditorProvider.notifier).setScale(s),
                       onOffsetChanged: (dx, dy) => ref
@@ -307,6 +352,9 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                     offsetX: editorState.offsetX,
                     offsetY: editorState.offsetY,
                     viewportSize: _canvasSize,
+                    onTap: (dx, dy) => ref
+                        .read(flowEditorProvider.notifier)
+                        .setOffset(dx, dy),
                   ),
                 ).animate().fadeIn(delay: 500.ms),
 

@@ -1,16 +1,14 @@
-import 'dart:async';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../core/constants.dart';
 import '../../core/extensions.dart';
 import '../../models/ticket.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
@@ -29,43 +27,17 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
   final _messageController = TextEditingController();
   bool _sending = false;
   final _scrollController = ScrollController();
-  WebSocketChannel? _wsChannel;
-  StreamSubscription<dynamic>? _wsSub;
   String? _attachmentName;
 
   @override
   void initState() {
     super.initState();
-    _connectWebSocket();
-  }
-
-  void _connectWebSocket() {
-    try {
-      final uri = Uri.parse(
-        '${AppConstants.wsBaseUrl}${AppConstants.wsTickets}/${widget.ticketId}',
-      );
-      _wsChannel = WebSocketChannel.connect(uri);
-      _wsSub = _wsChannel!.stream.listen(
-        (_) {
-          // Refresh ticket messages on any incoming event
-          if (mounted) {
-            ref.invalidate(ticketDetailProvider(widget.ticketId));
-          }
-        },
-        onError: (_) {}, // silently ignore connection errors
-        cancelOnError: false,
-      );
-    } catch (_) {
-      // WebSocket unavailable — fall back to polling only
-    }
   }
 
   @override
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
-    _wsSub?.cancel();
-    _wsChannel?.sink.close();
     super.dispose();
   }
 
@@ -90,8 +62,6 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
       _messageController.clear();
       setState(() => _attachmentName = null);
       ref.invalidate(ticketDetailProvider(ticket.id));
-      // Notify via WebSocket
-      _wsChannel?.sink.add('{"type":"message","ticketId":"${ticket.id}"}');
     } finally {
       if (mounted) setState(() => _sending = false);
     }
@@ -122,6 +92,16 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen to global WS and refresh when a message arrives for this ticket
+    ref.listen(realtimeStreamProvider, (prev, next) {
+      next.whenData((msg) {
+        if (msg['type'] == 'ticket.message_sent' &&
+            msg['ticketId'] == widget.ticketId) {
+          ref.invalidate(ticketDetailProvider(widget.ticketId));
+        }
+      });
+    });
+
     final ticketAsync = ref.watch(ticketDetailProvider(widget.ticketId));
     final currentUser = ref.watch(currentUserProvider);
 

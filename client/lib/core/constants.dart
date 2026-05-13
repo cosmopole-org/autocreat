@@ -22,7 +22,7 @@ class AppConstants {
 
   // WebSocket
   static const String wsBaseUrl = 'wss://autocreat.vercel.app';
-  static const String wsTickets = '/ws/tickets';
+  static const String wsRealtimeEndpoint = '/api/v1/realtime/ws';
 
   // Storage keys
   static const String accessTokenKey = 'access_token';

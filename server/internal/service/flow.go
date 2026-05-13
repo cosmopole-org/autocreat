@@ -17,10 +17,11 @@ import (
 type FlowService struct {
 	repo *repository.FlowRepository
 	db   *gorm.DB
+	hub  *Hub
 }
 
-func NewFlowService(repo *repository.FlowRepository, db *gorm.DB) *FlowService {
-	return &FlowService{repo: repo, db: db}
+func NewFlowService(repo *repository.FlowRepository, db *gorm.DB, hub *Hub) *FlowService {
+	return &FlowService{repo: repo, db: db, hub: hub}
 }
 
 // ---------- Flow CRUD ----------
@@ -150,7 +151,7 @@ func (s *FlowService) DeleteEdge(ctx context.Context, edgeID uuid.UUID) error {
 // ---------- SaveGraph (atomic replace) ----------
 
 func (s *FlowService) SaveGraph(ctx context.Context, flowID uuid.UUID, req dto.SaveGraphRequest) error {
-	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("flow_id = ?", flowID).Delete(&models.FlowEdge{}).Error; err != nil {
 			return err
 		}
@@ -188,6 +189,12 @@ func (s *FlowService) SaveGraph(ctx context.Context, flowID uuid.UUID, req dto.S
 		}
 		return nil
 	})
+	if err == nil {
+		if flow, ferr := s.repo.FindByID(ctx, flowID); ferr == nil && flow != nil {
+			s.hub.BroadcastToCompany(flow.CompanyID, "flow.graph_saved", map[string]interface{}{"flowId": flowID})
+		}
+	}
+	return err
 }
 
 // ---------- Assignments ----------
@@ -242,6 +249,7 @@ func (s *FlowService) StartInstance(ctx context.Context, companyID, userID uuid.
 	if err := s.repo.CreateInstance(ctx, instance); err != nil {
 		return nil, err
 	}
+	s.hub.BroadcastToCompany(instance.CompanyID, "flow.instance_started", instance)
 
 	step := &models.FlowInstanceStep{
 		FlowInstanceID:   instance.ID,
@@ -303,7 +311,11 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 	if nextNodeID == nil {
 		instance.Status = models.InstanceStatusCompleted
 		instance.CurrentNodeID = nil
-		return instance, s.repo.UpdateInstance(ctx, instance)
+		if err := s.repo.UpdateInstance(ctx, instance); err != nil {
+			return nil, err
+		}
+		s.hub.BroadcastToCompany(instance.CompanyID, "flow.instance_advanced", instance)
+		return instance, nil
 	}
 
 	nextNode, err := s.repo.FindNodeByID(ctx, *nextNodeID)
@@ -318,6 +330,7 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 	if err := s.repo.UpdateInstance(ctx, instance); err != nil {
 		return nil, err
 	}
+	s.hub.BroadcastToCompany(instance.CompanyID, "flow.instance_advanced", instance)
 
 	if nextNode.NodeType != models.NodeTypeEnd {
 		newStep := &models.FlowInstanceStep{
@@ -378,7 +391,11 @@ func (s *FlowService) RejectInstance(ctx context.Context, instanceID uuid.UUID, 
 		instance.Status = models.InstanceStatusRejected
 	}
 
-	return instance, s.repo.UpdateInstance(ctx, instance)
+	if err := s.repo.UpdateInstance(ctx, instance); err != nil {
+		return nil, err
+	}
+	s.hub.BroadcastToCompany(instance.CompanyID, "flow.instance_rejected", instance)
+	return instance, nil
 }
 
 func (s *FlowService) GetMyTasks(ctx context.Context, companyID, roleID uuid.UUID) ([]models.FlowInstanceStep, error) {

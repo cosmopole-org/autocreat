@@ -13,10 +13,11 @@ import (
 
 type UserService struct {
 	repo *repository.UserRepository
+	hub  *Hub
 }
 
-func NewUserService(repo *repository.UserRepository) *UserService {
-	return &UserService{repo: repo}
+func NewUserService(repo *repository.UserRepository, hub *Hub) *UserService {
+	return &UserService{repo: repo, hub: hub}
 }
 
 func (s *UserService) Create(ctx context.Context, companyID uuid.UUID, req dto.CreateUserRequest) (*models.User, error) {
@@ -35,6 +36,9 @@ func (s *UserService) Create(ctx context.Context, companyID uuid.UUID, req dto.C
 	}
 	if err := s.repo.Create(ctx, user); err != nil {
 		return nil, err
+	}
+	if user.CompanyID != nil {
+		s.hub.BroadcastToCompany(*user.CompanyID, "user.created", ToUserResponse(user))
 	}
 	return user, nil
 }
@@ -67,11 +71,19 @@ func (s *UserService) Update(ctx context.Context, id uuid.UUID, req dto.UpdateUs
 	if err := s.repo.Update(ctx, user); err != nil {
 		return nil, err
 	}
+	if user.CompanyID != nil {
+		s.hub.BroadcastToCompany(*user.CompanyID, "user.updated", ToUserResponse(user))
+	}
 	return user, nil
 }
 
 func (s *UserService) Delete(ctx context.Context, id uuid.UUID) error {
-	return s.repo.Delete(ctx, id)
+	user, _ := s.repo.FindByID(ctx, id)
+	err := s.repo.Delete(ctx, id)
+	if err == nil && user != nil && user.CompanyID != nil {
+		s.hub.BroadcastToCompany(*user.CompanyID, "user.deleted", map[string]interface{}{"id": id})
+	}
+	return err
 }
 
 func ToUserResponse(u *models.User) dto.UserResponse {

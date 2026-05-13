@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/user.dart';
+import '../../providers/realtime_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
@@ -29,6 +30,15 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
   @override
   Widget build(BuildContext context) {
     final usersAsync = ref.watch(userNotifierProvider);
+
+    ref.listen(realtimeStreamProvider, (_, next) {
+      next.whenData((msg) {
+        final type = msg['type'] as String? ?? '';
+        if (type == 'user.created' || type == 'user.updated' || type == 'user.deleted') {
+          ref.invalidate(userNotifierProvider);
+        }
+      });
+    });
 
     return Scaffold(
       body: Column(

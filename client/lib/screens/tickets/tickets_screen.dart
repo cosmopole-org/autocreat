@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/ticket.dart';
+import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
@@ -59,6 +60,15 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
   @override
   Widget build(BuildContext context) {
     final ticketsAsync = ref.watch(ticketNotifierProvider);
+
+    ref.listen(realtimeStreamProvider, (_, next) {
+      next.whenData((msg) {
+        final type = msg['type'] as String? ?? '';
+        if (type == 'ticket.created' || type == 'ticket.status_updated') {
+          ref.invalidate(ticketNotifierProvider);
+        }
+      });
+    });
 
     return Scaffold(
       body: Column(

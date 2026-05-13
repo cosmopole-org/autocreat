@@ -8,9 +8,9 @@ import '../../core/constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/company_provider.dart';
 import '../../providers/flow_provider.dart';
+import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
 import '../../theme/app_colors.dart';
-import '../../widgets/common_widgets.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -21,6 +21,21 @@ class DashboardScreen extends ConsumerWidget {
     final companiesAsync = ref.watch(companiesProvider);
     final ticketsAsync = ref.watch(ticketsProvider(null));
     final flowsAsync = ref.watch(flowsProvider(null));
+
+    ref.listen(realtimeStreamProvider, (_, next) {
+      next.whenData((msg) {
+        final type = msg['type'] as String? ?? '';
+        if (type == 'ticket.created' || type == 'ticket.status_updated') {
+          ref.invalidate(ticketsProvider(null));
+        }
+        if (type == 'flow.instance_started') {
+          ref.invalidate(flowsProvider(null));
+        }
+        if (type == 'ticket.created' || type == 'ticket.status_updated' || type == 'flow.instance_started') {
+          ref.invalidate(companiesProvider);
+        }
+      });
+    });
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -110,7 +125,6 @@ class _WelcomeBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final hour = DateTime.now().hour;
     final greeting =
         hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';

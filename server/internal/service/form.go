@@ -14,10 +14,11 @@ import (
 
 type FormService struct {
 	repo *repository.FormRepository
+	hub  *Hub
 }
 
-func NewFormService(repo *repository.FormRepository) *FormService {
-	return &FormService{repo: repo}
+func NewFormService(repo *repository.FormRepository, hub *Hub) *FormService {
+	return &FormService{repo: repo, hub: hub}
 }
 
 func (s *FormService) Create(ctx context.Context, companyID uuid.UUID, req dto.CreateFormRequest) (*models.FormDefinition, error) {
@@ -34,6 +35,7 @@ func (s *FormService) Create(ctx context.Context, companyID uuid.UUID, req dto.C
 	if err := s.repo.Create(ctx, form); err != nil {
 		return nil, err
 	}
+	s.hub.BroadcastToCompany(form.CompanyID, "form.created", form)
 	return form, nil
 }
 
@@ -63,9 +65,18 @@ func (s *FormService) Update(ctx context.Context, id uuid.UUID, req dto.UpdateFo
 		}
 		form.Fields = datatypes.JSON(fields)
 	}
-	return form, s.repo.Update(ctx, form)
+	if err := s.repo.Update(ctx, form); err != nil {
+		return nil, err
+	}
+	s.hub.BroadcastToCompany(form.CompanyID, "form.updated", form)
+	return form, nil
 }
 
 func (s *FormService) Delete(ctx context.Context, id uuid.UUID) error {
-	return s.repo.Delete(ctx, id)
+	form, _ := s.repo.FindByID(ctx, id)
+	err := s.repo.Delete(ctx, id)
+	if err == nil && form != nil {
+		s.hub.BroadcastToCompany(form.CompanyID, "form.deleted", map[string]interface{}{"id": id})
+	}
+	return err
 }

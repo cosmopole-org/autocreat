@@ -83,3 +83,12 @@ final isAuthenticatedProvider = Provider<bool>((ref) {
 final currentUserProvider = Provider<User?>((ref) {
   return ref.watch(authProvider).valueOrNull;
 });
+
+// Provides the current access token as a String? (null when logged out).
+// Derived from authProvider so it updates when auth state changes.
+final authTokenProvider = FutureProvider<String?>((ref) async {
+  // Re-evaluate whenever auth state changes
+  ref.watch(authProvider);
+  final repo = ref.read(authRepositoryProvider);
+  return repo.getAccessToken();
+});

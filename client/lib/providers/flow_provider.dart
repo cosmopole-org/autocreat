@@ -42,7 +42,17 @@ class FlowEditorNotifier extends Notifier<FlowEditorState> {
   }
 
   void selectNode(String? nodeId) {
-    state = state.copyWith(selectedNodeId: nodeId);
+    state = state.copyWith(
+      selectedNodeId: nodeId,
+      clearSelectedEdge: true,
+    );
+  }
+
+  void selectEdge(String? edgeId) {
+    state = state.copyWith(
+      selectedEdgeId: edgeId,
+      clearSelectedNode: true,
+    );
   }
 
   void addNode(FlowNode node) {
@@ -89,6 +99,7 @@ class FlowEditorNotifier extends Notifier<FlowEditorState> {
     state = state.copyWith(
       edges: state.edges.where((e) => e.id != edgeId).toList(),
       isDirty: true,
+      clearSelectedEdge: true,
     );
   }
 
@@ -116,6 +127,7 @@ class FlowEditorState {
   final List<FlowNode> nodes;
   final List<FlowEdge> edges;
   final String? selectedNodeId;
+  final String? selectedEdgeId;
   final bool isDirty;
   final double scale;
   final double offsetX;
@@ -126,6 +138,7 @@ class FlowEditorState {
     required this.nodes,
     required this.edges,
     this.selectedNodeId,
+    this.selectedEdgeId,
     required this.isDirty,
     required this.scale,
     required this.offsetX,
@@ -146,11 +159,13 @@ class FlowEditorState {
     List<FlowNode>? nodes,
     List<FlowEdge>? edges,
     String? selectedNodeId,
+    String? selectedEdgeId,
     bool? isDirty,
     double? scale,
     double? offsetX,
     double? offsetY,
     bool clearSelectedNode = false,
+    bool clearSelectedEdge = false,
   }) {
     return FlowEditorState(
       flow: flow ?? this.flow,
@@ -158,6 +173,8 @@ class FlowEditorState {
       edges: edges ?? this.edges,
       selectedNodeId:
           clearSelectedNode ? null : (selectedNodeId ?? this.selectedNodeId),
+      selectedEdgeId:
+          clearSelectedEdge ? null : (selectedEdgeId ?? this.selectedEdgeId),
       isDirty: isDirty ?? this.isDirty,
       scale: scale ?? this.scale,
       offsetX: offsetX ?? this.offsetX,
