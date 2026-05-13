@@ -346,7 +346,7 @@ class _FlowsChart extends StatelessWidget {
     final typeMap = <String, int>{};
     for (final f in flows) {
       for (final n in f.nodes) {
-        final t = n.type;
+        final t = n.type.name;
         typeMap[t] = (typeMap[t] ?? 0) + 1;
       }
     }
