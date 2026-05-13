@@ -579,15 +579,16 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
 
     final data = widget.ticketsAsync.maybeWhen(
       data: (tickets) {
-        final open = tickets.where((t) => t.status.name == 'open').length;
+        final list = tickets as List<dynamic>;
+        final open = list.where((t) => t.status.name == 'open').length;
         final inProgress =
-            tickets.where((t) => t.status.name == 'inProgress').length;
+            list.where((t) => t.status.name == 'inProgress').length;
         final resolved =
-            tickets.where((t) => t.status.name == 'resolved').length;
-        final closed = tickets.where((t) => t.status.name == 'closed').length;
-        return [open, inProgress, resolved, closed];
+            list.where((t) => t.status.name == 'resolved').length;
+        final closed = list.where((t) => t.status.name == 'closed').length;
+        return <int>[open, inProgress, resolved, closed];
       },
-      orElse: () => [4, 3, 8, 2],
+      orElse: () => <int>[4, 3, 8, 2],
     );
 
     final labels = ['Open', 'In Progress', 'Resolved', 'Closed'];
@@ -597,7 +598,7 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
       AppColors.success,
       AppColors.lightTextSecondary,
     ];
-    final total = data.fold<int>(0, (a, b) => a + b);
+    final total = data.fold<int>(0, (int a, int b) => a + b);
 
     return _ChartCard(
       title: 'Ticket Status',
@@ -678,16 +679,20 @@ class _PriorityBarChart extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     final data = ticketsAsync.maybeWhen(
-      data: (tickets) => [
-        tickets.where((t) => t.priority.name == 'low').length.toDouble(),
-        tickets.where((t) => t.priority.name == 'medium').length.toDouble(),
-        tickets.where((t) => t.priority.name == 'high').length.toDouble(),
-        tickets.where((t) => t.priority.name == 'urgent').length.toDouble(),
-      ],
-      orElse: () => [3.0, 7.0, 5.0, 2.0],
+      data: (tickets) {
+        final list = tickets as List<dynamic>;
+        return <double>[
+          list.where((t) => t.priority.name == 'low').length.toDouble(),
+          list.where((t) => t.priority.name == 'medium').length.toDouble(),
+          list.where((t) => t.priority.name == 'high').length.toDouble(),
+          list.where((t) => t.priority.name == 'urgent').length.toDouble(),
+        ];
+      },
+      orElse: () => <double>[3.0, 7.0, 5.0, 2.0],
     );
 
-    final maxY = (data.reduce((a, b) => a > b ? a : b) + 2).clamp(4.0, 20.0);
+    final maxY = (data.reduce((double a, double b) => a > b ? a : b) + 2.0)
+        .clamp(4.0, 20.0);
 
     final colors = [
       AppColors.success,
