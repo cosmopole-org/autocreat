@@ -23,39 +23,37 @@ class AppCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        decoration: BoxDecoration(
-          color: color ?? (isDark ? AppColors.darkCard : AppColors.lightCard),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selected
-                ? AppColors.primary
-                : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
-            width: selected ? 2 : 1,
-          ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  )
-                ]
-              : null,
+    final bgColor = color ?? (isDark ? AppColors.darkCard : AppColors.lightCard);
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: selected
+              ? AppColors.primary
+              : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+          width: selected ? 2 : 1,
         ),
-        child: Material(
-          color: Colors.transparent,
+        boxShadow: [
+          BoxShadow(
+            color: selected
+                ? AppColors.primary.withOpacity(0.12)
+                : Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            blurRadius: selected ? 10 : 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(16),
-            child: Padding(
-              padding: padding ?? const EdgeInsets.all(16),
-              child: child,
-            ),
+          child: Padding(
+            padding: padding ?? const EdgeInsets.all(16),
+            child: child,
           ),
         ),
       ),
@@ -140,24 +138,38 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              width: 88,
+              height: 88,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.08),
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary.withOpacity(0.12),
+                    AppColors.primaryLight.withOpacity(0.06),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 shape: BoxShape.circle,
+                border: Border.all(
+                    color: AppColors.primary.withOpacity(0.15), width: 1.5),
               ),
-              child: Icon(icon, size: 48, color: AppColors.primary.withOpacity(0.6)),
+              child: Icon(icon, size: 40, color: AppColors.primary.withOpacity(0.65)),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
               title,
-              style: Theme.of(context).textTheme.titleLarge,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
             if (subtitle != null) ...[
@@ -165,17 +177,17 @@ class EmptyState extends StatelessWidget {
               Text(
                 subtitle!,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.lightTextSecondary,
+                      color: cs.onSurface.withOpacity(0.5),
                     ),
                 textAlign: TextAlign.center,
               ),
             ],
             if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               AppButton(label: actionLabel!, onPressed: onAction, icon: Icons.add),
             ],
           ],
-        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
+        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.08),
       ),
     );
   }

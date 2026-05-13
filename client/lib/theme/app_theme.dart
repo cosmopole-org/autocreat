@@ -43,6 +43,11 @@ class AppTheme {
         outlineVariant: AppColors.lightBorder.withOpacity(0.5),
       ),
       scaffoldBackgroundColor: AppColors.lightBg,
+      drawerTheme: const DrawerThemeData(
+        backgroundColor: AppColors.lightSurface,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+      ),
       textTheme: _buildTextTheme(base.textTheme, AppColors.lightText, AppColors.lightTextSecondary),
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.lightSurface,
@@ -244,6 +249,10 @@ class AppTheme {
         outlineVariant: AppColors.darkBorder.withOpacity(0.5),
       ),
       scaffoldBackgroundColor: AppColors.darkBg,
+      drawerTheme: const DrawerThemeData(
+        backgroundColor: AppColors.darkSurface,
+        elevation: 0,
+      ),
       textTheme: _buildTextTheme(base.textTheme, AppColors.darkText, AppColors.darkTextSecondary),
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.darkSurface,

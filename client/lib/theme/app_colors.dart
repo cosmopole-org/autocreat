@@ -1,52 +1,52 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary
-  static const Color primary = Color(0xFF3949AB);
-  static const Color primaryDark = Color(0xFF1A237E);
-  static const Color primaryLight = Color(0xFF5C6BC0);
-  static const Color primarySurface = Color(0xFFE8EAF6);
+  // Primary – Indigo/Violet
+  static const Color primary = Color(0xFF4F46E5);
+  static const Color primaryDark = Color(0xFF3730A3);
+  static const Color primaryLight = Color(0xFF6366F1);
+  static const Color primarySurface = Color(0xFFEEF2FF);
 
-  // Accent
-  static const Color accent = Color(0xFF00ACC1);
+  // Accent – Teal
+  static const Color accent = Color(0xFF0891B2);
 
   // Semantic
-  static const Color success = Color(0xFF43A047);
-  static const Color warning = Color(0xFFFB8C00);
-  static const Color error = Color(0xFFE53935);
-  static const Color info = Color(0xFF1E88E5);
+  static const Color success = Color(0xFF16A34A);
+  static const Color warning = Color(0xFFD97706);
+  static const Color error = Color(0xFFDC2626);
+  static const Color info = Color(0xFF2563EB);
 
   // Light theme
-  static const Color lightBg = Color(0xFFF8F9FF);
+  static const Color lightBg = Color(0xFFF5F7FF);
   static const Color lightSurface = Color(0xFFFFFFFF);
   static const Color lightCard = Color(0xFFFFFFFF);
-  static const Color lightBorder = Color(0xFFE2E8F0);
-  static const Color lightText = Color(0xFF1A202C);
-  static const Color lightTextSecondary = Color(0xFF718096);
-  static const Color lightTextHint = Color(0xFFA0AEC0);
+  static const Color lightBorder = Color(0xFFE4E4E7);
+  static const Color lightText = Color(0xFF18181B);
+  static const Color lightTextSecondary = Color(0xFF71717A);
+  static const Color lightTextHint = Color(0xFFA1A1AA);
 
   // Dark theme
-  static const Color darkBg = Color(0xFF0D1117);
-  static const Color darkSurface = Color(0xFF161B22);
-  static const Color darkCard = Color(0xFF1C2333);
-  static const Color darkBorder = Color(0xFF30363D);
-  static const Color darkText = Color(0xFFE6EDF3);
-  static const Color darkTextSecondary = Color(0xFF8B949E);
-  static const Color darkTextHint = Color(0xFF484F58);
+  static const Color darkBg = Color(0xFF09090B);
+  static const Color darkSurface = Color(0xFF18181B);
+  static const Color darkCard = Color(0xFF1C1C1F);
+  static const Color darkBorder = Color(0xFF27272A);
+  static const Color darkText = Color(0xFFFAFAFA);
+  static const Color darkTextSecondary = Color(0xFFA1A1AA);
+  static const Color darkTextHint = Color(0xFF52525B);
 
   // Node colors
-  static const Color nodeStart = Color(0xFF43A047);
-  static const Color nodeEnd = Color(0xFFE53935);
-  static const Color nodeStep = Color(0xFF3949AB);
-  static const Color nodeDecision = Color(0xFFFB8C00);
+  static const Color nodeStart = Color(0xFF16A34A);
+  static const Color nodeEnd = Color(0xFFDC2626);
+  static const Color nodeStep = Color(0xFF4F46E5);
+  static const Color nodeDecision = Color(0xFFD97706);
 
   // Chart colors
   static const List<Color> chartColors = [
-    Color(0xFF3949AB),
-    Color(0xFF00ACC1),
-    Color(0xFF43A047),
-    Color(0xFFFB8C00),
-    Color(0xFFE53935),
-    Color(0xFF8E24AA),
+    Color(0xFF4F46E5),
+    Color(0xFF0891B2),
+    Color(0xFF16A34A),
+    Color(0xFFD97706),
+    Color(0xFFDC2626),
+    Color(0xFF7C3AED),
   ];
 }
