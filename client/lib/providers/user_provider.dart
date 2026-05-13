@@ -36,7 +36,7 @@ class UserNotifier extends AsyncNotifier<List<User>> {
     return user;
   }
 
-  Future<User> update(String id, Map<String, dynamic> data) async {
+  Future<User> updateItem(String id, Map<String, dynamic> data) async {
     final user = await ref.read(userRepositoryProvider).updateUser(id, data);
     final current = state.valueOrNull ?? [];
     state =

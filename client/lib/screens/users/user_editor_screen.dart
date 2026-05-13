@@ -69,7 +69,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
       if (_user == null) {
         await ref.read(userNotifierProvider.notifier).create(data);
       } else {
-        await ref.read(userNotifierProvider.notifier).update(_user!.id, data);
+        await ref.read(userNotifierProvider.notifier).updateItem(_user!.id, data);
       }
       if (mounted) {
         context.go(AppRoutes.users);

@@ -37,7 +37,7 @@ class LetterNotifier extends AsyncNotifier<List<LetterTemplate>> {
     return letter;
   }
 
-  Future<LetterTemplate> update(String id, Map<String, dynamic> data) async {
+  Future<LetterTemplate> updateItem(String id, Map<String, dynamic> data) async {
     final letter =
         await ref.read(letterRepositoryProvider).updateLetter(id, data);
     final current = state.valueOrNull ?? [];

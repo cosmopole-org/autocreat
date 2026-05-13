@@ -322,7 +322,7 @@ class _ModelFieldRow extends StatelessWidget {
               if (field.required)
                 const Tooltip(
                   message: 'Required',
-                  child: Icon(Icons.asterisk, size: 12, color: AppColors.error),
+                  child: Icon(Icons.star, size: 12, color: AppColors.error),
                 ),
               if (field.unique)
                 const Tooltip(

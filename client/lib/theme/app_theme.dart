@@ -58,7 +58,7 @@ class AppTheme {
         actionsIconTheme: const IconThemeData(color: AppColors.lightTextSecondary),
         shape: const Border(bottom: BorderSide(color: AppColors.lightBorder, width: 1)),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: AppColors.lightCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -156,7 +156,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         behavior: SnackBarBehavior.floating,
       ),
-      dialogTheme: DialogThemeData(
+      dialogTheme: DialogTheme(
         backgroundColor: AppColors.lightSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 0,
@@ -205,7 +205,7 @@ class AppTheme {
         fillColor: WidgetStateProperty.resolveWith((s) =>
             s.contains(WidgetState.selected) ? AppColors.primary : AppColors.lightTextSecondary),
       ),
-      tabBarTheme: TabBarThemeData(
+      tabBarTheme: TabBarTheme(
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.lightTextSecondary,
         indicatorColor: AppColors.primary,
@@ -259,7 +259,7 @@ class AppTheme {
         actionsIconTheme: const IconThemeData(color: AppColors.darkTextSecondary),
         shape: const Border(bottom: BorderSide(color: AppColors.darkBorder, width: 1)),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: AppColors.darkCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -348,7 +348,7 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
-      dialogTheme: DialogThemeData(
+      dialogTheme: DialogTheme(
         backgroundColor: AppColors.darkCard,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 0,
@@ -399,7 +399,7 @@ class AppTheme {
         fillColor: WidgetStateProperty.resolveWith((s) =>
             s.contains(WidgetState.selected) ? AppColors.primaryLight : AppColors.darkTextSecondary),
       ),
-      tabBarTheme: TabBarThemeData(
+      tabBarTheme: TabBarTheme(
         labelColor: AppColors.primaryLight,
         unselectedLabelColor: AppColors.darkTextSecondary,
         indicatorColor: AppColors.primaryLight,

@@ -113,7 +113,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                         onSave: (data) async {
                           await ref
                               .read(companyNotifierProvider.notifier)
-                              .update(filtered[i].id, data);
+                              .updateItem(filtered[i].id, data);
                         },
                       ),
                     ),
