@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/demo_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -23,8 +24,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _errorMessage;
 
   static const _demoAccounts = [
+    {'email': 'demo@autocreat.io', 'password': 'Demo123!', 'label': 'Demo'},
     {'email': 'admin@demo.com', 'password': 'password123', 'label': 'Admin'},
-    {'email': 'owner@demo.com', 'password': 'password123', 'label': 'Owner'},
   ];
 
   @override
@@ -55,6 +56,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void _fillDemo(Map<String, String> account) {
     _emailController.text = account['email']!;
     _passwordController.text = account['password']!;
+  }
+
+  /// Activates client-side demo mode without a real network login.
+  ///
+  /// Sets [isDemoModeProvider] to `true` so the app uses local [DemoData]
+  /// throughout, then pre-fills the demo credentials and calls [_login].
+  /// If the backend happens to accept the demo credentials the normal auth
+  /// flow still works; if it rejects them the demo flag stays `true` and
+  /// the router can use that to redirect to the dashboard anyway.
+  void _enterDemoMode() {
+    ref.read(isDemoModeProvider.notifier).state = true;
+    _emailController.text = 'demo@autocreat.io';
+    _passwordController.text = 'Demo123!';
+    _login();
   }
 
   @override
@@ -254,13 +269,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           const SizedBox(height: 20),
 
+          // ── Try Demo Mode button ────────────────────────────────
+          _DemoModeButton(onPressed: _enterDemoMode)
+              .animate()
+              .fadeIn(delay: 580.ms, duration: 400.ms)
+              .slideY(begin: 0.1),
+          const SizedBox(height: 12),
+
           AppButton(
             label: 'Sign In',
             onPressed: _login,
             loading: _isLoading,
             icon: Icons.login,
             width: double.infinity,
-          ).animate().fadeIn(delay: 600.ms, duration: 400.ms).slideY(begin: 0.1),
+          ).animate().fadeIn(delay: 640.ms, duration: 400.ms).slideY(begin: 0.1),
           const SizedBox(height: 20),
 
           Row(
@@ -277,6 +299,105 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ],
           ).animate().fadeIn(delay: 700.ms, duration: 400.ms),
         ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DEMO MODE BUTTON
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A visually distinct card-style button that enters client-side demo mode.
+///
+/// Uses a gradient matching the app accent palette and a subtle "DEMO" badge
+/// to make it clear no account is needed.
+class _DemoModeButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _DemoModeButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF6C63FF), Color(0xFF48CAE4)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF6C63FF).withOpacity(0.35),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Eye icon
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.visibility_outlined,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Try Demo Mode',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.1,
+                    ),
+                  ),
+                  Text(
+                    'No account needed — explore with sample data',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // "DEMO" badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white38),
+              ),
+              child: const Text(
+                'DEMO',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

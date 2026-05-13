@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -80,6 +81,26 @@ func (h *Hub) BroadcastToCompany(companyID uuid.UUID, msgType string, payload in
 	}
 }
 
+// BroadcastToCompanyExcept sends to all clients in a company except the given clientID.
+func (h *Hub) BroadcastToCompanyExcept(companyID uuid.UUID, excludeClientID uuid.UUID, msgType string, payload interface{}) {
+	raw, err := json.Marshal(payload)
+	if err != nil {
+		return
+	}
+	msg := WSMessage{Type: msgType, Payload: raw}
+	data, _ := json.Marshal(msg)
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	for _, c := range h.clients {
+		if c.CompanyID == companyID && c.ID != excludeClientID {
+			select {
+			case c.Send <- data:
+			default:
+			}
+		}
+	}
+}
+
 // BroadcastToUser sends a message to a specific user (all their connections).
 func (h *Hub) BroadcastToUser(userID uuid.UUID, msgType string, payload interface{}) {
 	raw, err := json.Marshal(payload)
@@ -103,13 +124,28 @@ func (h *Hub) BroadcastToUser(userID uuid.UUID, msgType string, payload interfac
 
 // WritePump pumps messages from the hub to the WebSocket connection.
 func (h *Hub) WritePump(c *Client) {
+	ticker := time.NewTicker(30 * time.Second)
 	defer func() {
-		c.Conn.Close()
+		ticker.Stop()
+		_ = c.Conn.Close()
 	}()
-	for msg := range c.Send {
-		if err := c.Conn.WriteMessage(websocket.TextMessage, msg); err != nil {
-			h.log.Warn("ws write error", zap.Error(err))
-			return
+	for {
+		select {
+		case msg, ok := <-c.Send:
+			_ = c.Conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			if !ok {
+				_ = c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
+			if err := c.Conn.WriteMessage(websocket.TextMessage, msg); err != nil {
+				h.log.Warn("ws write error", zap.Error(err))
+				return
+			}
+		case <-ticker.C:
+			_ = c.Conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				return
+			}
 		}
 	}
 }
@@ -118,9 +154,16 @@ func (h *Hub) WritePump(c *Client) {
 func (h *Hub) ReadPump(c *Client) {
 	defer func() {
 		h.Unregister(c)
-		c.Conn.Close()
+		_ = c.Conn.Close()
 	}()
-	c.Conn.SetReadLimit(512 * 1024) // 512 KB
+	c.Conn.SetReadLimit(512 * 1024)
+	c.Conn.SetPongHandler(func(string) error {
+		return c.Conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+	})
+	if err := c.Conn.SetReadDeadline(time.Now().Add(60 * time.Second)); err != nil {
+		h.log.Warn("ws set read deadline error", zap.Error(err))
+		return
+	}
 	for {
 		_, _, err := c.Conn.ReadMessage()
 		if err != nil {
@@ -129,6 +172,5 @@ func (h *Hub) ReadPump(c *Client) {
 			}
 			break
 		}
-		// We don't process inbound messages for now; the server is push-only.
 	}
 }

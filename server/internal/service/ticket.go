@@ -13,10 +13,11 @@ import (
 
 type TicketService struct {
 	repo *repository.TicketRepository
+	hub  *Hub
 }
 
-func NewTicketService(repo *repository.TicketRepository) *TicketService {
-	return &TicketService{repo: repo}
+func NewTicketService(repo *repository.TicketRepository, hub *Hub) *TicketService {
+	return &TicketService{repo: repo, hub: hub}
 }
 
 func (s *TicketService) Create(ctx context.Context, companyID, creatorID uuid.UUID, req dto.CreateTicketRequest) (*models.Ticket, error) {
@@ -30,6 +31,9 @@ func (s *TicketService) Create(ctx context.Context, companyID, creatorID uuid.UU
 	}
 	if err := s.repo.Create(ctx, ticket); err != nil {
 		return nil, err
+	}
+	if ticket.CompanyID != uuid.Nil {
+		s.hub.BroadcastToCompany(ticket.CompanyID, "ticket.created", ticket)
 	}
 	return ticket, nil
 }
@@ -53,7 +57,11 @@ func (s *TicketService) UpdateStatus(ctx context.Context, id uuid.UUID, req dto.
 	default:
 		return nil, fmt.Errorf("invalid status: %s", req.Status)
 	}
-	return ticket, s.repo.Update(ctx, ticket)
+	if err := s.repo.Update(ctx, ticket); err != nil {
+		return nil, err
+	}
+	s.hub.BroadcastToCompany(ticket.CompanyID, "ticket.status_updated", ticket)
+	return ticket, nil
 }
 
 func (s *TicketService) SendMessage(ctx context.Context, ticketID, senderID uuid.UUID, req dto.SendTicketMessageRequest) (*models.TicketMessage, error) {
@@ -71,6 +79,9 @@ func (s *TicketService) SendMessage(ctx context.Context, ticketID, senderID uuid
 	}
 	if err := s.repo.CreateMessage(ctx, msg); err != nil {
 		return nil, err
+	}
+	if t, err2 := s.repo.FindByID(ctx, ticketID); err2 == nil {
+		s.hub.BroadcastToCompany(t.CompanyID, "ticket.message_sent", msg)
 	}
 	return msg, nil
 }

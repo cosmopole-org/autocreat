@@ -1,3 +1,4 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,6 +84,37 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
       y: 200 - state.offsetY / state.scale,
     );
     ref.read(flowEditorProvider.notifier).addNode(node);
+  }
+
+  void _showLabelEditor(BuildContext ctx, FlowNode node) {
+    final ctrl = TextEditingController(text: node.label);
+    showDialog(
+      context: ctx,
+      builder: (_) => AlertDialog(
+        title: const Text('Edit node label'),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'Label'),
+          onSubmitted: (_) => Navigator.pop(ctx, ctrl.text),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, ctrl.text),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    ).then((result) {
+      if (result is String && result.isNotEmpty) {
+        ref.read(flowEditorProvider.notifier).updateNode(
+              node.copyWith(label: result),
+            );
+      }
+    });
   }
 
   void _autoLayout() {
@@ -251,37 +283,56 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                   builder: (context, constraints) {
                     _canvasSize = Size(
                         constraints.maxWidth, constraints.maxHeight);
+                    if (editorState.nodes.isEmpty) {
+                      return _EmptyCanvasHint(
+                        onAddNode: () => _addNode(NodeType.start),
+                      );
+                    }
                     return GraphEditor(
                       nodes: editorState.nodes,
                       edges: editorState.edges,
                       selectedNodeId: editorState.selectedNodeId,
+                      selectedEdgeId: editorState.selectedEdgeId,
                       scale: editorState.scale,
                       offsetX: editorState.offsetX,
                       offsetY: editorState.offsetY,
                       onNodeTap: (node) {
                         if (node.id.isEmpty) {
-                          ref.read(flowEditorProvider.notifier).selectNode(null);
+                          ref
+                              .read(flowEditorProvider.notifier)
+                              .selectNode(null);
                         } else {
-                          ref.read(flowEditorProvider.notifier).selectNode(node.id);
+                          ref
+                              .read(flowEditorProvider.notifier)
+                              .selectNode(node.id);
                         }
                       },
-                      onNodeMoved: (node) {
-                        ref.read(flowEditorProvider.notifier).updateNodePosition(
-                              node.id,
-                              node.x,
-                              node.y,
-                            );
-                      },
-                      onEdgeCreate: (sourceId, targetId) {
+                      onEdgeTap: (edge) => ref
+                          .read(flowEditorProvider.notifier)
+                          .selectEdge(edge.id),
+                      onNodeMoved: (node) => ref
+                          .read(flowEditorProvider.notifier)
+                          .updateNodePosition(node.id, node.x, node.y),
+                      onEdgeCreate: (sourceId, targetId,
+                          {String? conditionLabel}) {
                         const uuid = Uuid();
                         ref.read(flowEditorProvider.notifier).addEdge(
                               FlowEdge(
                                 id: uuid.v4(),
                                 sourceNodeId: sourceId,
                                 targetNodeId: targetId,
+                                label: conditionLabel,
                               ),
                             );
                       },
+                      onEdgeDelete: (edgeId) => ref
+                          .read(flowEditorProvider.notifier)
+                          .deleteEdge(edgeId),
+                      onNodeDelete: (nodeId) => ref
+                          .read(flowEditorProvider.notifier)
+                          .deleteNode(nodeId),
+                      onNodeDoubleTap: (node) =>
+                          _showLabelEditor(context, node),
                       onScaleChanged: (s) =>
                           ref.read(flowEditorProvider.notifier).setScale(s),
                       onOffsetChanged: (dx, dy) => ref
@@ -301,6 +352,9 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                     offsetX: editorState.offsetX,
                     offsetY: editorState.offsetY,
                     viewportSize: _canvasSize,
+                    onTap: (dx, dy) => ref
+                        .read(flowEditorProvider.notifier)
+                        .setOffset(dx, dy),
                   ),
                 ).animate().fadeIn(delay: 500.ms),
 
@@ -347,6 +401,66 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
               ),
             ).animate().fadeIn(duration: 200.ms).slideX(begin: 0.1),
         ],
+      ),
+    );
+  }
+}
+
+class _EmptyCanvasHint extends StatelessWidget {
+  final VoidCallback onAddNode;
+
+  const _EmptyCanvasHint({required this.onAddNode});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Center(
+      child: DottedBorder(
+        borderType: BorderType.RRect,
+        radius: const Radius.circular(20),
+        dashPattern: const [8, 4],
+        color: AppColors.primary.withOpacity(0.4),
+        strokeWidth: 2,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
+            onTap: onAddNode,
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 60, vertical: 48),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.add_circle_outline,
+                    size: 56,
+                    color: AppColors.primary.withOpacity(0.45),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Start building your flow',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: isDark
+                              ? AppColors.darkText
+                              : AppColors.lightText,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Click here to add a Start node,\nor use the toolbar on the left.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.lightTextSecondary,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

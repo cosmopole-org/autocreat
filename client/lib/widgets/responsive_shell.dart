@@ -1,6 +1,5 @@
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/constants.dart';
@@ -429,7 +428,6 @@ class _FullSidebar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final user = ref.watch(currentUserProvider);
     final unread = ref.watch(unreadTicketCountProvider);
 
@@ -889,7 +887,6 @@ class _LogoutTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 4, 10, 12),
       child: Material(

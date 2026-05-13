@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shimmer/shimmer.dart';
@@ -457,35 +458,83 @@ class AvatarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = color ?? AppColors.primary.withOpacity(0.15);
+    final borderColor = color?.withOpacity(0.3) ?? AppColors.primary.withOpacity(0.2);
+
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: imageUrl!,
+        imageBuilder: (context, imageProvider) => Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: borderColor),
+            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+          ),
+        ),
+        placeholder: (context, url) => _InitialsAvatar(
+          initials: initials,
+          size: size,
+          bgColor: bgColor,
+          borderColor: borderColor,
+          textColor: color ?? AppColors.primary,
+        ),
+        errorWidget: (context, url, error) => _InitialsAvatar(
+          initials: initials,
+          size: size,
+          bgColor: bgColor,
+          borderColor: borderColor,
+          textColor: color ?? AppColors.primary,
+        ),
+      );
+    }
+
+    return _InitialsAvatar(
+      initials: initials,
+      size: size,
+      bgColor: bgColor,
+      borderColor: borderColor,
+      textColor: color ?? AppColors.primary,
+    );
+  }
+}
+
+class _InitialsAvatar extends StatelessWidget {
+  final String initials;
+  final double size;
+  final Color bgColor;
+  final Color borderColor;
+  final Color textColor;
+
+  const _InitialsAvatar({
+    required this.initials,
+    required this.size,
+    required this.bgColor,
+    required this.borderColor,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: color ?? AppColors.primary.withOpacity(0.15),
-        border: Border.all(
-          color: color?.withOpacity(0.3) ??
-              AppColors.primary.withOpacity(0.2),
-        ),
-        image: imageUrl != null
-            ? DecorationImage(
-                image: NetworkImage(imageUrl!),
-                fit: BoxFit.cover,
-              )
-            : null,
+        color: bgColor,
+        border: Border.all(color: borderColor),
       ),
-      child: imageUrl == null
-          ? Center(
-              child: Text(
-                initials,
-                style: TextStyle(
-                  fontSize: size * 0.35,
-                  fontWeight: FontWeight.w600,
-                  color: color ?? AppColors.primary,
-                ),
-              ),
-            )
-          : null,
+      child: Center(
+        child: Text(
+          initials,
+          style: TextStyle(
+            fontSize: size * 0.35,
+            fontWeight: FontWeight.w600,
+            color: textColor,
+          ),
+        ),
+      ),
     );
   }
 }

@@ -14,6 +14,7 @@ const (
 	ContextCompanyID = "companyID"
 	ContextRoleID    = "roleID"
 	ContextClaims    = "claims"
+	ContextIsDemo    = "isDemo"
 )
 
 // Auth validates the Bearer JWT in the Authorization header.
@@ -40,6 +41,7 @@ func Auth(authSvc *service.AuthService) gin.HandlerFunc {
 		c.Set(ContextClaims, claims)
 		c.Set(ContextUserID, claims.UserID)
 		c.Set(ContextEmail, claims.Email)
+		c.Set(ContextIsDemo, claims.IsDemo)
 		if claims.CompanyID != nil {
 			c.Set(ContextCompanyID, *claims.CompanyID)
 		}

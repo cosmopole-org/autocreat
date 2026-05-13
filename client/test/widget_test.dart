@@ -1,0 +1,18 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:autocreat/main.dart';
+
+void main() {
+  testWidgets('AutoCreat app smoke test', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(
+      ProviderScope(
+        child: const AutoCreatApp(),
+      ),
+    );
+    expect(find.byType(MaterialApp), findsOneWidget);
+  });
+}

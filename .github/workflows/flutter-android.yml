@@ -10,6 +10,7 @@ on:
     branches: [main, master]
     paths:
       - 'client/**'
+      - '.github/workflows/flutter-android.yml'
   workflow_dispatch:
     inputs:
       release_type:
@@ -43,13 +44,17 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Ensure Android platform files exist
+        working-directory: client
+        run: flutter create --platforms=android --org io.autocreat --no-pub .
+
       - name: Get Flutter dependencies
         working-directory: client
         run: flutter pub get
 
       - name: Run Flutter code generation
         working-directory: client
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Set up signing keystore (release only)
         if: github.event.inputs.release_type == 'release' || github.event_name == 'push'

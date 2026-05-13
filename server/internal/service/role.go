@@ -14,10 +14,11 @@ import (
 
 type RoleService struct {
 	repo *repository.RoleRepository
+	hub  *Hub
 }
 
-func NewRoleService(repo *repository.RoleRepository) *RoleService {
-	return &RoleService{repo: repo}
+func NewRoleService(repo *repository.RoleRepository, hub *Hub) *RoleService {
+	return &RoleService{repo: repo, hub: hub}
 }
 
 func (s *RoleService) Create(ctx context.Context, companyID uuid.UUID, req dto.CreateRoleRequest) (*models.Role, error) {
@@ -35,6 +36,7 @@ func (s *RoleService) Create(ctx context.Context, companyID uuid.UUID, req dto.C
 	if err := s.repo.Create(ctx, role); err != nil {
 		return nil, err
 	}
+	s.hub.BroadcastToCompany(role.CompanyID, "role.created", role)
 	return role, nil
 }
 
@@ -70,9 +72,15 @@ func (s *RoleService) Update(ctx context.Context, id uuid.UUID, req dto.UpdateRo
 	if err := s.repo.Update(ctx, role); err != nil {
 		return nil, err
 	}
+	s.hub.BroadcastToCompany(role.CompanyID, "role.updated", role)
 	return role, nil
 }
 
 func (s *RoleService) Delete(ctx context.Context, id uuid.UUID) error {
-	return s.repo.Delete(ctx, id)
+	role, _ := s.repo.FindByID(ctx, id)
+	err := s.repo.Delete(ctx, id)
+	if err == nil && role != nil {
+		s.hub.BroadcastToCompany(role.CompanyID, "role.deleted", map[string]interface{}{"id": id})
+	}
+	return err
 }
