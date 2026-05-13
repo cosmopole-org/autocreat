@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/constants.dart';
 import '../providers/auth_provider.dart';
+import '../providers/demo_provider.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/companies/companies_screen.dart';
@@ -24,12 +25,27 @@ import '../screens/users/user_editor_screen.dart';
 import '../screens/users/users_screen.dart';
 import '../widgets/responsive_shell.dart';
 
+// Notifies GoRouter to re-evaluate its redirect whenever auth or demo state
+// changes, without recreating the GoRouter instance itself.
+class _RouterNotifier extends ChangeNotifier {
+  _RouterNotifier(Ref ref) {
+    ref.listen<AsyncValue<dynamic>>(authProvider, (_, __) => notifyListeners());
+    ref.listen<bool>(isDemoModeProvider, (_, __) => notifyListeners());
+  }
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
+  final notifier = _RouterNotifier(ref);
+  ref.onDispose(notifier.dispose);
 
   return GoRouter(
     initialLocation: AppRoutes.dashboard,
+    refreshListenable: notifier,
     redirect: (context, state) {
+      // Read current state at redirect time — not captured at router creation.
+      final authState = ref.read(authProvider);
+      final isDemoMode = ref.read(isDemoModeProvider);
+
       final isAuthenticated = authState.maybeWhen(
         data: (user) => user != null,
         orElse: () => false,
@@ -41,10 +57,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuthRoute = state.matchedLocation == AppRoutes.login ||
           state.matchedLocation == AppRoutes.register;
 
-      if (!isAuthenticated && !isAuthRoute) {
+      if (!isAuthenticated && !isDemoMode && !isAuthRoute) {
         return AppRoutes.login;
       }
-      if (isAuthenticated && isAuthRoute) {
+      if ((isAuthenticated || isDemoMode) && isAuthRoute) {
         return AppRoutes.dashboard;
       }
       return null;
