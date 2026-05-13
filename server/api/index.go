@@ -1,49 +1,25 @@
 // Package api provides the Vercel serverless handler entry point.
-// It sets up the same Gin engine as the standalone server but exports it
-// as a plain http.HandlerFunc for the @vercel/go runtime.
 package api
 
 import (
 	"net/http"
 
-	"github.com/autocreat/server/internal/app"
-	"github.com/autocreat/server/internal/config"
-	"github.com/autocreat/server/internal/database"
+	"github.com/autocreat/server/pkg/bootstrap"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 )
 
-var (
-	ginApp *app.App
-	initDB *gorm.DB
-)
+var ginHandler http.Handler
 
 func init() {
 	log, _ := zap.NewProduction()
-
-	cfg, err := config.Load()
+	h, err := bootstrap.NewHandler(log)
 	if err != nil {
-		log.Fatal("config load failed", zap.Error(err))
+		log.Fatal("bootstrap failed", zap.Error(err))
 	}
-
-	db, err := database.Connect(cfg.DatabaseURL, log)
-	if err != nil {
-		log.Fatal("db connect failed", zap.Error(err))
-	}
-	if err := database.Migrate(db); err != nil {
-		log.Fatal("db migrate failed", zap.Error(err))
-	}
-	initDB = db
-
-	rdb, err := database.NewRedisClient(cfg.RedisURL, log)
-	if err != nil {
-		log.Warn("redis not available, caching disabled", zap.Error(err))
-	}
-
-	ginApp = app.New(cfg, db, rdb, log)
+	ginHandler = h
 }
 
 // Handler is the Vercel serverless entry point.
 func Handler(w http.ResponseWriter, r *http.Request) {
-	ginApp.Engine.ServeHTTP(w, r)
+	ginHandler.ServeHTTP(w, r)
 }
