@@ -10,7 +10,13 @@ final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   final storage = ref.watch(secureStorageProvider);
-  return ApiClient(storage: storage);
+  return ApiClient(
+    storage: storage,
+    // When the interceptor can't refresh an expired token it clears storage
+    // and calls this callback, which propagates the logout into Riverpod state
+    // so the router redirects to the login page.
+    onUnauthorized: () => ref.read(authProvider.notifier).forceLogout(),
+  );
 });
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -68,6 +74,26 @@ class AuthNotifier extends AsyncNotifier<User?> {
     final repo = ref.read(authRepositoryProvider);
     await repo.logout();
     state = const AsyncValue.data(null);
+  }
+
+  /// Called by the API interceptor when token refresh fails so the app
+  /// transitions to the logged-out state without an explicit user action.
+  void forceLogout() {
+    state = const AsyncValue.data(null);
+  }
+
+  /// Sets a synthetic demo user as the current session without any network
+  /// call, used exclusively by client-side demo mode.
+  void loginAsDemoUser() {
+    state = const AsyncValue.data(
+      User(
+        id: 'demo',
+        email: 'demo@autocreat.io',
+        firstName: 'Demo',
+        lastName: 'User',
+        role: 'owner',
+      ),
+    );
   }
 }
 

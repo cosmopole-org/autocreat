@@ -58,18 +58,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _passwordController.text = account['password']!;
   }
 
-  /// Activates client-side demo mode without a real network login.
+  /// Activates client-side demo mode without any network call.
   ///
-  /// Sets [isDemoModeProvider] to `true` so the app uses local [DemoData]
-  /// throughout, then pre-fills the demo credentials and calls [_login].
-  /// If the backend happens to accept the demo credentials the normal auth
-  /// flow still works; if it rejects them the demo flag stays `true` and
-  /// the router can use that to redirect to the dashboard anyway.
+  /// Sets [isDemoModeProvider] to `true` and injects a synthetic demo user
+  /// into [authProvider].  The router sees both flags and redirects straight
+  /// to the dashboard, skipping the real login flow entirely.
   void _enterDemoMode() {
     ref.read(isDemoModeProvider.notifier).state = true;
-    _emailController.text = 'demo@autocreat.io';
-    _passwordController.text = 'Demo123!';
-    _login();
+    ref.read(authProvider.notifier).loginAsDemoUser();
   }
 
   @override

@@ -6,7 +6,7 @@ class ApiClient {
   late final Dio _dio;
   final FlutterSecureStorage _storage;
 
-  ApiClient({FlutterSecureStorage? storage})
+  ApiClient({FlutterSecureStorage? storage, void Function()? onUnauthorized})
       : _storage = storage ?? const FlutterSecureStorage() {
     _dio = Dio(
       BaseOptions(
@@ -21,7 +21,7 @@ class ApiClient {
     );
 
     _dio.interceptors.addAll([
-      _AuthInterceptor(_storage, _dio),
+      _AuthInterceptor(_storage, _dio, onUnauthorized),
       LogInterceptor(
         requestBody: true,
         responseBody: true,
@@ -102,8 +102,9 @@ class ApiClient {
 class _AuthInterceptor extends Interceptor {
   final FlutterSecureStorage _storage;
   final Dio _dio;
+  final void Function()? _onUnauthorized;
 
-  _AuthInterceptor(this._storage, this._dio);
+  _AuthInterceptor(this._storage, this._dio, this._onUnauthorized);
 
   @override
   Future<void> onRequest(
@@ -119,29 +120,43 @@ class _AuthInterceptor extends Interceptor {
   Future<void> onError(
       DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      try {
-        final refreshToken =
-            await _storage.read(key: AppConstants.refreshTokenKey);
-        if (refreshToken == null) {
-          handler.next(err);
+      // Guard: if the failed request was itself the refresh call, don't retry —
+      // that would create an infinite 401 loop.
+      final isRefreshRequest =
+          err.requestOptions.path.contains(AppConstants.refreshEndpoint);
+
+      if (!isRefreshRequest) {
+        try {
+          final refreshToken =
+              await _storage.read(key: AppConstants.refreshTokenKey);
+          if (refreshToken == null) {
+            await _storage.deleteAll();
+            _onUnauthorized?.call();
+            handler.next(err);
+            return;
+          }
+
+          final response = await _dio.post(
+            AppConstants.refreshEndpoint,
+            data: {'refresh_token': refreshToken},
+          );
+
+          final newToken = response.data['access_token'];
+          await _storage.write(
+              key: AppConstants.accessTokenKey, value: newToken);
+
+          err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+          final retryResponse = await _dio.fetch(err.requestOptions);
+          handler.resolve(retryResponse);
           return;
+        } catch (_) {
+          await _storage.deleteAll();
+          _onUnauthorized?.call();
         }
-
-        final response = await _dio.post(
-          AppConstants.refreshEndpoint,
-          data: {'refresh_token': refreshToken},
-        );
-
-        final newToken = response.data['access_token'];
-        await _storage.write(
-            key: AppConstants.accessTokenKey, value: newToken);
-
-        err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-        final retryResponse = await _dio.fetch(err.requestOptions);
-        handler.resolve(retryResponse);
-        return;
-      } catch (_) {
+      } else {
+        // Refresh token itself is rejected — clear credentials and notify.
         await _storage.deleteAll();
+        _onUnauthorized?.call();
       }
     }
     handler.next(err);
