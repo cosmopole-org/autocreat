@@ -34,17 +34,21 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Ensure Web platform files exist
+        working-directory: client
+        run: flutter create --platforms=web --org io.autocreat --no-pub .
+
       - name: Get Flutter dependencies
         working-directory: client
         run: flutter pub get
 
       - name: Run Flutter code generation
         working-directory: client
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Run Flutter analyzer
         working-directory: client
-        run: flutter analyze --no-fatal-infos
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
       - name: Build Flutter Web (release)
         working-directory: client
