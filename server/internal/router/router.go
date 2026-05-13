@@ -83,6 +83,10 @@ func New(opts Options) *gin.Engine {
 		companies.DELETE("/:id/members/:userId", opts.CompanyHandler.RemoveMember)
 	}
 
+	// Apply demo interceptor to the top-level authenticated group so both
+	// /companies and /companies/:cid/... endpoints support demo mode.
+	authed.Use(middleware.DemoMode())
+
 	// Company-scoped resources (all under /companies/:cid/...)
 	cid := authed.Group("/companies/:cid")
 	cid.Use(middleware.CompanyContext())

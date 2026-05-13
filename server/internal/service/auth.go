@@ -16,12 +16,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// DemoUserID and DemoCompanyID are the well-known identifiers for demo mode.
+var (
+	DemoUserID    = uuid.MustParse("d0e1f2a3-b4c5-d6e7-f8a9-b0c1d2e3f4a5")
+	DemoCompanyID = uuid.MustParse("a1b2c3d4-e5f6-7890-abcd-ef1234567890")
+)
+
 // Claims is the JWT payload stored in access tokens.
 type Claims struct {
 	UserID    uuid.UUID  `json:"user_id"`
 	Email     string     `json:"email"`
 	CompanyID *uuid.UUID `json:"company_id,omitempty"`
 	RoleID    *uuid.UUID `json:"role_id,omitempty"`
+	IsDemo    bool       `json:"is_demo,omitempty"`
 	jwt.RegisteredClaims
 }
 
@@ -55,6 +62,11 @@ func (s *AuthService) Register(ctx context.Context, req dto.RegisterRequest) (*d
 }
 
 func (s *AuthService) Login(ctx context.Context, req dto.LoginRequest) (*dto.AuthResponse, error) {
+	// Demo mode: special credentials bypass DB lookup.
+	if req.Email == "demo@autocreat.io" && req.Password == "Demo123!" {
+		return s.buildDemoAuthResponse(ctx)
+	}
+
 	user, err := s.repo.FindUserByEmail(ctx, req.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -143,6 +155,52 @@ func (s *AuthService) ValidateAccessToken(tokenStr string) (*Claims, error) {
 }
 
 // ---------- helpers ----------
+
+func (s *AuthService) buildDemoAuthResponse(ctx context.Context) (*dto.AuthResponse, error) {
+	cid := DemoCompanyID
+	now := time.Now()
+	accessClaims := &Claims{
+		UserID:    DemoUserID,
+		Email:     "demo@autocreat.io",
+		CompanyID: &cid,
+		IsDemo:    true,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   DemoUserID.String(),
+			IssuedAt:  jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(365 * 24 * time.Hour)),
+		},
+	}
+	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims).SignedString([]byte(s.cfg.JWTSecret))
+	if err != nil {
+		return nil, fmt.Errorf("sign demo access token: %w", err)
+	}
+	// Demo refresh token never stored in DB.
+	refreshClaims := jwt.RegisteredClaims{
+		Subject:   DemoUserID.String(),
+		IssuedAt:  jwt.NewNumericDate(now),
+		ExpiresAt: jwt.NewNumericDate(now.Add(365 * 24 * time.Hour)),
+	}
+	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(s.cfg.JWTRefreshSecret))
+	if err != nil {
+		return nil, fmt.Errorf("sign demo refresh token: %w", err)
+	}
+	return &dto.AuthResponse{
+		User: dto.UserResponse{
+			ID:        DemoUserID,
+			Email:     "demo@autocreat.io",
+			FullName:  "Demo User",
+			CompanyID: &cid,
+			IsActive:  true,
+			IsOwner:   true,
+		},
+		Tokens: dto.TokenPair{
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+			TokenType:    "Bearer",
+			ExpiresIn:    int64((365 * 24 * time.Hour).Seconds()),
+		},
+	}, nil
+}
 
 func (s *AuthService) buildAuthResponse(ctx context.Context, user *models.User) (*dto.AuthResponse, error) {
 	pair, err := s.issuePair(ctx, user)

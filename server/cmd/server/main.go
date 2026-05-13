@@ -17,6 +17,7 @@ import (
 	"go.uber.org/zap"
 )
 
+
 func main() {
 	// Logger
 	log, err := zap.NewProduction()
@@ -43,6 +44,13 @@ func main() {
 	if err != nil {
 		log.Warn("redis not available, caching disabled", zap.Error(err))
 		rdb = nil
+	}
+
+	// Seed database when SEED_DB=true (idempotent)
+	if os.Getenv("SEED_DB") == "true" {
+		if err := database.SeedDatabase(db, log); err != nil {
+			log.Warn("seed database failed", zap.Error(err))
+		}
 	}
 
 	// Wire application
