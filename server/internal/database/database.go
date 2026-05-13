@@ -64,14 +64,9 @@ func Connect(dsn string, log *zap.Logger) (*gorm.DB, error) {
 		return nil, fmt.Errorf("could not connect to database after retries: %w", err)
 	}
 
-	sqlDB, err := db.DB()
-	if err != nil {
+	if _, err := db.DB(); err != nil {
 		return nil, fmt.Errorf("could not get underlying sql.DB: %w", err)
 	}
-
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	log.Info("database connected")
 	return db, nil
