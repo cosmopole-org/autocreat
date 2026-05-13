@@ -2,6 +2,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/autocreat/server/pkg/bootstrap"
@@ -14,7 +15,14 @@ func init() {
 	log, _ := zap.NewProduction()
 	h, err := bootstrap.NewHandler(log)
 	if err != nil {
-		log.Fatal("bootstrap failed", zap.Error(err))
+		log.Error("bootstrap failed", zap.Error(err))
+		errMsg := fmt.Sprintf(`{"error":"service unavailable","detail":%q}`, err.Error())
+		ginHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_, _ = w.Write([]byte(errMsg))
+		})
+		return
 	}
 	ginHandler = h
 }

@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String baseUrl = 'http://localhost:8080';
+  static const String baseUrl = 'https://autocreat.vercel.app';
   static const String apiPrefix = '/api/v1';
   static const String fullBaseUrl = baseUrl + apiPrefix;
 
@@ -21,7 +21,7 @@ class AppConstants {
   static const String ticketsEndpoint = '/tickets';
 
   // WebSocket
-  static const String wsBaseUrl = 'ws://localhost:8080';
+  static const String wsBaseUrl = 'wss://autocreat.vercel.app';
   static const String wsTickets = '/ws/tickets';
 
   // Storage keys

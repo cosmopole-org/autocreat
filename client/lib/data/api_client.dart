@@ -129,10 +129,10 @@ class _AuthInterceptor extends Interceptor {
 
         final response = await _dio.post(
           AppConstants.refreshEndpoint,
-          data: {'refreshToken': refreshToken},
+          data: {'refresh_token': refreshToken},
         );
 
-        final newToken = response.data['accessToken'];
+        final newToken = response.data['access_token'];
         await _storage.write(
             key: AppConstants.accessTokenKey, value: newToken);
 
