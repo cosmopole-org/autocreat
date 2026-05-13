@@ -71,7 +71,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
       if (_role == null) {
         await ref.read(roleNotifierProvider.notifier).create(data);
       } else {
-        await ref.read(roleNotifierProvider.notifier).update(_role!.id, data);
+        await ref.read(roleNotifierProvider.notifier).updateItem(_role!.id, data);
       }
       if (mounted) {
         context.go(AppRoutes.roles);

@@ -36,7 +36,7 @@ class RoleNotifier extends AsyncNotifier<List<Role>> {
     return role;
   }
 
-  Future<Role> update(String id, Map<String, dynamic> data) async {
+  Future<Role> updateItem(String id, Map<String, dynamic> data) async {
     final role = await ref.read(roleRepositoryProvider).updateRole(id, data);
     final current = state.valueOrNull ?? [];
     state = AsyncValue.data(

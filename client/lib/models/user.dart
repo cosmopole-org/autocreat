@@ -52,7 +52,6 @@ class LoginRequest with _$LoginRequest {
   }) = _LoginRequest;
 
   factory LoginRequest.fromJson(Map<String, dynamic> json) => _$LoginRequestFromJson(json);
-  Map<String, dynamic> toJson() => _$LoginRequestToJson(this);
 }
 
 @freezed
@@ -67,5 +66,4 @@ class RegisterRequest with _$RegisterRequest {
   }) = _RegisterRequest;
 
   factory RegisterRequest.fromJson(Map<String, dynamic> json) => _$RegisterRequestFromJson(json);
-  Map<String, dynamic> toJson() => _$RegisterRequestToJson(this);
 }

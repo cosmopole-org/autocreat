@@ -22,6 +22,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
   final _nameController = TextEditingController();
   final _descController = TextEditingController();
   final _focusNode = FocusNode();
+  final _scrollController = ScrollController();
   bool _loading = true;
   bool _saving = false;
   String? _letterId;
@@ -106,6 +107,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     _nameController.dispose();
     _descController.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -163,7 +165,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
             ),
             child: QuillSimpleToolbar(
               controller: _quillController,
-              config: QuillSimpleToolbarConfig(
+              configurations: QuillSimpleToolbarConfigurations(
                 showFontSize: true,
                 showBoldButton: true,
                 showItalicButton: true,
@@ -177,7 +179,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                 showAlignmentButtons: true,
                 showIndent: true,
                 showLink: true,
-                multiRowsToolbar: false,
+                multiRowsDisplay: false,
               ),
             ),
           ),
@@ -201,7 +203,8 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                   child: QuillEditor(
                     controller: _quillController,
                     focusNode: _focusNode,
-                    config: QuillEditorConfig(
+                    scrollController: _scrollController,
+                    configurations: const QuillEditorConfigurations(
                       placeholder: 'Start writing your letter template...',
                       padding: EdgeInsets.zero,
                       autoFocus: false,

@@ -50,7 +50,7 @@ class CompanyNotifier extends AsyncNotifier<List<Company>> {
     return company;
   }
 
-  Future<Company> update(String id, Map<String, dynamic> data) async {
+  Future<Company> updateItem(String id, Map<String, dynamic> data) async {
     final company =
         await ref.read(companyRepositoryProvider).updateCompany(id, data);
     final current = state.valueOrNull ?? [];
