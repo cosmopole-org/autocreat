@@ -3,13 +3,11 @@ name: Flutter Web - Build & Deploy to GitHub Pages
 on:
   push:
     branches: [main, master]
-    paths:
-      - 'client/**'
-      - '.github/workflows/flutter-web.yml'
   pull_request:
     branches: [main, master]
     paths:
       - 'client/**'
+      - '.github/workflows/flutter-web.yml'
   workflow_dispatch:
 
 permissions:
@@ -18,7 +16,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "pages-${{ github.event_name == 'push' && 'deploy' || github.ref }}"
   cancel-in-progress: false
 
 jobs:
@@ -54,8 +52,6 @@ jobs:
           flutter build web \
             --release \
             --base-href "/autocreat/" \
-            --web-renderer canvaskit \
-            --dart-define=FLUTTER_WEB_USE_SKIA=true \
             --dart-define=API_BASE_URL=${{ vars.API_BASE_URL || 'https://autocreat-api.vercel.app' }}
 
       - name: Upload Pages artifact
