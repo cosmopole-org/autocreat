@@ -94,15 +94,6 @@ final _navItems = [
   ),
 ];
 
-// Bottom nav shows first 5 items (most used)
-final _bottomNavItems = [
-  _navItems[0], // Dashboard
-  _navItems[1], // Companies
-  _navItems[4], // Flows
-  _navItems[7], // Letters
-  _navItems[8], // Tickets
-];
-
 class ResponsiveShell extends ConsumerStatefulWidget {
   final Widget child;
 
@@ -140,18 +131,6 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
     context.go(_navItems[index].route);
   }
 
-  void _navigateBottomNav(int index) {
-    final item = _bottomNavItems[index];
-    final navIndex = _navItems.indexOf(item);
-    _navigate(navIndex);
-  }
-
-  int get _bottomNavIndex {
-    final current = _navItems[_selectedIndex];
-    final idx = _bottomNavItems.indexOf(current);
-    return idx < 0 ? 0 : idx;
-  }
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -168,8 +147,6 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
   }
 
   Widget _buildMobileLayout() {
-    final unread = ref.watch(unreadTicketCountProvider);
-
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -185,11 +162,6 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
         },
       ),
       body: widget.child,
-      bottomNavigationBar: _ModernBottomNav(
-        selectedIndex: _bottomNavIndex,
-        unread: unread,
-        onNavigate: _navigateBottomNav,
-      ),
     );
   }
 
@@ -920,103 +892,3 @@ class _LogoutTile extends StatelessWidget {
   }
 }
 
-// ────────────────────────────────────────────────────────────────
-// MODERN BOTTOM NAV (mobile)
-// ────────────────────────────────────────────────────────────────
-
-class _ModernBottomNav extends StatelessWidget {
-  final int selectedIndex;
-  final int unread;
-  final ValueChanged<int> onNavigate;
-
-  const _ModernBottomNav({
-    required this.selectedIndex,
-    required this.unread,
-    required this.onNavigate,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: cs.surface,
-        border: Border(top: BorderSide(color: cs.outline.withOpacity(0.3))),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 60,
-          child: Row(
-            children: List.generate(_bottomNavItems.length, (i) {
-              final item = _bottomNavItems[i];
-              final selected = selectedIndex == i;
-              final hasBadge = item.hasBadge && unread > 0;
-
-              return Expanded(
-                child: InkWell(
-                  onTap: () => onNavigate(i),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      badges.Badge(
-                        showBadge: hasBadge,
-                        badgeStyle: const badges.BadgeStyle(
-                          badgeColor: AppColors.error,
-                          padding: EdgeInsets.all(3),
-                        ),
-                        badgeContent: Text(
-                          unread > 9 ? '9+' : unread.toString(),
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 8),
-                        ),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: selected
-                                ? AppColors.primary.withOpacity(0.12)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            selected ? item.selectedIcon : item.icon,
-                            size: 22,
-                            color: selected
-                                ? AppColors.primary
-                                : cs.onSurface.withOpacity(0.45),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item.label,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: selected
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                          color: selected
-                              ? AppColors.primary
-                              : cs.onSurface.withOpacity(0.45),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ),
-    );
-  }
-}

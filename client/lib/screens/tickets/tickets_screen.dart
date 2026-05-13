@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,11 +39,16 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
 
   TicketStatus? get _selectedStatus {
     switch (_tabController.index) {
-      case 1: return TicketStatus.open;
-      case 2: return TicketStatus.inProgress;
-      case 3: return TicketStatus.resolved;
-      case 4: return TicketStatus.closed;
-      default: return null;
+      case 1:
+        return TicketStatus.open;
+      case 2:
+        return TicketStatus.inProgress;
+      case 3:
+        return TicketStatus.resolved;
+      case 4:
+        return TicketStatus.closed;
+      default:
+        return null;
     }
   }
 
@@ -71,80 +77,425 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
     });
 
     return Scaffold(
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SearchField(
-                    controller: _searchController,
-                    hintText: 'Search tickets...',
-                    onChanged: (v) => setState(() => _search = v),
+      body: ticketsAsync.when(
+        loading: () => const LoadingList(),
+        error: (e, _) => AppErrorWidget(message: e.toString()),
+        data: (tickets) {
+          var filtered = tickets;
+          final status = _selectedStatus;
+          if (status != null) {
+            filtered =
+                filtered.where((t) => t.status == status).toList();
+          }
+          if (_search.isNotEmpty) {
+            filtered = filtered
+                .where((t) =>
+                    t.title
+                        .toLowerCase()
+                        .contains(_search.toLowerCase()) ||
+                    (t.description ?? '')
+                        .toLowerCase()
+                        .contains(_search.toLowerCase()))
+                .toList();
+          }
+
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Support Tickets',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                          AppButton(
+                            label: 'New Ticket',
+                            icon: Icons.add,
+                            onPressed: () => _showCreateTicket(context),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Stats row
+                      _TicketStatsRow(tickets: tickets),
+                      const SizedBox(height: 16),
+
+                      // Charts row
+                      LayoutBuilder(builder: (ctx, constraints) {
+                        final isWide = constraints.maxWidth > 600;
+                        if (isWide) {
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 5,
+                                child: _PriorityBarChart(tickets: tickets),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                flex: 4,
+                                child: _StatusDonut(tickets: tickets),
+                              ),
+                            ],
+                          );
+                        }
+                        return Column(
+                          children: [
+                            _PriorityBarChart(tickets: tickets),
+                            const SizedBox(height: 12),
+                            _StatusDonut(tickets: tickets),
+                          ],
+                        );
+                      }),
+                      const SizedBox(height: 16),
+
+                      // Search
+                      SearchField(
+                        controller: _searchController,
+                        hintText: 'Search tickets...',
+                        onChanged: (v) => setState(() => _search = v),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 12),
-                AppButton(
-                  label: 'New Ticket',
-                  icon: Icons.add,
-                  onPressed: () => _showCreateTicket(context),
-                ),
-              ],
-            ),
-          ),
-          TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            onTap: (_) => setState(() {}),
-            tabs: _tabs.map((t) => Tab(text: t)).toList(),
-          ),
-          Expanded(
-            child: ticketsAsync.when(
-              loading: () => const LoadingList(),
-              error: (e, _) => AppErrorWidget(message: e.toString()),
-              data: (tickets) {
-                var filtered = tickets;
-                final status = _selectedStatus;
-                if (status != null) {
-                  filtered = filtered
-                      .where((t) => t.status == status)
-                      .toList();
-                }
-                if (_search.isNotEmpty) {
-                  filtered = filtered
-                      .where((t) => t.title
-                          .toLowerCase()
-                          .contains(_search.toLowerCase()))
-                      .toList();
-                }
+              ),
 
-                if (filtered.isEmpty) {
-                  return EmptyState(
+              // Tab bar
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _TabBarDelegate(
+                  TabBar(
+                    controller: _tabController,
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    onTap: (_) => setState(() {}),
+                    tabs: _tabs.map((t) => Tab(text: t)).toList(),
+                  ),
+                ),
+              ),
+
+              if (filtered.isEmpty)
+                SliverFillRemaining(
+                  child: EmptyState(
                     title: 'No tickets found',
-                    subtitle: 'Create a new ticket to start',
+                    subtitle: 'Try adjusting your filters',
                     icon: Icons.support_agent_outlined,
-                  );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, i) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: _TicketCard(
-                      ticket: filtered[i],
-                      onTap: () =>
-                          context.go('/tickets/${filtered[i].id}'),
-                      onUpdateStatus: (status) async {
-                        await ref
-                            .read(ticketNotifierProvider.notifier)
-                            .updateStatus(filtered[i].id, status);
-                      },
-                    ).animate().fadeIn(delay: Duration(milliseconds: i * 50)),
                   ),
-                );
-              },
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (ctx, i) => Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                      child: _TicketCard(
+                        ticket: filtered[i],
+                        index: i,
+                        onTap: () =>
+                            context.go('/tickets/${filtered[i].id}'),
+                        onUpdateStatus: (s) async {
+                          await ref
+                              .read(ticketNotifierProvider.notifier)
+                              .updateStatus(filtered[i].id, s);
+                        },
+                      ),
+                    ),
+                    childCount: filtered.length,
+                  ),
+                ),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ── Tab Bar Delegate ───────────────────────────────────────────────
+
+class _TabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+
+  const _TabBarDelegate(this.tabBar);
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _TabBarDelegate oldDelegate) => false;
+}
+
+// ── Stats Row ──────────────────────────────────────────────────────
+
+class _TicketStatsRow extends StatelessWidget {
+  final List<Ticket> tickets;
+
+  const _TicketStatsRow({required this.tickets});
+
+  @override
+  Widget build(BuildContext context) {
+    final total = tickets.length;
+    final open = tickets.where((t) => t.status == TicketStatus.open).length;
+    final inProgress =
+        tickets.where((t) => t.status == TicketStatus.inProgress).length;
+    final resolved =
+        tickets.where((t) => t.status == TicketStatus.resolved).length;
+
+    return LayoutBuilder(builder: (context, constraints) {
+      final cols = constraints.maxWidth > 500 ? 4 : 2;
+      return GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: cols,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 1.6,
+        children: [
+          _StatCard(
+            icon: Icons.confirmation_number_rounded,
+            value: '$total',
+            label: 'Total',
+            color: AppColors.primary,
+          ),
+          _StatCard(
+            icon: Icons.inbox_rounded,
+            value: '$open',
+            label: 'Open',
+            color: AppColors.warning,
+          ),
+          _StatCard(
+            icon: Icons.sync_rounded,
+            value: '$inProgress',
+            label: 'In Progress',
+            color: AppColors.info,
+          ),
+          _StatCard(
+            icon: Icons.check_circle_rounded,
+            value: '$resolved',
+            label: 'Resolved',
+            color: AppColors.success,
+          ),
+        ],
+      );
+    });
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+  final Color color;
+
+  const _StatCard({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 16),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                  height: 1,
+                ),
+              ),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: cs.onSurface.withOpacity(0.55),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Priority Bar Chart ─────────────────────────────────────────────
+
+class _PriorityBarChart extends StatelessWidget {
+  final List<Ticket> tickets;
+
+  const _PriorityBarChart({required this.tickets});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final data = [
+      tickets.where((t) => t.priority == TicketPriority.low).length.toDouble(),
+      tickets
+          .where((t) => t.priority == TicketPriority.medium)
+          .length
+          .toDouble(),
+      tickets
+          .where((t) => t.priority == TicketPriority.high)
+          .length
+          .toDouble(),
+      tickets
+          .where((t) => t.priority == TicketPriority.urgent)
+          .length
+          .toDouble(),
+    ];
+    final maxY =
+        (data.reduce((a, b) => a > b ? a : b) + 2).clamp(4.0, 20.0);
+    final colors = [
+      AppColors.success,
+      AppColors.info,
+      AppColors.warning,
+      AppColors.error,
+    ];
+    const labels = ['Low', 'Med', 'High', 'Urgent'];
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Priority Breakdown',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w700)),
+          Text('Tickets by priority level',
+              style: TextStyle(
+                  fontSize: 11,
+                  color: cs.onSurface.withOpacity(0.45))),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 140,
+            child: BarChart(
+              BarChartData(
+                maxY: maxY,
+                borderData: FlBorderData(show: false),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  getDrawingHorizontalLine: (_) => FlLine(
+                    color: cs.outline.withOpacity(0.2),
+                    strokeWidth: 1,
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  leftTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (v, _) => Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          labels[v.toInt()],
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: cs.onSurface.withOpacity(0.5)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                barGroups: List.generate(
+                  4,
+                  (i) => BarChartGroupData(
+                    x: i,
+                    barRods: [
+                      BarChartRodData(
+                        toY: data[i],
+                        color: colors[i],
+                        width: 28,
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(6)),
+                        backDrawRodData: BackgroundBarChartRodData(
+                          show: true,
+                          toY: maxY,
+                          color: colors[i].withOpacity(0.06),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -153,126 +504,448 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
   }
 }
 
+// ── Status Donut ───────────────────────────────────────────────────
+
+class _StatusDonut extends StatefulWidget {
+  final List<Ticket> tickets;
+
+  const _StatusDonut({required this.tickets});
+
+  @override
+  State<_StatusDonut> createState() => _StatusDonutState();
+}
+
+class _StatusDonutState extends State<_StatusDonut> {
+  int _touchedIndex = -1;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final open =
+        widget.tickets.where((t) => t.status == TicketStatus.open).length;
+    final inProgress = widget.tickets
+        .where((t) => t.status == TicketStatus.inProgress)
+        .length;
+    final resolved =
+        widget.tickets.where((t) => t.status == TicketStatus.resolved).length;
+    final closed =
+        widget.tickets.where((t) => t.status == TicketStatus.closed).length;
+    final data = [open, inProgress, resolved, closed];
+    final total = data.fold(0, (a, b) => a + b);
+
+    final labels = ['Open', 'In Progress', 'Resolved', 'Closed'];
+    final colors = [
+      AppColors.warning,
+      AppColors.info,
+      AppColors.success,
+      AppColors.lightTextSecondary,
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Status Distribution',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w700)),
+          Text('Current ticket states',
+              style: TextStyle(
+                  fontSize: 11,
+                  color: cs.onSurface.withOpacity(0.45))),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: total == 0
+                    ? Center(
+                        child: Text('No data',
+                            style: TextStyle(
+                                fontSize: 11,
+                                color: cs.onSurface.withOpacity(0.4))))
+                    : PieChart(
+                        PieChartData(
+                          sectionsSpace: 2,
+                          centerSpaceRadius: 28,
+                          pieTouchData: PieTouchData(
+                            touchCallback: (event, response) {
+                              setState(() {
+                                _touchedIndex = response
+                                        ?.touchedSection
+                                        ?.touchedSectionIndex ??
+                                    -1;
+                              });
+                            },
+                          ),
+                          sections: List.generate(4, (i) {
+                            final isTouched = _touchedIndex == i;
+                            return PieChartSectionData(
+                              value: data[i].toDouble(),
+                              color: colors[i],
+                              radius: isTouched ? 36 : 28,
+                              showTitle: false,
+                            );
+                          }),
+                        ),
+                      ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(4, (i) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 3),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 9,
+                              height: 9,
+                              decoration: BoxDecoration(
+                                color: colors[i],
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                                child: Text(labels[i],
+                                    style:
+                                        const TextStyle(fontSize: 11))),
+                            Text(
+                              '${data[i]}',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: colors[i]),
+                            ),
+                          ],
+                        ),
+                      )),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Ticket Card ────────────────────────────────────────────────────
+
 class _TicketCard extends StatelessWidget {
   final Ticket ticket;
+  final int index;
   final VoidCallback onTap;
   final ValueChanged<TicketStatus> onUpdateStatus;
 
   const _TicketCard({
     required this.ticket,
+    required this.index,
     required this.onTap,
     required this.onUpdateStatus,
   });
 
   Color _priorityColor() {
     switch (ticket.priority) {
-      case TicketPriority.urgent: return AppColors.error;
-      case TicketPriority.high: return AppColors.warning;
-      case TicketPriority.medium: return AppColors.info;
-      case TicketPriority.low: return AppColors.lightTextSecondary;
+      case TicketPriority.urgent:
+        return AppColors.error;
+      case TicketPriority.high:
+        return AppColors.warning;
+      case TicketPriority.medium:
+        return AppColors.info;
+      case TicketPriority.low:
+        return AppColors.success;
+    }
+  }
+
+  Color _statusColor() {
+    switch (ticket.status) {
+      case TicketStatus.open:
+        return AppColors.warning;
+      case TicketStatus.inProgress:
+        return AppColors.info;
+      case TicketStatus.resolved:
+        return AppColors.success;
+      case TicketStatus.closed:
+        return AppColors.lightTextSecondary;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return AppCard(
+    final priorityColor = _priorityColor();
+    final statusColor = _statusColor();
+    final hasDescription = ticket.description != null &&
+        ticket.description!.trim().isNotEmpty;
+
+    return GestureDetector(
       onTap: onTap,
-      child: Row(
-        children: [
-          // Priority indicator
-          Container(
-            width: 4,
-            height: 52,
-            decoration: BoxDecoration(
-              color: _priorityColor(),
-              borderRadius: BorderRadius.circular(2),
-            ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: cs.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: ticket.isRead
+                ? cs.outline.withOpacity(0.4)
+                : priorityColor.withOpacity(0.35),
           ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.warning.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDark ? 0.15 : 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
             ),
-            child: Icon(
-              ticket.isRead
-                  ? Icons.confirmation_number_outlined
-                  : Icons.confirmation_number,
-              color: AppColors.warning,
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  ticket.title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: ticket.isRead
-                            ? FontWeight.w400
-                            : FontWeight.w600,
-                      ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+          ],
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              // Priority accent bar
+              Container(
+                width: 5,
+                decoration: BoxDecoration(
+                  color: priorityColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                  ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    StatusChip(status: ticket.status.displayName),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: _priorityColor().withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        ticket.priority.displayName,
-                        style: TextStyle(
-                            fontSize: 10, color: _priorityColor()),
-                      ),
-                    ),
-                    if (ticket.messageCount > 0) ...[
-                      const SizedBox(width: 8),
+              ),
+
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Row(
                         children: [
-                          Icon(Icons.chat_bubble_outline,
-                              size: 12,
-                              color: isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.lightTextSecondary),
-                          const SizedBox(width: 3),
-                          Text('${ticket.messageCount}',
-                              style:
-                                  const TextStyle(fontSize: 11)),
+                          // Unread dot
+                          if (!ticket.isRead)
+                            Container(
+                              width: 8,
+                              height: 8,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: priorityColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          Expanded(
+                            child: Text(
+                              ticket.title,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    fontWeight: ticket.isRead
+                                        ? FontWeight.w500
+                                        : FontWeight.w700,
+                                  ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          PopupMenuButton<TicketStatus>(
+                            icon: Icon(Icons.more_vert,
+                                size: 18,
+                                color: cs.onSurface.withOpacity(0.4)),
+                            itemBuilder: (_) => TicketStatus.values
+                                .map((s) => PopupMenuItem(
+                                      value: s,
+                                      child: Text(s.displayName),
+                                    ))
+                                .toList(),
+                            onSelected: onUpdateStatus,
+                          ),
+                        ],
+                      ),
+
+                      if (hasDescription) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          ticket.description!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: cs.onSurface.withOpacity(0.55),
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+
+                      const SizedBox(height: 10),
+
+                      // Tags
+                      if (ticket.tags.isNotEmpty) ...[
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: ticket.tags.map((tag) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: cs.outline.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Text(
+                                tag,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: cs.onSurface.withOpacity(0.55),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+
+                      // Footer row
+                      Row(
+                        children: [
+                          // Status badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: statusColor.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              ticket.status.displayName,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: statusColor,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          // Priority badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: priorityColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              ticket.priority.displayName,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: priorityColor,
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+
+                          // Assignee
+                          if (ticket.assigneeName != null) ...[
+                            Icon(Icons.person_outline,
+                                size: 12,
+                                color: cs.onSurface.withOpacity(0.4)),
+                            const SizedBox(width: 3),
+                            Text(
+                              ticket.assigneeName!,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: cs.onSurface.withOpacity(0.5),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+
+                          // Message count
+                          if (ticket.messageCount > 0) ...[
+                            Icon(Icons.chat_bubble_outline,
+                                size: 12,
+                                color: cs.onSurface.withOpacity(0.4)),
+                            const SizedBox(width: 3),
+                            Text(
+                              '${ticket.messageCount}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: cs.onSurface.withOpacity(0.5),
+                              ),
+                            ),
+                          ],
+
+                          // Due date
+                          if (ticket.dueDate != null) ...[
+                            const SizedBox(width: 8),
+                            Icon(Icons.schedule_rounded,
+                                size: 12,
+                                color: _isOverdue(ticket.dueDate!)
+                                    ? AppColors.error
+                                    : cs.onSurface.withOpacity(0.4)),
+                            const SizedBox(width: 3),
+                            Text(
+                              _formatDue(ticket.dueDate!),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: _isOverdue(ticket.dueDate!)
+                                    ? AppColors.error
+                                    : cs.onSurface.withOpacity(0.5),
+                                fontWeight: _isOverdue(ticket.dueDate!)
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ],
-                  ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          PopupMenuButton<TicketStatus>(
-            icon: const Icon(Icons.more_vert, size: 18),
-            itemBuilder: (_) => TicketStatus.values
-                .map((s) => PopupMenuItem(
-                      value: s,
-                      child: Text(s.displayName),
-                    ))
-                .toList(),
-            onSelected: onUpdateStatus,
-          ),
-        ],
+        ),
       ),
-    );
+    )
+        .animate()
+        .fadeIn(delay: Duration(milliseconds: index * 40))
+        .slideY(begin: 0.04, curve: Curves.easeOut);
+  }
+
+  bool _isOverdue(DateTime due) =>
+      due.isBefore(DateTime.now()) &&
+      ticket.status != TicketStatus.resolved &&
+      ticket.status != TicketStatus.closed;
+
+  String _formatDue(DateTime due) {
+    final diff = due.difference(DateTime.now());
+    if (diff.inDays > 0) return 'Due in ${diff.inDays}d';
+    if (diff.inDays < 0) return '${-diff.inDays}d overdue';
+    return 'Due today';
   }
 }
+
+// ── Create Ticket Dialog ───────────────────────────────────────────
 
 class _CreateTicketDialog extends StatefulWidget {
   final Future<void> Function(Map<String, dynamic>) onCreate;
@@ -321,8 +994,7 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
                         value: p, child: Text(p.displayName)))
                     .toList(),
                 onChanged: (v) => setState(() => _priority = v!),
-                decoration:
-                    const InputDecoration(labelText: 'Priority'),
+                decoration: const InputDecoration(labelText: 'Priority'),
               ),
             ],
           ),

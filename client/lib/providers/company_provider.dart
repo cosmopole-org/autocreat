@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/constants.dart';
+import '../data/demo_data.dart';
 import '../data/repositories/company_repository.dart';
 import '../models/company.dart';
 import 'auth_provider.dart';
+import 'demo_provider.dart';
 import 'theme_provider.dart';
 
 final companyRepositoryProvider = Provider<CompanyRepository>((ref) {
@@ -10,6 +12,8 @@ final companyRepositoryProvider = Provider<CompanyRepository>((ref) {
 });
 
 final companiesProvider = FutureProvider<List<Company>>((ref) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) return [Company.fromJson(DemoData.company)];
   return ref.watch(companyRepositoryProvider).getCompanies();
 });
 

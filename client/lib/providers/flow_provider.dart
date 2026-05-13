@@ -1,17 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/demo_data.dart';
 import '../data/repositories/flow_repository.dart';
 import '../models/flow.dart';
 import 'auth_provider.dart';
+import 'demo_provider.dart';
 
 final flowRepositoryProvider = Provider<FlowRepository>((ref) {
   return FlowRepository(ref.watch(apiClientProvider));
 });
 
 final flowsProvider = FutureProvider.family<List<Flow>, String?>((ref, companyId) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) return DemoData.flows.map(Flow.fromJson).toList();
   return ref.watch(flowRepositoryProvider).getFlows(companyId: companyId);
 });
 
 final flowDetailProvider = FutureProvider.family<Flow, String>((ref, id) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) {
+    final match = DemoData.flows.firstWhere(
+      (f) => f['id'] == id,
+      orElse: () => DemoData.flows.first,
+    );
+    return Flow.fromJson(match);
+  }
   return ref.watch(flowRepositoryProvider).getFlow(id);
 });
 
