@@ -1,5 +1,8 @@
+import 'package:dotted_border/dotted_border.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/form_definition.dart';
 import '../theme/app_colors.dart';
 
@@ -28,8 +31,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
   @override
   void initState() {
     super.initState();
-    _textController = TextEditingController(
-        text: widget.value?.toString() ?? '');
+    _textController = TextEditingController(text: widget.value?.toString() ?? '');
   }
 
   @override
@@ -82,9 +84,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
         return TextFormField(
           controller: _textController,
           readOnly: widget.readOnly,
-          decoration: InputDecoration(
-            hintText: widget.field.placeholder,
-          ),
+          decoration: InputDecoration(hintText: widget.field.placeholder),
           onChanged: widget.onChanged,
         );
 
@@ -150,13 +150,10 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
       case FormFieldType.checkbox:
         return CheckboxListTile(
           title: Text(widget.field.label),
-          subtitle: widget.field.helpText != null
-              ? Text(widget.field.helpText!)
-              : null,
+          subtitle:
+              widget.field.helpText != null ? Text(widget.field.helpText!) : null,
           value: widget.value as bool? ?? false,
-          onChanged: widget.readOnly
-              ? null
-              : (v) => widget.onChanged?.call(v),
+          onChanged: widget.readOnly ? null : (v) => widget.onChanged?.call(v),
           contentPadding: EdgeInsets.zero,
         );
 
@@ -168,9 +165,8 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                     title: Text(o.label),
                     value: o.value,
                     groupValue: selected,
-                    onChanged: widget.readOnly
-                        ? null
-                        : (v) => widget.onChanged?.call(v),
+                    onChanged:
+                        widget.readOnly ? null : (v) => widget.onChanged?.call(v),
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                   ))
@@ -196,7 +192,9 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
               suffixIcon: const Icon(Icons.calendar_today, size: 18),
             ),
             child: Text(
-              widget.value?.toString() ?? widget.field.placeholder ?? 'Select date',
+              widget.value?.toString() ??
+                  widget.field.placeholder ??
+                  'Select date',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
@@ -219,60 +217,176 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
               suffixIcon: const Icon(Icons.access_time, size: 18),
             ),
             child: Text(
-              widget.value?.toString() ?? widget.field.placeholder ?? 'Select time',
+              widget.value?.toString() ??
+                  widget.field.placeholder ??
+                  'Select time',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
         );
 
       case FormFieldType.file:
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: AppColors.lightBorder,
-              style: BorderStyle.solid,
-            ),
+        final fileName = widget.value?.toString();
+        return DottedBorder(
+          borderType: BorderType.RRect,
+          radius: const Radius.circular(12),
+          color: AppColors.primary.withOpacity(0.4),
+          strokeWidth: 1.5,
+          dashPattern: const [6, 3],
+          child: InkWell(
+            onTap: widget.readOnly
+                ? null
+                : () async {
+                    final result = await FilePicker.platform.pickFiles(
+                      allowMultiple: false,
+                      withData: false,
+                    );
+                    if (result != null && result.files.isNotEmpty) {
+                      widget.onChanged?.call(result.files.single.name);
+                    }
+                  },
             borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.attach_file, color: AppColors.primary),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  widget.value?.toString() ?? 'Click to upload file',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    fileName != null
+                        ? Icons.insert_drive_file_outlined
+                        : Icons.upload_file,
+                    size: 36,
+                    color: AppColors.primary.withOpacity(0.7),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    fileName ?? 'Click to upload file',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: fileName != null
+                              ? AppColors.primary
+                              : AppColors.lightTextSecondary,
+                          fontWeight: fileName != null ? FontWeight.w500 : null,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (fileName == null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Any file type supported',
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelSmall
+                          ?.copyWith(color: AppColors.lightTextHint),
+                    ),
+                  ],
+                  if (fileName != null && !widget.readOnly) ...[
+                    const SizedBox(height: 8),
+                    TextButton.icon(
+                      onPressed: () => widget.onChanged?.call(null),
+                      icon: const Icon(Icons.close, size: 14),
+                      label: const Text('Remove'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              if (!widget.readOnly)
-                TextButton(
-                  onPressed: () {},
-                  child: const Text('Browse'),
-                ),
-            ],
+            ),
           ),
         );
 
       case FormFieldType.image:
-        return Container(
-          height: 120,
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.lightBorder),
+        final imagePath = widget.value?.toString();
+        return DottedBorder(
+          borderType: BorderType.RRect,
+          radius: const Radius.circular(12),
+          color: AppColors.accent.withOpacity(0.4),
+          strokeWidth: 1.5,
+          dashPattern: const [6, 3],
+          child: InkWell(
+            onTap: widget.readOnly
+                ? null
+                : () async {
+                    final picker = ImagePicker();
+                    final picked = await picker.pickImage(
+                      source: ImageSource.gallery,
+                      imageQuality: 80,
+                    );
+                    if (picked != null) {
+                      widget.onChanged?.call(picked.path);
+                    }
+                  },
             borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: double.infinity,
+              height: 140,
+              clipBehavior: Clip.antiAlias,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              child: imagePath != null
+                  ? Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(
+                          imagePath,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const Center(
+                            child: Icon(Icons.broken_image_outlined,
+                                size: 40, color: AppColors.lightTextSecondary),
+                          ),
+                        ),
+                        if (!widget.readOnly)
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: GestureDetector(
+                              onTap: () => widget.onChanged?.call(null),
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Icon(Icons.close,
+                                    size: 16, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                      ],
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add_photo_alternate_outlined,
+                          size: 40,
+                          color: AppColors.accent.withOpacity(0.7),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Click to upload image',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.lightTextSecondary,
+                                  ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'PNG, JPG, GIF supported',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(color: AppColors.lightTextHint),
+                        ),
+                      ],
+                    ),
+            ),
           ),
-          child: widget.value != null
-              ? Image.network(widget.value.toString(), fit: BoxFit.cover)
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.image_outlined,
-                        size: 36, color: AppColors.lightTextSecondary),
-                    const SizedBox(height: 8),
-                    Text('Click to upload image',
-                        style: Theme.of(context).textTheme.bodySmall),
-                  ],
-                ),
         );
 
       case FormFieldType.color:
@@ -300,7 +414,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                         TextButton(
                           onPressed: () => Navigator.pop(ctx),
                           child: const Text('Done'),
-                        )
+                        ),
                       ],
                     ),
                   );
@@ -341,8 +455,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
             ),
             Switch(
               value: widget.value as bool? ?? false,
-              onChanged:
-                  widget.readOnly ? null : (v) => widget.onChanged?.call(v),
+              onChanged: widget.readOnly ? null : (v) => widget.onChanged?.call(v),
             ),
           ],
         );
@@ -428,7 +541,6 @@ class _TableFieldState extends State<_TableField> {
       ),
       child: Column(
         children: [
-          // Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: const BoxDecoration(
@@ -445,10 +557,9 @@ class _TableFieldState extends State<_TableField> {
                   .toList(),
             ),
           ),
-          // Rows
           ..._rows.map((row) => Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 child: Row(
                   children: row
                       .asMap()
@@ -467,7 +578,6 @@ class _TableFieldState extends State<_TableField> {
                       .toList(),
                 ),
               )),
-          // Add row button
           if (!widget.readOnly)
             Padding(
               padding: const EdgeInsets.all(8),
@@ -487,7 +597,6 @@ class _TableFieldState extends State<_TableField> {
   }
 }
 
-// Field palette item for the form builder
 class FieldPaletteItem extends StatelessWidget {
   final FormFieldType type;
   final VoidCallback? onTap;
@@ -512,18 +621,15 @@ class FieldPaletteItem extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                _getIcon(type),
-                size: 18,
-                color: AppColors.primary,
-              ),
+              Icon(_getIcon(type), size: 18, color: AppColors.primary),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   type.displayName,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(fontWeight: FontWeight.w500),
                 ),
               ),
               const Icon(Icons.drag_indicator,
@@ -537,22 +643,38 @@ class FieldPaletteItem extends StatelessWidget {
 
   IconData _getIcon(FormFieldType t) {
     switch (t) {
-      case FormFieldType.text: return Icons.text_fields;
-      case FormFieldType.number: return Icons.pin;
-      case FormFieldType.textarea: return Icons.notes;
-      case FormFieldType.dropdown: return Icons.arrow_drop_down_circle_outlined;
-      case FormFieldType.multiselect: return Icons.checklist;
-      case FormFieldType.checkbox: return Icons.check_box_outlined;
-      case FormFieldType.radio: return Icons.radio_button_checked;
-      case FormFieldType.date: return Icons.calendar_today;
-      case FormFieldType.time: return Icons.access_time;
-      case FormFieldType.file: return Icons.attach_file;
-      case FormFieldType.image: return Icons.image_outlined;
-      case FormFieldType.color: return Icons.color_lens_outlined;
-      case FormFieldType.switchField: return Icons.toggle_on_outlined;
-      case FormFieldType.table: return Icons.table_chart_outlined;
-      case FormFieldType.rating: return Icons.star_outline;
-      case FormFieldType.signature: return Icons.draw_outlined;
+      case FormFieldType.text:
+        return Icons.text_fields;
+      case FormFieldType.number:
+        return Icons.pin;
+      case FormFieldType.textarea:
+        return Icons.notes;
+      case FormFieldType.dropdown:
+        return Icons.arrow_drop_down_circle_outlined;
+      case FormFieldType.multiselect:
+        return Icons.checklist;
+      case FormFieldType.checkbox:
+        return Icons.check_box_outlined;
+      case FormFieldType.radio:
+        return Icons.radio_button_checked;
+      case FormFieldType.date:
+        return Icons.calendar_today;
+      case FormFieldType.time:
+        return Icons.access_time;
+      case FormFieldType.file:
+        return Icons.attach_file;
+      case FormFieldType.image:
+        return Icons.image_outlined;
+      case FormFieldType.color:
+        return Icons.color_lens_outlined;
+      case FormFieldType.switchField:
+        return Icons.toggle_on_outlined;
+      case FormFieldType.table:
+        return Icons.table_chart_outlined;
+      case FormFieldType.rating:
+        return Icons.star_outline;
+      case FormFieldType.signature:
+        return Icons.draw_outlined;
     }
   }
 }

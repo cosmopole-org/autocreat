@@ -1,3 +1,4 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -251,6 +252,11 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                   builder: (context, constraints) {
                     _canvasSize = Size(
                         constraints.maxWidth, constraints.maxHeight);
+                    if (editorState.nodes.isEmpty) {
+                      return _EmptyCanvasHint(
+                        onAddNode: () => _addNode(NodeType.start),
+                      );
+                    }
                     return GraphEditor(
                       nodes: editorState.nodes,
                       edges: editorState.edges,
@@ -347,6 +353,66 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
               ),
             ).animate().fadeIn(duration: 200.ms).slideX(begin: 0.1),
         ],
+      ),
+    );
+  }
+}
+
+class _EmptyCanvasHint extends StatelessWidget {
+  final VoidCallback onAddNode;
+
+  const _EmptyCanvasHint({required this.onAddNode});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Center(
+      child: DottedBorder(
+        borderType: BorderType.RRect,
+        radius: const Radius.circular(20),
+        dashPattern: const [8, 4],
+        color: AppColors.primary.withOpacity(0.4),
+        strokeWidth: 2,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
+            onTap: onAddNode,
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 60, vertical: 48),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.add_circle_outline,
+                    size: 56,
+                    color: AppColors.primary.withOpacity(0.45),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Start building your flow',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: isDark
+                              ? AppColors.darkText
+                              : AppColors.lightText,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Click here to add a Start node,\nor use the toolbar on the left.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.lightTextSecondary,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

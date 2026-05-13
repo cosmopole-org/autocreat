@@ -1,6 +1,8 @@
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import '../../core/constants.dart';
 import '../../models/role.dart';
 import '../../providers/role_provider.dart';
@@ -50,9 +52,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
         _permissions = List.from(_role!.permissions);
       } catch (_) {}
     } else {
-      _permissions = _resources
-          .map((r) => Permission(resource: r))
-          .toList();
+      _permissions = _resources.map((r) => Permission(resource: r)).toList();
     }
     if (mounted) setState(() => _loading = false);
   }
@@ -63,7 +63,9 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
     try {
       final data = {
         'name': _nameController.text,
-        'description': _descController.text.isNotEmpty ? _descController.text : null,
+        'description': _descController.text.isNotEmpty
+            ? _descController.text
+            : null,
         'level': _level,
         'isActive': _isActive,
         'permissions': _permissions.map((p) => p.toJson()).toList(),
@@ -71,24 +73,41 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
       if (_role == null) {
         await ref.read(roleNotifierProvider.notifier).create(data);
       } else {
-        await ref.read(roleNotifierProvider.notifier).updateItem(_role!.id, data);
+        await ref
+            .read(roleNotifierProvider.notifier)
+            .updateItem(_role!.id, data);
       }
       if (mounted) {
         context.go(AppRoutes.roles);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Role saved'), backgroundColor: AppColors.success),
+              content: Text('Role saved'),
+              backgroundColor: AppColors.success),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+              content: Text('Error: $e'), backgroundColor: AppColors.error),
         );
       }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
+  }
+
+  double get _permissionCoverage {
+    if (_permissions.isEmpty) return 0;
+    int granted = 0;
+    int total = _permissions.length * 4; // create/read/update/delete
+    for (final p in _permissions) {
+      if (p.canCreate) granted++;
+      if (p.canRead) granted++;
+      if (p.canUpdate) granted++;
+      if (p.canDelete) granted++;
+    }
+    return granted / total;
   }
 
   @override
@@ -103,6 +122,8 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
+    final coverage = _permissionCoverage;
 
     return Scaffold(
       appBar: AppBar(
@@ -153,8 +174,10 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                     DropdownButtonFormField<String>(
                       value: _level,
                       items: const [
-                        DropdownMenuItem(value: 'owner', child: Text('Owner')),
-                        DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                        DropdownMenuItem(
+                            value: 'owner', child: Text('Owner')),
+                        DropdownMenuItem(
+                            value: 'admin', child: Text('Admin')),
                         DropdownMenuItem(
                             value: 'manager', child: Text('Manager')),
                         DropdownMenuItem(
@@ -178,62 +201,175 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Permissions
+              // Permission coverage indicator
               AppCard(
+                child: Row(
+                  children: [
+                    CircularPercentIndicator(
+                      radius: 40,
+                      lineWidth: 8,
+                      percent: coverage,
+                      center: Text(
+                        '${(coverage * 100).toInt()}%',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 13),
+                      ),
+                      progressColor: _coverageColor(coverage),
+                      backgroundColor:
+                          _coverageColor(coverage).withOpacity(0.12),
+                      animation: true,
+                      animationDuration: 800,
+                      circularStrokeCap: CircularStrokeCap.round,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Permission Coverage',
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${(coverage * 100).toInt()}% of CRUD operations are granted across all resources.',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                    color: AppColors.lightTextSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Permissions DataTable2
+              AppCard(
+                padding: const EdgeInsets.all(0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Permissions',
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Configure CRUD permissions per resource',
-                      style: Theme.of(context).textTheme.bodySmall,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                      child: Text('Permissions',
+                          style: Theme.of(context).textTheme.titleMedium),
                     ),
-                    const SizedBox(height: 16),
-                    // Header
-                    Row(
-                      children: [
-                        const Expanded(
-                            flex: 3,
-                            child: Text('Resource',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12))),
-                        ...['Create', 'Read', 'Update', 'Delete'].map(
-                          (h) => Expanded(
-                            child: Center(
-                              child: Text(h,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 11)),
-                            ),
-                          ),
-                        ),
-                      ],
+                    Padding(
+                      padding:
+                          const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                      child: Text(
+                        'Configure CRUD permissions per resource',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ),
-                    const Divider(),
-                    ..._resources.asMap().entries.map((e) {
-                      final resource = e.value;
-                      final permIdx = _permissions
-                          .indexWhere((p) => p.resource == resource);
-                      final perm = permIdx >= 0
-                          ? _permissions[permIdx]
-                          : Permission(resource: resource);
+                    SizedBox(
+                      height: (_resources.length * 52.0) + 56,
+                      child: DataTable2(
+                        columnSpacing: 0,
+                        horizontalMargin: 16,
+                        headingRowHeight: 40,
+                        dataRowHeight: 52,
+                        headingTextStyle: const TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 12),
+                        columns: const [
+                          DataColumn2(
+                              label: Text('Resource'),
+                              size: ColumnSize.L),
+                          DataColumn2(
+                              label: Center(child: Text('Create')),
+                              size: ColumnSize.S,
+                              numeric: true),
+                          DataColumn2(
+                              label: Center(child: Text('Read')),
+                              size: ColumnSize.S,
+                              numeric: true),
+                          DataColumn2(
+                              label: Center(child: Text('Update')),
+                              size: ColumnSize.S,
+                              numeric: true),
+                          DataColumn2(
+                              label: Center(child: Text('Delete')),
+                              size: ColumnSize.S,
+                              numeric: true),
+                        ],
+                        rows: _resources.map((resource) {
+                          final permIdx = _permissions
+                              .indexWhere((p) => p.resource == resource);
+                          final perm = permIdx >= 0
+                              ? _permissions[permIdx]
+                              : Permission(resource: resource);
 
-                      return _PermissionRow(
-                        permission: perm,
-                        onChanged: (updated) {
-                          setState(() {
-                            if (permIdx >= 0) {
-                              _permissions[permIdx] = updated;
-                            } else {
-                              _permissions.add(updated);
-                            }
-                          });
-                        },
-                      );
-                    }),
+                          return DataRow2(
+                            cells: [
+                              DataCell(Text(
+                                resource,
+                                style: const TextStyle(fontSize: 13),
+                              )),
+                              DataCell(Center(
+                                child: Checkbox(
+                                  value: perm.canCreate,
+                                  onChanged: (v) => setState(() {
+                                    final updated =
+                                        perm.copyWith(canCreate: v!);
+                                    if (permIdx >= 0) {
+                                      _permissions[permIdx] = updated;
+                                    } else {
+                                      _permissions.add(updated);
+                                    }
+                                  }),
+                                ),
+                              )),
+                              DataCell(Center(
+                                child: Checkbox(
+                                  value: perm.canRead,
+                                  onChanged: (v) => setState(() {
+                                    final updated =
+                                        perm.copyWith(canRead: v!);
+                                    if (permIdx >= 0) {
+                                      _permissions[permIdx] = updated;
+                                    } else {
+                                      _permissions.add(updated);
+                                    }
+                                  }),
+                                ),
+                              )),
+                              DataCell(Center(
+                                child: Checkbox(
+                                  value: perm.canUpdate,
+                                  onChanged: (v) => setState(() {
+                                    final updated =
+                                        perm.copyWith(canUpdate: v!);
+                                    if (permIdx >= 0) {
+                                      _permissions[permIdx] = updated;
+                                    } else {
+                                      _permissions.add(updated);
+                                    }
+                                  }),
+                                ),
+                              )),
+                              DataCell(Center(
+                                child: Checkbox(
+                                  value: perm.canDelete,
+                                  onChanged: (v) => setState(() {
+                                    final updated =
+                                        perm.copyWith(canDelete: v!);
+                                    if (permIdx >= 0) {
+                                      _permissions[permIdx] = updated;
+                                    } else {
+                                      _permissions.add(updated);
+                                    }
+                                  }),
+                                ),
+                              )),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -243,57 +379,10 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
       ),
     );
   }
-}
 
-class _PermissionRow extends StatelessWidget {
-  final Permission permission;
-  final ValueChanged<Permission> onChanged;
-
-  const _PermissionRow({required this.permission, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              permission.resource,
-              style: const TextStyle(fontSize: 13),
-            ),
-          ),
-          Expanded(
-            child: Checkbox(
-              value: permission.canCreate,
-              onChanged: (v) =>
-                  onChanged(permission.copyWith(canCreate: v!)),
-            ),
-          ),
-          Expanded(
-            child: Checkbox(
-              value: permission.canRead,
-              onChanged: (v) =>
-                  onChanged(permission.copyWith(canRead: v!)),
-            ),
-          ),
-          Expanded(
-            child: Checkbox(
-              value: permission.canUpdate,
-              onChanged: (v) =>
-                  onChanged(permission.copyWith(canUpdate: v!)),
-            ),
-          ),
-          Expanded(
-            child: Checkbox(
-              value: permission.canDelete,
-              onChanged: (v) =>
-                  onChanged(permission.copyWith(canDelete: v!)),
-            ),
-          ),
-        ],
-      ),
-    );
+  Color _coverageColor(double coverage) {
+    if (coverage >= 0.7) return AppColors.success;
+    if (coverage >= 0.4) return AppColors.warning;
+    return AppColors.info;
   }
 }

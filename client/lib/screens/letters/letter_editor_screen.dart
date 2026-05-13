@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,6 +27,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
   bool _loading = true;
   bool _saving = false;
   String? _letterId;
+  final List<PlatformFile> _attachments = [];
 
   @override
   void initState() {
@@ -101,6 +103,17 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     }
   }
 
+  Future<void> _pickAttachment() async {
+    final result = await FilePicker.platform.pickFiles(allowMultiple: true);
+    if (result != null && mounted) {
+      setState(() => _attachments.addAll(result.files));
+    }
+  }
+
+  void _removeAttachment(int index) {
+    setState(() => _attachments.removeAt(index));
+  }
+
   @override
   void dispose() {
     _quillController.dispose();
@@ -136,6 +149,14 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         actions: [
+          // Attach files
+          TextButton.icon(
+            icon: const Icon(Icons.attach_file, size: 16),
+            label: Text(_attachments.isEmpty
+                ? 'Attach'
+                : '${_attachments.length} file${_attachments.length > 1 ? 's' : ''}'),
+            onPressed: _pickAttachment,
+          ),
           // Variable chip
           TextButton.icon(
             icon: const Icon(Icons.data_object, size: 16),
@@ -183,6 +204,62 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
               ),
             ),
           ),
+
+          // Attachments strip
+          if (_attachments.isNotEmpty)
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color:
+                    isDark ? AppColors.darkCard : AppColors.primarySurface,
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
+                  ),
+                ),
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    const Icon(Icons.attach_file,
+                        size: 14, color: AppColors.lightTextSecondary),
+                    const SizedBox(width: 4),
+                    ..._attachments.asMap().entries.map(
+                          (e) => Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Chip(
+                              label: Text(
+                                e.value.name,
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                              deleteIcon: const Icon(Icons.close, size: 14),
+                              onDeleted: () => _removeAttachment(e.key),
+                              visualDensity: VisualDensity.compact,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                        ),
+                    TextButton.icon(
+                      onPressed: _pickAttachment,
+                      icon: const Icon(Icons.add, size: 14),
+                      label: const Text('Add more',
+                          style: TextStyle(fontSize: 11)),
+                      style: TextButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
           // Editor body
           Expanded(

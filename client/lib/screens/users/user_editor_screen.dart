@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../core/constants.dart';
 import '../../models/user.dart';
 import '../../providers/role_provider.dart';
@@ -29,6 +30,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
   bool _loading = true;
   bool _saving = false;
   User? _user;
+  String? _avatarPath;
 
   @override
   void initState() {
@@ -52,6 +54,19 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
     if (mounted) setState(() => _loading = false);
   }
 
+  Future<void> _pickAvatar() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+      maxWidth: 512,
+      maxHeight: 512,
+    );
+    if (picked != null && mounted) {
+      setState(() => _avatarPath = picked.path);
+    }
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
@@ -64,18 +79,22 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
           'password': _passwordController.text,
         if (_phoneController.text.isNotEmpty) 'phone': _phoneController.text,
         if (_selectedRoleId != null) 'roleId': _selectedRoleId,
+        if (_avatarPath != null) 'avatar': _avatarPath,
         'isActive': _isActive,
       };
       if (_user == null) {
         await ref.read(userNotifierProvider.notifier).create(data);
       } else {
-        await ref.read(userNotifierProvider.notifier).updateItem(_user!.id, data);
+        await ref
+            .read(userNotifierProvider.notifier)
+            .updateItem(_user!.id, data);
       }
       if (mounted) {
         context.go(AppRoutes.users);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('User saved'), backgroundColor: AppColors.success),
+              content: Text('User saved'),
+              backgroundColor: AppColors.success),
         );
       }
     } catch (e) {
@@ -108,6 +127,13 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    final initials = (_firstNameController.text.isNotEmpty
+            ? _firstNameController.text[0]
+            : '') +
+        (_lastNameController.text.isNotEmpty
+            ? _lastNameController.text[0]
+            : '');
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -131,6 +157,49 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
           key: _formKey,
           child: Column(
             children: [
+              // Avatar picker
+              Center(
+                child: Stack(
+                  children: [
+                    AvatarWidget(
+                      imageUrl: _avatarPath ?? _user?.avatar,
+                      initials: initials.isNotEmpty
+                          ? initials.toUpperCase()
+                          : '?',
+                      size: 88,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: _pickAvatar,
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                            border:
+                                Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: const Icon(Icons.camera_alt,
+                              size: 14, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: _pickAvatar,
+                icon: const Icon(Icons.photo_library_outlined, size: 16),
+                label: Text(_avatarPath != null || _user?.avatar != null
+                    ? 'Change photo'
+                    : 'Upload photo'),
+              ),
+              const SizedBox(height: 16),
+
               AppCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,8 +212,9 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _firstNameController,
-                            decoration:
-                                const InputDecoration(labelText: 'First name *'),
+                            decoration: const InputDecoration(
+                                labelText: 'First name *'),
+                            onChanged: (_) => setState(() {}),
                             validator: (v) =>
                                 v?.isEmpty ?? true ? 'Required' : null,
                           ),
@@ -153,8 +223,9 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _lastNameController,
-                            decoration:
-                                const InputDecoration(labelText: 'Last name *'),
+                            decoration: const InputDecoration(
+                                labelText: 'Last name *'),
+                            onChanged: (_) => setState(() {}),
                             validator: (v) =>
                                 v?.isEmpty ?? true ? 'Required' : null,
                           ),
@@ -193,15 +264,16 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                         labelText: _user == null
                             ? 'Password *'
                             : 'New password (leave blank to keep)',
-                        prefixIcon:
-                            const Icon(Icons.lock_outline, size: 18),
+                        prefixIcon: const Icon(Icons.lock_outline, size: 18),
                       ),
                       validator: _user == null
                           ? (v) {
-                              if (v?.isEmpty ?? true)
+                              if (v?.isEmpty ?? true) {
                                 return 'Password is required';
-                              if (v!.length < 8)
+                              }
+                              if (v!.length < 8) {
                                 return 'At least 8 characters';
+                              }
                               return null;
                             }
                           : null,
@@ -220,10 +292,8 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                     const SizedBox(height: 16),
                     rolesAsync.when(
                       loading: () => const LinearProgressIndicator(),
-                      error: (_, __) =>
-                          const Text('Error loading roles'),
-                      data: (roles) =>
-                          DropdownButtonFormField<String?>(
+                      error: (_, __) => const Text('Error loading roles'),
+                      data: (roles) => DropdownButtonFormField<String?>(
                         value: _selectedRoleId,
                         items: [
                           const DropdownMenuItem(
@@ -235,16 +305,15 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                             setState(() => _selectedRoleId = v),
                         decoration: const InputDecoration(
                           labelText: 'Assigned role',
-                          prefixIcon:
-                              Icon(Icons.shield_outlined, size: 18),
+                          prefixIcon: Icon(Icons.shield_outlined, size: 18),
                         ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     SwitchListTile(
                       title: const Text('Active account'),
-                      subtitle: const Text(
-                          'Inactive users cannot log in'),
+                      subtitle:
+                          const Text('Inactive users cannot log in'),
                       value: _isActive,
                       onChanged: (v) => setState(() => _isActive = v),
                       contentPadding: EdgeInsets.zero,
