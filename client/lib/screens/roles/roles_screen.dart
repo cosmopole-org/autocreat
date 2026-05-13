@@ -51,7 +51,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
 
     final active = roles.where((r) => r.isActive).length;
     final totalMembers =
-        roles.fold<int>(0, (s, r) => s + (r.memberCount ?? 0));
+        roles.fold<int>(0, (s, r) => s + r.memberCount);
     final totalPerms =
         roles.fold<int>(0, (s, r) => s + r.permissions.length);
 
@@ -298,7 +298,7 @@ class _MembersBarChart extends StatelessWidget {
 
     final top = roles.take(6).toList();
     final maxVal = top
-            .map((r) => r.memberCount ?? 0)
+            .map((r) => r.memberCount)
             .fold<int>(0, (a, b) => a > b ? a : b)
             .toDouble() +
         1;
@@ -388,7 +388,7 @@ class _MembersBarChart extends StatelessWidget {
                     x: e.key,
                     barRods: [
                       BarChartRodData(
-                        toY: (e.value.memberCount ?? 0).toDouble(),
+                        toY: e.value.memberCount.toDouble(),
                         color: color,
                         width: 28,
                         borderRadius: const BorderRadius.vertical(
@@ -446,8 +446,6 @@ class _RoleCard extends StatelessWidget {
     // Permission summary
     final canCreate =
         role.permissions.where((p) => p.canCreate).length;
-    final canDelete =
-        role.permissions.where((p) => p.canDelete).length;
 
     return GestureDetector(
       onTap: onEdit,
@@ -557,7 +555,7 @@ class _RoleCard extends StatelessWidget {
               children: [
                 _PermBadge(
                   icon: Icons.people_rounded,
-                  label: '${role.memberCount ?? 0} members',
+                  label: '${role.memberCount} members',
                   color: AppColors.primary,
                 ),
                 const SizedBox(width: 8),

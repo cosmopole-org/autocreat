@@ -556,7 +556,6 @@ class _StatusBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final pct = total == 0 ? 0.0 : count / total;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
