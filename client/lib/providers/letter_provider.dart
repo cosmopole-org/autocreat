@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/demo_data.dart';
 import '../data/repositories/letter_repository.dart';
 import '../models/letter_template.dart';
 import 'auth_provider.dart';
+import 'demo_provider.dart';
 
 final letterRepositoryProvider = Provider<LetterRepository>((ref) {
   return LetterRepository(ref.watch(apiClientProvider));
@@ -9,17 +11,29 @@ final letterRepositoryProvider = Provider<LetterRepository>((ref) {
 
 final lettersProvider =
     FutureProvider.family<List<LetterTemplate>, String?>((ref, companyId) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) return DemoData.letters.map(LetterTemplate.fromJson).toList();
   return ref.watch(letterRepositoryProvider).getLetters(companyId: companyId);
 });
 
 final letterDetailProvider =
     FutureProvider.family<LetterTemplate, String>((ref, id) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) {
+    final match = DemoData.letters.firstWhere(
+      (l) => l['id'] == id,
+      orElse: () => DemoData.letters.first,
+    );
+    return LetterTemplate.fromJson(match);
+  }
   return ref.watch(letterRepositoryProvider).getLetter(id);
 });
 
 class LetterNotifier extends AsyncNotifier<List<LetterTemplate>> {
   @override
   Future<List<LetterTemplate>> build() async {
+    final isDemo = ref.watch(isDemoModeProvider);
+    if (isDemo) return DemoData.letters.map(LetterTemplate.fromJson).toList();
     return ref.watch(letterRepositoryProvider).getLetters();
   }
 

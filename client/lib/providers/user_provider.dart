@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/demo_data.dart';
 import '../data/repositories/user_repository.dart';
 import '../models/user.dart';
 import 'auth_provider.dart';
+import 'demo_provider.dart';
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {
   return UserRepository(ref.watch(apiClientProvider));
@@ -9,17 +11,29 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
 
 final usersProvider =
     FutureProvider.family<List<User>, String?>((ref, companyId) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) return DemoData.users.map(User.fromJson).toList();
   return ref.watch(userRepositoryProvider).getUsers(companyId: companyId);
 });
 
 final userDetailProvider =
     FutureProvider.family<User, String>((ref, id) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) {
+    final match = DemoData.users.firstWhere(
+      (u) => u['id'] == id,
+      orElse: () => DemoData.users.first,
+    );
+    return User.fromJson(match);
+  }
   return ref.watch(userRepositoryProvider).getUser(id);
 });
 
 class UserNotifier extends AsyncNotifier<List<User>> {
   @override
   Future<List<User>> build() async {
+    final isDemo = ref.watch(isDemoModeProvider);
+    if (isDemo) return DemoData.users.map(User.fromJson).toList();
     return ref.watch(userRepositoryProvider).getUsers();
   }
 

@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/demo_data.dart';
 import '../data/repositories/role_repository.dart';
 import '../models/role.dart';
 import 'auth_provider.dart';
+import 'demo_provider.dart';
 
 final roleRepositoryProvider = Provider<RoleRepository>((ref) {
   return RoleRepository(ref.watch(apiClientProvider));
@@ -9,17 +11,29 @@ final roleRepositoryProvider = Provider<RoleRepository>((ref) {
 
 final rolesProvider =
     FutureProvider.family<List<Role>, String?>((ref, companyId) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) return DemoData.roles.map(Role.fromJson).toList();
   return ref.watch(roleRepositoryProvider).getRoles(companyId: companyId);
 });
 
 final roleDetailProvider =
     FutureProvider.family<Role, String>((ref, id) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) {
+    final match = DemoData.roles.firstWhere(
+      (r) => r['id'] == id,
+      orElse: () => DemoData.roles.first,
+    );
+    return Role.fromJson(match);
+  }
   return ref.watch(roleRepositoryProvider).getRole(id);
 });
 
 class RoleNotifier extends AsyncNotifier<List<Role>> {
   @override
   Future<List<Role>> build() async {
+    final isDemo = ref.watch(isDemoModeProvider);
+    if (isDemo) return DemoData.roles.map(Role.fromJson).toList();
     return ref.watch(roleRepositoryProvider).getRoles();
   }
 

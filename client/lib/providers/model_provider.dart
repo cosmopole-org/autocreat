@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/demo_data.dart';
 import '../data/repositories/model_repository.dart';
 import '../models/model_definition.dart';
 import 'auth_provider.dart';
+import 'demo_provider.dart';
 
 final modelRepositoryProvider = Provider<ModelRepository>((ref) {
   return ModelRepository(ref.watch(apiClientProvider));
@@ -9,11 +11,21 @@ final modelRepositoryProvider = Provider<ModelRepository>((ref) {
 
 final modelsProvider =
     FutureProvider.family<List<ModelDefinition>, String?>((ref, companyId) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) return DemoData.models.map(ModelDefinition.fromJson).toList();
   return ref.watch(modelRepositoryProvider).getModels(companyId: companyId);
 });
 
 final modelDetailProvider =
     FutureProvider.family<ModelDefinition, String>((ref, id) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) {
+    final match = DemoData.models.firstWhere(
+      (m) => m['id'] == id,
+      orElse: () => DemoData.models.first,
+    );
+    return ModelDefinition.fromJson(match);
+  }
   return ref.watch(modelRepositoryProvider).getModel(id);
 });
 

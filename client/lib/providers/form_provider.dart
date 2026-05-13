@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/demo_data.dart';
 import '../data/repositories/form_repository.dart';
 import '../models/form_definition.dart';
 import 'auth_provider.dart';
+import 'demo_provider.dart';
 
 final formRepositoryProvider = Provider<FormRepository>((ref) {
   return FormRepository(ref.watch(apiClientProvider));
@@ -9,11 +11,21 @@ final formRepositoryProvider = Provider<FormRepository>((ref) {
 
 final formsProvider =
     FutureProvider.family<List<FormDefinition>, String?>((ref, companyId) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) return DemoData.forms.map(FormDefinition.fromJson).toList();
   return ref.watch(formRepositoryProvider).getForms(companyId: companyId);
 });
 
 final formDetailProvider =
     FutureProvider.family<FormDefinition, String>((ref, id) async {
+  final isDemo = ref.watch(isDemoModeProvider);
+  if (isDemo) {
+    final match = DemoData.forms.firstWhere(
+      (f) => f['id'] == id,
+      orElse: () => DemoData.forms.first,
+    );
+    return FormDefinition.fromJson(match);
+  }
   return ref.watch(formRepositoryProvider).getForm(id);
 });
 
