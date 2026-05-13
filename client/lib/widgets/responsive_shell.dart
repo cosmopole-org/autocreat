@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -104,7 +106,6 @@ class ResponsiveShell extends ConsumerStatefulWidget {
 }
 
 class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
-  // Key must live in State, not build(), to survive rebuilds
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
 
@@ -147,13 +148,16 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
   }
 
   Widget _buildMobileLayout() {
+    final topPadding = MediaQuery.of(context).padding.top;
+    const barHeight = 56.0;
+    const barMarginTop = 10.0;
+    const barMarginH = 14.0;
+    final floatingTopOffset = topPadding + barMarginTop;
+    final contentTopPadding = floatingTopOffset + barHeight + barMarginTop;
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: _TopBar(
-        onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
-        showMenuButton: true,
-      ),
       drawer: _SidebarDrawer(
         selectedIndex: _selectedIndex,
         onNavigate: (i) {
@@ -161,7 +165,25 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
           _navigate(i);
         },
       ),
-      body: widget.child,
+      body: Stack(
+        children: [
+          // Page content – offset below the floating bar
+          Positioned.fill(
+            top: contentTopPadding,
+            child: widget.child,
+          ),
+          // Floating top bar
+          Positioned(
+            top: floatingTopOffset,
+            left: barMarginH,
+            right: barMarginH,
+            height: barHeight,
+            child: _FloatingMobileBar(
+              onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -211,7 +233,145 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
 }
 
 // ────────────────────────────────────────────────────────────────
-// TOP BAR
+// FLOATING MOBILE BAR (new)
+// ────────────────────────────────────────────────────────────────
+
+class _FloatingMobileBar extends ConsumerWidget {
+  final VoidCallback onMenuTap;
+
+  const _FloatingMobileBar({required this.onMenuTap});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final unread = ref.watch(unreadTicketCountProvider);
+    final user = ref.watch(currentUserProvider);
+
+    final bgColor = isDark
+        ? AppColors.darkSurface.withOpacity(0.92)
+        : AppColors.lightSurface.withOpacity(0.92);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withOpacity(0.08)
+                  : Colors.black.withOpacity(0.06),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDark ? 0.35 : 0.10),
+                blurRadius: 24,
+                spreadRadius: 0,
+                offset: const Offset(0, 6),
+              ),
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.06),
+                blurRadius: 12,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Row(
+            children: [
+              // Hamburger menu
+              _BarIconButton(
+                icon: Icons.menu_rounded,
+                onTap: onMenuTap,
+                tooltip: 'Menu',
+              ),
+              const SizedBox(width: 8),
+              // Logo
+              const _LogoMark(compact: true),
+              const Spacer(),
+              // Search (compact icon)
+              _BarIconButton(
+                icon: Icons.search_rounded,
+                onTap: () {},
+                tooltip: 'Search',
+              ),
+              const SizedBox(width: 2),
+              // Notification bell with badge
+              badges.Badge(
+                showBadge: unread > 0,
+                badgeStyle: const badges.BadgeStyle(
+                  badgeColor: AppColors.error,
+                  padding: EdgeInsets.all(4),
+                ),
+                badgeContent: Text(
+                  unread > 9 ? '9+' : unread.toString(),
+                  style: const TextStyle(color: Colors.white, fontSize: 9),
+                ),
+                child: _BarIconButton(
+                  icon: Icons.notifications_outlined,
+                  onTap: () => GoRouter.of(context).go(AppRoutes.tickets),
+                  tooltip: 'Notifications',
+                ),
+              ),
+              const SizedBox(width: 2),
+              // Theme toggle
+              _BarIconButton(
+                icon: isDark
+                    ? Icons.light_mode_outlined
+                    : Icons.dark_mode_outlined,
+                onTap: () => ref.read(themeProvider.notifier).toggleTheme(),
+                tooltip: 'Toggle theme',
+              ),
+              const SizedBox(width: 6),
+              // Avatar
+              if (user != null)
+                AvatarWidget(
+                  imageUrl: user.avatar,
+                  initials: '${user.firstName[0]}${user.lastName[0]}',
+                  size: 32,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BarIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final String tooltip;
+
+  const _BarIconButton({
+    required this.icon,
+    required this.onTap,
+    required this.tooltip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.all(7),
+          child: Icon(icon, size: 20, color: cs.onSurface.withOpacity(0.75)),
+        ),
+      ),
+    );
+  }
+}
+
+// ────────────────────────────────────────────────────────────────
+// TOP BAR (tablet / desktop)
 // ────────────────────────────────────────────────────────────────
 
 class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
@@ -262,31 +422,31 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
               _LogoMark(compact: true),
             ],
             const Spacer(),
-            // Search
-            Container(
-              height: 36,
-              width: 200,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkBg
-                    : AppColors.lightBg,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: cs.outline.withOpacity(0.4)),
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 10),
-                  Icon(Icons.search_rounded,
-                      size: 16,
-                      color: cs.onSurface.withOpacity(0.4)),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Search...',
-                    style: TextStyle(
-                        fontSize: 13,
+            // Search field (only on tablet/desktop)
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 220, minWidth: 140),
+              child: Container(
+                height: 36,
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkBg : AppColors.lightBg,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: cs.outline.withOpacity(0.4)),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    Icon(Icons.search_rounded,
+                        size: 16,
                         color: cs.onSurface.withOpacity(0.4)),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Text(
+                      'Search...',
+                      style: TextStyle(
+                          fontSize: 13,
+                          color: cs.onSurface.withOpacity(0.4)),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -891,4 +1051,3 @@ class _LogoutTile extends StatelessWidget {
     );
   }
 }
-

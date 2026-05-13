@@ -317,21 +317,61 @@ class _KpiRow extends StatelessWidget {
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
-      final cols = constraints.maxWidth > 700 ? 4 : 2;
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: cols,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: constraints.maxWidth > 700 ? 1.7 : 1.45,
-        ),
-        itemCount: cards.length,
-        itemBuilder: (context, i) => _KpiCard(data: cards[i])
-            .animate(delay: (i * 80).ms)
-            .fadeIn()
-            .scale(begin: const Offset(0.94, 0.94)),
+      final isWide = constraints.maxWidth > 700;
+      if (isWide) {
+        return Row(
+          children: cards.asMap().entries.map((e) {
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+                child: _KpiCard(data: e.value)
+                    .animate(delay: (e.key * 80).ms)
+                    .fadeIn()
+                    .scale(begin: const Offset(0.94, 0.94)),
+              ),
+            );
+          }).toList(),
+        );
+      }
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _KpiCard(data: cards[0])
+                    .animate(delay: 0.ms)
+                    .fadeIn()
+                    .scale(begin: const Offset(0.94, 0.94)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _KpiCard(data: cards[1])
+                    .animate(delay: 80.ms)
+                    .fadeIn()
+                    .scale(begin: const Offset(0.94, 0.94)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _KpiCard(data: cards[2])
+                    .animate(delay: 160.ms)
+                    .fadeIn()
+                    .scale(begin: const Offset(0.94, 0.94)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _KpiCard(data: cards[3])
+                    .animate(delay: 240.ms)
+                    .fadeIn()
+                    .scale(begin: const Offset(0.94, 0.94)),
+              ),
+            ],
+          ),
+        ],
       );
     });
   }
@@ -387,7 +427,7 @@ class _KpiCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -409,6 +449,7 @@ class _KpiCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -41,7 +41,10 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
     return Scaffold(
       body: modelsAsync.when(
         loading: () => const LoadingList(),
-        error: (e, _) => AppErrorWidget(message: e.toString()),
+        error: (e, _) => AppErrorWidget(
+          message: e.toString(),
+          onRetry: () => ref.invalidate(modelsProvider),
+        ),
         data: (models) => _buildContent(context, models),
       ),
     );
@@ -210,21 +213,35 @@ class _ModelStatsRow extends StatelessWidget {
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
-      final cols = constraints.maxWidth > 700 ? 4 : 2;
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: cols,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: constraints.maxWidth > 700 ? 2.2 : 1.8,
-        ),
-        itemCount: stats.length,
-        itemBuilder: (context, i) {
-          final (icon, label, value, color) = stats[i];
-          return _StatCard(icon: icon, label: label, value: value, color: color);
-        },
+      final isWide = constraints.maxWidth > 700;
+      final cards = stats
+          .map((s) => _StatCard(icon: s.$1, label: s.$2, value: s.$3, color: s.$4))
+          .toList();
+      if (isWide) {
+        return Row(
+          children: cards.asMap().entries.map((e) => Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+              child: e.value,
+            ),
+          )).toList(),
+        );
+      }
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(children: [
+            Expanded(child: cards[0]),
+            const SizedBox(width: 12),
+            Expanded(child: cards[1]),
+          ]),
+          const SizedBox(height: 12),
+          Row(children: [
+            Expanded(child: cards[2]),
+            const SizedBox(width: 12),
+            Expanded(child: cards[3]),
+          ]),
+        ],
       );
     });
   }

@@ -37,6 +37,8 @@ final selectedCompanyProvider = Provider<Company?>((ref) {
 class CompanyNotifier extends AsyncNotifier<List<Company>> {
   @override
   Future<List<Company>> build() async {
+    final isDemo = ref.watch(isDemoModeProvider);
+    if (isDemo) return [Company.fromJson(DemoData.company)];
     return ref.watch(companyRepositoryProvider).getCompanies();
   }
 
