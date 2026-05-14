@@ -150,9 +150,9 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
   Widget _buildMobileLayout() {
     final mediaQuery = MediaQuery.of(context);
     final topPadding = mediaQuery.padding.top;
-    const barHeight = 58.0;
-    const barMarginTop = 10.0;
-    const barMarginH = 12.0;
+    const barHeight = 52.0;
+    const barMarginTop = 16.0;
+    const barMarginH = 22.0;
     final floatingTopOffset = topPadding + barMarginTop;
     final contentTopPadding = floatingTopOffset + barHeight + barMarginTop;
 
@@ -262,13 +262,16 @@ class _FloatingMobileBar extends ConsumerWidget {
             : AppColors.lightCard.withValues(alpha: 0.94);
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(18),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: glassMode ? 24 : 16, sigmaY: glassMode ? 24 : 16),
+        filter: ImageFilter.blur(
+          sigmaX: glassMode ? 24 : 16,
+          sigmaY: glassMode ? 24 : 16,
+        ),
         child: Container(
           decoration: BoxDecoration(
             color: bgColor,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isDark
                   ? Colors.white.withValues(alpha: 0.08)
@@ -299,7 +302,7 @@ class _FloatingMobileBar extends ConsumerWidget {
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: [
               // Hamburger menu
@@ -308,9 +311,9 @@ class _FloatingMobileBar extends ConsumerWidget {
                 onTap: onMenuTap,
                 tooltip: 'Menu',
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               // Logo
-              const _LogoMark(compact: true),
+              const _LogoMark(compact: true, tiny: true),
               const Spacer(),
               // Search (compact icon)
               _BarIconButton(
@@ -347,13 +350,13 @@ class _FloatingMobileBar extends ConsumerWidget {
               ),
               const SizedBox(width: 2),
               const _GlassModeButton(compact: true),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               // Avatar
               if (user != null)
                 AvatarWidget(
                   imageUrl: user.avatar,
                   initials: '${user.firstName[0]}${user.lastName[0]}',
-                  size: 32,
+                  size: 28,
                 ),
             ],
           ),
@@ -383,7 +386,7 @@ class _BarIconButton extends ConsumerWidget {
     return Tooltip(
       message: tooltip,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(glassMode ? 12 : 10),
+        borderRadius: BorderRadius.circular(glassMode ? 11 : 9),
         child: BackdropFilter(
           filter: ImageFilter.blur(
             sigmaX: glassMode ? 10 : 0,
@@ -393,21 +396,27 @@ class _BarIconButton extends ConsumerWidget {
             color: glassMode
                 ? Colors.white.withValues(alpha: isDark ? 0.06 : 0.28)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(glassMode ? 12 : 10),
+            borderRadius: BorderRadius.circular(glassMode ? 11 : 9),
             child: InkWell(
               onTap: onTap,
-              borderRadius: BorderRadius.circular(glassMode ? 12 : 10),
+              borderRadius: BorderRadius.circular(glassMode ? 11 : 9),
               child: Container(
-                padding: const EdgeInsets.all(7),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(glassMode ? 12 : 10),
+                  borderRadius: BorderRadius.circular(glassMode ? 11 : 9),
                   border: glassMode
                       ? Border.all(
-                          color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.42),
+                          color: Colors.white.withValues(
+                            alpha: isDark ? 0.10 : 0.42,
+                          ),
                         )
                       : null,
                 ),
-                child: Icon(icon, size: 20, color: cs.onSurface.withValues(alpha: 0.75)),
+                child: Icon(
+                  icon,
+                  size: 18,
+                  color: cs.onSurface.withValues(alpha: 0.75),
+                ),
               ),
             ),
           ),
@@ -606,8 +615,9 @@ class _GlassModeButton extends ConsumerWidget {
 
 class _LogoMark extends StatelessWidget {
   final bool compact;
+  final bool tiny;
 
-  const _LogoMark({this.compact = false});
+  const _LogoMark({this.compact = false, this.tiny = false});
 
   @override
   Widget build(BuildContext context) {
@@ -615,20 +625,20 @@ class _LogoMark extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: compact ? 28 : 34,
-          height: compact ? 28 : 34,
+          width: tiny ? 26 : (compact ? 28 : 34),
+          height: tiny ? 26 : (compact ? 28 : 34),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [AppColors.primary, AppColors.primaryLight],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(compact ? 8 : 10),
+            borderRadius: BorderRadius.circular(tiny ? 7 : (compact ? 8 : 10)),
           ),
           child: Icon(
             Icons.auto_awesome_rounded,
             color: Colors.white,
-            size: compact ? 16 : 20,
+            size: tiny ? 15 : (compact ? 16 : 20),
           ),
         ),
         if (!compact) ...[
