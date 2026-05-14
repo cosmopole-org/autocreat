@@ -79,7 +79,10 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
     return Scaffold(
       body: ticketsAsync.when(
         loading: () => const LoadingList(),
-        error: (e, _) => AppErrorWidget(message: e.toString()),
+        error: (e, _) => AppErrorWidget(
+          message: e.toString(),
+          onRetry: () => ref.read(ticketNotifierProvider.notifier).refresh(),
+        ),
         data: (tickets) {
           var filtered = tickets;
           final status = _selectedStatus;
