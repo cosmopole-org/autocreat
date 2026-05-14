@@ -150,9 +150,9 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
   Widget _buildMobileLayout() {
     final mediaQuery = MediaQuery.of(context);
     final topPadding = mediaQuery.padding.top;
-    const barHeight = 52.0;
-    const barMarginTop = 16.0;
-    const barMarginH = 22.0;
+    const barHeight = 46.0;
+    const barMarginTop = 14.0;
+    const barMarginH = 28.0;
     final floatingTopOffset = topPadding + barMarginTop;
     final contentTopPadding = floatingTopOffset + barHeight + barMarginTop;
 
@@ -472,7 +472,7 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Row(
           children: [
             if (showMenuButton) ...[

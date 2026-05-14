@@ -45,7 +45,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
           Padding(
             padding: AppPageLayout.contentPadding(
               context,
-              horizontal: 16,
+              horizontal: 20,
               bottom: 8,
             ),
             child: Column(
@@ -116,12 +116,12 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                 return Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
                       child: _CompanyStatsRow(companies: companies),
                     ),
                     Expanded(
                       child: GridView.builder(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(20),
                         gridDelegate:
                             const SliverGridDelegateWithMaxCrossAxisExtent(
                           maxCrossAxisExtent: 320,

@@ -296,7 +296,6 @@ class _FlowsChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final maxY = flows
             .map((f) => f.nodes.length.toDouble())
@@ -318,23 +317,8 @@ class _FlowsChart extends StatelessWidget {
       }
     }
 
-    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
-
-    return Container(
+    return AppCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -561,33 +545,14 @@ class _FlowCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final steps = flow.nodes.where((n) => n.type == NodeType.step).length;
     final decisions = flow.nodes.where((n) => n.type == NodeType.decision).length;
 
-    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
-
-    return GestureDetector(
+    return AppCard(
       onTap: onEdit,
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-              color: isDark
-                  ? AppColors.darkBorder
-                  : AppColors.lightBorder),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
+      padding: const EdgeInsets.all(18),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
