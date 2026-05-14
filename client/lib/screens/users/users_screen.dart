@@ -343,6 +343,7 @@ class _RoleDonut extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Group users by role
     final roleCounts = <String, int>{};
