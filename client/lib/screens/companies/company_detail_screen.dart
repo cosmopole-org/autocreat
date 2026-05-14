@@ -5,8 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import '../../core/constants.dart';
+import '../../data/demo_data.dart';
+import '../../models/company.dart';
 import '../../providers/company_provider.dart';
+import '../../providers/demo_provider.dart';
 import '../../providers/flow_provider.dart';
+import '../../data/demo_overrides.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -38,8 +42,13 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final companyAsync = ref.watch(companyDetailProvider(widget.id));
-    final flowsAsync = ref.watch(flowsProvider(widget.id));
+    final isDemo = ref.watch(isDemoModeProvider);
+    final companyAsync = isDemo
+        ? AsyncValue.data(Company.fromJson(DemoData.company))
+        : ref.watch(companyDetailProvider(widget.id));
+    final flowsAsync = isDemo
+        ? ref.watch(demoTypedFlowsProvider)
+        : ref.watch(flowsProvider(widget.id));
 
     return companyAsync.when(
       loading: () =>

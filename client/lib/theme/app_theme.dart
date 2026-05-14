@@ -105,6 +105,8 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
+          minimumSize: const Size(0, 46),
+          alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
@@ -113,6 +115,8 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
+          minimumSize: const Size(0, 46),
+          alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           side: const BorderSide(color: AppColors.primary, width: 1.5),
@@ -122,6 +126,8 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
+          minimumSize: const Size(0, 40),
+          alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
@@ -309,6 +315,8 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryLight,
           foregroundColor: Colors.white,
+          minimumSize: const Size(0, 46),
+          alignment: Alignment.center,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -318,6 +326,8 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryLight,
+          minimumSize: const Size(0, 46),
+          alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           side: const BorderSide(color: AppColors.primaryLight, width: 1.5),
@@ -327,6 +337,8 @@ class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primaryLight,
+          minimumSize: const Size(0, 40),
+          alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
