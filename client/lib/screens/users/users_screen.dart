@@ -67,11 +67,9 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    16,
-                    MediaQuery.of(context).padding.top + 16,
-                    16,
-                    0,
+                  padding: AppPageLayout.contentPadding(
+                    context,
+                    horizontal: 16,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

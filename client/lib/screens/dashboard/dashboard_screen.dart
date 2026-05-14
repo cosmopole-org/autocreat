@@ -55,11 +55,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(
-          16,
-          MediaQuery.of(context).padding.top + 16,
-          16,
-          32,
+        padding: AppPageLayout.contentPadding(
+          context,
+          horizontal: 16,
+          bottom: 32,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
