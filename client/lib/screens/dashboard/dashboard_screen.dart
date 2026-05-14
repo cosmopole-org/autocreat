@@ -139,7 +139,7 @@ class _WelcomeBanner extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
             AppColors.primary,
             AppColors.primaryLight,
@@ -150,7 +150,7 @@ class _WelcomeBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -175,7 +175,7 @@ class _WelcomeBanner extends StatelessWidget {
                 Text(
                   'Here\'s what\'s happening in your organization today.',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -200,7 +200,7 @@ class _WelcomeBanner extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
@@ -226,7 +226,7 @@ class _BannerPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.18),
+        color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -416,10 +416,10 @@ class _KpiCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outline.withOpacity(0.5)),
+          border: Border.all(color: cs.outline.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -435,7 +435,7 @@ class _KpiCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: data.color.withOpacity(0.1),
+                    color: data.color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(data.icon, color: data.color, size: 20),
@@ -476,7 +476,7 @@ class _KpiCard extends StatelessWidget {
                   data.subtitle,
                   style: TextStyle(
                     fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.45),
+                    color: cs.onSurface.withValues(alpha: 0.45),
                   ),
                 ),
               ],
@@ -504,11 +504,11 @@ class _ActivityLineChart extends StatelessWidget {
     return _ChartCard(
       title: 'Activity Overview',
       subtitle: 'Tickets & flows – last 7 days',
-      trailing: Row(
+      trailing: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           _Legend(color: AppColors.primary, label: 'Tickets'),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           _Legend(color: AppColors.accent, label: 'Flows'),
         ],
       ),
@@ -524,7 +524,7 @@ class _ActivityLineChart extends StatelessWidget {
               drawVerticalLine: false,
               horizontalInterval: 2,
               getDrawingHorizontalLine: (_) => FlLine(
-                color: cs.outline.withOpacity(0.2),
+                color: cs.outline.withValues(alpha: 0.2),
                 strokeWidth: 1,
               ),
             ),
@@ -542,7 +542,7 @@ class _ActivityLineChart extends StatelessWidget {
                     child: Text(
                       _days[v.toInt() % 7],
                       style: TextStyle(
-                          fontSize: 11, color: cs.onSurface.withOpacity(0.45)),
+                          fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45)),
                     ),
                   ),
                 ),
@@ -580,8 +580,8 @@ class _ActivityLineChart extends StatelessWidget {
                   show: true,
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.primary.withOpacity(0.18),
-                      AppColors.primary.withOpacity(0.0),
+                      AppColors.primary.withValues(alpha: 0.18),
+                      AppColors.primary.withValues(alpha: 0.0),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -601,8 +601,8 @@ class _ActivityLineChart extends StatelessWidget {
                   show: true,
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.accent.withOpacity(0.12),
-                      AppColors.accent.withOpacity(0.0),
+                      AppColors.accent.withValues(alpha: 0.12),
+                      AppColors.accent.withValues(alpha: 0.0),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -670,7 +670,7 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
             child: total == 0
                 ? Center(
                     child: Text('No tickets',
-                        style: TextStyle(color: cs.onSurface.withOpacity(0.4))))
+                        style: TextStyle(color: cs.onSurface.withValues(alpha: 0.4))))
                 : PieChart(
                     PieChartData(
                       sectionsSpace: 3,
@@ -713,7 +713,7 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
                             style: const TextStyle(fontSize: 12))),
                     Text(
                       data[i].toString(),
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 12, fontWeight: FontWeight.w700),
                     ),
                   ],
@@ -775,7 +775,7 @@ class _PriorityBarChart extends StatelessWidget {
               show: true,
               drawVerticalLine: false,
               getDrawingHorizontalLine: (_) => FlLine(
-                color: cs.outline.withOpacity(0.2),
+                color: cs.outline.withValues(alpha: 0.2),
                 strokeWidth: 1,
               ),
             ),
@@ -795,7 +795,7 @@ class _PriorityBarChart extends StatelessWidget {
                       labels[v.toInt()],
                       style: TextStyle(
                           fontSize: 11,
-                          color: cs.onSurface.withOpacity(0.5)),
+                          color: cs.onSurface.withValues(alpha: 0.5)),
                     ),
                   ),
                 ),
@@ -815,7 +815,7 @@ class _PriorityBarChart extends StatelessWidget {
                     backDrawRodData: BackgroundBarChartRodData(
                       show: true,
                       toY: maxY,
-                      color: colors[i].withOpacity(0.06),
+                      color: colors[i].withValues(alpha: 0.06),
                     ),
                   ),
                 ],
@@ -855,7 +855,7 @@ class _RecentTicketsList extends StatelessWidget {
       ),
       child: ticketsAsync.when(
         loading: () => const _TicketShimmer(),
-        error: (e, _) => Text('Error loading',
+        error: (e, _) => const Text('Error loading',
             style: TextStyle(color: AppColors.error, fontSize: 13)),
         data: (tickets) {
           if (tickets.isEmpty) {
@@ -864,7 +864,7 @@ class _RecentTicketsList extends StatelessWidget {
               child: Center(
                 child: Text('No tickets yet',
                     style: TextStyle(
-                        color: cs.onSurface.withOpacity(0.4), fontSize: 13)),
+                        color: cs.onSurface.withValues(alpha: 0.4), fontSize: 13)),
               ),
             );
           }
@@ -891,7 +891,7 @@ class _RecentTicketsList extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: cs.surface,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: cs.outline.withOpacity(0.3)),
+                  border: Border.all(color: cs.outline.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -922,7 +922,7 @@ class _RecentTicketsList extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: statusColor.withOpacity(0.1),
+                                  color: statusColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -939,7 +939,7 @@ class _RecentTicketsList extends StatelessWidget {
                       ),
                     ),
                     Icon(Icons.chevron_right_rounded,
-                        size: 16, color: cs.onSurface.withOpacity(0.3)),
+                        size: 16, color: cs.onSurface.withValues(alpha: 0.3)),
                   ],
                 ),
               );
@@ -963,7 +963,7 @@ class _TicketShimmer extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: 4),
           height: 56,
           decoration: BoxDecoration(
-            color: AppColors.lightBorder.withOpacity(0.5),
+            color: AppColors.lightBorder.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(10),
           ),
         ),
@@ -989,9 +989,9 @@ class _PerformanceSection extends StatelessWidget {
         final total = list.length;
         if (total == 0) {
           return <_MetricData>[
-            _MetricData('Resolution Rate', 0, AppColors.success),
-            _MetricData('In Progress', 0, AppColors.info),
-            _MetricData('SLA Compliance', 0, AppColors.primary),
+            const _MetricData('Resolution Rate', 0, AppColors.success),
+            const _MetricData('In Progress', 0, AppColors.info),
+            const _MetricData('SLA Compliance', 0, AppColors.primary),
           ];
         }
         final resolved =
@@ -1007,9 +1007,9 @@ class _PerformanceSection extends StatelessWidget {
         ];
       },
       orElse: () => <_MetricData>[
-        _MetricData('Resolution Rate', 0.72, AppColors.success),
-        _MetricData('In Progress', 0.18, AppColors.info),
-        _MetricData('SLA Compliance', 0.85, AppColors.primary),
+        const _MetricData('Resolution Rate', 0.72, AppColors.success),
+        const _MetricData('In Progress', 0.18, AppColors.info),
+        const _MetricData('SLA Compliance', 0.85, AppColors.primary),
       ],
     );
 
@@ -1043,7 +1043,7 @@ class _PerformanceSection extends StatelessWidget {
                     LinearPercentIndicator(
                       lineHeight: 8,
                       percent: m.value.clamp(0.0, 1.0),
-                      backgroundColor: m.color.withOpacity(0.1),
+                      backgroundColor: m.color.withValues(alpha: 0.1),
                       progressColor: m.color,
                       barRadius: const Radius.circular(4),
                       padding: EdgeInsets.zero,
@@ -1129,10 +1129,10 @@ class _QuickActionsSection extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: cs.surface,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: color.withOpacity(0.25)),
+                    border: Border.all(color: color.withValues(alpha: 0.25)),
                     boxShadow: [
                       BoxShadow(
-                        color: color.withOpacity(isDark ? 0.08 : 0.05),
+                        color: color.withValues(alpha: isDark ? 0.08 : 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
@@ -1143,7 +1143,7 @@ class _QuickActionsSection extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
+                          color: color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(icon, color: color, size: 18),
@@ -1160,7 +1160,7 @@ class _QuickActionsSection extends StatelessWidget {
                         ),
                       ),
                       Icon(Icons.arrow_forward_ios_rounded,
-                          size: 12, color: color.withOpacity(0.6)),
+                          size: 12, color: color.withValues(alpha: 0.6)),
                     ],
                   ),
                 ),
@@ -1201,10 +1201,10 @@ class _ChartCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -1228,7 +1228,7 @@ class _ChartCard extends StatelessWidget {
                   Text(subtitle,
                       style: TextStyle(
                           fontSize: 11,
-                          color: cs.onSurface.withOpacity(0.45))),
+                          color: cs.onSurface.withValues(alpha: 0.45))),
                 ],
               ),
               if (trailing != null) trailing!,
@@ -1263,7 +1263,7 @@ class _Legend extends StatelessWidget {
         Text(label,
             style: TextStyle(
                 fontSize: 11,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
       ],
     );
   }

@@ -282,10 +282,10 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -296,7 +296,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -321,7 +321,7 @@ class _StatCard extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.55),
+                    color: cs.onSurface.withValues(alpha: 0.55),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -373,10 +373,10 @@ class _FlowsChart extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -399,14 +399,14 @@ class _FlowsChart extends StatelessWidget {
                   Text('Nodes and edges per flow',
                       style: TextStyle(
                           fontSize: 11,
-                          color: cs.onSurface.withOpacity(0.45))),
+                          color: cs.onSurface.withValues(alpha: 0.45))),
                 ],
               ),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withOpacity(0.1),
+                  color: AppColors.accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -475,7 +475,7 @@ class _FlowsChart extends StatelessWidget {
           show: true,
           drawVerticalLine: false,
           getDrawingHorizontalLine: (_) => FlLine(
-            color: cs.outline.withOpacity(0.2),
+            color: cs.outline.withValues(alpha: 0.2),
             strokeWidth: 1,
           ),
         ),
@@ -501,7 +501,7 @@ class _FlowsChart extends StatelessWidget {
                   child: Text(short,
                       style: TextStyle(
                           fontSize: 9,
-                          color: cs.onSurface.withOpacity(0.5))),
+                          color: cs.onSurface.withValues(alpha: 0.5))),
                 );
               },
             ),
@@ -521,7 +521,7 @@ class _FlowsChart extends StatelessWidget {
                 backDrawRodData: BackgroundBarChartRodData(
                   show: true,
                   toY: maxY.clamp(4.0, 20.0),
-                  color: color.withOpacity(0.06),
+                  color: color.withValues(alpha: 0.06),
                 ),
               ),
             ],
@@ -546,7 +546,7 @@ class _FlowsChart extends StatelessWidget {
             style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: cs.onSurface.withOpacity(0.7))),
+                color: cs.onSurface.withValues(alpha: 0.7))),
         const SizedBox(height: 8),
         ...typeMap.entries.map((e) {
           final color =
@@ -610,8 +610,8 @@ class _FlowCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final steps = flow.nodes.where((n) => n.type == 'step').length;
-    final decisions = flow.nodes.where((n) => n.type == 'decision').length;
+    final steps = flow.nodes.where((n) => n.type == NodeType.step).length;
+    final decisions = flow.nodes.where((n) => n.type == NodeType.decision).length;
 
     return GestureDetector(
       onTap: onEdit,
@@ -620,10 +620,10 @@ class _FlowCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outline.withOpacity(0.4)),
+          border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -637,7 +637,7 @@ class _FlowCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.12),
+                    color: AppColors.primary.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.account_tree_rounded,
@@ -648,7 +648,7 @@ class _FlowCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: _statusColor.withOpacity(0.1),
+                    color: _statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -663,7 +663,7 @@ class _FlowCard extends StatelessWidget {
                 const Spacer(),
                 PopupMenuButton<String>(
                   icon: Icon(Icons.more_vert,
-                      size: 18, color: cs.onSurface.withOpacity(0.5)),
+                      size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                   itemBuilder: (_) => [
                     const PopupMenuItem(
                         value: 'edit', child: Text('Open Editor')),
@@ -697,7 +697,7 @@ class _FlowCard extends StatelessWidget {
               Text(
                 flow.description!,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: cs.onSurface.withOpacity(0.55),
+                      color: cs.onSurface.withValues(alpha: 0.55),
                     ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -741,7 +741,7 @@ class _FlowCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Icon(Icons.edit_outlined,
-                    size: 14, color: cs.onSurface.withOpacity(0.3)),
+                    size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
               ],
             ),
           ],
@@ -767,7 +767,7 @@ class _FlowChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(

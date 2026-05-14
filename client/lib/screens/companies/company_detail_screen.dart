@@ -293,7 +293,7 @@ class _LogoFallback extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Center(
@@ -347,7 +347,7 @@ class _CapacityIndicator extends StatelessWidget {
         LinearPercentIndicator(
           lineHeight: 8,
           percent: value,
-          backgroundColor: color.withOpacity(0.12),
+          backgroundColor: color.withValues(alpha: 0.12),
           progressColor: color,
           barRadius: const Radius.circular(4),
           padding: EdgeInsets.zero,

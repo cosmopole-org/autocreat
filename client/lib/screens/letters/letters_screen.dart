@@ -281,10 +281,10 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -295,7 +295,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -320,7 +320,7 @@ class _StatCard extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.55),
+                    color: cs.onSurface.withValues(alpha: 0.55),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -365,10 +365,10 @@ class _CategoryChart extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -391,14 +391,14 @@ class _CategoryChart extends StatelessWidget {
                   Text('Distribution across categories',
                       style: TextStyle(
                           fontSize: 11,
-                          color: cs.onSurface.withOpacity(0.45))),
+                          color: cs.onSurface.withValues(alpha: 0.45))),
                 ],
               ),
               // Variable usage indicator
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -525,7 +525,7 @@ class _CategoryDropdown extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.outline.withOpacity(0.5)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.5)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String?>(
@@ -586,10 +586,10 @@ class _LetterCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outline.withOpacity(0.4)),
+          border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -604,7 +604,7 @@ class _LetterCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withOpacity(0.12),
+                    color: AppColors.warning.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.mail_rounded,
@@ -615,7 +615,7 @@ class _LetterCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: _statusColor.withOpacity(0.1),
+                    color: _statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -630,7 +630,7 @@ class _LetterCard extends StatelessWidget {
                 const Spacer(),
                 PopupMenuButton<String>(
                   icon: Icon(Icons.more_vert,
-                      size: 18, color: cs.onSurface.withOpacity(0.5)),
+                      size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                   itemBuilder: (_) => [
                     const PopupMenuItem(value: 'edit', child: Text('Edit')),
                     const PopupMenuItem(
@@ -664,7 +664,7 @@ class _LetterCard extends StatelessWidget {
               Text(
                 letter.description!,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: cs.onSurface.withOpacity(0.55),
+                      color: cs.onSurface.withValues(alpha: 0.55),
                     ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -703,20 +703,20 @@ class _LetterCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.code, size: 10,
-                          color: cs.onSurface.withOpacity(0.5)),
+                          color: cs.onSurface.withValues(alpha: 0.5)),
                       const SizedBox(width: 3),
                       Text(
                         '${letter.variables.length} vars',
                         style: TextStyle(
                             fontSize: 10,
-                            color: cs.onSurface.withOpacity(0.6)),
+                            color: cs.onSurface.withValues(alpha: 0.6)),
                       ),
                     ],
                   ),
                 ),
                 const Spacer(),
                 Icon(Icons.edit_outlined,
-                    size: 14, color: cs.onSurface.withOpacity(0.3)),
+                    size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
               ],
             ),
           ],

@@ -330,7 +330,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                         return LinearPercentIndicator(
                           lineHeight: 8,
                           percent: sla,
-                          backgroundColor: slaColor.withOpacity(0.15),
+                          backgroundColor: slaColor.withValues(alpha: 0.15),
                           progressColor: slaColor,
                           barRadius: const Radius.circular(4),
                           padding: EdgeInsets.zero,
@@ -355,11 +355,11 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: _priorityColor(ticket.priority)
-                            .withOpacity(0.1),
+                            .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                             color: _priorityColor(ticket.priority)
-                                .withOpacity(0.3)),
+                                .withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
@@ -451,7 +451,7 @@ class _MessageBubble extends StatelessWidget {
                             horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
                           color: isOwn
-                              ? AppColors.primary.withOpacity(0.8)
+                              ? AppColors.primary.withValues(alpha: 0.8)
                               : (isDark
                                   ? AppColors.darkCard
                                   : Colors.white),

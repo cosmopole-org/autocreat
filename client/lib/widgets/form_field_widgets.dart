@@ -205,11 +205,18 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
           onTap: widget.readOnly
               ? null
               : () async {
+                  final localizations = MaterialLocalizations.of(context);
+                  final alwaysUse24h = MediaQuery.alwaysUse24HourFormatOf(context);
                   final time = await showTimePicker(
                     context: context,
                     initialTime: TimeOfDay.now(),
                   );
-                  widget.onChanged?.call(time?.format(context));
+                  if (!mounted) return;
+                  widget.onChanged?.call(
+                    time == null
+                        ? null
+                        : localizations.formatTimeOfDay(time, alwaysUse24HourFormat: alwaysUse24h),
+                  );
                 },
           child: InputDecorator(
             decoration: InputDecoration(
@@ -230,7 +237,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
         return DottedBorder(
           borderType: BorderType.RRect,
           radius: const Radius.circular(12),
-          color: AppColors.primary.withOpacity(0.4),
+          color: AppColors.primary.withValues(alpha: 0.4),
           strokeWidth: 1.5,
           dashPattern: const [6, 3],
           child: InkWell(
@@ -257,7 +264,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                         ? Icons.insert_drive_file_outlined
                         : Icons.upload_file,
                     size: 36,
-                    color: AppColors.primary.withOpacity(0.7),
+                    color: AppColors.primary.withValues(alpha: 0.7),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -304,7 +311,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
         return DottedBorder(
           borderType: BorderType.RRect,
           radius: const Radius.circular(12),
-          color: AppColors.accent.withOpacity(0.4),
+          color: AppColors.accent.withValues(alpha: 0.4),
           strokeWidth: 1.5,
           dashPattern: const [6, 3],
           child: InkWell(
@@ -365,7 +372,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                         Icon(
                           Icons.add_photo_alternate_outlined,
                           size: 40,
-                          color: AppColors.accent.withOpacity(0.7),
+                          color: AppColors.accent.withValues(alpha: 0.7),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -406,7 +413,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                           pickerColor: color,
                           onColorChanged: (c) {
                             setState(() => _selectedColor = c);
-                            widget.onChanged?.call(c.value);
+                            widget.onChanged?.call(((c.a * 255).round() << 24) | ((c.r * 255).round() << 16) | ((c.g * 255).round() << 8) | (c.b * 255).round());
                           },
                         ),
                       ),
@@ -428,7 +435,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
             ),
             child: Center(
               child: Text(
-                '#${color.value.toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}',
+                '#${(color.r * 255).round().toRadixString(16).padLeft(2, '0')}${(color.g * 255).round().toRadixString(16).padLeft(2, '0')}${(color.b * 255).round().toRadixString(16).padLeft(2, '0')}'.toUpperCase(),
                 style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -529,7 +536,7 @@ class _TableField extends StatefulWidget {
 }
 
 class _TableFieldState extends State<_TableField> {
-  List<List<String>> _rows = [];
+  final List<List<String>> _rows = [];
   final List<String> _headers = ['Column 1', 'Column 2', 'Column 3'];
 
   @override

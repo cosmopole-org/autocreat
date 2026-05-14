@@ -9,8 +9,8 @@ void main() {
   testWidgets('AutoCreat app smoke test', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(
-      ProviderScope(
-        child: const AutoCreatApp(),
+      const ProviderScope(
+        child: AutoCreatApp(),
       ),
     );
     expect(find.byType(MaterialApp), findsOneWidget);

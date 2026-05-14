@@ -259,10 +259,10 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -273,7 +273,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -298,7 +298,7 @@ class _StatCard extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.55),
+                    color: cs.onSurface.withValues(alpha: 0.55),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -352,10 +352,10 @@ class _FieldTypeChart extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -371,13 +371,13 @@ class _FieldTypeChart extends StatelessWidget {
                   ?.copyWith(fontWeight: FontWeight.w700)),
           Text('Count of each field type across all forms',
               style: TextStyle(
-                  fontSize: 11, color: cs.onSurface.withOpacity(0.45))),
+                  fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           if (top.isEmpty)
             Center(
               child: Text('No fields defined',
                   style:
-                      TextStyle(color: cs.onSurface.withOpacity(0.4))),
+                      TextStyle(color: cs.onSurface.withValues(alpha: 0.4))),
             )
           else
             SizedBox(
@@ -390,7 +390,7 @@ class _FieldTypeChart extends StatelessWidget {
                     show: true,
                     drawVerticalLine: false,
                     getDrawingHorizontalLine: (_) => FlLine(
-                      color: cs.outline.withOpacity(0.2),
+                      color: cs.outline.withValues(alpha: 0.2),
                       strokeWidth: 1,
                     ),
                   ),
@@ -413,7 +413,7 @@ class _FieldTypeChart extends StatelessWidget {
                               top[idx].key,
                               style: TextStyle(
                                   fontSize: 10,
-                                  color: cs.onSurface.withOpacity(0.5)),
+                                  color: cs.onSurface.withValues(alpha: 0.5)),
                             ),
                           );
                         },
@@ -434,7 +434,7 @@ class _FieldTypeChart extends StatelessWidget {
                           backDrawRodData: BackgroundBarChartRodData(
                             show: true,
                             toY: maxVal + 1,
-                            color: color.withOpacity(0.06),
+                            color: color.withValues(alpha: 0.06),
                           ),
                         ),
                       ],
@@ -485,10 +485,10 @@ class _FormCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outline.withOpacity(0.4)),
+          border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -502,7 +502,7 @@ class _FormCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.12),
+                    color: AppColors.accent.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.dynamic_form_rounded,
@@ -513,7 +513,7 @@ class _FormCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: _statusColor.withOpacity(0.1),
+                    color: _statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -528,7 +528,7 @@ class _FormCard extends StatelessWidget {
                 const Spacer(),
                 PopupMenuButton<String>(
                   icon: Icon(Icons.more_vert,
-                      size: 18, color: cs.onSurface.withOpacity(0.5)),
+                      size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                   itemBuilder: (_) => [
                     const PopupMenuItem(
                         value: 'edit', child: Text('Open Editor')),
@@ -561,7 +561,7 @@ class _FormCard extends StatelessWidget {
               Text(
                 form.description!,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: cs.onSurface.withOpacity(0.55),
+                      color: cs.onSurface.withValues(alpha: 0.55),
                     ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -588,7 +588,7 @@ class _FormCard extends StatelessWidget {
                             f.type.name,
                             style: TextStyle(
                                 fontSize: 9,
-                                color: cs.onSurface.withOpacity(0.6)),
+                                color: cs.onSurface.withValues(alpha: 0.6)),
                           ),
                         ))
                     .toList()
@@ -616,16 +616,16 @@ class _FormCard extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.list_alt_rounded,
-                    size: 13, color: cs.onSurface.withOpacity(0.4)),
+                    size: 13, color: cs.onSurface.withValues(alpha: 0.4)),
                 const SizedBox(width: 4),
                 Text(
                   '${form.fields.length} fields',
                   style: TextStyle(
-                      fontSize: 11, color: cs.onSurface.withOpacity(0.55)),
+                      fontSize: 11, color: cs.onSurface.withValues(alpha: 0.55)),
                 ),
                 const Spacer(),
                 Icon(Icons.edit_outlined,
-                    size: 14, color: cs.onSurface.withOpacity(0.3)),
+                    size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
               ],
             ),
           ],

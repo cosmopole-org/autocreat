@@ -224,7 +224,7 @@ class _GraphEditorState extends State<GraphEditor>
         widget.onEdgeDelete?.call(widget.selectedEdgeId!);
       }
     } else if (event.logicalKey == LogicalKeyboardKey.escape) {
-      widget.onNodeTap?.call(FlowNode(id: '', label: '', type: NodeType.step));
+      widget.onNodeTap?.call(const FlowNode(id: '', label: '', type: NodeType.step));
     }
   }
 
@@ -253,9 +253,9 @@ class _GraphEditorState extends State<GraphEditor>
         ),
         const PopupMenuDivider(height: 1),
         PopupMenuItem<Object?>(
-          child: Row(children: [
+          child: const Row(children: [
             Icon(Icons.delete_outline, size: 16, color: AppColors.error),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text('Delete node',
                 style: TextStyle(color: AppColors.error)),
           ]),
@@ -277,9 +277,9 @@ class _GraphEditorState extends State<GraphEditor>
       ),
       items: <PopupMenuEntry<Object?>>[
         PopupMenuItem<Object?>(
-          child: Row(children: [
+          child: const Row(children: [
             Icon(Icons.delete_outline, size: 16, color: AppColors.error),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text('Delete edge',
                 style: TextStyle(color: AppColors.error)),
           ]),
@@ -379,7 +379,7 @@ class _GraphEditorState extends State<GraphEditor>
     }
     // Deselect
     widget.onNodeTap
-        ?.call(FlowNode(id: '', label: '', type: NodeType.step));
+        ?.call(const FlowNode(id: '', label: '', type: NodeType.step));
   }
 
   void _onDoubleTap() {
@@ -628,7 +628,7 @@ class _GraphPainter extends CustomPainter {
     canvas.drawRRect(
       RRect.fromRectAndRadius(rect.inflate(6), const Radius.circular(18)),
       Paint()
-        ..color = color.withOpacity(0.25)
+        ..color = color.withValues(alpha: 0.25)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
     );
   }
@@ -660,7 +660,7 @@ class _GraphPainter extends CustomPainter {
       canvas.drawPath(
         path,
         Paint()
-          ..color = edgeSelectedColor.withOpacity(0.3)
+          ..color = edgeSelectedColor.withValues(alpha: 0.3)
           ..strokeWidth = 6
           ..style = PaintingStyle.stroke
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
@@ -711,7 +711,7 @@ class _GraphPainter extends CustomPainter {
       canvas,
       path,
       Paint()
-        ..color = AppColors.accent.withOpacity(0.8)
+        ..color = AppColors.accent.withValues(alpha: 0.8)
         ..strokeWidth = 2
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round,
@@ -720,7 +720,7 @@ class _GraphPainter extends CustomPainter {
     canvas.drawCircle(
       p3,
       5,
-      Paint()..color = AppColors.accent.withOpacity(0.6),
+      Paint()..color = AppColors.accent.withValues(alpha: 0.6),
     );
   }
 
@@ -764,7 +764,7 @@ class _GraphPainter extends CustomPainter {
           color: selected ? edgeSelectedColor : textSecondary,
           fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
           background: Paint()
-            ..color = bgColor.withOpacity(0.85)
+            ..color = bgColor.withValues(alpha: 0.85)
             ..style = PaintingStyle.fill,
         ),
       ),
@@ -779,13 +779,13 @@ class _GraphPainter extends CustomPainter {
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(rect, const Radius.circular(6)),
-      Paint()..color = bgColor.withOpacity(0.9),
+      Paint()..color = bgColor.withValues(alpha: 0.9),
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(rect, const Radius.circular(6)),
       Paint()
         ..color =
-            (selected ? edgeSelectedColor : edgeColor).withOpacity(0.6)
+            (selected ? edgeSelectedColor : edgeColor).withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1,
     );
@@ -826,7 +826,7 @@ class _GraphPainter extends CustomPainter {
       canvas.drawCircle(
         badgeCenter,
         badgeR,
-        Paint()..color = color.withOpacity(0.15),
+        Paint()..color = color.withValues(alpha: 0.15),
       );
       _paintText(
         canvas,
@@ -875,7 +875,7 @@ class _GraphPainter extends CustomPainter {
           Rect.fromLTWH(bp.dx - 2, bp.dy - 1, 34, 12),
           const Radius.circular(4),
         ),
-        Paint()..color = color.withOpacity(0.12),
+        Paint()..color = color.withValues(alpha: 0.12),
       );
       _paintTextBox(canvas, badgeText, bp, 32, 8, color,
           fontWeight: FontWeight.w600);
@@ -910,7 +910,7 @@ class _GraphPainter extends CustomPainter {
 
       // Outer ring
       canvas.drawCircle(sp, radius + 2,
-          Paint()..color = portColor.withOpacity(showPorts ? 0.2 : 0.0));
+          Paint()..color = portColor.withValues(alpha: showPorts ? 0.2 : 0.0));
       // Circle
       canvas.drawCircle(
           sp, radius, Paint()..color = nodeBg);
@@ -1047,15 +1047,15 @@ class GraphMinimap extends StatelessWidget {
         height: 100,
         decoration: BoxDecoration(
           color: isDark
-              ? const Color(0xFF1C2333).withOpacity(0.96)
-              : Colors.white.withOpacity(0.96),
+              ? const Color(0xFF1C2333).withValues(alpha: 0.96)
+              : Colors.white.withValues(alpha: 0.96),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
+              color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -1104,7 +1104,7 @@ class _MinimapPainter extends CustomPainter {
           text: 'No nodes',
           style: TextStyle(
               fontSize: 9,
-              color: AppColors.lightTextSecondary.withOpacity(0.6)),
+              color: AppColors.lightTextSecondary.withValues(alpha: 0.6)),
         ),
         textDirection: TextDirection.ltr,
       );
@@ -1136,7 +1136,7 @@ class _MinimapPainter extends CustomPainter {
         RRect.fromRectAndRadius(
             Rect.fromLTWH(rx, ry, rw, rh), const Radius.circular(2)),
         Paint()
-          ..color = AppUtils.getNodeTypeColor(node.type.name).withOpacity(0.65)
+          ..color = AppUtils.getNodeTypeColor(node.type.name).withValues(alpha: 0.65)
           ..style = PaintingStyle.fill,
       );
     }
@@ -1150,13 +1150,13 @@ class _MinimapPainter extends CustomPainter {
     canvas.drawRect(
       Rect.fromLTWH(vpLeft, vpTop, vpW, vpH),
       Paint()
-        ..color = AppColors.primary.withOpacity(0.12)
+        ..color = AppColors.primary.withValues(alpha: 0.12)
         ..style = PaintingStyle.fill,
     );
     canvas.drawRect(
       Rect.fromLTWH(vpLeft, vpTop, vpW, vpH),
       Paint()
-        ..color = AppColors.primary.withOpacity(0.5)
+        ..color = AppColors.primary.withValues(alpha: 0.5)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.2,
     );

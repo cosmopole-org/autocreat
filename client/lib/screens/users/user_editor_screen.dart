@@ -243,7 +243,9 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                       validator: (v) {
                         if (v?.isEmpty ?? true) return 'Required';
                         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(v!)) return 'Invalid email';
+                            .hasMatch(v!)) {
+                          return 'Invalid email';
+                        }
                         return null;
                       },
                     ),

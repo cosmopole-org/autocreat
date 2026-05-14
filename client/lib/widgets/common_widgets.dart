@@ -39,8 +39,8 @@ class AppCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: selected
-                ? AppColors.primary.withOpacity(0.12)
-                : Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+                ? AppColors.primary.withValues(alpha: 0.12)
+                : Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: selected ? 10 : 8,
             offset: const Offset(0, 3),
           ),
@@ -152,17 +152,17 @@ class EmptyState extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.primary.withOpacity(0.12),
-                    AppColors.primaryLight.withOpacity(0.06),
+                    AppColors.primary.withValues(alpha: 0.12),
+                    AppColors.primaryLight.withValues(alpha: 0.06),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 shape: BoxShape.circle,
                 border: Border.all(
-                    color: AppColors.primary.withOpacity(0.15), width: 1.5),
+                    color: AppColors.primary.withValues(alpha: 0.15), width: 1.5),
               ),
-              child: Icon(icon, size: 40, color: AppColors.primary.withOpacity(0.65)),
+              child: Icon(icon, size: 40, color: AppColors.primary.withValues(alpha: 0.65)),
             ),
             const SizedBox(height: 24),
             Text(
@@ -178,7 +178,7 @@ class EmptyState extends StatelessWidget {
               Text(
                 subtitle!,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: cs.onSurface.withOpacity(0.5),
+                      color: cs.onSurface.withValues(alpha: 0.5),
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -292,9 +292,9 @@ class StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: c.withOpacity(0.12),
+        color: c.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: c.withOpacity(0.3), width: 1),
+        border: Border.all(color: c.withValues(alpha: 0.3), width: 1),
       ),
       child: Text(
         status,
@@ -458,8 +458,8 @@ class AvatarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = color ?? AppColors.primary.withOpacity(0.15);
-    final borderColor = color?.withOpacity(0.3) ?? AppColors.primary.withOpacity(0.2);
+    final bgColor = color ?? AppColors.primary.withValues(alpha: 0.15);
+    final borderColor = color?.withValues(alpha: 0.3) ?? AppColors.primary.withValues(alpha: 0.2);
 
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return CachedNetworkImage(
