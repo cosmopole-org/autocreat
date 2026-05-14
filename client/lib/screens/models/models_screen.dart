@@ -250,7 +250,7 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
     final entries = widget.typeMap.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    final colors = AppColors.chartColors;
+    const colors = AppColors.chartColors;
 
     final total = entries.fold<int>(0, (s, e) => s + e.value);
 

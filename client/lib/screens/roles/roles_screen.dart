@@ -210,7 +210,7 @@ class _MembersBarChart extends StatelessWidget {
             .toDouble() +
         1;
 
-    final colors = AppColors.chartColors;
+    const colors = AppColors.chartColors;
 
     return AppCard(
       padding: const EdgeInsets.all(20),

@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
-import '../../core/constants.dart';
 import '../../models/model_definition.dart';
 import '../../providers/model_provider.dart';
 import '../../theme/app_colors.dart';

@@ -259,7 +259,7 @@ class _FlowsChart extends StatelessWidget {
             .fold<double>(0, (a, b) => a > b ? a : b) +
         2;
 
-    final colors = AppColors.chartColors;
+    const colors = AppColors.chartColors;
 
     // Node type breakdown
     final typeMap = <String, int>{};
