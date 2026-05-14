@@ -426,42 +426,37 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
               label: Text(_isMobileNodeEditorOpen ? 'Hide properties' : 'Edit node'),
             )
           : null,
+      bottomSheet: isMobile && editorState.selectedNode != null && _isMobileNodeEditorOpen
+          ? BottomSheet(
+              enableDrag: true,
+              showDragHandle: true,
+              onClosing: () {
+                if (mounted) {
+                  setState(() => _isMobileNodeEditorOpen = false);
+                }
+              },
+              builder: (context) => SafeArea(
+                top: false,
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.56,
+                  child: FlowNodeEditor(
+                    node: editorState.selectedNode!,
+                    onUpdate: (updated) =>
+                        ref.read(flowEditorProvider.notifier).updateNode(updated),
+                    onDelete: () => ref
+                        .read(flowEditorProvider.notifier)
+                        .deleteNode(editorState.selectedNode!.id),
+                  ),
+                ),
+              ),
+            )
+          : null,
     );
   }
 
-  Future<void> _toggleMobileNodeEditor(FlowEditorState editorState) async {
-    if (_isMobileNodeEditorOpen) {
-      Navigator.of(context).pop();
-      return;
-    }
-    final selected = editorState.selectedNode;
-    if (selected == null) return;
-    setState(() => _isMobileNodeEditorOpen = true);
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.52,
-        minChildSize: 0.36,
-        maxChildSize: 0.9,
-        builder: (context, scrollController) => SingleChildScrollView(
-          controller: scrollController,
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: FlowNodeEditor(
-              node: selected,
-              onUpdate: (updated) =>
-                  ref.read(flowEditorProvider.notifier).updateNode(updated),
-              onDelete: () =>
-                  ref.read(flowEditorProvider.notifier).deleteNode(selected.id),
-            ),
-          ),
-        ),
-      ),
-    );
-    if (mounted) setState(() => _isMobileNodeEditorOpen = false);
+  void _toggleMobileNodeEditor(FlowEditorState editorState) {
+    if (editorState.selectedNode == null) return;
+    setState(() => _isMobileNodeEditorOpen = !_isMobileNodeEditorOpen);
   }
 
   void _showMobileControls(
