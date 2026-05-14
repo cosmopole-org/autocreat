@@ -7,7 +7,6 @@ import 'package:percent_indicator/percent_indicator.dart';
 
 import '../../core/constants.dart';
 import '../../models/company.dart';
-import '../../models/flow.dart';
 import '../../models/ticket.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/company_provider.dart';
@@ -50,7 +49,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     final companies = companiesAsync.valueOrNull ?? <Company>[];
     final tickets = ticketsAsync.valueOrNull ?? <Ticket>[];
-    final flows = flowsAsync.valueOrNull ?? <Flow>[];
+    final flowCount = flowsAsync.valueOrNull?.length ?? 0;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -66,7 +65,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             const SizedBox(height: 24),
             _KpiRow(
               companyCount: companies.length,
-              flowCount: flows.length,
+              flowCount: flowCount,
               openTickets:
                   tickets.where((t) => t.status == TicketStatus.open).length,
               resolvedTickets:
@@ -82,7 +81,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(flex: 5, child: _ActivityLineChart()),
+                    const Expanded(flex: 5, child: _ActivityLineChart()),
                     const SizedBox(width: 16),
                     Expanded(
                         flex: 3, child: _TicketStatusDonut(tickets: tickets)),
@@ -92,7 +91,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _ActivityLineChart(),
+                  const _ActivityLineChart(),
                   const SizedBox(height: 16),
                   _TicketStatusDonut(tickets: tickets),
                 ],
