@@ -279,28 +279,12 @@ class _FieldCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onSelect,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        margin: const EdgeInsets.only(bottom: 8),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: AppCard(
+        onTap: onSelect,
+        selected: isSelected,
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.08)
-              : (Theme.of(context).brightness == Brightness.dark
-                  ? AppColors.darkCard
-                  : AppColors.lightSurface),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? AppColors.primary
-                : (Theme.of(context).brightness == Brightness.dark
-                    ? AppColors.darkBorder
-                    : AppColors.lightBorder),
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
         child: Row(
           children: [
             const Icon(

@@ -24,8 +24,12 @@ class AppTheme {
     );
   }
 
-  static ThemeData light() {
+  static ThemeData light({bool glassMode = false}) {
     final base = ThemeData.light(useMaterial3: true);
+    final surface = glassMode ? Colors.white.withValues(alpha: 0.62) : AppColors.lightSurface;
+    final card = glassMode ? Colors.white.withValues(alpha: 0.70) : AppColors.lightCard;
+    final inputFill = glassMode ? Colors.white.withValues(alpha: 0.46) : AppColors.lightSurface;
+    final border = glassMode ? Colors.white.withValues(alpha: 0.58) : AppColors.lightBorder;
     return base.copyWith(
       colorScheme: ColorScheme.light(
         primary: AppColors.primary,
@@ -34,25 +38,25 @@ class AppTheme {
         onPrimaryContainer: AppColors.primaryDark,
         secondary: AppColors.accent,
         onSecondary: Colors.white,
-        surface: AppColors.lightCard,
+        surface: card,
         onSurface: AppColors.lightText,
         surfaceContainerHighest: AppColors.lightBg,
-        surfaceContainer: AppColors.lightSurface,
+        surfaceContainer: surface,
         error: AppColors.error,
         onError: Colors.white,
         outline: AppColors.lightBorder,
         outlineVariant: AppColors.lightBorder.withValues(alpha: 0.5),
       ),
       scaffoldBackgroundColor: Colors.transparent,
-      drawerTheme: const DrawerThemeData(
-        backgroundColor: AppColors.lightSurface,
+      drawerTheme: DrawerThemeData(
+        backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.58) : AppColors.lightSurface,
         elevation: 0,
         shadowColor: Colors.transparent,
-        shape: RoundedRectangleBorder(),
+        shape: const RoundedRectangleBorder(),
       ),
       textTheme: _buildTextTheme(base.textTheme, AppColors.lightText, AppColors.lightTextSecondary),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.lightCard,
+        backgroundColor: card,
         foregroundColor: AppColors.lightText,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -63,27 +67,27 @@ class AppTheme {
         ),
         iconTheme: const IconThemeData(color: AppColors.lightText),
         actionsIconTheme: const IconThemeData(color: AppColors.lightTextSecondary),
-        shape: const Border(bottom: BorderSide(color: AppColors.lightBorder, width: 1)),
+        shape: Border(bottom: BorderSide(color: border, width: 1)),
       ),
       cardTheme: CardTheme(
-        color: AppColors.lightCard,
+        color: card,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.lightBorder, width: 1),
+          side: BorderSide(color: border, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.lightSurface,
+        fillColor: inputFill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.lightBorder, width: 1),
+          borderSide: BorderSide(color: border, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.lightBorder, width: 1),
+          borderSide: BorderSide(color: border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -104,46 +108,62 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: glassMode
+              ? AppColors.primary.withValues(alpha: 0.72)
+              : AppColors.primary,
           foregroundColor: Colors.white,
-          elevation: 0,
+          elevation: glassMode ? 8 : 0,
+          shadowColor: glassMode
+              ? AppColors.primary.withValues(alpha: 0.24)
+              : Colors.transparent,
           minimumSize: const Size(0, 46),
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 16 : 12)),
+          side: glassMode
+              ? BorderSide(color: Colors.white.withValues(alpha: 0.42), width: 1)
+              : BorderSide.none,
+          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
+          backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.34) : null,
           foregroundColor: AppColors.primary,
           minimumSize: const Size(0, 46),
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          side: const BorderSide(color: AppColors.primary, width: 1.5),
-          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 16 : 12)),
+          side: BorderSide(
+            color: glassMode ? Colors.white.withValues(alpha: 0.62) : AppColors.primary,
+            width: glassMode ? 1.2 : 1.5,
+          ),
+          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
+          backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.18) : null,
           foregroundColor: AppColors.primary,
           minimumSize: const Size(0, 40),
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 14 : 8)),
+          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.primarySurface,
-        labelStyle: GoogleFonts.inter(fontSize: 12, color: AppColors.primary),
-        side: const BorderSide(color: AppColors.primaryLight, width: 1),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.42) : AppColors.primarySurface,
+        labelStyle: GoogleFonts.inter(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w600),
+        side: BorderSide(
+          color: glassMode ? Colors.white.withValues(alpha: 0.58) : AppColors.primaryLight,
+          width: 1,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 999 : 8)),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.lightBorder,
+      dividerTheme: DividerThemeData(
+        color: glassMode ? Colors.white.withValues(alpha: 0.50) : AppColors.lightBorder,
         thickness: 1,
         space: 1,
       ),
@@ -153,7 +173,12 @@ class AppTheme {
       ),
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.20) : null,
+          foregroundColor: AppColors.lightText,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 14 : 8)),
+          side: glassMode
+              ? BorderSide(color: Colors.white.withValues(alpha: 0.48), width: 1)
+              : BorderSide.none,
         ),
       ),
       tooltipTheme: TooltipThemeData(
@@ -170,7 +195,7 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
       ),
       dialogTheme: DialogTheme(
-        backgroundColor: AppColors.lightSurface,
+        backgroundColor: surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 0,
         titleTextStyle: GoogleFonts.inter(
@@ -196,10 +221,12 @@ class AppTheme {
         useIndicator: true,
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.primary,
+        backgroundColor: glassMode
+            ? AppColors.primary.withValues(alpha: 0.76)
+            : AppColors.primary,
         foregroundColor: Colors.white,
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: glassMode ? 10 : 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 18 : 16)),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((s) =>
@@ -227,19 +254,29 @@ class AppTheme {
         dividerColor: AppColors.lightBorder,
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: AppColors.lightSurface,
+        color: glassMode ? Colors.white.withValues(alpha: 0.74) : surface,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.black.withValues(alpha: glassMode ? 0.14 : 0.12),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: AppColors.lightBorder),
+          borderRadius: BorderRadius.circular(glassMode ? 18 : 12),
+          side: BorderSide(
+            color: glassMode
+                ? Colors.white.withValues(alpha: 0.62)
+                : AppColors.lightBorder,
+          ),
         ),
-        elevation: 4,
+        elevation: glassMode ? 14 : 4,
         textStyle: GoogleFonts.inter(fontSize: 14, color: AppColors.lightText),
       ),
     );
   }
 
-  static ThemeData dark() {
+  static ThemeData dark({bool glassMode = false}) {
     final base = ThemeData.dark(useMaterial3: true);
+    final surface = glassMode ? Colors.white.withValues(alpha: 0.08) : AppColors.darkSurface;
+    final card = glassMode ? Colors.white.withValues(alpha: 0.11) : AppColors.darkCard;
+    final inputFill = glassMode ? Colors.white.withValues(alpha: 0.075) : AppColors.darkSurface;
+    final border = glassMode ? Colors.white.withValues(alpha: 0.16) : AppColors.darkBorder;
     return base.copyWith(
       colorScheme: ColorScheme.dark(
         primary: AppColors.primaryLight,
@@ -248,23 +285,23 @@ class AppTheme {
         onPrimaryContainer: AppColors.primarySurface,
         secondary: AppColors.accent,
         onSecondary: Colors.white,
-        surface: AppColors.darkCard,
+        surface: card,
         onSurface: AppColors.darkText,
         surfaceContainerHighest: AppColors.darkBg,
-        surfaceContainer: AppColors.darkSurface,
+        surfaceContainer: surface,
         error: AppColors.error,
         onError: Colors.white,
         outline: AppColors.darkBorder,
         outlineVariant: AppColors.darkBorder.withValues(alpha: 0.5),
       ),
       scaffoldBackgroundColor: Colors.transparent,
-      drawerTheme: const DrawerThemeData(
-        backgroundColor: AppColors.darkSurface,
+      drawerTheme: DrawerThemeData(
+        backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.08) : AppColors.darkSurface,
         elevation: 0,
       ),
       textTheme: _buildTextTheme(base.textTheme, AppColors.darkText, AppColors.darkTextSecondary),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.darkCard,
+        backgroundColor: card,
         foregroundColor: AppColors.darkText,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -275,27 +312,27 @@ class AppTheme {
         ),
         iconTheme: const IconThemeData(color: AppColors.darkText),
         actionsIconTheme: const IconThemeData(color: AppColors.darkTextSecondary),
-        shape: const Border(bottom: BorderSide(color: AppColors.darkBorder, width: 1)),
+        shape: Border(bottom: BorderSide(color: border, width: 1)),
       ),
       cardTheme: CardTheme(
-        color: AppColors.darkCard,
+        color: card,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.darkBorder, width: 1),
+          side: BorderSide(color: border, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.darkSurface,  // panels/inputs slightly darker than card
+        fillColor: inputFill,  // panels/inputs slightly darker than card
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.darkBorder, width: 1),
+          borderSide: BorderSide(color: border, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.darkBorder, width: 1),
+          borderSide: BorderSide(color: border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -316,46 +353,66 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
+          backgroundColor: glassMode
+              ? AppColors.primaryLight.withValues(alpha: 0.58)
+              : AppColors.primaryLight,
           foregroundColor: Colors.white,
           minimumSize: const Size(0, 46),
           alignment: Alignment.center,
-          elevation: 0,
+          elevation: glassMode ? 10 : 0,
+          shadowColor: glassMode
+              ? AppColors.primaryLight.withValues(alpha: 0.22)
+              : Colors.transparent,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 16 : 12)),
+          side: glassMode
+              ? BorderSide(color: Colors.white.withValues(alpha: 0.18), width: 1)
+              : BorderSide.none,
+          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
+          backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.07) : null,
           foregroundColor: AppColors.primaryLight,
           minimumSize: const Size(0, 46),
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          side: const BorderSide(color: AppColors.primaryLight, width: 1.5),
-          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 16 : 12)),
+          side: BorderSide(
+            color: glassMode ? Colors.white.withValues(alpha: 0.18) : AppColors.primaryLight,
+            width: glassMode ? 1.2 : 1.5,
+          ),
+          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
+          backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.06) : null,
           foregroundColor: AppColors.primaryLight,
           minimumSize: const Size(0, 40),
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 14 : 8)),
+          textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-        labelStyle: GoogleFonts.inter(fontSize: 12, color: AppColors.primaryLight),
-        side: BorderSide(color: AppColors.primaryLight.withValues(alpha: 0.4), width: 1),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        backgroundColor: glassMode
+            ? Colors.white.withValues(alpha: 0.08)
+            : AppColors.primary.withValues(alpha: 0.2),
+        labelStyle: GoogleFonts.inter(fontSize: 12, color: AppColors.primaryLight, fontWeight: FontWeight.w600),
+        side: BorderSide(
+          color: glassMode
+              ? Colors.white.withValues(alpha: 0.16)
+              : AppColors.primaryLight.withValues(alpha: 0.4),
+          width: 1,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 999 : 8)),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.darkBorder,
+      dividerTheme: DividerThemeData(
+        color: glassMode ? Colors.white.withValues(alpha: 0.13) : AppColors.darkBorder,
         thickness: 1,
         space: 1,
       ),
@@ -363,8 +420,18 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.06) : null,
+          foregroundColor: AppColors.darkText,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 14 : 8)),
+          side: glassMode
+              ? BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1)
+              : BorderSide.none,
+        ),
+      ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.darkCard,
+        backgroundColor: card,
         contentTextStyle: GoogleFonts.inter(color: AppColors.darkText),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -400,10 +467,12 @@ class AppTheme {
         useIndicator: true,
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.primaryLight,
+        backgroundColor: glassMode
+            ? AppColors.primaryLight.withValues(alpha: 0.58)
+            : AppColors.primaryLight,
         foregroundColor: Colors.white,
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: glassMode ? 10 : 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 18 : 16)),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((s) =>
@@ -432,12 +501,18 @@ class AppTheme {
         dividerColor: AppColors.darkBorder,
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: AppColors.darkCard,
+        color: glassMode ? Colors.white.withValues(alpha: 0.10) : card,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.black.withValues(alpha: glassMode ? 0.36 : 0.22),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: AppColors.darkBorder),
+          borderRadius: BorderRadius.circular(glassMode ? 18 : 12),
+          side: BorderSide(
+            color: glassMode
+                ? Colors.white.withValues(alpha: 0.16)
+                : AppColors.darkBorder,
+          ),
         ),
-        elevation: 4,
+        elevation: glassMode ? 14 : 4,
         textStyle: GoogleFonts.inter(fontSize: 14, color: AppColors.darkText),
       ),
     );

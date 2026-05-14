@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import '../core/utils.dart';
 import '../models/flow.dart';
+import '../providers/theme_provider.dart';
 import '../theme/app_colors.dart';
 
 typedef NodeCallback = void Function(FlowNode node);
@@ -232,6 +234,30 @@ class _GraphEditorState extends State<GraphEditor>
 
   // ── context menu ──────────────────────────────────────────────────────────
 
+  bool get _glassMode => ProviderScope.containerOf(context, listen: false).read(glassModeProvider);
+
+  Color _contextMenuColor() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (!_glassMode) {
+      return isDark ? AppColors.darkCard : AppColors.lightSurface;
+    }
+    return Colors.white.withValues(alpha: isDark ? 0.10 : 0.74);
+  }
+
+  ShapeBorder _contextMenuShape() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(_glassMode ? 18 : 12),
+      side: BorderSide(
+        color: _glassMode
+            ? Colors.white.withValues(alpha: isDark ? 0.16 : 0.62)
+            : isDark
+                ? AppColors.darkBorder
+                : AppColors.lightBorder,
+      ),
+    );
+  }
+
   void _showNodeMenu(FlowNode node, Offset screenPos) {
     final RenderBox? overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox?;
@@ -243,6 +269,11 @@ class _GraphEditorState extends State<GraphEditor>
         Rect.fromLTWH(screenPos.dx, screenPos.dy, 0, 0),
         overlay.size,
       ),
+      color: _contextMenuColor(),
+      surfaceTintColor: Colors.transparent,
+      elevation: _glassMode ? 14 : 4,
+      shadowColor: Colors.black.withValues(alpha: _glassMode ? 0.28 : 0.16),
+      shape: _contextMenuShape(),
       items: <PopupMenuEntry<Object?>>[
         PopupMenuItem<Object?>(
           child: const Row(children: [
@@ -277,6 +308,11 @@ class _GraphEditorState extends State<GraphEditor>
         Rect.fromLTWH(screenPos.dx, screenPos.dy, 0, 0),
         overlay.size,
       ),
+      color: _contextMenuColor(),
+      surfaceTintColor: Colors.transparent,
+      elevation: _glassMode ? 14 : 4,
+      shadowColor: Colors.black.withValues(alpha: _glassMode ? 0.28 : 0.16),
+      shape: _contextMenuShape(),
       items: <PopupMenuEntry<Object?>>[
         PopupMenuItem<Object?>(
           child: const Row(children: [

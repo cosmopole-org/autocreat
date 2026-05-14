@@ -179,7 +179,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
       useSafeArea: true,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkCard : AppColors.lightCard,
+          color: cs.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: [
             BoxShadow(
