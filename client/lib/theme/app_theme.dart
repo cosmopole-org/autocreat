@@ -254,12 +254,18 @@ class AppTheme {
         dividerColor: AppColors.lightBorder,
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: surface,
+        color: glassMode ? Colors.white.withValues(alpha: 0.74) : surface,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.black.withValues(alpha: glassMode ? 0.14 : 0.12),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: AppColors.lightBorder),
+          borderRadius: BorderRadius.circular(glassMode ? 18 : 12),
+          side: BorderSide(
+            color: glassMode
+                ? Colors.white.withValues(alpha: 0.62)
+                : AppColors.lightBorder,
+          ),
         ),
-        elevation: 4,
+        elevation: glassMode ? 14 : 4,
         textStyle: GoogleFonts.inter(fontSize: 14, color: AppColors.lightText),
       ),
     );
@@ -495,12 +501,18 @@ class AppTheme {
         dividerColor: AppColors.darkBorder,
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: card,
+        color: glassMode ? Colors.white.withValues(alpha: 0.10) : card,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.black.withValues(alpha: glassMode ? 0.36 : 0.22),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: AppColors.darkBorder),
+          borderRadius: BorderRadius.circular(glassMode ? 18 : 12),
+          side: BorderSide(
+            color: glassMode
+                ? Colors.white.withValues(alpha: 0.16)
+                : AppColors.darkBorder,
+          ),
         ),
-        elevation: 4,
+        elevation: glassMode ? 14 : 4,
         textStyle: GoogleFonts.inter(fontSize: 14, color: AppColors.darkText),
       ),
     );

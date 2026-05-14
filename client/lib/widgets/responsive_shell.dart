@@ -825,44 +825,136 @@ class _SidebarDrawer extends ConsumerWidget {
             ? AppColors.darkSurface
             : AppColors.lightSurface;
 
-    return Drawer(
-      backgroundColor: drawerBg,
-      width: 280,
-      shape: const RoundedRectangleBorder(),
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                children: [
-                  const _LogoMark(),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 20),
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: IconButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
+    final content = SafeArea(
+      child: Column(
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Row(
+              children: [
+                const _LogoMark(),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 20),
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: IconButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(glassMode ? 14 : 8),
                     ),
                   ),
+                ),
+              ],
+            ),
+          ),
+          _SidebarUserCard(user: user),
+          Expanded(
+            child: _SidebarNavList(
+              selectedIndex: selectedIndex,
+              unread: unread,
+              onNavigate: onNavigate,
+              expanded: true,
+            ),
+          ),
+          _LogoutTile(
+            onLogout: () => ref.read(authProvider.notifier).logout(),
+          ),
+        ],
+      ),
+    );
+
+    if (!glassMode) {
+      return Drawer(
+        backgroundColor: drawerBg,
+        width: 280,
+        shape: const RoundedRectangleBorder(),
+        child: content,
+      );
+    }
+
+    return Drawer(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      width: 292,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(28)),
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.horizontal(right: Radius.circular(28)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 26, sigmaY: 26),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: drawerBg,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: isDark ? 0.13 : 0.72),
+                  Colors.white.withValues(alpha: isDark ? 0.055 : 0.36),
                 ],
               ),
-            ),
-            _SidebarUserCard(user: user),
-            Expanded(
-              child: _SidebarNavList(
-                selectedIndex: selectedIndex,
-                unread: unread,
-                onNavigate: onNavigate,
-                expanded: true,
+              border: Border(
+                right: BorderSide(
+                  color: Colors.white.withValues(alpha: isDark ? 0.13 : 0.56),
+                ),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.34 : 0.12),
+                  blurRadius: 28,
+                  offset: const Offset(10, 0),
+                ),
+              ],
             ),
-            _LogoutTile(
-                onLogout: () => ref.read(authProvider.notifier).logout()),
-          ],
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -80,
+                  left: -70,
+                  child: _DrawerGlow(
+                    color: AppColors.primary.withValues(alpha: isDark ? 0.18 : 0.16),
+                    size: 190,
+                  ),
+                ),
+                Positioned(
+                  right: -90,
+                  bottom: 110,
+                  child: _DrawerGlow(
+                    color: AppColors.accent.withValues(alpha: isDark ? 0.14 : 0.12),
+                    size: 210,
+                  ),
+                ),
+                content,
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class _DrawerGlow extends StatelessWidget {
+  final Color color;
+  final double size;
+
+  const _DrawerGlow({required this.color, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [color, color.withValues(alpha: 0)],
+          ),
         ),
       ),
     );
@@ -884,11 +976,57 @@ class _SidebarUserCard extends ConsumerWidget {
     final glassMode = ref.watch(glassModeProvider);
     if (user == null) return const SizedBox.shrink();
 
-    return GlassSurface(
-      enabled: glassMode,
-      borderRadius: BorderRadius.circular(16),
-      color: glassMode ? AppColors.primary.withValues(alpha: 0.10) : null,
-      child: Container(
+    final cardContent = Row(
+      children: [
+        AvatarWidget(
+          imageUrl: user.avatar,
+          initials: '${user.firstName[0]}${user.lastName[0]}',
+          size: 36,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${user.firstName} ${user.lastName}',
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                user.email ?? '',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: cs.onSurface.withValues(alpha: 0.5),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (glassMode) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+        child: GlassSurface(
+          enabled: true,
+          borderRadius: BorderRadius.circular(18),
+          blur: 18,
+          padding: const EdgeInsets.all(12),
+          color: AppColors.primary.withValues(alpha: 0.10),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.18),
+          ),
+          child: cardContent,
+        ),
+      );
+    }
+
+    return Container(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -896,39 +1034,7 @@ class _SidebarUserCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
       ),
-      child: Row(
-        children: [
-          AvatarWidget(
-            imageUrl: user.avatar,
-            initials: '${user.firstName[0]}${user.lastName[0]}',
-            size: 36,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${user.firstName} ${user.lastName}',
-                  style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w600),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  user.email ?? '',
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: cs.onSurface.withValues(alpha: 0.5)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      ),
+      child: cardContent,
     );
   }
 }
@@ -1147,24 +1253,36 @@ class _NavIcon extends ConsumerWidget {
   }
 }
 
-class _LogoutTile extends StatelessWidget {
+class _LogoutTile extends ConsumerWidget {
   final VoidCallback onLogout;
 
   const _LogoutTile({required this.onLogout});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final glassMode = ref.watch(glassModeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 4, 10, 12),
       child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
+        color: glassMode
+            ? AppColors.error.withValues(alpha: isDark ? 0.10 : 0.08)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(glassMode ? 14 : 10),
         child: InkWell(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(glassMode ? 14 : 10),
           onTap: onLogout,
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(glassMode ? 14 : 10),
+              border: glassMode
+                  ? Border.all(
+                      color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.34),
+                    )
+                  : null,
+            ),
             child: Row(
               children: [
                 Icon(Icons.logout_rounded,
@@ -1174,7 +1292,7 @@ class _LogoutTile extends StatelessWidget {
                   'Sign Out',
                   style: TextStyle(
                     fontSize: 13.5,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.error.withValues(alpha: 0.85),
                   ),
                 ),

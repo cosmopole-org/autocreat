@@ -286,21 +286,8 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
+    return AppCard(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -378,7 +365,7 @@ class _RoleDonut extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -501,7 +488,7 @@ class _ActivityCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -613,7 +600,7 @@ class _RoleDropdown extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: cs.outline.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(12),
-        color: isDark ? AppColors.darkCard : AppColors.lightCard,
+        color: cs.surface,
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -671,7 +658,7 @@ class _UserCard extends StatelessWidget {
       onTap: onEdit,
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkCard : AppColors.lightCard,
+          color: cs.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
           boxShadow: [
@@ -705,7 +692,7 @@ class _UserCard extends StatelessWidget {
                           color: AppColors.success,
                           shape: BoxShape.circle,
                           border: Border.all(
-                              color: isDark ? AppColors.darkCard : AppColors.lightCard, width: 2),
+                              color: cs.surface, width: 2),
                         ),
                       ),
                     ),
