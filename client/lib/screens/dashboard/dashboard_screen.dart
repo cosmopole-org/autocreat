@@ -14,6 +14,7 @@ import '../../providers/flow_provider.dart';
 import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/common_widgets.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -412,87 +413,76 @@ class _KpiCardData {
   });
 }
 
-class _KpiCard extends StatelessWidget {
+class _KpiCard extends ConsumerWidget {
   final _KpiCardData data;
 
   const _KpiCard({required this.data});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tintedSurface = data.color.withValues(alpha: isDark ? 0.13 : 0.10);
 
-    return GestureDetector(
+    return AppCard(
       onTap: () => context.go(data.route),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: cs.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: data.color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
+      color: tintedSurface,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: data.color.withValues(alpha: isDark ? 0.18 : 0.14),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: data.color.withValues(alpha: isDark ? 0.24 : 0.18),
                   ),
-                  child: Icon(data.icon, color: data.color, size: 20),
                 ),
-                Icon(
-                  data.trendUp
-                      ? Icons.trending_up_rounded
-                      : Icons.trending_flat_rounded,
-                  size: 16,
-                  color: data.trendUp ? AppColors.success : AppColors.warning,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              data.value,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                color: data.color,
-                letterSpacing: -1,
-                height: 1,
+                child: Icon(data.icon, color: data.color, size: 20),
               ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              data.label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: cs.onSurface,
+              Icon(
+                data.trendUp
+                    ? Icons.trending_up_rounded
+                    : Icons.trending_flat_rounded,
+                size: 16,
+                color: data.trendUp ? AppColors.success : AppColors.warning,
               ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            data.value,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: data.color,
+              letterSpacing: -1,
+              height: 1,
             ),
-            Text(
-              data.subtitle,
-              style: TextStyle(
-                fontSize: 11,
-                color: cs.onSurface.withValues(alpha: 0.45),
-              ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            data.label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: cs.onSurface,
             ),
-          ],
-        ),
+          ),
+          Text(
+            data.subtitle,
+            style: TextStyle(
+              fontSize: 11,
+              color: cs.onSurface.withValues(alpha: 0.45),
+            ),
+          ),
+        ],
       ),
     );
   }

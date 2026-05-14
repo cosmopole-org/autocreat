@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -6,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../models/ticket.dart';
 import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
+import '../../providers/theme_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 
@@ -245,9 +248,56 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: tabBar,
+    return Consumer(
+      builder: (context, ref, _) {
+        final theme = Theme.of(context);
+        final cs = theme.colorScheme;
+        final isDark = theme.brightness == Brightness.dark;
+        final glassMode = ref.watch(glassModeProvider);
+        final backgroundColor = glassMode
+            ? Colors.white.withValues(alpha: isDark ? 0.08 : 0.54)
+            : cs.surface;
+
+        final decoratedTabBar = DecoratedBox(
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            gradient: glassMode
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withValues(alpha: isDark ? 0.13 : 0.68),
+                      Colors.white.withValues(alpha: isDark ? 0.045 : 0.34),
+                    ],
+                  )
+                : null,
+            border: Border(
+              bottom: BorderSide(
+                color: glassMode
+                    ? Colors.white.withValues(alpha: isDark ? 0.14 : 0.56)
+                    : cs.outline.withValues(alpha: 0.55),
+              ),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.24 : 0.05),
+                blurRadius: glassMode ? 18 : 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: tabBar,
+        );
+
+        if (!glassMode) return decoratedTabBar;
+
+        return ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: decoratedTabBar,
+          ),
+        );
+      },
     );
   }
 

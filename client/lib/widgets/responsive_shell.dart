@@ -824,6 +824,42 @@ class _SidebarDrawer extends ConsumerWidget {
         : isDark
             ? AppColors.darkSurface
             : AppColors.lightSurface;
+    final drawerRadius = BorderRadius.horizontal(
+      right: Radius.circular(glassMode ? 28 : 24),
+    );
+    final drawerGradient = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: glassMode
+          ? [
+              Color.alphaBlend(
+                AppColors.primary.withValues(alpha: isDark ? 0.16 : 0.12),
+                Colors.white.withValues(alpha: isDark ? 0.09 : 0.62),
+              ),
+              Color.alphaBlend(
+                AppColors.accent.withValues(alpha: isDark ? 0.12 : 0.10),
+                Colors.white.withValues(alpha: isDark ? 0.045 : 0.34),
+              ),
+            ]
+          : [
+              Color.alphaBlend(
+                AppColors.primary.withValues(alpha: isDark ? 0.13 : 0.08),
+                drawerBg,
+              ),
+              Color.alphaBlend(
+                AppColors.accent.withValues(alpha: isDark ? 0.09 : 0.055),
+                drawerBg,
+              ),
+            ],
+    );
+    final drawerBorder = Border(
+      right: BorderSide(
+        color: glassMode
+            ? Colors.white.withValues(alpha: isDark ? 0.13 : 0.56)
+            : (isDark ? AppColors.darkBorder : AppColors.lightBorder)
+                .withValues(alpha: 0.75),
+      ),
+    );
 
     final content = SafeArea(
       child: Column(
@@ -865,10 +901,30 @@ class _SidebarDrawer extends ConsumerWidget {
 
     if (!glassMode) {
       return Drawer(
-        backgroundColor: drawerBg,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         width: 280,
-        shape: const RoundedRectangleBorder(),
-        child: content,
+        shape: RoundedRectangleBorder(borderRadius: drawerRadius),
+        child: ClipRRect(
+          borderRadius: drawerRadius,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: drawerBg,
+              gradient: drawerGradient,
+              border: drawerBorder,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.24 : 0.08),
+                  blurRadius: 20,
+                  offset: const Offset(8, 0),
+                ),
+              ],
+            ),
+            child: content,
+          ),
+        ),
       );
     }
 
@@ -878,29 +934,16 @@ class _SidebarDrawer extends ConsumerWidget {
       shadowColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       width: 292,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.horizontal(right: Radius.circular(28)),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: drawerRadius),
       child: ClipRRect(
-        borderRadius: const BorderRadius.horizontal(right: Radius.circular(28)),
+        borderRadius: drawerRadius,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 26, sigmaY: 26),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: drawerBg,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: isDark ? 0.13 : 0.72),
-                  Colors.white.withValues(alpha: isDark ? 0.055 : 0.36),
-                ],
-              ),
-              border: Border(
-                right: BorderSide(
-                  color: Colors.white.withValues(alpha: isDark ? 0.13 : 0.56),
-                ),
-              ),
+              gradient: drawerGradient,
+              border: drawerBorder,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: isDark ? 0.34 : 0.12),
@@ -915,7 +958,8 @@ class _SidebarDrawer extends ConsumerWidget {
                   top: -80,
                   left: -70,
                   child: _DrawerGlow(
-                    color: AppColors.primary.withValues(alpha: isDark ? 0.18 : 0.16),
+                    color: AppColors.primary
+                        .withValues(alpha: isDark ? 0.18 : 0.16),
                     size: 190,
                   ),
                 ),
@@ -923,7 +967,8 @@ class _SidebarDrawer extends ConsumerWidget {
                   right: -90,
                   bottom: 110,
                   child: _DrawerGlow(
-                    color: AppColors.accent.withValues(alpha: isDark ? 0.14 : 0.12),
+                    color: AppColors.accent
+                        .withValues(alpha: isDark ? 0.14 : 0.12),
                     size: 210,
                   ),
                 ),
