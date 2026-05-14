@@ -48,3 +48,7 @@ server/.docker/
 .env
 .env.local
 .env.production
+# Generated Android APK packages staged by local/CI builds
+autocreat-*.apk
+dist/android/*.apk
+
