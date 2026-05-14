@@ -281,25 +281,25 @@ class _TicketStatsRow extends StatelessWidget {
         mainAxisSpacing: 10,
         childAspectRatio: 1.6,
         children: [
-          _StatCard(
+          AppStatCard(
             icon: Icons.confirmation_number_rounded,
             value: '$total',
             label: 'Total',
             color: AppColors.primary,
           ),
-          _StatCard(
+          AppStatCard(
             icon: Icons.inbox_rounded,
             value: '$open',
             label: 'Open',
             color: AppColors.warning,
           ),
-          _StatCard(
+          AppStatCard(
             icon: Icons.sync_rounded,
             value: '$inProgress',
             label: 'In Progress',
             color: AppColors.info,
           ),
-          _StatCard(
+          AppStatCard(
             icon: Icons.check_circle_rounded,
             value: '$resolved',
             label: 'Resolved',
@@ -308,63 +308,6 @@ class _TicketStatsRow extends StatelessWidget {
         ],
       );
     });
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-
-  const _StatCard({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return AppCard(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: color, size: 16),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: color,
-                  height: 1,
-                ),
-              ),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: cs.onSurface.withValues(alpha: 0.55),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }
 

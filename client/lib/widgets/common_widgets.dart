@@ -39,34 +39,52 @@ class GlassSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final radius = borderRadius;
+    final glassTint = color;
     final container = Container(
       padding: padding,
       decoration: BoxDecoration(
         color: enabled
-            ? (color ?? Colors.white.withValues(alpha: isDark ? 0.10 : 0.56))
+            ? (glassTint ?? Colors.white).withValues(
+                alpha: glassTint == null
+                    ? (isDark ? 0.10 : 0.56)
+                    : (isDark ? 0.16 : 0.22),
+              )
             : color,
         borderRadius: radius,
         border: border ??
             (enabled
                 ? Border.all(
-                    color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.58),
+                    color: (glassTint ?? Colors.white).withValues(
+                      alpha: glassTint == null
+                          ? (isDark ? 0.15 : 0.58)
+                          : (isDark ? 0.30 : 0.42),
+                    ),
                   )
                 : null),
         gradient: enabled
             ? LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: isDark ? 0.14 : 0.70),
-                  Colors.white.withValues(alpha: isDark ? 0.045 : 0.32),
-                ],
+                colors: glassTint == null
+                    ? [
+                        Colors.white.withValues(alpha: isDark ? 0.14 : 0.70),
+                        Colors.white.withValues(alpha: isDark ? 0.045 : 0.32),
+                      ]
+                    : [
+                        Color.alphaBlend(
+                          Colors.white.withValues(alpha: isDark ? 0.08 : 0.28),
+                          glassTint.withValues(alpha: isDark ? 0.18 : 0.24),
+                        ),
+                        glassTint.withValues(alpha: isDark ? 0.08 : 0.13),
+                      ],
               )
             : null,
         boxShadow: boxShadow ??
             (enabled
                 ? [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.09),
+                      color:
+                          Colors.black.withValues(alpha: isDark ? 0.30 : 0.09),
                       blurRadius: 26,
                       offset: const Offset(0, 14),
                     ),
@@ -115,13 +133,22 @@ class AppCard extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final bgColor =
         color ?? (isDark ? AppColors.darkCard : AppColors.lightCard);
+    final glassTint = color;
     final borderColor = selected
         ? AppColors.primary
         : glassMode
-            ? Colors.white.withValues(alpha: isDark ? 0.16 : 0.62)
+            ? (glassTint ?? Colors.white).withValues(
+                alpha: glassTint == null
+                    ? (isDark ? 0.16 : 0.62)
+                    : (isDark ? 0.30 : 0.42),
+              )
             : (isDark ? AppColors.darkBorder : AppColors.lightBorder);
     final effectiveColor = glassMode
-        ? (color ?? Colors.white.withValues(alpha: isDark ? 0.10 : 0.56))
+        ? (glassTint ?? Colors.white).withValues(
+            alpha: glassTint == null
+                ? (isDark ? 0.10 : 0.56)
+                : (isDark ? 0.16 : 0.22),
+          )
         : bgColor;
     final content = AnimatedContainer(
       duration: const Duration(milliseconds: 150),
@@ -136,10 +163,18 @@ class AppCard extends ConsumerWidget {
             ? LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withValues(alpha: isDark ? 0.13 : 0.68),
-                  Colors.white.withValues(alpha: isDark ? 0.05 : 0.34),
-                ],
+                colors: glassTint == null
+                    ? [
+                        Colors.white.withValues(alpha: isDark ? 0.13 : 0.68),
+                        Colors.white.withValues(alpha: isDark ? 0.05 : 0.34),
+                      ]
+                    : [
+                        Color.alphaBlend(
+                          Colors.white.withValues(alpha: isDark ? 0.08 : 0.28),
+                          glassTint.withValues(alpha: isDark ? 0.18 : 0.24),
+                        ),
+                        glassTint.withValues(alpha: isDark ? 0.08 : 0.13),
+                      ],
               )
             : null,
         boxShadow: [
@@ -179,6 +214,87 @@ class AppCard extends ConsumerWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: content,
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// APP STAT CARD
+// ─────────────────────────────────────────────────────────────────────────────
+
+class AppStatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const AppStatCard({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final tintedSurface = color.withValues(alpha: isDark ? 0.13 : 0.10);
+
+    return AppCard(
+      color: tintedSurface,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: isDark ? 0.18 : 0.14),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: color.withValues(alpha: isDark ? 0.24 : 0.18),
+              ),
+            ),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      color: color,
+                      height: 1,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
+                    fontWeight: FontWeight.w600,
+                    height: 1.1,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

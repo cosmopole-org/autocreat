@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../models/company.dart';
 import '../../providers/company_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
@@ -108,46 +109,59 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                   );
                 }
 
-                return GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate:
-                      const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 320,
-                    mainAxisExtent: 160,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                  ),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, i) => _CompanyCard(
-                    company: filtered[i],
-                    onTap: () => context.go('/companies/${filtered[i].id}'),
-                    onEdit: () => showDialog(
-                      context: context,
-                      builder: (_) => _CompanyDialog(
-                        company: filtered[i],
-                        onSave: (data) async {
-                          await ref
-                              .read(companyNotifierProvider.notifier)
-                              .updateItem(filtered[i].id, data);
-                        },
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                      child: _CompanyStatsRow(companies: companies),
+                    ),
+                    Expanded(
+                      child: GridView.builder(
+                        padding: const EdgeInsets.all(16),
+                        gridDelegate:
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 320,
+                          mainAxisExtent: 160,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                        itemCount: filtered.length,
+                        itemBuilder: (context, i) => _CompanyCard(
+                          company: filtered[i],
+                          onTap: () =>
+                              context.go('/companies/${filtered[i].id}'),
+                          onEdit: () => showDialog(
+                            context: context,
+                            builder: (_) => _CompanyDialog(
+                              company: filtered[i],
+                              onSave: (data) async {
+                                await ref
+                                    .read(companyNotifierProvider.notifier)
+                                    .updateItem(filtered[i].id, data);
+                              },
+                            ),
+                          ),
+                          onDelete: () async {
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (_) => const ConfirmDialog(
+                                title: 'Delete Company',
+                                message:
+                                    'Are you sure you want to delete this company?',
+                              ),
+                            );
+                            if (confirmed == true) {
+                              await ref
+                                  .read(companyNotifierProvider.notifier)
+                                  .delete(filtered[i].id);
+                            }
+                          },
+                        ).animate().fadeIn(
+                              delay: Duration(milliseconds: i * 50),
+                            ),
                       ),
                     ),
-                    onDelete: () async {
-                      final confirmed = await showDialog<bool>(
-                        context: context,
-                        builder: (_) => const ConfirmDialog(
-                          title: 'Delete Company',
-                          message:
-                              'Are you sure you want to delete this company?',
-                        ),
-                      );
-                      if (confirmed == true) {
-                        await ref
-                            .read(companyNotifierProvider.notifier)
-                            .delete(filtered[i].id);
-                      }
-                    },
-                  ).animate().fadeIn(delay: Duration(milliseconds: i * 50)),
+                  ],
                 );
               },
             ),
@@ -155,6 +169,64 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
         ],
       ),
     );
+  }
+}
+
+class _CompanyStatsRow extends StatelessWidget {
+  final List<Company> companies;
+
+  const _CompanyStatsRow({required this.companies});
+
+  @override
+  Widget build(BuildContext context) {
+    final total = companies.length;
+    final active = companies.where((c) => c.status == 'active').length;
+    final members = companies.fold<int>(
+      0,
+      (sum, c) => sum + c.memberCount,
+    );
+    final flows = companies.fold<int>(
+      0,
+      (sum, c) => sum + c.flowCount,
+    );
+
+    return LayoutBuilder(builder: (context, constraints) {
+      final cols = constraints.maxWidth > 500 ? 4 : 2;
+      return GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: cols,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: constraints.maxWidth > 500 ? 2.05 : 1.6,
+        children: [
+          AppStatCard(
+            icon: Icons.business_rounded,
+            value: '$total',
+            label: 'Companies',
+            color: AppColors.primary,
+          ),
+          AppStatCard(
+            icon: Icons.check_circle_rounded,
+            value: '$active',
+            label: 'Active',
+            color: AppColors.success,
+          ),
+          AppStatCard(
+            icon: Icons.people_rounded,
+            value: '$members',
+            label: 'Members',
+            color: AppColors.accent,
+          ),
+          AppStatCard(
+            icon: Icons.account_tree_rounded,
+            value: '$flows',
+            label: 'Flows',
+            color: AppColors.warning,
+          ),
+        ],
+      );
+    });
   }
 }
 
