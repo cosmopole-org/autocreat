@@ -566,7 +566,6 @@ class _UserCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final roleColor = _roleColor();
     final joined = user.createdAt != null
         ? '${user.createdAt!.day}/${user.createdAt!.month}/${user.createdAt!.year}'
