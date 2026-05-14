@@ -59,12 +59,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              20,
-              MediaQuery.of(context).padding.top + 20,
-              20,
-              0,
-            ),
+            padding: AppPageLayout.contentPadding(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -66,11 +66,10 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
 
         return Scaffold(
           body: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(
-              16,
-              MediaQuery.of(context).padding.top + 16,
-              16,
-              16,
+            padding: AppPageLayout.contentPadding(
+              context,
+              horizontal: 16,
+              bottom: 16,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

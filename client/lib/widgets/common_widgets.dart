@@ -8,6 +8,29 @@ import 'package:shimmer/shimmer.dart';
 import '../providers/theme_provider.dart';
 import '../theme/app_colors.dart';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// PAGE LAYOUT METRICS
+// ─────────────────────────────────────────────────────────────────────────────
+
+class AppPageLayout {
+  static const double horizontalPadding = 20;
+  static const double topGap = 20;
+
+  const AppPageLayout._();
+
+  static EdgeInsets contentPadding(
+    BuildContext context, {
+    double horizontal = horizontalPadding,
+    double bottom = 0,
+  }) {
+    return EdgeInsets.fromLTRB(
+      horizontal,
+      MediaQuery.of(context).padding.top + topGap,
+      horizontal,
+      bottom,
+    );
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GLASS SURFACE
