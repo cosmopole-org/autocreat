@@ -64,36 +64,16 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Roles & Permissions',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(fontWeight: FontWeight.w800),
-                          ),
-                        ),
-                        AppButton(
-                          label: 'New Role',
-                          icon: Icons.add,
-                          onPressed: () => context.go('/roles/new/edit'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Define access control roles for your organization',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
+                AppPageHeader(
+                  title: 'Roles & Permissions',
+                  description:
+                      'Shape secure access policies, clarify responsibilities, and give every teammate exactly the permissions they need.',
+                  actionLabel: 'New Role',
+                  compactActionLabel: 'New',
+                  actionIcon: Icons.add,
+                  onAction: () => context.go('/roles/new/edit'),
                 ).animate().fadeIn(duration: 300.ms),
-                const SizedBox(height: 14),
+                const SizedBox(height: 18),
 
                 // Stats
                 _RoleStatsRow(

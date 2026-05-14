@@ -83,36 +83,16 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Data Models',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(fontWeight: FontWeight.w800),
-                          ),
-                        ),
-                        AppButton(
-                          label: 'New Model',
-                          icon: Icons.add,
-                          onPressed: () => _createModel(context),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Define entity schemas and data structures',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
+                AppPageHeader(
+                  title: 'Data Models',
+                  description:
+                      'Define durable entity schemas, organize fields, and keep your operational data consistent across every product surface.',
+                  actionLabel: 'New Model',
+                  compactActionLabel: 'New',
+                  actionIcon: Icons.add,
+                  onAction: () => _createModel(context),
                 ).animate().fadeIn(duration: 300.ms),
-                const SizedBox(height: 14),
+                const SizedBox(height: 18),
 
                 // Stats
                 _ModelStatsRow(

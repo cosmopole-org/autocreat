@@ -51,28 +51,16 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                LayoutBuilder(builder: (context, constraints) {
-                  final isNarrow = constraints.maxWidth < 500;
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Companies',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                      AppButton(
-                        label: isNarrow ? 'New' : 'New Company',
-                        icon: Icons.add,
-                        onPressed: () => _showCreateDialog(context),
-                      ),
-                    ],
-                  );
-                }),
-                const SizedBox(height: 12),
+                AppPageHeader(
+                  title: 'Companies',
+                  description:
+                      'Organize client and partner workspaces, monitor portfolio health, and keep each organization easy to find and manage.',
+                  actionLabel: 'New Company',
+                  compactActionLabel: 'New',
+                  actionIcon: Icons.add,
+                  onAction: () => _showCreateDialog(context),
+                ).animate().fadeIn(duration: 300.ms),
+                const SizedBox(height: 18),
                 SearchField(
                   controller: _searchController,
                   hintText: 'Search companies...',

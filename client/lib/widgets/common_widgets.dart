@@ -32,6 +32,130 @@ class AppPageLayout {
   }
 }
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PAGE HEADER
+// ─────────────────────────────────────────────────────────────────────────────
+
+class AppPageHeader extends StatelessWidget {
+  final String title;
+  final String description;
+  final String? actionLabel;
+  final String? compactActionLabel;
+  final IconData? actionIcon;
+  final VoidCallback? onAction;
+  final Widget? trailing;
+
+  const AppPageHeader({
+    super.key,
+    required this.title,
+    required this.description,
+    this.actionLabel,
+    this.compactActionLabel,
+    this.actionIcon,
+    this.onAction,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final titleStyle = theme.textTheme.headlineSmall?.copyWith(
+      fontWeight: FontWeight.w800,
+      height: 1.05,
+      letterSpacing: -0.6,
+    );
+    final descriptionStyle = theme.textTheme.bodySmall?.copyWith(
+      height: 1.35,
+      color: theme.colorScheme.onSurface.withValues(alpha: 0.62),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 520;
+        final action = trailing ??
+            (actionLabel != null && onAction != null
+                ? AppButton(
+                    label: isCompact
+                        ? (compactActionLabel ?? actionLabel!)
+                        : actionLabel!,
+                    icon: actionIcon,
+                    onPressed: onAction,
+                  )
+                : null);
+
+        final descriptionText = ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isCompact ? double.infinity : 620,
+          ),
+          child: Text(description, style: descriptionStyle),
+        );
+
+        if (action == null) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(title, style: titleStyle),
+              const SizedBox(height: 10),
+              descriptionText,
+            ],
+          );
+        }
+
+        if (isCompact) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (constraints.maxWidth < 340) ...[
+                Text(title, style: titleStyle),
+                const SizedBox(height: 12),
+                action,
+              ] else
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: Text(title, style: titleStyle)),
+                    const SizedBox(width: 14),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: action,
+                    ),
+                  ],
+                ),
+              const SizedBox(height: 10),
+              descriptionText,
+            ],
+          );
+        }
+
+        final copy = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(title, style: titleStyle),
+            const SizedBox(height: 10),
+            descriptionText,
+          ],
+        );
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: copy),
+            const SizedBox(width: 16),
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: action,
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // GLASS SURFACE
 // ─────────────────────────────────────────────────────────────────────────────

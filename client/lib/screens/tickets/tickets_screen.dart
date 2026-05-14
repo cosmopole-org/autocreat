@@ -117,28 +117,16 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header
-                      LayoutBuilder(builder: (ctx, constraints) {
-                        final isNarrow = constraints.maxWidth < 500;
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Support Tickets',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                            ),
-                            AppButton(
-                              label: isNarrow ? 'New' : 'New Ticket',
-                              icon: Icons.add,
-                              onPressed: () => _showCreateTicket(context),
-                            ),
-                          ],
-                        );
-                      }),
-                      const SizedBox(height: 12),
+                      AppPageHeader(
+                        title: 'Support Tickets',
+                        description:
+                            'Track customer requests, prioritize urgent work, and keep every resolution moving from one polished command center.',
+                        actionLabel: 'New Ticket',
+                        compactActionLabel: 'New',
+                        actionIcon: Icons.add,
+                        onAction: () => _showCreateTicket(context),
+                      ).animate().fadeIn(duration: 300.ms),
+                      const SizedBox(height: 18),
 
                       // Stats row
                       _TicketStatsRow(tickets: tickets),
