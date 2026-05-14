@@ -243,7 +243,6 @@ class _FloatingMobileBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final unread = ref.watch(unreadTicketCountProvider);
     final user = ref.watch(currentUserProvider);

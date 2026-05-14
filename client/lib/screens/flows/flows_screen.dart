@@ -610,8 +610,8 @@ class _FlowCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final steps = flow.nodes.where((n) => n.type == 'step').length;
-    final decisions = flow.nodes.where((n) => n.type == 'decision').length;
+    final steps = flow.nodes.where((n) => n.type == NodeType.step).length;
+    final decisions = flow.nodes.where((n) => n.type == NodeType.decision).length;
 
     return GestureDetector(
       onTap: onEdit,
