@@ -542,12 +542,9 @@ class _RoleCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }
-
-class _PermBadge extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
