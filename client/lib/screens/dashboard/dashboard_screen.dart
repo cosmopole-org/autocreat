@@ -135,90 +135,90 @@ class _WelcomeBanner extends StatelessWidget {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ][now.month - 1];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isNarrow = constraints.maxWidth < 520;
-        return Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(isNarrow ? 18 : 24),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.primaryLight],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
+    // Use MediaQuery instead of LayoutBuilder to avoid intrinsic-size conflicts
+    // with flutter_animate wrappers on Flutter Web.
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isNarrow = screenWidth < 600;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(isNarrow ? 18 : 24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryLight],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$greeting, ${user?.firstName ?? 'there'}! 👋',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: isNarrow ? 18 : 22,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Here\'s what\'s happening in your organization today.',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: isNarrow ? 13 : 14,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
                   children: [
-                    Text(
-                      '$greeting, ${user?.firstName ?? 'there'}! 👋',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: isNarrow ? 18 : 22,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                      ),
+                    _BannerPill(
+                      icon: Icons.calendar_today_rounded,
+                      label:
+                          '$dayName, ${now.day} $monthName ${now.year}',
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Here\'s what\'s happening in your organization today.',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        fontSize: isNarrow ? 13 : 14,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      children: [
-                        _BannerPill(
-                          icon: Icons.calendar_today_rounded,
-                          label:
-                              '$dayName, ${now.day} $monthName ${now.year}',
-                        ),
-                        _BannerPill(
-                          icon: Icons.access_time_rounded,
-                          label:
-                              '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
-                        ),
-                      ],
+                    _BannerPill(
+                      icon: Icons.access_time_rounded,
+                      label:
+                          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
                     ),
                   ],
                 ),
-              ),
-              if (!isNarrow) ...[
-                const SizedBox(width: 16),
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.auto_awesome_rounded,
-                    color: Colors.white,
-                    size: 32,
-                  ),
-                ),
               ],
-            ],
+            ),
           ),
-        );
-      },
+          if (!isNarrow) ...[
+            const SizedBox(width: 16),
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(
+                Icons.auto_awesome_rounded,
+                color: Colors.white,
+                size: 32,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
