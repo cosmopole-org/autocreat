@@ -803,15 +803,21 @@ class _PriorityBarChart extends StatelessWidget {
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  getTitlesWidget: (v, _) => Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      labels[v.toInt()],
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: cs.onSurface.withValues(alpha: 0.5)),
-                    ),
-                  ),
+                  getTitlesWidget: (v, _) {
+                    final idx = v.toInt();
+                    if (idx < 0 || idx >= labels.length) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        labels[idx],
+                        style: TextStyle(
+                            fontSize: 11,
+                            color: cs.onSurface.withValues(alpha: 0.5)),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
