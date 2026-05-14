@@ -42,21 +42,36 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: SearchField(
-                    controller: _searchController,
-                    hintText: 'Search companies...',
-                    onChanged: (v) => setState(() => _search = v),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                AppButton(
-                  label: 'New Company',
-                  icon: Icons.add,
-                  onPressed: () => _showCreateDialog(context),
+                LayoutBuilder(builder: (context, constraints) {
+                  final isNarrow = constraints.maxWidth < 500;
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Companies',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                      AppButton(
+                        label: isNarrow ? 'New' : 'New Company',
+                        icon: Icons.add,
+                        onPressed: () => _showCreateDialog(context),
+                      ),
+                    ],
+                  );
+                }),
+                const SizedBox(height: 12),
+                SearchField(
+                  controller: _searchController,
+                  hintText: 'Search companies...',
+                  onChanged: (v) => setState(() => _search = v),
                 ),
               ],
             ),

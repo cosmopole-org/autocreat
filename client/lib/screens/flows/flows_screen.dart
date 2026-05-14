@@ -95,32 +95,57 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Automation Flows',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(fontWeight: FontWeight.w800),
-                          ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isNarrow = constraints.maxWidth < 500;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Automation Flows',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall
+                                        ?.copyWith(
+                                            fontWeight:
+                                                FontWeight.w800),
+                                  ),
+                                  if (!isNarrow)
+                                    Text(
+                                      'Design and manage organizational process flows',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall,
+                                    ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            AppButton(
+                              label: isNarrow ? 'New' : 'New Flow',
+                              icon: Icons.add,
+                              onPressed: () => _createFlow(context),
+                            ),
+                          ],
+                        ),
+                        if (isNarrow) ...[
+                          const SizedBox(height: 4),
                           Text(
                             'Design and manage organizational process flows',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
-                      ),
-                    ),
-                    AppButton(
-                      label: 'New Flow',
-                      icon: Icons.add,
-                      onPressed: () => _createFlow(context),
-                    ),
-                  ],
+                      ],
+                    );
+                  },
                 ).animate().fadeIn(duration: 300.ms),
                 const SizedBox(height: 20),
 
@@ -167,8 +192,8 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 380,
-                mainAxisExtent: 220,
+                maxCrossAxisExtent: 360,
+                mainAxisExtent: 226,
                 crossAxisSpacing: 14,
                 mainAxisSpacing: 14,
               ),
@@ -277,15 +302,19 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cardBg,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -368,15 +397,18 @@ class _FlowsChart extends StatelessWidget {
       }
     }
 
+    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
+        border: Border.all(
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -613,17 +645,22 @@ class _FlowCard extends StatelessWidget {
     final steps = flow.nodes.where((n) => n.type == NodeType.step).length;
     final decisions = flow.nodes.where((n) => n.type == NodeType.decision).length;
 
+    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
+
     return GestureDetector(
       onTap: onEdit,
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: cs.surface,
+          color: cardBg,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
+          border: Border.all(
+              color: isDark
+                  ? AppColors.darkBorder
+                  : AppColors.lightBorder),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),

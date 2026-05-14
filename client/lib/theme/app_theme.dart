@@ -34,9 +34,10 @@ class AppTheme {
         onPrimaryContainer: AppColors.primaryDark,
         secondary: AppColors.accent,
         onSecondary: Colors.white,
-        surface: AppColors.lightSurface,
+        surface: AppColors.lightCard,
         onSurface: AppColors.lightText,
         surfaceContainerHighest: AppColors.lightBg,
+        surfaceContainer: AppColors.lightSurface,
         error: AppColors.error,
         onError: Colors.white,
         outline: AppColors.lightBorder,
@@ -47,10 +48,11 @@ class AppTheme {
         backgroundColor: AppColors.lightSurface,
         elevation: 0,
         shadowColor: Colors.transparent,
+        shape: RoundedRectangleBorder(),
       ),
       textTheme: _buildTextTheme(base.textTheme, AppColors.lightText, AppColors.lightTextSecondary),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.lightSurface,
+        backgroundColor: AppColors.lightCard,
         foregroundColor: AppColors.lightText,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -74,7 +76,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.lightBg,
+        fillColor: AppColors.lightSurface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.lightBorder, width: 1),
@@ -246,9 +248,10 @@ class AppTheme {
         onPrimaryContainer: AppColors.primarySurface,
         secondary: AppColors.accent,
         onSecondary: Colors.white,
-        surface: AppColors.darkSurface,
+        surface: AppColors.darkCard,
         onSurface: AppColors.darkText,
         surfaceContainerHighest: AppColors.darkBg,
+        surfaceContainer: AppColors.darkSurface,
         error: AppColors.error,
         onError: Colors.white,
         outline: AppColors.darkBorder,
@@ -261,7 +264,7 @@ class AppTheme {
       ),
       textTheme: _buildTextTheme(base.textTheme, AppColors.darkText, AppColors.darkTextSecondary),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.darkSurface,
+        backgroundColor: AppColors.darkCard,
         foregroundColor: AppColors.darkText,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -285,7 +288,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.darkSurface,
+        fillColor: AppColors.darkSurface,  // panels/inputs slightly darker than card
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.darkBorder, width: 1),
@@ -380,7 +383,7 @@ class AppTheme {
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.darkSurface,
+        backgroundColor: AppColors.darkCard,
         selectedItemColor: AppColors.primaryLight,
         unselectedItemColor: AppColors.darkTextSecondary,
         elevation: 0,

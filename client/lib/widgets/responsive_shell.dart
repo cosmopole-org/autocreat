@@ -149,9 +149,9 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
 
   Widget _buildMobileLayout() {
     final topPadding = MediaQuery.of(context).padding.top;
-    const barHeight = 56.0;
+    const barHeight = 58.0;
     const barMarginTop = 10.0;
-    const barMarginH = 14.0;
+    const barMarginH = 12.0;
     final floatingTopOffset = topPadding + barMarginTop;
     final contentTopPadding = floatingTopOffset + barHeight + barMarginTop;
 
@@ -167,7 +167,7 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
       ),
       body: Stack(
         children: [
-          // Page content – offset below the floating bar
+          // Page content – padded below the floating bar
           Positioned.fill(
             top: contentTopPadding,
             child: widget.child,
@@ -248,8 +248,8 @@ class _FloatingMobileBar extends ConsumerWidget {
     final user = ref.watch(currentUserProvider);
 
     final bgColor = isDark
-        ? AppColors.darkSurface.withValues(alpha: 0.92)
-        : AppColors.lightSurface.withValues(alpha: 0.92);
+        ? AppColors.darkCard.withValues(alpha: 0.94)
+        : AppColors.lightCard.withValues(alpha: 0.94);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
@@ -388,16 +388,20 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
     final unread = ref.watch(unreadTicketCountProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final topBarBg =
+        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+
     return Container(
       height: 60,
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: topBarBg,
         border: Border(
-          bottom: BorderSide(color: cs.outline.withValues(alpha: 0.5), width: 1),
+          bottom: BorderSide(
+              color: cs.outline.withValues(alpha: 0.45), width: 1),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -426,7 +430,7 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
               child: Container(
                 height: 36,
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkBg : AppColors.lightBg,
+                  color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
                 ),
@@ -561,10 +565,14 @@ class _FullSidebar extends ConsumerWidget {
     final user = ref.watch(currentUserProvider);
     final unread = ref.watch(unreadTicketCountProvider);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final sidebarBg =
+        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+
     return Container(
       width: 248,
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: sidebarBg,
         border: Border(
           right: BorderSide(color: cs.outline.withValues(alpha: 0.4)),
         ),
@@ -626,10 +634,14 @@ class _CollapsedSidebar extends ConsumerWidget {
     final unread = ref.watch(unreadTicketCountProvider);
     final user = ref.watch(currentUserProvider);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final sidebarBg =
+        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+
     return Container(
       width: 68,
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: sidebarBg,
         border: Border(
           right: BorderSide(color: cs.outline.withValues(alpha: 0.4)),
         ),
@@ -706,8 +718,12 @@ class _SidebarDrawer extends ConsumerWidget {
     final user = ref.watch(currentUserProvider);
     final unread = ref.watch(unreadTicketCountProvider);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final drawerBg =
+        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+
     return Drawer(
-      backgroundColor: cs.surface,
+      backgroundColor: drawerBg,
       width: 280,
       shape: const RoundedRectangleBorder(),
       child: SafeArea(
@@ -768,9 +784,9 @@ class _SidebarUserCard extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.06),
+        color: AppColors.primary.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.12)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: [

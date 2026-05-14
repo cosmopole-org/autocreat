@@ -111,24 +111,27 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Support Tickets',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.copyWith(fontWeight: FontWeight.w800),
+                      LayoutBuilder(builder: (ctx, constraints) {
+                        final isNarrow = constraints.maxWidth < 500;
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Support Tickets',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(fontWeight: FontWeight.w800),
+                              ),
                             ),
-                          ),
-                          AppButton(
-                            label: 'New Ticket',
-                            icon: Icons.add,
-                            onPressed: () => _showCreateTicket(context),
-                          ),
-                        ],
-                      ),
+                            AppButton(
+                              label: isNarrow ? 'New' : 'New Ticket',
+                              icon: Icons.add,
+                              onPressed: () => _showCreateTicket(context),
+                            ),
+                          ],
+                        );
+                      }),
                       const SizedBox(height: 16),
 
                       // Stats row
@@ -328,7 +331,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -418,7 +421,7 @@ class _PriorityBarChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -549,7 +552,7 @@ class _StatusDonutState extends State<_StatusDonut> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -705,7 +708,7 @@ class _TicketCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: cs.surface,
+          color: isDark ? AppColors.darkCard : AppColors.lightCard,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: ticket.isRead

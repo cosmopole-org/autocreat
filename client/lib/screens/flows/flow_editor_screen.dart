@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../core/constants.dart';
+import '../../core/utils.dart';
 import '../../models/flow.dart';
 import '../../providers/flow_provider.dart';
 import '../../theme/app_colors.dart';
@@ -25,7 +26,8 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
   bool _loading = true;
   bool _saving = false;
   Size _canvasSize = Size.zero;
-  bool _isMobileNodeEditorOpen = false;
+  // Track which node id currently has the bottom sheet open (mobile)
+  String? _sheetNodeId;
 
   @override
   void initState() {
@@ -65,7 +67,8 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving: $e'),
+          SnackBar(
+              content: Text('Error saving: $e'),
               backgroundColor: AppColors.error),
         );
       }
@@ -111,9 +114,9 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
       ),
     ).then((result) {
       if (result is String && result.isNotEmpty) {
-        ref.read(flowEditorProvider.notifier).updateNode(
-              node.copyWith(label: result),
-            );
+        ref
+            .read(flowEditorProvider.notifier)
+            .updateNode(node.copyWith(label: result));
       }
     });
   }
@@ -125,7 +128,6 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     const startY = 200.0;
     const spacingX = 220.0;
 
-    // Simple left-to-right layout
     int i = 0;
     for (final node in nodes) {
       ref.read(flowEditorProvider.notifier).updateNodePosition(
@@ -137,6 +139,159 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     }
   }
 
+  // ── Mobile bottom sheet ───────────────────────────────────────
+
+  void _openNodeSheet(FlowNode node) {
+    if (_sheetNodeId == node.id) return;
+    setState(() => _sheetNodeId = node.id);
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      enableDrag: true,
+      builder: (sheetCtx) => _NodePropertiesSheet(
+        node: node,
+        onUpdate: (updated) =>
+            ref.read(flowEditorProvider.notifier).updateNode(updated),
+        onDelete: () {
+          Navigator.of(sheetCtx).pop();
+          ref.read(flowEditorProvider.notifier).deleteNode(node.id);
+          ref.read(flowEditorProvider.notifier).selectNode(null);
+        },
+      ),
+    ).whenComplete(() {
+      if (mounted) {
+        setState(() => _sheetNodeId = null);
+        // Deselect so the sheet does not auto-reopen after user swipes down
+        ref.read(flowEditorProvider.notifier).selectNode(null);
+      }
+    });
+  }
+
+  void _showMobileControls(
+      BuildContext context, FlowEditorState editorState, bool isDark) {
+    final cs = Theme.of(context).colorScheme;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkCard : AppColors.lightCard,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
+              blurRadius: 28,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Drag handle
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: cs.onSurface.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Text(
+                  'Canvas Controls',
+                  style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Zoom: ${(editorState.scale * 100).toInt()}%',
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: cs.onSurface.withValues(alpha: 0.55)),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _ControlButton(
+                        icon: Icons.remove_rounded,
+                        label: 'Zoom Out',
+                        color: AppColors.primary,
+                        onTap: () {
+                          ref
+                              .read(flowEditorProvider.notifier)
+                              .setScale(editorState.scale - 0.15);
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _ControlButton(
+                        icon: Icons.add_rounded,
+                        label: 'Zoom In',
+                        color: AppColors.primary,
+                        onTap: () {
+                          ref
+                              .read(flowEditorProvider.notifier)
+                              .setScale(editorState.scale + 0.15);
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _ControlButton(
+                        icon: Icons.fit_screen_rounded,
+                        label: 'Fit Screen',
+                        color: AppColors.accent,
+                        onTap: () {
+                          ref
+                              .read(flowEditorProvider.notifier)
+                              .setScale(1.0);
+                          ref
+                              .read(flowEditorProvider.notifier)
+                              .setOffset(0, 0);
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _ControlButton(
+                        icon: Icons.auto_fix_high_rounded,
+                        label: 'Auto Layout',
+                        color: AppColors.accent,
+                        onTap: () {
+                          _autoLayout();
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final editorState = ref.watch(flowEditorProvider);
@@ -146,16 +301,31 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     final isTablet = width >= 700 && width < 1100;
     final isMobile = width < 700;
 
+    // Auto-open sheet when node is selected on mobile
+    if (isMobile && editorState.selectedNode != null) {
+      final selId = editorState.selectedNode!.id;
+      if (_sheetNodeId != selId) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _openNodeSheet(editorState.selectedNode!);
+        });
+      }
+    }
+
     if (_loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
+    final toolbarBg =
+        isDark ? AppColors.darkSurface : AppColors.lightCard;
+    final toolbarBorder =
+        isDark ? AppColors.darkBorder : AppColors.lightBorder;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.go(AppRoutes.flows),
         ),
         titleSpacing: 0,
@@ -171,10 +341,13 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
             if (editorState.isDirty) ...[
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.2),
+                  color: AppColors.warning.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: AppColors.warning.withValues(alpha: 0.35)),
                 ),
                 child: const Text(
                   'Unsaved',
@@ -187,63 +360,66 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
         actions: [
           if (!isMobile) ...[
             IconButton(
-              icon: const Icon(Icons.remove, size: 18),
+              icon: const Icon(Icons.remove_rounded, size: 18),
               onPressed: () => ref
                   .read(flowEditorProvider.notifier)
                   .setScale(editorState.scale - 0.1),
               tooltip: 'Zoom out',
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.darkCard : AppColors.primarySurface,
+                color: isDark
+                    ? AppColors.darkSurface
+                    : AppColors.primarySurface,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 '${(editorState.scale * 100).toInt()}%',
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.w600),
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.add, size: 18),
+              icon: const Icon(Icons.add_rounded, size: 18),
               onPressed: () => ref
                   .read(flowEditorProvider.notifier)
                   .setScale(editorState.scale + 0.1),
               tooltip: 'Zoom in',
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 4),
           ],
           if (isMobile)
             IconButton(
-              icon: const Icon(Icons.tune),
-              tooltip: 'Editor controls',
-              onPressed: () => _showMobileControls(context, editorState, isDark),
+              icon: const Icon(Icons.tune_rounded),
+              tooltip: 'Canvas controls',
+              onPressed: () =>
+                  _showMobileControls(context, editorState, isDark),
             ),
           AppButton(
-            label: 'Save',
+            label: isMobile ? 'Save' : 'Save Flow',
             icon: Icons.save_outlined,
             loading: _saving,
             onPressed: _save,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
         ],
       ),
       body: Row(
         children: [
-          // Toolbar
+          // ── Left toolbar ──────────────────────────────────────
           Container(
-            width: isMobile ? 50 : 56,
+            width: isMobile ? 48 : 56,
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+              color: toolbarBg,
               border: Border(
-                right: BorderSide(
-                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-                ),
+                right: BorderSide(color: toolbarBorder),
               ),
             ),
             child: Column(
               children: [
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 _ToolButton(
                   icon: Icons.play_circle_outline,
                   color: AppColors.nodeStart,
@@ -273,33 +449,35 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                 ),
                 const Spacer(),
                 _ToolButton(
-                  icon: Icons.auto_fix_high,
+                  icon: Icons.auto_fix_high_rounded,
                   color: AppColors.accent,
                   tooltip: 'Auto Layout',
                   onTap: _autoLayout,
                 ),
                 _ToolButton(
-                  icon: Icons.fit_screen,
-                  color: AppColors.lightTextSecondary,
+                  icon: Icons.fit_screen_rounded,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
                   tooltip: 'Fit to screen',
                   onTap: () {
                     ref.read(flowEditorProvider.notifier).setScale(1.0);
                     ref.read(flowEditorProvider.notifier).setOffset(0, 0);
                   },
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
               ],
             ),
           ),
 
-          // Canvas
+          // ── Canvas ────────────────────────────────────────────
           Expanded(
             child: Stack(
               children: [
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    _canvasSize = Size(
-                        constraints.maxWidth, constraints.maxHeight);
+                    _canvasSize =
+                        Size(constraints.maxWidth, constraints.maxHeight);
                     if (editorState.nodes.isEmpty) {
                       return _EmptyCanvasHint(
                         onAddNode: () => _addNode(NodeType.start),
@@ -375,7 +553,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                   ),
                 ).animate().fadeIn(delay: 500.ms),
 
-                // Node count indicator
+                // Node / edge count badge
                 Positioned(
                   left: 12,
                   bottom: 12,
@@ -384,17 +562,26 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                         horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? AppColors.darkCard.withValues(alpha: 0.9)
-                          : Colors.white.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(8),
+                          ? AppColors.darkCard.withValues(alpha: 0.92)
+                          : Colors.white.withValues(alpha: 0.92),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isDark
                             ? AppColors.darkBorder
                             : AppColors.lightBorder,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Text(
-                      '${editorState.nodes.length} nodes · ${editorState.edges.length} edges',
+                      '${editorState.nodes.length} nodes · '
+                      '${editorState.edges.length} edges',
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                   ),
@@ -403,98 +590,232 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
             ),
           ),
 
-          // Node properties panel
+          // ── Right properties panel (tablet / desktop) ─────────
           if (editorState.selectedNode != null && !isMobile)
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              width: isDesktop ? 340 : isTablet ? 280 : 240,
+              width: isDesktop ? 340 : isTablet ? 290 : 240,
               child: FlowNodeEditor(
                 node: editorState.selectedNode!,
-                onUpdate: (updated) =>
-                    ref.read(flowEditorProvider.notifier).updateNode(updated),
+                onUpdate: (updated) => ref
+                    .read(flowEditorProvider.notifier)
+                    .updateNode(updated),
                 onDelete: () => ref
                     .read(flowEditorProvider.notifier)
                     .deleteNode(editorState.selectedNode!.id),
               ),
-            ).animate().fadeIn(duration: 200.ms).slideX(begin: 0.1),
+            ).animate().fadeIn(duration: 200.ms).slideX(begin: 0.06),
         ],
       ),
-      floatingActionButton: isMobile && editorState.selectedNode != null
-          ? FloatingActionButton.extended(
-              onPressed: () => _toggleMobileNodeEditor(editorState),
-              icon: Icon(_isMobileNodeEditorOpen ? Icons.close : Icons.tune),
-              label: Text(_isMobileNodeEditorOpen ? 'Hide properties' : 'Edit node'),
-            )
-          : null,
-      bottomSheet: isMobile && editorState.selectedNode != null && _isMobileNodeEditorOpen
-          ? BottomSheet(
-              enableDrag: true,
-              showDragHandle: true,
-              onClosing: () {
-                if (mounted) {
-                  setState(() => _isMobileNodeEditorOpen = false);
-                }
-              },
-              builder: (context) => SafeArea(
-                top: false,
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.56,
-                  child: FlowNodeEditor(
-                    node: editorState.selectedNode!,
-                    onUpdate: (updated) =>
-                        ref.read(flowEditorProvider.notifier).updateNode(updated),
-                    onDelete: () => ref
-                        .read(flowEditorProvider.notifier)
-                        .deleteNode(editorState.selectedNode!.id),
+    );
+  }
+}
+
+// ────────────────────────────────────────────────────────────────
+// MOBILE NODE PROPERTIES SHEET
+// ────────────────────────────────────────────────────────────────
+
+class _NodePropertiesSheet extends StatelessWidget {
+  final FlowNode node;
+  final ValueChanged<FlowNode> onUpdate;
+  final VoidCallback onDelete;
+
+  const _NodePropertiesSheet({
+    required this.node,
+    required this.onUpdate,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
+    final nodeColor = AppUtils.getNodeTypeColor(node.type.name);
+    final sheetBg = isDark ? AppColors.darkCard : AppColors.lightCard;
+    final handleColor = cs.onSurface.withValues(alpha: 0.18);
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.35,
+      maxChildSize: 0.92,
+      snapSizes: const [0.35, 0.6, 0.92],
+      snap: true,
+      expand: false,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: sheetBg,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(28)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black
+                    .withValues(alpha: isDark ? 0.55 : 0.16),
+                blurRadius: 32,
+                spreadRadius: 0,
+                offset: const Offset(0, -6),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // ── Drag handle ──────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.only(top: 14, bottom: 6),
+                child: Container(
+                  width: 44,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: handleColor,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
-            )
-          : null,
+
+              // ── Sheet header ─────────────────────────────────
+              Padding(
+                padding:
+                    const EdgeInsets.fromLTRB(20, 6, 12, 12),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(9),
+                      decoration: BoxDecoration(
+                        color: nodeColor.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        AppUtils.getNodeTypeIcon(node.type.name),
+                        color: nodeColor,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Node Properties',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 1),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: nodeColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              node.type.name.toUpperCase(),
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: nodeColor,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline_rounded,
+                          color: AppColors.error, size: 22),
+                      onPressed: onDelete,
+                      tooltip: 'Delete node',
+                      style: IconButton.styleFrom(
+                        backgroundColor:
+                            AppColors.error.withValues(alpha: 0.08),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_down_rounded,
+                          color: cs.onSurface.withValues(alpha: 0.5),
+                          size: 26),
+                      onPressed: () => Navigator.of(context).pop(),
+                      tooltip: 'Close',
+                    ),
+                  ],
+                ),
+              ),
+
+              Divider(
+                  height: 1,
+                  color: isDark
+                      ? AppColors.darkBorder
+                      : AppColors.lightBorder),
+
+              // ── Scrollable properties ─────────────────────────
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  padding: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    top: 4,
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  ),
+                  child: FlowNodeEditor(
+                    node: node,
+                    onUpdate: onUpdate,
+                    onDelete: onDelete,
+                    compact: true,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
+}
 
-  void _toggleMobileNodeEditor(FlowEditorState editorState) {
-    if (editorState.selectedNode == null) return;
-    setState(() => _isMobileNodeEditorOpen = !_isMobileNodeEditorOpen);
-  }
+// ────────────────────────────────────────────────────────────────
+// CONTROL BUTTON (mobile canvas controls sheet)
+// ────────────────────────────────────────────────────────────────
 
-  void _showMobileControls(
-      BuildContext context, FlowEditorState editorState, bool isDark) {
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (context) => SafeArea(
+class _ControlButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ControlButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
         child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Wrap(
-            spacing: 10,
-            runSpacing: 10,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _MobileActionChip(
-                label: 'Zoom -',
-                icon: Icons.remove,
-                onTap: () => ref.read(flowEditorProvider.notifier).setScale(editorState.scale - 0.1),
-              ),
-              _MobileActionChip(
-                label: 'Zoom +',
-                icon: Icons.add,
-                onTap: () => ref.read(flowEditorProvider.notifier).setScale(editorState.scale + 0.1),
-              ),
-              _MobileActionChip(
-                label: 'Fit screen',
-                icon: Icons.fit_screen,
-                onTap: () {
-                  ref.read(flowEditorProvider.notifier).setScale(1.0);
-                  ref.read(flowEditorProvider.notifier).setOffset(0, 0);
-                },
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkCard : AppColors.primarySurface,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text('Zoom ${(editorState.scale * 100).toInt()}%'),
+              Icon(icon, size: 20, color: color),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: color),
               ),
             ],
           ),
@@ -504,26 +825,9 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
   }
 }
 
-class _MobileActionChip extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _MobileActionChip({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ActionChip(
-      avatar: Icon(icon, size: 18),
-      label: Text(label),
-      onPressed: onTap,
-    );
-  }
-}
+// ────────────────────────────────────────────────────────────────
+// EMPTY CANVAS HINT
+// ────────────────────────────────────────────────────────────────
 
 class _EmptyCanvasHint extends StatelessWidget {
   final VoidCallback onAddNode;
@@ -538,7 +842,7 @@ class _EmptyCanvasHint extends StatelessWidget {
         borderType: BorderType.RRect,
         radius: const Radius.circular(20),
         dashPattern: const [8, 4],
-        color: AppColors.primary.withValues(alpha: 0.4),
+        color: AppColors.primary.withValues(alpha: 0.35),
         strokeWidth: 2,
         child: Material(
           color: Colors.transparent,
@@ -546,33 +850,44 @@ class _EmptyCanvasHint extends StatelessWidget {
           child: InkWell(
             onTap: onAddNode,
             borderRadius: BorderRadius.circular(20),
-            child: Container(
+            child: Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 60, vertical: 48),
+                  const EdgeInsets.symmetric(horizontal: 56, vertical: 48),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.add_circle_outline,
-                    size: 56,
-                    color: AppColors.primary.withValues(alpha: 0.45),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color:
+                          AppColors.primary.withValues(alpha: 0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.add_circle_outline_rounded,
+                      size: 48,
+                      color: AppColors.primary.withValues(alpha: 0.5),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     'Start building your flow',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: isDark
-                              ? AppColors.darkText
-                              : AppColors.lightText,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    style:
+                        Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: isDark
+                                  ? AppColors.darkText
+                                  : AppColors.lightText,
+                              fontWeight: FontWeight.w600,
+                            ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Click here to add a Start node,\nor use the toolbar on the left.',
+                    'Tap here to add a Start node,\nor use the toolbar on the left.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.lightTextSecondary,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.lightTextSecondary,
                         ),
                   ),
                 ],
@@ -584,6 +899,10 @@ class _EmptyCanvasHint extends StatelessWidget {
     );
   }
 }
+
+// ────────────────────────────────────────────────────────────────
+// TOOLBAR BUTTON
+// ────────────────────────────────────────────────────────────────
 
 class _ToolButton extends StatelessWidget {
   final IconData icon;
@@ -606,15 +925,12 @@ class _ToolButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         child: Material(
           color: Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(10),
           child: InkWell(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
             onTap: onTap,
             child: Container(
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-              ),
               child: Icon(icon, size: 22, color: color),
             ),
           ),
