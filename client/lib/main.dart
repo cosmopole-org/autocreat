@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/theme_provider.dart';
 import 'providers/realtime_provider.dart';
 import 'router/router.dart';
+import 'theme/app_colors.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
@@ -38,6 +39,16 @@ class AutoCreatApp extends ConsumerWidget {
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
       routerConfig: router,
+      builder: (context, child) {
+        final brightness = Theme.of(context).brightness;
+
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient(brightness),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }
