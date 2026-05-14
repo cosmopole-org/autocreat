@@ -18,6 +18,8 @@ class AppColors {
 
   // Light theme
   static const Color lightBg = Color(0xFFEEF1FF);       // scaffold background – visible indigo tint
+  static const Color lightBgGlow = Color(0xFFE0F2FE);   // soft cyan glow for gradient depth
+  static const Color lightBgWarm = Color(0xFFF7F0FF);   // soft violet glow for gradient depth
   static const Color lightSurface = Color(0xFFF7F8FF);  // panels / sidebars – very subtle tint
   static const Color lightCard = Color(0xFFFFFFFF);     // cards – pure white, elevated above surface
   static const Color lightBorder = Color(0xFFDEE1F0);
@@ -27,12 +29,44 @@ class AppColors {
 
   // Dark theme
   static const Color darkBg = Color(0xFF070C18);        // scaffold – noticeably darker than surface
+  static const Color darkBgGlow = Color(0xFF111C3A);    // firm indigo glow for gradient depth
+  static const Color darkBgTeal = Color(0xFF082633);    // restrained teal glow for gradient depth
   static const Color darkSurface = Color(0xFF0F172A);   // panels – was old darkBg
   static const Color darkCard = Color(0xFF192437);      // cards – lighter than surface
   static const Color darkBorder = Color(0xFF243247);
   static const Color darkText = Color(0xFFFAFAFA);
   static const Color darkTextSecondary = Color(0xFFB8C2D9);
   static const Color darkTextHint = Color(0xFF7B8AA8);
+
+  static const LinearGradient lightBackgroundGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFFBFCFF),
+      lightBgGlow,
+      lightBg,
+      lightBgWarm,
+    ],
+    stops: [0.0, 0.32, 0.68, 1.0],
+  );
+
+  static const LinearGradient darkBackgroundGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      darkBgGlow,
+      darkBg,
+      Color(0xFF0B1428),
+      darkBgTeal,
+    ],
+    stops: [0.0, 0.36, 0.70, 1.0],
+  );
+
+  static LinearGradient backgroundGradient(Brightness brightness) {
+    return brightness == Brightness.dark
+        ? darkBackgroundGradient
+        : lightBackgroundGradient;
+  }
 
   // Node colors
   static const Color nodeStart = Color(0xFF16A34A);

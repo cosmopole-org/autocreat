@@ -43,7 +43,7 @@ class AppTheme {
         outline: AppColors.lightBorder,
         outlineVariant: AppColors.lightBorder.withValues(alpha: 0.5),
       ),
-      scaffoldBackgroundColor: AppColors.lightBg,
+      scaffoldBackgroundColor: Colors.transparent,
       drawerTheme: const DrawerThemeData(
         backgroundColor: AppColors.lightSurface,
         elevation: 0,
@@ -257,7 +257,7 @@ class AppTheme {
         outline: AppColors.darkBorder,
         outlineVariant: AppColors.darkBorder.withValues(alpha: 0.5),
       ),
-      scaffoldBackgroundColor: AppColors.darkBg,
+      scaffoldBackgroundColor: Colors.transparent,
       drawerTheme: const DrawerThemeData(
         backgroundColor: AppColors.darkSurface,
         elevation: 0,
