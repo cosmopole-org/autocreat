@@ -25,7 +25,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
   bool _loading = true;
   bool _saving = false;
   Size _canvasSize = Size.zero;
-  bool _showNodeEditorMobile = true;
+  bool _isMobileNodeEditorOpen = false;
 
   @override
   void initState() {
@@ -421,30 +421,47 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
       ),
       floatingActionButton: isMobile && editorState.selectedNode != null
           ? FloatingActionButton.extended(
-              onPressed: () => setState(
-                () => _showNodeEditorMobile = !_showNodeEditorMobile,
-              ),
-              icon: Icon(_showNodeEditorMobile ? Icons.close : Icons.tune),
-              label: Text(_showNodeEditorMobile ? 'Hide properties' : 'Edit node'),
-            )
-          : null,
-      bottomSheet: isMobile && editorState.selectedNode != null && _showNodeEditorMobile
-          ? SafeArea(
-              top: false,
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.48,
-                child: FlowNodeEditor(
-                  node: editorState.selectedNode!,
-                  onUpdate: (updated) =>
-                      ref.read(flowEditorProvider.notifier).updateNode(updated),
-                  onDelete: () => ref
-                      .read(flowEditorProvider.notifier)
-                      .deleteNode(editorState.selectedNode!.id),
-                ),
-              ),
+              onPressed: () => _toggleMobileNodeEditor(editorState),
+              icon: Icon(_isMobileNodeEditorOpen ? Icons.close : Icons.tune),
+              label: Text(_isMobileNodeEditorOpen ? 'Hide properties' : 'Edit node'),
             )
           : null,
     );
+  }
+
+  Future<void> _toggleMobileNodeEditor(FlowEditorState editorState) async {
+    if (_isMobileNodeEditorOpen) {
+      Navigator.of(context).pop();
+      return;
+    }
+    final selected = editorState.selectedNode;
+    if (selected == null) return;
+    setState(() => _isMobileNodeEditorOpen = true);
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.52,
+        minChildSize: 0.36,
+        maxChildSize: 0.9,
+        builder: (context, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: FlowNodeEditor(
+              node: selected,
+              onUpdate: (updated) =>
+                  ref.read(flowEditorProvider.notifier).updateNode(updated),
+              onDelete: () =>
+                  ref.read(flowEditorProvider.notifier).deleteNode(selected.id),
+            ),
+          ),
+        ),
+      ),
+    );
+    if (mounted) setState(() => _isMobileNodeEditorOpen = false);
   }
 
   void _showMobileControls(
