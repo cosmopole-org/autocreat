@@ -4,6 +4,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shimmer/shimmer.dart';
 import '../theme/app_colors.dart';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// APP CARD
+// ─────────────────────────────────────────────────────────────────────────────
+
 class AppCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -24,7 +28,8 @@ class AppCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bgColor = color ?? (isDark ? AppColors.darkCard : AppColors.lightCard);
+    final bgColor =
+        color ?? (isDark ? AppColors.darkCard : AppColors.lightCard);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       decoration: BoxDecoration(
@@ -39,9 +44,9 @@ class AppCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: selected
-                ? AppColors.primary.withValues(alpha: 0.12)
-                : Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: selected ? 10 : 8,
+                ? AppColors.primary.withValues(alpha: 0.14)
+                : Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
+            blurRadius: selected ? 12 : 8,
             offset: const Offset(0, 3),
           ),
         ],
@@ -61,6 +66,10 @@ class AppCard extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// APP BUTTON  –  icon + label always centred, consistent sizing
+// ─────────────────────────────────────────────────────────────────────────────
 
 class AppButton extends StatelessWidget {
   final String label;
@@ -82,58 +91,60 @@ class AppButton extends StatelessWidget {
     this.width,
   });
 
+  Widget _buildChild() {
+    final hasLeading = loading || icon != null;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (loading)
+          const SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.white,
+            ),
+          )
+        else if (icon != null)
+          Icon(icon, size: 18),
+        if (hasLeading) const SizedBox(width: 8),
+        Text(label, textAlign: TextAlign.center),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final hasLeading = loading || icon != null;
-    final indicator = const SizedBox(
-      width: 16,
-      height: 16,
-      child: CircularProgressIndicator(strokeWidth: 2),
-    );
-
     if (outlined) {
       return SizedBox(
         width: width,
-        child: hasLeading
-            ? OutlinedButton.icon(
-                onPressed: loading ? null : onPressed,
-                icon: loading ? indicator : Icon(icon, size: 18),
-                label: Text(label, textAlign: TextAlign.center),
-              )
-            : OutlinedButton(
-                onPressed: loading ? null : onPressed,
-                child: Text(label, textAlign: TextAlign.center),
-              ),
+        child: OutlinedButton(
+          onPressed: loading ? null : onPressed,
+          child: _buildChild(),
+        ),
       );
     }
+
+    ButtonStyle? extraStyle;
+    if (color != null) {
+      extraStyle = ElevatedButton.styleFrom(backgroundColor: color);
+    }
+
     return SizedBox(
       width: width,
-      child: hasLeading
-          ? ElevatedButton.icon(
-              onPressed: loading ? null : onPressed,
-              style: color != null
-                  ? ElevatedButton.styleFrom(backgroundColor: color)
-                  : null,
-              icon: loading
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : Icon(icon, size: 18),
-              label: Text(label, textAlign: TextAlign.center),
-            )
-          : ElevatedButton(
-              onPressed: loading ? null : onPressed,
-              style: color != null
-                  ? ElevatedButton.styleFrom(backgroundColor: color)
-                  : null,
-              child: Text(label, textAlign: TextAlign.center),
-            ),
+      child: ElevatedButton(
+        onPressed: loading ? null : onPressed,
+        style: extraStyle,
+        child: _buildChild(),
+      ),
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EMPTY STATE
+// ─────────────────────────────────────────────────────────────────────────────
 
 class EmptyState extends StatelessWidget {
   final String title;
@@ -174,9 +185,11 @@ class EmptyState extends StatelessWidget {
                 ),
                 shape: BoxShape.circle,
                 border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.15), width: 1.5),
+                    color: AppColors.primary.withValues(alpha: 0.18),
+                    width: 1.5),
               ),
-              child: Icon(icon, size: 40, color: AppColors.primary.withValues(alpha: 0.65)),
+              child: Icon(icon,
+                  size: 40, color: AppColors.primary.withValues(alpha: 0.6)),
             ),
             const SizedBox(height: 24),
             Text(
@@ -199,7 +212,8 @@ class EmptyState extends StatelessWidget {
             ],
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: 28),
-              AppButton(label: actionLabel!, onPressed: onAction, icon: Icons.add),
+              AppButton(
+                  label: actionLabel!, onPressed: onAction, icon: Icons.add),
             ],
           ],
         ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.08),
@@ -207,6 +221,10 @@ class EmptyState extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LOADING SKELETONS
+// ─────────────────────────────────────────────────────────────────────────────
 
 class LoadingGrid extends StatelessWidget {
   final int count;
@@ -219,8 +237,7 @@ class LoadingGrid extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
       baseColor: isDark ? AppColors.darkCard : AppColors.lightBorder,
-      highlightColor:
-          isDark ? AppColors.darkBorder : AppColors.lightBg,
+      highlightColor: isDark ? AppColors.darkBorder : AppColors.lightSurface,
       child: GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -251,7 +268,8 @@ class LoadingList extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
       baseColor: isDark ? AppColors.darkCard : AppColors.lightBorder,
-      highlightColor: isDark ? AppColors.darkBorder : AppColors.lightBg,
+      highlightColor:
+          isDark ? AppColors.darkBorder : AppColors.lightSurface,
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: count,
@@ -267,6 +285,10 @@ class LoadingList extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATUS CHIP
+// ─────────────────────────────────────────────────────────────────────────────
 
 class StatusChip extends StatelessWidget {
   final String status;
@@ -306,9 +328,9 @@ class StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: c.withValues(alpha: 0.12),
+        color: c.withValues(alpha: 0.11),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: c.withValues(alpha: 0.3), width: 1),
+        border: Border.all(color: c.withValues(alpha: 0.28), width: 1),
       ),
       child: Text(
         status,
@@ -322,6 +344,10 @@ class StatusChip extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION HEADER
+// ─────────────────────────────────────────────────────────────────────────────
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -363,6 +389,10 @@ class SectionHeader extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// INFO ROW
+// ─────────────────────────────────────────────────────────────────────────────
+
 class InfoRow extends StatelessWidget {
   final String label;
   final String value;
@@ -377,12 +407,17 @@ class InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 16, color: AppColors.lightTextSecondary),
+            Icon(icon,
+                size: 16,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary),
             const SizedBox(width: 8),
           ],
           SizedBox(
@@ -407,6 +442,10 @@ class InfoRow extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// APP DIVIDER
+// ─────────────────────────────────────────────────────────────────────────────
+
 class AppDivider extends StatelessWidget {
   const AppDivider({super.key});
 
@@ -419,6 +458,10 @@ class AppDivider extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIRM DIALOG
+// ─────────────────────────────────────────────────────────────────────────────
 
 class ConfirmDialog extends StatelessWidget {
   final String title;
@@ -448,6 +491,7 @@ class ConfirmDialog extends StatelessWidget {
           onPressed: () => Navigator.pop(context, true),
           style: ElevatedButton.styleFrom(
             backgroundColor: confirmColor ?? AppColors.error,
+            foregroundColor: Colors.white,
           ),
           child: Text(confirmLabel),
         ),
@@ -455,6 +499,10 @@ class ConfirmDialog extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AVATAR WIDGET
+// ─────────────────────────────────────────────────────────────────────────────
 
 class AvatarWidget extends StatelessWidget {
   final String? imageUrl;
@@ -472,8 +520,10 @@ class AvatarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = color ?? AppColors.primary.withValues(alpha: 0.15);
-    final borderColor = color?.withValues(alpha: 0.3) ?? AppColors.primary.withValues(alpha: 0.2);
+    final bgColor = color?.withValues(alpha: 0.15) ??
+        AppColors.primary.withValues(alpha: 0.14);
+    final borderColor = color?.withValues(alpha: 0.3) ??
+        AppColors.primary.withValues(alpha: 0.22);
 
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return CachedNetworkImage(
@@ -484,7 +534,8 @@ class AvatarWidget extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(color: borderColor),
-            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+            image:
+                DecorationImage(image: imageProvider, fit: BoxFit.cover),
           ),
         ),
         placeholder: (context, url) => _InitialsAvatar(
@@ -543,7 +594,7 @@ class _InitialsAvatar extends StatelessWidget {
         child: Text(
           initials,
           style: TextStyle(
-            fontSize: size * 0.35,
+            fontSize: size * 0.36,
             fontWeight: FontWeight.w600,
             color: textColor,
           ),
@@ -553,7 +604,11 @@ class _InitialsAvatar extends StatelessWidget {
   }
 }
 
-class SearchField extends StatelessWidget {
+// ─────────────────────────────────────────────────────────────────────────────
+// SEARCH FIELD
+// ─────────────────────────────────────────────────────────────────────────────
+
+class SearchField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final ValueChanged<String>? onChanged;
@@ -561,33 +616,47 @@ class SearchField extends StatelessWidget {
   const SearchField({
     super.key,
     required this.controller,
-    this.hintText = 'Search...',
+    this.hintText = 'Search…',
     this.onChanged,
   });
 
   @override
+  State<SearchField> createState() => _SearchFieldState();
+}
+
+class _SearchFieldState extends State<SearchField> {
+  @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      onChanged: onChanged,
+      controller: widget.controller,
+      onChanged: (v) {
+        setState(() {}); // update clear button visibility
+        widget.onChanged?.call(v);
+      },
       decoration: InputDecoration(
-        hintText: hintText,
-        prefixIcon: const Icon(Icons.search, size: 20),
-        suffixIcon: controller.text.isNotEmpty
+        hintText: widget.hintText,
+        prefixIcon:
+            const Icon(Icons.search_rounded, size: 20),
+        suffixIcon: widget.controller.text.isNotEmpty
             ? IconButton(
-                icon: const Icon(Icons.clear, size: 18),
+                icon: const Icon(Icons.clear_rounded, size: 18),
                 onPressed: () {
-                  controller.clear();
-                  onChanged?.call('');
+                  widget.controller.clear();
+                  setState(() {});
+                  widget.onChanged?.call('');
                 },
               )
             : null,
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ERROR WIDGET
+// ─────────────────────────────────────────────────────────────────────────────
 
 class AppErrorWidget extends StatelessWidget {
   final String message;
@@ -607,7 +676,15 @@ class AppErrorWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.error.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.error_outline_rounded,
+                  size: 40, color: AppColors.error),
+            ),
             const SizedBox(height: 16),
             Text(
               'Something went wrong',
@@ -621,7 +698,8 @@ class AppErrorWidget extends StatelessWidget {
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 20),
-              AppButton(label: 'Retry', onPressed: onRetry, icon: Icons.refresh),
+              AppButton(
+                  label: 'Retry', onPressed: onRetry, icon: Icons.refresh),
             ],
           ],
         ),

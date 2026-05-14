@@ -279,7 +279,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -363,7 +363,7 @@ class _CategoryChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -519,11 +519,12 @@ class _CategoryDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: cs.outline.withValues(alpha: 0.5)),
       ),
@@ -584,7 +585,7 @@ class _LetterCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: cs.surface,
+          color: isDark ? AppColors.darkCard : AppColors.lightCard,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
           boxShadow: [

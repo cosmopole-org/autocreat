@@ -17,19 +17,19 @@ class AppColors {
   static const Color info = Color(0xFF2563EB);
 
   // Light theme
-  static const Color lightBg = Color(0xFFF5F7FF);
-  static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightCard = Color(0xFFFFFFFF);
-  static const Color lightBorder = Color(0xFFE4E4E7);
+  static const Color lightBg = Color(0xFFEEF1FF);       // scaffold background – visible indigo tint
+  static const Color lightSurface = Color(0xFFF7F8FF);  // panels / sidebars – very subtle tint
+  static const Color lightCard = Color(0xFFFFFFFF);     // cards – pure white, elevated above surface
+  static const Color lightBorder = Color(0xFFDEE1F0);
   static const Color lightText = Color(0xFF18181B);
   static const Color lightTextSecondary = Color(0xFF71717A);
   static const Color lightTextHint = Color(0xFFA1A1AA);
 
   // Dark theme
-  static const Color darkBg = Color(0xFF0F172A);
-  static const Color darkSurface = Color(0xFF111B2E);
-  static const Color darkCard = Color(0xFF1A263D);
-  static const Color darkBorder = Color(0xFF29364F);
+  static const Color darkBg = Color(0xFF070C18);        // scaffold – noticeably darker than surface
+  static const Color darkSurface = Color(0xFF0F172A);   // panels – was old darkBg
+  static const Color darkCard = Color(0xFF192437);      // cards – lighter than surface
+  static const Color darkBorder = Color(0xFF243247);
   static const Color darkText = Color(0xFFFAFAFA);
   static const Color darkTextSecondary = Color(0xFFB8C2D9);
   static const Color darkTextHint = Color(0xFF7B8AA8);

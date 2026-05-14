@@ -40,7 +40,7 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -135,82 +135,90 @@ class _WelcomeBanner extends StatelessWidget {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ][now.month - 1];
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            AppColors.primary,
-            AppColors.primaryLight,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 520;
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(isNarrow ? 18 : 24),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryLight],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$greeting, ${user?.firstName ?? 'there'}! 👋',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Here\'s what\'s happening in your organization today.',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _BannerPill(
-                      icon: Icons.calendar_today_rounded,
-                      label: '$dayName, ${now.day} $monthName ${now.year}',
+                    Text(
+                      '$greeting, ${user?.firstName ?? 'there'}! 👋',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: isNarrow ? 18 : 22,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                      ),
                     ),
-                    const SizedBox(width: 8),
-                    _BannerPill(
-                      icon: Icons.access_time_rounded,
-                      label: '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+                    const SizedBox(height: 6),
+                    Text(
+                      'Here\'s what\'s happening in your organization today.',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontSize: isNarrow ? 13 : 14,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        _BannerPill(
+                          icon: Icons.calendar_today_rounded,
+                          label:
+                              '$dayName, ${now.day} $monthName ${now.year}',
+                        ),
+                        _BannerPill(
+                          icon: Icons.access_time_rounded,
+                          label:
+                              '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+                        ),
+                      ],
                     ),
                   ],
                 ),
+              ),
+              if (!isNarrow) ...[
+                const SizedBox(width: 16),
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
               ],
-            ),
+            ],
           ),
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(
-              Icons.auto_awesome_rounded,
-              color: Colors.white,
-              size: 32,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -409,17 +417,23 @@ class _KpiCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
+
     return GestureDetector(
       onTap: () => context.go(data.route),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: cs.surface,
+          color: cardBg,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outline.withValues(alpha: 0.5)),
+          border: Border.all(
+            color: isDark
+                ? AppColors.darkBorder
+                : AppColors.lightBorder,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -885,13 +899,21 @@ class _RecentTicketsList extends StatelessWidget {
                   }[t.status.name] ??
                   AppColors.info;
 
+              final isDarkCtx = Theme.of(context).brightness == Brightness.dark;
+              final innerBg = isDarkCtx
+                  ? AppColors.darkSurface
+                  : AppColors.lightSurface;
               return Container(
                 margin: const EdgeInsets.symmetric(vertical: 4),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: cs.surface,
+                  color: innerBg,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: cs.outline.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: isDarkCtx
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -1119,6 +1141,7 @@ class _QuickActionsSection extends StatelessWidget {
             runSpacing: 12,
             children: _actions.asMap().entries.map((e) {
               final (label, icon, color, route) = e.value;
+              final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
               return GestureDetector(
                 onTap: () => context.go(route),
                 child: Container(
@@ -1127,12 +1150,17 @@ class _QuickActionsSection extends StatelessWidget {
                       : (constraints.maxWidth - 12) / 2,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: cs.surface,
+                    color: cardBg,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: color.withValues(alpha: 0.25)),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.lightBorder,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: color.withValues(alpha: isDark ? 0.08 : 0.05),
+                        color: Colors.black
+                            .withValues(alpha: isDark ? 0.22 : 0.06),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
@@ -1195,16 +1223,20 @@ class _ChartCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

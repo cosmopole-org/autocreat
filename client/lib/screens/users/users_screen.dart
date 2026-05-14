@@ -72,24 +72,27 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Team Members',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.copyWith(fontWeight: FontWeight.w800),
+                      LayoutBuilder(builder: (ctx, constraints) {
+                        final isNarrow = constraints.maxWidth < 500;
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Team Members',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(fontWeight: FontWeight.w800),
+                              ),
                             ),
-                          ),
-                          AppButton(
-                            label: 'Add User',
-                            icon: Icons.person_add_outlined,
-                            onPressed: () => context.go('/users/new/edit'),
-                          ),
-                        ],
-                      ),
+                            AppButton(
+                              label: isNarrow ? 'Add' : 'Add User',
+                              icon: Icons.person_add_outlined,
+                              onPressed: () => context.go('/users/new/edit'),
+                            ),
+                          ],
+                        );
+                      }),
                       const SizedBox(height: 16),
 
                       // Stats row
@@ -287,7 +290,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -375,7 +378,7 @@ class _RoleDonut extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -498,7 +501,7 @@ class _ActivityCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -604,12 +607,13 @@ class _RoleDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         border: Border.all(color: cs.outline.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(12),
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -667,7 +671,7 @@ class _UserCard extends StatelessWidget {
       onTap: onEdit,
       child: Container(
         decoration: BoxDecoration(
-          color: cs.surface,
+          color: isDark ? AppColors.darkCard : AppColors.lightCard,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
           boxShadow: [
@@ -701,7 +705,7 @@ class _UserCard extends StatelessWidget {
                           color: AppColors.success,
                           shape: BoxShape.circle,
                           border: Border.all(
-                              color: cs.surface, width: 2),
+                              color: isDark ? AppColors.darkCard : AppColors.lightCard, width: 2),
                         ),
                       ),
                     ),

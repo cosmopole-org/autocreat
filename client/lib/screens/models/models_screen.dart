@@ -267,7 +267,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -358,7 +358,7 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
@@ -529,7 +529,7 @@ class _ModelCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: cs.surface,
+          color: isDark ? AppColors.darkCard : AppColors.lightCard,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
           boxShadow: [
