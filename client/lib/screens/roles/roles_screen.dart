@@ -174,6 +174,7 @@ class _RoleStatsRow extends StatelessWidget {
       final cols = constraints.maxWidth > 700 ? 4 : 2;
       return GridView.builder(
         shrinkWrap: true,
+        padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: cols,

@@ -316,6 +316,7 @@ class _TicketStatsRow extends StatelessWidget {
       final cols = constraints.maxWidth > 500 ? 4 : 2;
       return GridView.count(
         shrinkWrap: true,
+        padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
         crossAxisCount: cols,
         crossAxisSpacing: 10,
