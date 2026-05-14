@@ -74,36 +74,16 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Form Definitions',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(fontWeight: FontWeight.w800),
-                          ),
-                        ),
-                        AppButton(
-                          label: 'New Form',
-                          icon: Icons.add,
-                          onPressed: () => _createForm(context),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Build and manage data collection forms',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
+                AppPageHeader(
+                  title: 'Form Definitions',
+                  description:
+                      'Build structured forms that capture reliable data, guide users beautifully, and feed your workflows without friction.',
+                  actionLabel: 'New Form',
+                  compactActionLabel: 'New',
+                  actionIcon: Icons.add,
+                  onAction: () => _createForm(context),
                 ).animate().fadeIn(duration: 300.ms),
-                const SizedBox(height: 14),
+                const SizedBox(height: 18),
 
                 // Stats
                 _FormsStatsRow(

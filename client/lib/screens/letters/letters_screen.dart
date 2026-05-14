@@ -79,38 +79,16 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header
-                      LayoutBuilder(builder: (ctx, constraints) {
-                        final isNarrow = constraints.maxWidth < 500;
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Letter Templates',
-                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                  ),
-                                ),
-                                AppButton(
-                                  label: isNarrow ? 'New' : 'New Template',
-                                  icon: Icons.add,
-                                  onPressed: () => _createLetter(context),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Manage reusable letter templates with dynamic variables',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        );
-                      }).animate().fadeIn(duration: 300.ms),
-                      const SizedBox(height: 14),
+                      AppPageHeader(
+                        title: 'Letter Templates',
+                        description:
+                            'Manage reusable letter templates with dynamic variables, ready-to-send language, and consistent branded communication.',
+                        actionLabel: 'New Template',
+                        compactActionLabel: 'New',
+                        actionIcon: Icons.add,
+                        onAction: () => _createLetter(context),
+                      ).animate().fadeIn(duration: 300.ms),
+                      const SizedBox(height: 18),
 
                       // Stats row
                       _StatsRow(

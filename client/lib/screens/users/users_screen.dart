@@ -75,28 +75,16 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header
-                      LayoutBuilder(builder: (ctx, constraints) {
-                        final isNarrow = constraints.maxWidth < 500;
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Team Members',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                            ),
-                            AppButton(
-                              label: isNarrow ? 'Add' : 'Add User',
-                              icon: Icons.person_add_outlined,
-                              onPressed: () => context.go('/users/new/edit'),
-                            ),
-                          ],
-                        );
-                      }),
-                      const SizedBox(height: 12),
+                      AppPageHeader(
+                        title: 'Team Members',
+                        description:
+                            'Invite teammates, understand account activity, and balance roles so collaboration stays organized and secure.',
+                        actionLabel: 'Add User',
+                        compactActionLabel: 'Add',
+                        actionIcon: Icons.person_add_outlined,
+                        onAction: () => context.go('/users/new/edit'),
+                      ).animate().fadeIn(duration: 300.ms),
+                      const SizedBox(height: 18),
 
                       // Stats row
                       _UserStatsRow(users: users),

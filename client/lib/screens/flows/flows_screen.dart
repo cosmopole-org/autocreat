@@ -95,59 +95,16 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isNarrow = constraints.maxWidth < 500;
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Automation Flows',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall
-                                        ?.copyWith(
-                                            fontWeight:
-                                                FontWeight.w800),
-                                  ),
-                                  if (!isNarrow)
-                                    Text(
-                                      'Design and manage organizational process flows',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall,
-                                    ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            AppButton(
-                              label: isNarrow ? 'New' : 'New Flow',
-                              icon: Icons.add,
-                              onPressed: () => _createFlow(context),
-                            ),
-                          ],
-                        ),
-                        if (isNarrow) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            'Design and manage organizational process flows',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ],
-                    );
-                  },
+                AppPageHeader(
+                  title: 'Automation Flows',
+                  description:
+                      'Design, review, and launch organizational process flows with clear steps, connected decisions, and measurable outcomes.',
+                  actionLabel: 'New Flow',
+                  compactActionLabel: 'New',
+                  actionIcon: Icons.add,
+                  onAction: () => _createFlow(context),
                 ).animate().fadeIn(duration: 300.ms),
-                const SizedBox(height: 14),
+                const SizedBox(height: 18),
 
                 // Stats
                 _FlowStatsRow(
