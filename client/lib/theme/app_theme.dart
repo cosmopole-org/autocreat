@@ -24,8 +24,12 @@ class AppTheme {
     );
   }
 
-  static ThemeData light() {
+  static ThemeData light({bool glassMode = false}) {
     final base = ThemeData.light(useMaterial3: true);
+    final surface = glassMode ? Colors.white.withValues(alpha: 0.62) : AppColors.lightSurface;
+    final card = glassMode ? Colors.white.withValues(alpha: 0.70) : AppColors.lightCard;
+    final inputFill = glassMode ? Colors.white.withValues(alpha: 0.46) : AppColors.lightSurface;
+    final border = glassMode ? Colors.white.withValues(alpha: 0.58) : AppColors.lightBorder;
     return base.copyWith(
       colorScheme: ColorScheme.light(
         primary: AppColors.primary,
@@ -34,25 +38,25 @@ class AppTheme {
         onPrimaryContainer: AppColors.primaryDark,
         secondary: AppColors.accent,
         onSecondary: Colors.white,
-        surface: AppColors.lightCard,
+        surface: card,
         onSurface: AppColors.lightText,
         surfaceContainerHighest: AppColors.lightBg,
-        surfaceContainer: AppColors.lightSurface,
+        surfaceContainer: surface,
         error: AppColors.error,
         onError: Colors.white,
         outline: AppColors.lightBorder,
         outlineVariant: AppColors.lightBorder.withValues(alpha: 0.5),
       ),
       scaffoldBackgroundColor: Colors.transparent,
-      drawerTheme: const DrawerThemeData(
-        backgroundColor: AppColors.lightSurface,
+      drawerTheme: DrawerThemeData(
+        backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.58) : AppColors.lightSurface,
         elevation: 0,
         shadowColor: Colors.transparent,
-        shape: RoundedRectangleBorder(),
+        shape: const RoundedRectangleBorder(),
       ),
       textTheme: _buildTextTheme(base.textTheme, AppColors.lightText, AppColors.lightTextSecondary),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.lightCard,
+        backgroundColor: card,
         foregroundColor: AppColors.lightText,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -63,27 +67,27 @@ class AppTheme {
         ),
         iconTheme: const IconThemeData(color: AppColors.lightText),
         actionsIconTheme: const IconThemeData(color: AppColors.lightTextSecondary),
-        shape: const Border(bottom: BorderSide(color: AppColors.lightBorder, width: 1)),
+        shape: Border(bottom: BorderSide(color: border, width: 1)),
       ),
       cardTheme: CardTheme(
-        color: AppColors.lightCard,
+        color: card,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.lightBorder, width: 1),
+          side: BorderSide(color: border, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.lightSurface,
+        fillColor: inputFill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.lightBorder, width: 1),
+          borderSide: BorderSide(color: border, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.lightBorder, width: 1),
+          borderSide: BorderSide(color: border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -170,7 +174,7 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
       ),
       dialogTheme: DialogTheme(
-        backgroundColor: AppColors.lightSurface,
+        backgroundColor: surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 0,
         titleTextStyle: GoogleFonts.inter(
@@ -227,7 +231,7 @@ class AppTheme {
         dividerColor: AppColors.lightBorder,
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: AppColors.lightSurface,
+        color: surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: const BorderSide(color: AppColors.lightBorder),
@@ -238,8 +242,12 @@ class AppTheme {
     );
   }
 
-  static ThemeData dark() {
+  static ThemeData dark({bool glassMode = false}) {
     final base = ThemeData.dark(useMaterial3: true);
+    final surface = glassMode ? Colors.white.withValues(alpha: 0.08) : AppColors.darkSurface;
+    final card = glassMode ? Colors.white.withValues(alpha: 0.11) : AppColors.darkCard;
+    final inputFill = glassMode ? Colors.white.withValues(alpha: 0.075) : AppColors.darkSurface;
+    final border = glassMode ? Colors.white.withValues(alpha: 0.16) : AppColors.darkBorder;
     return base.copyWith(
       colorScheme: ColorScheme.dark(
         primary: AppColors.primaryLight,
@@ -248,23 +256,23 @@ class AppTheme {
         onPrimaryContainer: AppColors.primarySurface,
         secondary: AppColors.accent,
         onSecondary: Colors.white,
-        surface: AppColors.darkCard,
+        surface: card,
         onSurface: AppColors.darkText,
         surfaceContainerHighest: AppColors.darkBg,
-        surfaceContainer: AppColors.darkSurface,
+        surfaceContainer: surface,
         error: AppColors.error,
         onError: Colors.white,
         outline: AppColors.darkBorder,
         outlineVariant: AppColors.darkBorder.withValues(alpha: 0.5),
       ),
       scaffoldBackgroundColor: Colors.transparent,
-      drawerTheme: const DrawerThemeData(
-        backgroundColor: AppColors.darkSurface,
+      drawerTheme: DrawerThemeData(
+        backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.08) : AppColors.darkSurface,
         elevation: 0,
       ),
       textTheme: _buildTextTheme(base.textTheme, AppColors.darkText, AppColors.darkTextSecondary),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.darkCard,
+        backgroundColor: card,
         foregroundColor: AppColors.darkText,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -275,27 +283,27 @@ class AppTheme {
         ),
         iconTheme: const IconThemeData(color: AppColors.darkText),
         actionsIconTheme: const IconThemeData(color: AppColors.darkTextSecondary),
-        shape: const Border(bottom: BorderSide(color: AppColors.darkBorder, width: 1)),
+        shape: Border(bottom: BorderSide(color: border, width: 1)),
       ),
       cardTheme: CardTheme(
-        color: AppColors.darkCard,
+        color: card,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.darkBorder, width: 1),
+          side: BorderSide(color: border, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.darkSurface,  // panels/inputs slightly darker than card
+        fillColor: inputFill,  // panels/inputs slightly darker than card
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.darkBorder, width: 1),
+          borderSide: BorderSide(color: border, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.darkBorder, width: 1),
+          borderSide: BorderSide(color: border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -364,7 +372,7 @@ class AppTheme {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.darkCard,
+        backgroundColor: card,
         contentTextStyle: GoogleFonts.inter(color: AppColors.darkText),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -432,7 +440,7 @@ class AppTheme {
         dividerColor: AppColors.darkBorder,
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: AppColors.darkCard,
+        color: card,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: const BorderSide(color: AppColors.darkBorder),
