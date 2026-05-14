@@ -188,7 +188,7 @@ class AppCard extends ConsumerWidget {
 // APP BUTTON  –  icon + label always centred, consistent sizing
 // ─────────────────────────────────────────────────────────────────────────────
 
-class AppButton extends StatelessWidget {
+class AppButton extends ConsumerWidget {
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
@@ -208,19 +208,19 @@ class AppButton extends StatelessWidget {
     this.width,
   });
 
-  Widget _buildChild() {
+  Widget _buildChild(Color spinnerColor) {
     final hasLeading = loading || icon != null;
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (loading)
-          const SizedBox(
+          SizedBox(
             width: 16,
             height: 16,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              color: Colors.white,
+              color: spinnerColor,
             ),
           )
         else if (icon != null)
@@ -232,13 +232,27 @@ class AppButton extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final glassMode = ref.watch(glassModeProvider);
+
+    if (glassMode) {
+      return _GlassButton(
+        label: label,
+        onPressed: loading ? null : onPressed,
+        icon: icon,
+        loading: loading,
+        outlined: outlined,
+        color: color,
+        width: width,
+      );
+    }
+
     if (outlined) {
       return SizedBox(
         width: width,
         child: OutlinedButton(
           onPressed: loading ? null : onPressed,
-          child: _buildChild(),
+          child: _buildChild(AppColors.primary),
         ),
       );
     }
@@ -253,8 +267,150 @@ class AppButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: loading ? null : onPressed,
         style: extraStyle,
-        child: _buildChild(),
+        child: _buildChild(Colors.white),
       ),
+    );
+  }
+}
+
+class _GlassButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final bool loading;
+  final bool outlined;
+  final Color? color;
+  final double? width;
+
+  const _GlassButton({
+    required this.label,
+    required this.onPressed,
+    required this.icon,
+    required this.loading,
+    required this.outlined,
+    required this.color,
+    required this.width,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final enabled = onPressed != null;
+    final accent = color ?? (isDark ? AppColors.primaryLight : AppColors.primary);
+    final foreground = outlined ? accent : Colors.white;
+    final hasLeading = loading || icon != null;
+
+    final button = AnimatedOpacity(
+      duration: const Duration(milliseconds: 160),
+      opacity: enabled ? 1 : 0.58,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: outlined
+                  ? Colors.white.withValues(alpha: isDark ? 0.075 : 0.38)
+                  : accent.withValues(alpha: isDark ? 0.55 : 0.72),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: outlined
+                    ? Colors.white.withValues(alpha: isDark ? 0.18 : 0.70)
+                    : Colors.white.withValues(alpha: isDark ? 0.22 : 0.45),
+                width: 1.2,
+              ),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: outlined
+                    ? [
+                        Colors.white.withValues(alpha: isDark ? 0.15 : 0.62),
+                        Colors.white.withValues(alpha: isDark ? 0.04 : 0.22),
+                      ]
+                    : [
+                        accent.withValues(alpha: isDark ? 0.70 : 0.86),
+                        AppColors.accent.withValues(alpha: isDark ? 0.45 : 0.62),
+                      ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: (outlined ? Colors.black : accent)
+                      .withValues(alpha: isDark ? 0.28 : 0.20),
+                  blurRadius: 22,
+                  offset: const Offset(0, 10),
+                ),
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: isDark ? 0.025 : 0.45),
+                  blurRadius: 1,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -24,
+                  left: -36,
+                  child: Transform.rotate(
+                    angle: -0.55,
+                    child: Container(
+                      width: 92,
+                      height: 18,
+                      color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.26),
+                    ),
+                  ),
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: enabled ? onPressed : null,
+                    borderRadius: BorderRadius.circular(16),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 46),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (loading)
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: foreground,
+                                ),
+                              )
+                            else if (icon != null)
+                              Icon(icon, size: 18, color: foreground),
+                            if (hasLeading) const SizedBox(width: 8),
+                            Text(
+                              label,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: foreground,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.05,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return SizedBox(
+      width: width,
+      child: button,
     );
   }
 }
@@ -263,7 +419,7 @@ class AppButton extends StatelessWidget {
 // EMPTY STATE
 // ─────────────────────────────────────────────────────────────────────────────
 
-class EmptyState extends StatelessWidget {
+class EmptyState extends ConsumerWidget {
   final String title;
   final String? subtitle;
   final IconData icon;
@@ -280,33 +436,40 @@ class EmptyState extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final glassMode = ref.watch(glassModeProvider);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.primary.withValues(alpha: 0.12),
-                    AppColors.primaryLight.withValues(alpha: 0.06),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            GlassSurface(
+              enabled: glassMode,
+              borderRadius: BorderRadius.circular(28),
+              blur: 20,
+              color: AppColors.primary.withValues(alpha: glassMode ? 0.12 : 0.0),
+              child: Container(
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primary.withValues(alpha: glassMode ? 0.18 : 0.12),
+                      AppColors.primaryLight.withValues(alpha: glassMode ? 0.10 : 0.06),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                      color: AppColors.primary.withValues(alpha: glassMode ? 0.26 : 0.18),
+                      width: 1.5),
                 ),
-                shape: BoxShape.circle,
-                border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.18),
-                    width: 1.5),
+                child: Icon(icon,
+                    size: 40, color: AppColors.primary.withValues(alpha: 0.68)),
               ),
-              child: Icon(icon,
-                  size: 40, color: AppColors.primary.withValues(alpha: 0.6)),
             ),
             const SizedBox(height: 24),
             Text(
@@ -407,7 +570,7 @@ class LoadingList extends StatelessWidget {
 // STATUS CHIP
 // ─────────────────────────────────────────────────────────────────────────────
 
-class StatusChip extends StatelessWidget {
+class StatusChip extends ConsumerWidget {
   final String status;
   final Color? color;
 
@@ -440,22 +603,38 @@ class StatusChip extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final c = color ?? _statusColor();
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: c.withValues(alpha: 0.11),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: c.withValues(alpha: 0.28), width: 1),
+    final glassMode = ref.watch(glassModeProvider);
+
+    return GlassSurface(
+      enabled: glassMode,
+      borderRadius: BorderRadius.circular(999),
+      blur: 12,
+      color: c.withValues(alpha: glassMode ? 0.10 : 0.11),
+      border: Border.all(
+        color: c.withValues(alpha: glassMode ? 0.34 : 0.28),
+        width: 1,
       ),
-      child: Text(
-        status,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: c,
-          letterSpacing: 0.3,
+      boxShadow: glassMode
+          ? [
+              BoxShadow(
+                color: c.withValues(alpha: 0.14),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+              ),
+            ]
+          : null,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        child: Text(
+          status,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: c,
+            letterSpacing: 0.3,
+          ),
         ),
       ),
     );
@@ -563,15 +742,20 @@ class InfoRow extends StatelessWidget {
 // APP DIVIDER
 // ─────────────────────────────────────────────────────────────────────────────
 
-class AppDivider extends StatelessWidget {
+class AppDivider extends ConsumerWidget {
   const AppDivider({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassMode = ref.watch(glassModeProvider);
     return Divider(
       height: 1,
-      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+      color: glassMode
+          ? Colors.white.withValues(alpha: isDark ? 0.13 : 0.50)
+          : isDark
+              ? AppColors.darkBorder
+              : AppColors.lightBorder,
     );
   }
 }
@@ -580,7 +764,7 @@ class AppDivider extends StatelessWidget {
 // CONFIRM DIALOG
 // ─────────────────────────────────────────────────────────────────────────────
 
-class ConfirmDialog extends StatelessWidget {
+class ConfirmDialog extends ConsumerWidget {
   final String title;
   final String message;
   final String confirmLabel;
@@ -595,24 +779,63 @@ class ConfirmDialog extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(title),
-      content: Text(message),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context, true),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: confirmColor ?? AppColors.error,
-            foregroundColor: Colors.white,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final glassMode = ref.watch(glassModeProvider);
+
+    if (!glassMode) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
           ),
-          child: Text(confirmLabel),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: confirmColor ?? AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(confirmLabel),
+          ),
+        ],
+      );
+    }
+
+    return Dialog(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      child: GlassSurface(
+        enabled: true,
+        borderRadius: BorderRadius.circular(24),
+        padding: const EdgeInsets.fromLTRB(24, 22, 24, 18),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 12),
+            Text(message, style: Theme.of(context).textTheme.bodyMedium),
+            const SizedBox(height: 22),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: 10),
+                AppButton(
+                  label: confirmLabel,
+                  onPressed: () => Navigator.pop(context, true),
+                  color: confirmColor ?? AppColors.error,
+                ),
+              ],
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

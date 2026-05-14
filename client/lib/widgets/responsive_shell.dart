@@ -356,7 +356,7 @@ class _FloatingMobileBar extends ConsumerWidget {
   }
 }
 
-class _BarIconButton extends StatelessWidget {
+class _BarIconButton extends ConsumerWidget {
   final IconData icon;
   final VoidCallback onTap;
   final String tooltip;
@@ -368,16 +368,42 @@ class _BarIconButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final glassMode = ref.watch(glassModeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Tooltip(
       message: tooltip,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: Padding(
-          padding: const EdgeInsets.all(7),
-          child: Icon(icon, size: 20, color: cs.onSurface.withValues(alpha: 0.75)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(glassMode ? 12 : 10),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: glassMode ? 10 : 0,
+            sigmaY: glassMode ? 10 : 0,
+          ),
+          child: Material(
+            color: glassMode
+                ? Colors.white.withValues(alpha: isDark ? 0.06 : 0.28)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(glassMode ? 12 : 10),
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(glassMode ? 12 : 10),
+              child: Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(glassMode ? 12 : 10),
+                  border: glassMode
+                      ? Border.all(
+                          color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.42),
+                        )
+                      : null,
+                ),
+                child: Icon(icon, size: 20, color: cs.onSurface.withValues(alpha: 0.75)),
+              ),
+            ),
+          ),
         ),
       ),
     );
