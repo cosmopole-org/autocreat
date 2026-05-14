@@ -103,7 +103,7 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
                     ),
                   ],
                 ).animate().fadeIn(duration: 300.ms),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
 
                 // Stats
                 _FormsStatsRow(

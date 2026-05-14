@@ -96,7 +96,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                           ],
                         );
                       }),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
                       // Stats row
                       _UserStatsRow(users: users),

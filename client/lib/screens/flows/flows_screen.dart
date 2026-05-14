@@ -147,7 +147,7 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
                     );
                   },
                 ).animate().fadeIn(duration: 300.ms),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
 
                 // Stats
                 _FlowStatsRow(

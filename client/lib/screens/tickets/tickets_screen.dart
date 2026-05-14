@@ -138,7 +138,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                           ],
                         );
                       }),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
                       // Stats row
                       _TicketStatsRow(tickets: tickets),
