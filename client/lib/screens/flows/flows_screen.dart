@@ -669,7 +669,6 @@ class _FlowCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }
