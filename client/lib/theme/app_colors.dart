@@ -50,6 +50,18 @@ class AppColors {
     stops: [0.0, 0.32, 0.68, 1.0],
   );
 
+  static const LinearGradient glassLightBackgroundGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFFAFCFF),
+      Color(0xFFDFF8FF),
+      Color(0xFFEAE7FF),
+      Color(0xFFFFF1F8),
+    ],
+    stops: [0.0, 0.30, 0.66, 1.0],
+  );
+
   static const LinearGradient darkBackgroundGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -62,7 +74,27 @@ class AppColors {
     stops: [0.0, 0.36, 0.70, 1.0],
   );
 
-  static LinearGradient backgroundGradient(Brightness brightness) {
+  static const LinearGradient glassDarkBackgroundGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFF121B3F),
+      Color(0xFF050A16),
+      Color(0xFF10172F),
+      Color(0xFF052B37),
+    ],
+    stops: [0.0, 0.34, 0.68, 1.0],
+  );
+
+  static LinearGradient backgroundGradient(
+    Brightness brightness, {
+    bool glassMode = false,
+  }) {
+    if (glassMode) {
+      return brightness == Brightness.dark
+          ? glassDarkBackgroundGradient
+          : glassLightBackgroundGradient;
+    }
     return brightness == Brightness.dark
         ? darkBackgroundGradient
         : lightBackgroundGradient;
