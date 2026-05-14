@@ -168,8 +168,8 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                   const SizedBox(height: 12),
 
                   if (editorState.fields.isEmpty)
-                    AppCard(
-                      child: const Padding(
+                    const AppCard(
+                      child: Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: Center(
                           child: Column(
@@ -292,7 +292,7 @@ class _ModelFieldRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: AppColors.info.withOpacity(0.1),
+              color: AppColors.info.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(_getTypeIcon(field.type),

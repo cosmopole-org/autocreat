@@ -289,10 +289,10 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -305,7 +305,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 16),
@@ -326,7 +326,7 @@ class _StatCard extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 11,
-                  color: cs.onSurface.withOpacity(0.55),
+                  color: cs.onSurface.withValues(alpha: 0.55),
                 ),
               ),
             ],
@@ -377,10 +377,10 @@ class _RoleDonut extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -397,7 +397,7 @@ class _RoleDonut extends StatelessWidget {
           Text('Members by assigned role',
               style: TextStyle(
                   fontSize: 11,
-                  color: cs.onSurface.withOpacity(0.45))),
+                  color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -464,7 +464,7 @@ class _RoleDonut extends StatelessWidget {
                             '${e.value.value} ($pct%)',
                             style: TextStyle(
                                 fontSize: 11,
-                                color: cs.onSurface.withOpacity(0.55)),
+                                color: cs.onSurface.withValues(alpha: 0.55)),
                           ),
                         ],
                       ),
@@ -500,10 +500,10 @@ class _ActivityCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -520,7 +520,7 @@ class _ActivityCard extends StatelessWidget {
           Text('Account activity',
               style: TextStyle(
                   fontSize: 11,
-                  color: cs.onSurface.withOpacity(0.45))),
+                  color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           _StatusBar(
             label: 'Active',
@@ -578,7 +578,7 @@ class _StatusBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: pct,
-            backgroundColor: color.withOpacity(0.1),
+            backgroundColor: color.withValues(alpha: 0.1),
             valueColor: AlwaysStoppedAnimation(color),
             minHeight: 7,
           ),
@@ -607,7 +607,7 @@ class _RoleDropdown extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        border: Border.all(color: cs.outline.withOpacity(0.5)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(12),
         color: cs.surface,
       ),
@@ -669,10 +669,10 @@ class _UserCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outline.withOpacity(0.4)),
+          border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.15 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -731,7 +731,7 @@ class _UserCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: roleColor.withOpacity(0.12),
+                            color: roleColor.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -752,14 +752,14 @@ class _UserCard extends StatelessWidget {
                         Icon(Icons.email_outlined,
                             size: 12,
                             color:
-                                cs.onSurface.withOpacity(0.45)),
+                                cs.onSurface.withValues(alpha: 0.45)),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             user.email,
                             style: TextStyle(
                               fontSize: 12,
-                              color: cs.onSurface.withOpacity(0.55),
+                              color: cs.onSurface.withValues(alpha: 0.55),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -795,7 +795,7 @@ class _UserCard extends StatelessWidget {
               PopupMenuButton<String>(
                 icon: Icon(Icons.more_vert,
                     size: 18,
-                    color: cs.onSurface.withOpacity(0.45)),
+                    color: cs.onSurface.withValues(alpha: 0.45)),
                 itemBuilder: (_) => const [
                   PopupMenuItem(value: 'edit', child: Text('Edit')),
                   PopupMenuItem(
@@ -832,12 +832,12 @@ class _InfoChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 11, color: cs.onSurface.withOpacity(0.4)),
+        Icon(icon, size: 11, color: cs.onSurface.withValues(alpha: 0.4)),
         const SizedBox(width: 3),
         Text(
           label,
           style: TextStyle(
-              fontSize: 11, color: cs.onSurface.withOpacity(0.45)),
+              fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45)),
         ),
       ],
     );

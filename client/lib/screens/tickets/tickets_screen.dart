@@ -191,7 +191,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
               ),
 
               if (filtered.isEmpty)
-                SliverFillRemaining(
+                const SliverFillRemaining(
                   child: EmptyState(
                     title: 'No tickets found',
                     subtitle: 'Try adjusting your filters',
@@ -330,10 +330,10 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -346,7 +346,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 16),
@@ -367,7 +367,7 @@ class _StatCard extends StatelessWidget {
                 label,
                 style: TextStyle(
                   fontSize: 11,
-                  color: cs.onSurface.withOpacity(0.55),
+                  color: cs.onSurface.withValues(alpha: 0.55),
                 ),
               ),
             ],
@@ -420,10 +420,10 @@ class _PriorityBarChart extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -440,7 +440,7 @@ class _PriorityBarChart extends StatelessWidget {
           Text('Tickets by priority level',
               style: TextStyle(
                   fontSize: 11,
-                  color: cs.onSurface.withOpacity(0.45))),
+                  color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           SizedBox(
             height: 140,
@@ -452,7 +452,7 @@ class _PriorityBarChart extends StatelessWidget {
                   show: true,
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (_) => FlLine(
-                    color: cs.outline.withOpacity(0.2),
+                    color: cs.outline.withValues(alpha: 0.2),
                     strokeWidth: 1,
                   ),
                 ),
@@ -472,7 +472,7 @@ class _PriorityBarChart extends StatelessWidget {
                           labels[v.toInt()],
                           style: TextStyle(
                               fontSize: 11,
-                              color: cs.onSurface.withOpacity(0.5)),
+                              color: cs.onSurface.withValues(alpha: 0.5)),
                         ),
                       ),
                     ),
@@ -492,7 +492,7 @@ class _PriorityBarChart extends StatelessWidget {
                         backDrawRodData: BackgroundBarChartRodData(
                           show: true,
                           toY: maxY,
-                          color: colors[i].withOpacity(0.06),
+                          color: colors[i].withValues(alpha: 0.06),
                         ),
                       ),
                     ],
@@ -551,10 +551,10 @@ class _StatusDonutState extends State<_StatusDonut> {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -571,7 +571,7 @@ class _StatusDonutState extends State<_StatusDonut> {
           Text('Current ticket states',
               style: TextStyle(
                   fontSize: 11,
-                  color: cs.onSurface.withOpacity(0.45))),
+                  color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -583,7 +583,7 @@ class _StatusDonutState extends State<_StatusDonut> {
                         child: Text('No data',
                             style: TextStyle(
                                 fontSize: 11,
-                                color: cs.onSurface.withOpacity(0.4))))
+                                color: cs.onSurface.withValues(alpha: 0.4))))
                     : PieChart(
                         PieChartData(
                           sectionsSpace: 2,
@@ -709,12 +709,12 @@ class _TicketCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: ticket.isRead
-                ? cs.outline.withOpacity(0.4)
-                : priorityColor.withOpacity(0.35),
+                ? cs.outline.withValues(alpha: 0.4)
+                : priorityColor.withValues(alpha: 0.35),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.15 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -773,7 +773,7 @@ class _TicketCard extends StatelessWidget {
                           PopupMenuButton<TicketStatus>(
                             icon: Icon(Icons.more_vert,
                                 size: 18,
-                                color: cs.onSurface.withOpacity(0.4)),
+                                color: cs.onSurface.withValues(alpha: 0.4)),
                             itemBuilder: (_) => TicketStatus.values
                                 .map((s) => PopupMenuItem(
                                       value: s,
@@ -791,7 +791,7 @@ class _TicketCard extends StatelessWidget {
                           ticket.description!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: cs.onSurface.withOpacity(0.55),
+                            color: cs.onSurface.withValues(alpha: 0.55),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -810,14 +810,14 @@ class _TicketCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 7, vertical: 2),
                               decoration: BoxDecoration(
-                                color: cs.outline.withOpacity(0.1),
+                                color: cs.outline.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: Text(
                                 tag,
                                 style: TextStyle(
                                   fontSize: 10,
-                                  color: cs.onSurface.withOpacity(0.55),
+                                  color: cs.onSurface.withValues(alpha: 0.55),
                                 ),
                               ),
                             );
@@ -834,7 +834,7 @@ class _TicketCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: statusColor.withOpacity(0.12),
+                              color: statusColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -852,7 +852,7 @@ class _TicketCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: priorityColor.withOpacity(0.1),
+                              color: priorityColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -870,13 +870,13 @@ class _TicketCard extends StatelessWidget {
                           if (ticket.assigneeName != null) ...[
                             Icon(Icons.person_outline,
                                 size: 12,
-                                color: cs.onSurface.withOpacity(0.4)),
+                                color: cs.onSurface.withValues(alpha: 0.4)),
                             const SizedBox(width: 3),
                             Text(
                               ticket.assigneeName!,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: cs.onSurface.withOpacity(0.5),
+                                color: cs.onSurface.withValues(alpha: 0.5),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -886,13 +886,13 @@ class _TicketCard extends StatelessWidget {
                           if (ticket.messageCount > 0) ...[
                             Icon(Icons.chat_bubble_outline,
                                 size: 12,
-                                color: cs.onSurface.withOpacity(0.4)),
+                                color: cs.onSurface.withValues(alpha: 0.4)),
                             const SizedBox(width: 3),
                             Text(
                               '${ticket.messageCount}',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: cs.onSurface.withOpacity(0.5),
+                                color: cs.onSurface.withValues(alpha: 0.5),
                               ),
                             ),
                           ],
@@ -904,7 +904,7 @@ class _TicketCard extends StatelessWidget {
                                 size: 12,
                                 color: _isOverdue(ticket.dueDate!)
                                     ? AppColors.error
-                                    : cs.onSurface.withOpacity(0.4)),
+                                    : cs.onSurface.withValues(alpha: 0.4)),
                             const SizedBox(width: 3),
                             Text(
                               _formatDue(ticket.dueDate!),
@@ -912,7 +912,7 @@ class _TicketCard extends StatelessWidget {
                                 fontSize: 11,
                                 color: _isOverdue(ticket.dueDate!)
                                     ? AppColors.error
-                                    : cs.onSurface.withOpacity(0.5),
+                                    : cs.onSurface.withValues(alpha: 0.5),
                                 fontWeight: _isOverdue(ticket.dueDate!)
                                     ? FontWeight.w600
                                     : FontWeight.normal,

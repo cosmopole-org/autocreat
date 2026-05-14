@@ -216,7 +216,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                       ),
                       progressColor: _coverageColor(coverage),
                       backgroundColor:
-                          _coverageColor(coverage).withOpacity(0.12),
+                          _coverageColor(coverage).withValues(alpha: 0.12),
                       animation: true,
                       animationDuration: 800,
                       circularStrokeCap: CircularStrokeCap.round,

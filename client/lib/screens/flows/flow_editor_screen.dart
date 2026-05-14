@@ -162,7 +162,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withOpacity(0.2),
+                  color: AppColors.warning.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
@@ -367,8 +367,8 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                         horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? AppColors.darkCard.withOpacity(0.9)
-                          : Colors.white.withOpacity(0.9),
+                          ? AppColors.darkCard.withValues(alpha: 0.9)
+                          : Colors.white.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: isDark
@@ -419,7 +419,7 @@ class _EmptyCanvasHint extends StatelessWidget {
         borderType: BorderType.RRect,
         radius: const Radius.circular(20),
         dashPattern: const [8, 4],
-        color: AppColors.primary.withOpacity(0.4),
+        color: AppColors.primary.withValues(alpha: 0.4),
         strokeWidth: 2,
         child: Material(
           color: Colors.transparent,
@@ -436,7 +436,7 @@ class _EmptyCanvasHint extends StatelessWidget {
                   Icon(
                     Icons.add_circle_outline,
                     size: 56,
-                    color: AppColors.primary.withOpacity(0.45),
+                    color: AppColors.primary.withValues(alpha: 0.45),
                   ),
                   const SizedBox(height: 20),
                   Text(

@@ -78,7 +78,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: nodeColor.withOpacity(0.15),
+                    color: nodeColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -225,7 +225,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                       border: Border.all(
                         color: isDark
                             ? AppColors.darkBorder
-                            : AppColors.primaryLight.withOpacity(0.3),
+                            : AppColors.primaryLight.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Column(

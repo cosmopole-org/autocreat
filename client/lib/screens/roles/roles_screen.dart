@@ -231,10 +231,10 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -245,7 +245,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -270,7 +270,7 @@ class _StatCard extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.55),
+                    color: cs.onSurface.withValues(alpha: 0.55),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -317,10 +317,10 @@ class _MembersBarChart extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -336,7 +336,7 @@ class _MembersBarChart extends StatelessWidget {
                   ?.copyWith(fontWeight: FontWeight.w700)),
           Text('How many users are assigned to each role',
               style: TextStyle(
-                  fontSize: 11, color: cs.onSurface.withOpacity(0.45))),
+                  fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           SizedBox(
             height: 160,
@@ -348,7 +348,7 @@ class _MembersBarChart extends StatelessWidget {
                   show: true,
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (_) => FlLine(
-                    color: cs.outline.withOpacity(0.2),
+                    color: cs.outline.withValues(alpha: 0.2),
                     strokeWidth: 1,
                   ),
                 ),
@@ -375,7 +375,7 @@ class _MembersBarChart extends StatelessWidget {
                             short,
                             style: TextStyle(
                                 fontSize: 10,
-                                color: cs.onSurface.withOpacity(0.5)),
+                                color: cs.onSurface.withValues(alpha: 0.5)),
                           ),
                         );
                       },
@@ -396,7 +396,7 @@ class _MembersBarChart extends StatelessWidget {
                         backDrawRodData: BackgroundBarChartRodData(
                           show: true,
                           toY: maxVal.clamp(2.0, 20.0),
-                          color: color.withOpacity(0.06),
+                          color: color.withValues(alpha: 0.06),
                         ),
                       ),
                     ],
@@ -454,10 +454,10 @@ class _RoleCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outline.withOpacity(0.4)),
+          border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -472,7 +472,7 @@ class _RoleCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.12),
+                    color: AppColors.success.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.shield_rounded,
@@ -501,7 +501,7 @@ class _RoleCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: lvlColor.withOpacity(0.1),
+                              color: lvlColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -522,7 +522,7 @@ class _RoleCard extends StatelessWidget {
                               .textTheme
                               .bodySmall
                               ?.copyWith(
-                                color: cs.onSurface.withOpacity(0.55),
+                                color: cs.onSurface.withValues(alpha: 0.55),
                               ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -532,7 +532,7 @@ class _RoleCard extends StatelessWidget {
                 ),
                 PopupMenuButton<String>(
                   icon: Icon(Icons.more_vert,
-                      size: 18, color: cs.onSurface.withOpacity(0.5)),
+                      size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                   itemBuilder: (_) => [
                     const PopupMenuItem(value: 'edit', child: Text('Edit')),
                     const PopupMenuItem(
@@ -605,7 +605,7 @@ class _RoleCard extends StatelessWidget {
                               p.resource,
                               style: TextStyle(
                                   fontSize: 10,
-                                  color: cs.onSurface.withOpacity(0.65)),
+                                  color: cs.onSurface.withValues(alpha: 0.65)),
                             ),
                           ],
                         ),
@@ -639,7 +639,7 @@ class _RoleCard extends StatelessWidget {
                     status: role.isActive ? 'active' : 'inactive'),
                 const Spacer(),
                 Icon(Icons.edit_outlined,
-                    size: 14, color: cs.onSurface.withOpacity(0.3)),
+                    size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
               ],
             ),
           ],
@@ -665,7 +665,7 @@ class _PermBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(

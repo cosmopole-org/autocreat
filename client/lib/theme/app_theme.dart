@@ -40,7 +40,7 @@ class AppTheme {
         error: AppColors.error,
         onError: Colors.white,
         outline: AppColors.lightBorder,
-        outlineVariant: AppColors.lightBorder.withOpacity(0.5),
+        outlineVariant: AppColors.lightBorder.withValues(alpha: 0.5),
       ),
       scaffoldBackgroundColor: AppColors.lightBg,
       drawerTheme: const DrawerThemeData(
@@ -150,7 +150,7 @@ class AppTheme {
       ),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: AppColors.lightText.withOpacity(0.9),
+          color: AppColors.lightText.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(8),
         ),
         textStyle: GoogleFonts.inter(color: Colors.white, fontSize: 12),
@@ -236,7 +236,7 @@ class AppTheme {
       colorScheme: ColorScheme.dark(
         primary: AppColors.primaryLight,
         onPrimary: Colors.white,
-        primaryContainer: AppColors.primary.withOpacity(0.2),
+        primaryContainer: AppColors.primary.withValues(alpha: 0.2),
         onPrimaryContainer: AppColors.primarySurface,
         secondary: AppColors.accent,
         onSecondary: Colors.white,
@@ -246,7 +246,7 @@ class AppTheme {
         error: AppColors.error,
         onError: Colors.white,
         outline: AppColors.darkBorder,
-        outlineVariant: AppColors.darkBorder.withOpacity(0.5),
+        outlineVariant: AppColors.darkBorder.withValues(alpha: 0.5),
       ),
       scaffoldBackgroundColor: AppColors.darkBg,
       drawerTheme: const DrawerThemeData(
@@ -333,9 +333,9 @@ class AppTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.primary.withOpacity(0.2),
+        backgroundColor: AppColors.primary.withValues(alpha: 0.2),
         labelStyle: GoogleFonts.inter(fontSize: 12, color: AppColors.primaryLight),
-        side: BorderSide(color: AppColors.primaryLight.withOpacity(0.4), width: 1),
+        side: BorderSide(color: AppColors.primaryLight.withValues(alpha: 0.4), width: 1),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       ),
@@ -381,7 +381,7 @@ class AppTheme {
         selectedLabelTextStyle:
             const TextStyle(color: AppColors.primaryLight, fontWeight: FontWeight.w600),
         unselectedLabelTextStyle: const TextStyle(color: AppColors.darkTextSecondary),
-        indicatorColor: AppColors.primary.withOpacity(0.2),
+        indicatorColor: AppColors.primary.withValues(alpha: 0.2),
         useIndicator: true,
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -394,7 +394,7 @@ class AppTheme {
         thumbColor: WidgetStateProperty.resolveWith((s) =>
             s.contains(WidgetState.selected) ? AppColors.primaryLight : AppColors.darkTextSecondary),
         trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected)
-            ? AppColors.primary.withOpacity(0.4)
+            ? AppColors.primary.withValues(alpha: 0.4)
             : AppColors.darkBorder),
       ),
       checkboxTheme: CheckboxThemeData(

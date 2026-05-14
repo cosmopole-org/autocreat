@@ -269,10 +269,10 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -283,7 +283,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -308,7 +308,7 @@ class _StatCard extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 11,
-                    color: cs.onSurface.withOpacity(0.55),
+                    color: cs.onSurface.withValues(alpha: 0.55),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -360,10 +360,10 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.4)),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -379,7 +379,7 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
                   ?.copyWith(fontWeight: FontWeight.w700)),
           Text('Breakdown of field types across all models',
               style: TextStyle(
-                  fontSize: 11, color: cs.onSurface.withOpacity(0.45))),
+                  fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           LayoutBuilder(builder: (context, constraints) {
             final isWide = constraints.maxWidth > 500;
@@ -531,10 +531,10 @@ class _ModelCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outline.withOpacity(0.4)),
+          border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -549,7 +549,7 @@ class _ModelCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.info.withOpacity(0.12),
+                    color: AppColors.info.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.data_object_rounded,
@@ -573,7 +573,7 @@ class _ModelCard extends StatelessWidget {
                         Text(
                           model.description!,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: cs.onSurface.withOpacity(0.55),
+                                color: cs.onSurface.withValues(alpha: 0.55),
                               ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -583,7 +583,7 @@ class _ModelCard extends StatelessWidget {
                 ),
                 PopupMenuButton<String>(
                   icon: Icon(Icons.more_vert,
-                      size: 18, color: cs.onSurface.withOpacity(0.5)),
+                      size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                   itemBuilder: (_) => [
                     const PopupMenuItem(value: 'edit', child: Text('Edit')),
                     const PopupMenuItem(
@@ -634,7 +634,7 @@ class _ModelCard extends StatelessWidget {
                                 style: TextStyle(
                                     fontSize: 10,
                                     color: AppColors.primary
-                                        .withOpacity(0.7)),
+                                        .withValues(alpha: 0.7)),
                               ),
                             ],
                           ),
@@ -653,7 +653,7 @@ class _ModelCard extends StatelessWidget {
                               '+${model.fields.length - 5} more',
                               style: TextStyle(
                                   fontSize: 10,
-                                  color: cs.onSurface.withOpacity(0.5)),
+                                  color: cs.onSurface.withValues(alpha: 0.5)),
                             ),
                           )
                         ]
@@ -683,7 +683,7 @@ class _ModelCard extends StatelessWidget {
                       color: AppColors.success),
                 const Spacer(),
                 Icon(Icons.edit_outlined,
-                    size: 14, color: cs.onSurface.withOpacity(0.3)),
+                    size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
               ],
             ),
           ],
@@ -709,7 +709,7 @@ class _FieldBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(

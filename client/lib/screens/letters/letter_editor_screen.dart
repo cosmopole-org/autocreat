@@ -186,7 +186,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
             ),
             child: QuillSimpleToolbar(
               controller: _quillController,
-              configurations: QuillSimpleToolbarConfigurations(
+              configurations: const QuillSimpleToolbarConfigurations(
                 showFontSize: true,
                 showBoldButton: true,
                 showItalicButton: true,

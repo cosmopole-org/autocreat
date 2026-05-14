@@ -30,63 +30,63 @@ class _NavItem {
 }
 
 final _navItems = [
-  _NavItem(
+  const _NavItem(
     label: 'Dashboard',
     icon: Icons.dashboard_outlined,
     selectedIcon: Icons.dashboard_rounded,
     route: AppRoutes.dashboard,
     section: 'Overview',
   ),
-  _NavItem(
+  const _NavItem(
     label: 'Companies',
     icon: Icons.business_outlined,
     selectedIcon: Icons.business_rounded,
     route: AppRoutes.companies,
     section: 'Organization',
   ),
-  _NavItem(
+  const _NavItem(
     label: 'Users',
     icon: Icons.people_outline_rounded,
     selectedIcon: Icons.people_rounded,
     route: AppRoutes.users,
     section: 'Organization',
   ),
-  _NavItem(
+  const _NavItem(
     label: 'Roles',
     icon: Icons.shield_outlined,
     selectedIcon: Icons.shield_rounded,
     route: AppRoutes.roles,
     section: 'Organization',
   ),
-  _NavItem(
+  const _NavItem(
     label: 'Flows',
     icon: Icons.account_tree_outlined,
     selectedIcon: Icons.account_tree_rounded,
     route: AppRoutes.flows,
     section: 'Automation',
   ),
-  _NavItem(
+  const _NavItem(
     label: 'Forms',
     icon: Icons.dynamic_form_outlined,
     selectedIcon: Icons.dynamic_form_rounded,
     route: AppRoutes.forms,
     section: 'Automation',
   ),
-  _NavItem(
+  const _NavItem(
     label: 'Models',
     icon: Icons.data_object_rounded,
     selectedIcon: Icons.data_object_rounded,
     route: AppRoutes.models,
     section: 'Automation',
   ),
-  _NavItem(
+  const _NavItem(
     label: 'Letters',
     icon: Icons.mail_outline_rounded,
     selectedIcon: Icons.mail_rounded,
     route: AppRoutes.letters,
     section: 'Communication',
   ),
-  _NavItem(
+  const _NavItem(
     label: 'Tickets',
     icon: Icons.support_agent_outlined,
     selectedIcon: Icons.support_agent_rounded,
@@ -199,7 +199,7 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
           Expanded(
             child: Column(
               children: [
-                _TopBar(showMenuButton: false),
+                const _TopBar(showMenuButton: false),
                 Expanded(child: widget.child),
               ],
             ),
@@ -221,7 +221,7 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
           Expanded(
             child: Column(
               children: [
-                _TopBar(showMenuButton: false),
+                const _TopBar(showMenuButton: false),
                 Expanded(child: widget.child),
               ],
             ),
@@ -248,8 +248,8 @@ class _FloatingMobileBar extends ConsumerWidget {
     final user = ref.watch(currentUserProvider);
 
     final bgColor = isDark
-        ? AppColors.darkSurface.withOpacity(0.92)
-        : AppColors.lightSurface.withOpacity(0.92);
+        ? AppColors.darkSurface.withValues(alpha: 0.92)
+        : AppColors.lightSurface.withValues(alpha: 0.92);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
@@ -261,19 +261,19 @@ class _FloatingMobileBar extends ConsumerWidget {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isDark
-                  ? Colors.white.withOpacity(0.08)
-                  : Colors.black.withOpacity(0.06),
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.black.withValues(alpha: 0.06),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.35 : 0.10),
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.10),
                 blurRadius: 24,
                 spreadRadius: 0,
                 offset: const Offset(0, 6),
               ),
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.06),
+                color: AppColors.primary.withValues(alpha: 0.06),
                 blurRadius: 12,
                 offset: const Offset(0, 2),
               ),
@@ -362,7 +362,7 @@ class _BarIconButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         child: Padding(
           padding: const EdgeInsets.all(7),
-          child: Icon(icon, size: 20, color: cs.onSurface.withOpacity(0.75)),
+          child: Icon(icon, size: 20, color: cs.onSurface.withValues(alpha: 0.75)),
         ),
       ),
     );
@@ -375,9 +375,8 @@ class _BarIconButton extends StatelessWidget {
 
 class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
   final bool showMenuButton;
-  final VoidCallback? onMenuTap;
 
-  const _TopBar({this.showMenuButton = false, this.onMenuTap});
+  const _TopBar({this.showMenuButton = false});
 
   @override
   Size get preferredSize => const Size.fromHeight(60);
@@ -394,11 +393,11 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         border: Border(
-          bottom: BorderSide(color: cs.outline.withOpacity(0.5), width: 1),
+          bottom: BorderSide(color: cs.outline.withValues(alpha: 0.5), width: 1),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -411,14 +410,14 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
             if (showMenuButton) ...[
               IconButton(
                 icon: const Icon(Icons.menu_rounded, size: 22),
-                onPressed: onMenuTap,
+                onPressed: null,
                 style: IconButton.styleFrom(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
               ),
               const SizedBox(width: 4),
-              _LogoMark(compact: true),
+              const _LogoMark(compact: true),
             ],
             const Spacer(),
             // Search field (only on tablet/desktop)
@@ -429,20 +428,20 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.darkBg : AppColors.lightBg,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: cs.outline.withOpacity(0.4)),
+                  border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
                 ),
                 child: Row(
                   children: [
                     const SizedBox(width: 10),
                     Icon(Icons.search_rounded,
                         size: 16,
-                        color: cs.onSurface.withOpacity(0.4)),
+                        color: cs.onSurface.withValues(alpha: 0.4)),
                     const SizedBox(width: 6),
                     Text(
                       'Search...',
                       style: TextStyle(
                           fontSize: 13,
-                          color: cs.onSurface.withOpacity(0.4)),
+                          color: cs.onSurface.withValues(alpha: 0.4)),
                     ),
                   ],
                 ),
@@ -531,7 +530,7 @@ class _LogoMark extends StatelessWidget {
         ),
         if (!compact) ...[
           const SizedBox(width: 10),
-          Text(
+          const Text(
             'AutoCreat',
             style: TextStyle(
               fontSize: 16,
@@ -567,7 +566,7 @@ class _FullSidebar extends ConsumerWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         border: Border(
-          right: BorderSide(color: cs.outline.withOpacity(0.4)),
+          right: BorderSide(color: cs.outline.withValues(alpha: 0.4)),
         ),
       ),
       child: Column(
@@ -579,7 +578,7 @@ class _FullSidebar extends ConsumerWidget {
             decoration: BoxDecoration(
               border: Border(
                 bottom:
-                    BorderSide(color: cs.outline.withOpacity(0.4)),
+                    BorderSide(color: cs.outline.withValues(alpha: 0.4)),
               ),
             ),
             child: const Align(
@@ -632,7 +631,7 @@ class _CollapsedSidebar extends ConsumerWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         border: Border(
-          right: BorderSide(color: cs.outline.withOpacity(0.4)),
+          right: BorderSide(color: cs.outline.withValues(alpha: 0.4)),
         ),
       ),
       child: Column(
@@ -642,7 +641,7 @@ class _CollapsedSidebar extends ConsumerWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               border:
-                  Border(bottom: BorderSide(color: cs.outline.withOpacity(0.4))),
+                  Border(bottom: BorderSide(color: cs.outline.withValues(alpha: 0.4))),
             ),
             child: const _LogoMark(compact: true),
           ),
@@ -769,9 +768,9 @@ class _SidebarUserCard extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.06),
+        color: AppColors.primary.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withOpacity(0.12)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.12)),
       ),
       child: Row(
         children: [
@@ -796,7 +795,7 @@ class _SidebarUserCard extends StatelessWidget {
                   user.email ?? '',
                   style: TextStyle(
                       fontSize: 11,
-                      color: cs.onSurface.withOpacity(0.5)),
+                      color: cs.onSurface.withValues(alpha: 0.5)),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -841,7 +840,7 @@ class _SidebarNavList extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
-                color: cs.onSurface.withOpacity(0.35),
+                color: cs.onSurface.withValues(alpha: 0.35),
                 letterSpacing: 1.0,
               ),
             ),
@@ -894,7 +893,7 @@ class _NavTile extends StatelessWidget {
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: selected
-                  ? AppColors.primary.withOpacity(0.1)
+                  ? AppColors.primary.withValues(alpha: 0.1)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
@@ -915,7 +914,7 @@ class _NavTile extends StatelessWidget {
                     size: 19,
                     color: selected
                         ? AppColors.primary
-                        : cs.onSurface.withOpacity(0.55),
+                        : cs.onSurface.withValues(alpha: 0.55),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -928,7 +927,7 @@ class _NavTile extends StatelessWidget {
                           selected ? FontWeight.w600 : FontWeight.w400,
                       color: selected
                           ? AppColors.primary
-                          : cs.onSurface.withOpacity(0.8),
+                          : cs.onSurface.withValues(alpha: 0.8),
                     ),
                   ),
                 ),
@@ -980,7 +979,7 @@ class _NavIcon extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: selected
-                  ? AppColors.primary.withOpacity(0.1)
+                  ? AppColors.primary.withValues(alpha: 0.1)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
@@ -1000,7 +999,7 @@ class _NavIcon extends StatelessWidget {
                   size: 22,
                   color: selected
                       ? AppColors.primary
-                      : cs.onSurface.withOpacity(0.5),
+                      : cs.onSurface.withValues(alpha: 0.5),
                 ),
               ),
             ),
@@ -1032,14 +1031,14 @@ class _LogoutTile extends StatelessWidget {
             child: Row(
               children: [
                 Icon(Icons.logout_rounded,
-                    size: 19, color: AppColors.error.withOpacity(0.8)),
+                    size: 19, color: AppColors.error.withValues(alpha: 0.8)),
                 const SizedBox(width: 12),
                 Text(
                   'Sign Out',
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.error.withOpacity(0.85),
+                    color: AppColors.error.withValues(alpha: 0.85),
                   ),
                 ),
               ],

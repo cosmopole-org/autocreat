@@ -104,7 +104,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withOpacity(0.2),
+                  color: AppColors.warning.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text('Unsaved',
@@ -287,7 +287,7 @@ class _FieldCard extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withOpacity(0.08)
+              ? AppColors.primary.withValues(alpha: 0.08)
               : (Theme.of(context).brightness == Brightness.dark
                   ? AppColors.darkCard
                   : AppColors.lightSurface),
@@ -303,7 +303,7 @@ class _FieldCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.drag_indicator,
               size: 18,
               color: AppColors.lightTextSecondary,
@@ -414,7 +414,7 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.1),
+                    color: AppColors.accent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
