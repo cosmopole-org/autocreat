@@ -148,7 +148,8 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
   }
 
   Widget _buildMobileLayout() {
-    final topPadding = MediaQuery.of(context).padding.top;
+    final mediaQuery = MediaQuery.of(context);
+    final topPadding = mediaQuery.padding.top;
     const barHeight = 58.0;
     const barMarginTop = 10.0;
     const barMarginH = 12.0;
@@ -167,10 +168,16 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
       ),
       body: Stack(
         children: [
-          // Page content – padded below the floating bar
+          // Page content fills the shell; the floating bar overlays it.
+          // The injected top padding lets inner page content start below the
+          // overlay while scrollable content can still move underneath it.
           Positioned.fill(
-            top: contentTopPadding,
-            child: widget.child,
+            child: MediaQuery(
+              data: mediaQuery.copyWith(
+                padding: mediaQuery.padding.copyWith(top: contentTopPadding),
+              ),
+              child: widget.child,
+            ),
           ),
           // Floating top bar
           Positioned(

@@ -109,7 +109,12 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    MediaQuery.of(context).padding.top + 16,
+                    16,
+                    0,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
