@@ -4,7 +4,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+
 import '../../core/constants.dart';
+import '../../models/company.dart';
+import '../../models/flow.dart';
+import '../../models/ticket.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/company_provider.dart';
 import '../../providers/flow_provider.dart';
@@ -12,11 +16,16 @@ import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
 import '../../theme/app_colors.dart';
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider);
     final companiesAsync = ref.watch(companiesProvider);
     final ticketsAsync = ref.watch(ticketsProvider(null));
@@ -31,81 +40,94 @@ class DashboardScreen extends ConsumerWidget {
         if (type == 'flow.instance_started') {
           ref.invalidate(flowsProvider(null));
         }
-        if (type == 'ticket.created' || type == 'ticket.status_updated' || type == 'flow.instance_started') {
+        if (type == 'ticket.created' ||
+            type == 'ticket.status_updated' ||
+            type == 'flow.instance_started') {
           ref.invalidate(companiesProvider);
         }
       });
     });
 
+    final companies = companiesAsync.valueOrNull ?? <Company>[];
+    final tickets = ticketsAsync.valueOrNull ?? <Ticket>[];
+    final flows = flowsAsync.valueOrNull ?? <Flow>[];
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _WelcomeBanner(user: user)
                 .animate()
                 .fadeIn(duration: 400.ms)
-                .slideY(begin: -0.05),
+                .slideY(begin: -0.04, duration: 400.ms),
             const SizedBox(height: 24),
-
-            // KPI stat cards
             _KpiRow(
-              companiesAsync: companiesAsync,
-              flowsAsync: flowsAsync,
-              ticketsAsync: ticketsAsync,
+              companyCount: companies.length,
+              flowCount: flows.length,
+              openTickets:
+                  tickets.where((t) => t.status == TicketStatus.open).length,
+              resolvedTickets:
+                  tickets.where((t) => t.status == TicketStatus.resolved).length,
+              isLoading: companiesAsync.isLoading ||
+                  ticketsAsync.isLoading ||
+                  flowsAsync.isLoading,
             ),
             const SizedBox(height: 24),
-
-            // Charts row
             LayoutBuilder(builder: (context, constraints) {
-              final isWide = constraints.maxWidth > 780;
-              if (isWide) {
+              final wide = constraints.maxWidth > 780;
+              if (wide) {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(flex: 5, child: _ActivityLineChart()),
                     const SizedBox(width: 16),
-                    Expanded(flex: 3, child: _TicketStatusDonut(ticketsAsync: ticketsAsync)),
+                    Expanded(
+                        flex: 3, child: _TicketStatusDonut(tickets: tickets)),
                   ],
                 );
               }
-              return Column(mainAxisSize: MainAxisSize.min, children: [
-                _ActivityLineChart(),
-                const SizedBox(height: 16),
-                _TicketStatusDonut(ticketsAsync: ticketsAsync),
-              ]);
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _ActivityLineChart(),
+                  const SizedBox(height: 16),
+                  _TicketStatusDonut(tickets: tickets),
+                ],
+              );
             }),
             const SizedBox(height: 16),
-
-            // Second charts row
             LayoutBuilder(builder: (context, constraints) {
-              final isWide = constraints.maxWidth > 780;
-              if (isWide) {
+              final wide = constraints.maxWidth > 780;
+              if (wide) {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(flex: 3, child: _PriorityBarChart(ticketsAsync: ticketsAsync)),
+                    Expanded(
+                        flex: 3,
+                        child: _PriorityBarChart(tickets: tickets)),
                     const SizedBox(width: 16),
-                    Expanded(flex: 4, child: _RecentTicketsList(ticketsAsync: ticketsAsync)),
+                    Expanded(
+                        flex: 4,
+                        child: _RecentTicketsList(tickets: tickets)),
                   ],
                 );
               }
-              return Column(mainAxisSize: MainAxisSize.min, children: [
-                _PriorityBarChart(ticketsAsync: ticketsAsync),
-                const SizedBox(height: 16),
-                _RecentTicketsList(ticketsAsync: ticketsAsync),
-              ]);
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _PriorityBarChart(tickets: tickets),
+                  const SizedBox(height: 16),
+                  _RecentTicketsList(tickets: tickets),
+                ],
+              );
             }),
             const SizedBox(height: 16),
-
-            // Performance metrics
-            _PerformanceSection(ticketsAsync: ticketsAsync),
+            _PerformanceSection(tickets: tickets),
             const SizedBox(height: 16),
-
-            // Quick actions
-            _QuickActionsSection(),
+            const _QuickActionsSection(),
             const SizedBox(height: 32),
           ],
         ),
@@ -114,9 +136,9 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // WELCOME BANNER
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 
 class _WelcomeBanner extends StatelessWidget {
   final dynamic user;
@@ -125,24 +147,23 @@ class _WelcomeBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hour = DateTime.now().hour;
+    final now = DateTime.now();
+    final hour = now.hour;
     final greeting =
         hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-    final now = DateTime.now();
-    final dayName = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][now.weekday - 1];
+    final dayName =
+        ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][now.weekday - 1];
     final monthName = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ][now.month - 1];
 
-    // Use MediaQuery instead of LayoutBuilder to avoid intrinsic-size conflicts
-    // with flutter_animate wrappers on Flutter Web.
     final screenWidth = MediaQuery.of(context).size.width;
-    final isNarrow = screenWidth < 600;
+    final narrow = screenWidth < 600;
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(isNarrow ? 18 : 24),
+      padding: EdgeInsets.all(narrow ? 18 : 24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [AppColors.primary, AppColors.primaryLight],
@@ -165,20 +186,20 @@ class _WelcomeBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$greeting, ${user?.firstName ?? 'there'}! 👋',
+                  '$greeting, ${user?.firstName ?? 'there'}!',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: isNarrow ? 18 : 22,
+                    fontSize: narrow ? 18 : 22,
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.3,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Here\'s what\'s happening in your organization today.',
+                  "Here's what's happening in your organization today.",
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: isNarrow ? 13 : 14,
+                    fontSize: narrow ? 13 : 14,
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -188,8 +209,7 @@ class _WelcomeBanner extends StatelessWidget {
                   children: [
                     _BannerPill(
                       icon: Icons.calendar_today_rounded,
-                      label:
-                          '$dayName, ${now.day} $monthName ${now.year}',
+                      label: '$dayName, ${now.day} $monthName ${now.year}',
                     ),
                     _BannerPill(
                       icon: Icons.access_time_rounded,
@@ -201,7 +221,7 @@ class _WelcomeBanner extends StatelessWidget {
               ],
             ),
           ),
-          if (!isNarrow) ...[
+          if (!narrow) ...[
             const SizedBox(width: 16),
             Container(
               width: 64,
@@ -245,7 +265,10 @@ class _BannerPill extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-                color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -253,113 +276,69 @@ class _BannerPill extends StatelessWidget {
   }
 }
 
-// ────────────────────────────────────────────────────────────────
-// KPI STAT CARDS
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// KPI CARDS
+// ─────────────────────────────────────────────────────────────
 
 class _KpiRow extends StatelessWidget {
-  final AsyncValue<dynamic> companiesAsync;
-  final AsyncValue<dynamic> flowsAsync;
-  final AsyncValue<dynamic> ticketsAsync;
+  final int companyCount;
+  final int flowCount;
+  final int openTickets;
+  final int resolvedTickets;
+  final bool isLoading;
 
   const _KpiRow({
-    required this.companiesAsync,
-    required this.flowsAsync,
-    required this.ticketsAsync,
+    required this.companyCount,
+    required this.flowCount,
+    required this.openTickets,
+    required this.resolvedTickets,
+    required this.isLoading,
   });
 
   @override
   Widget build(BuildContext context) {
-    int? safeLength(dynamic value) {
-      if (value is List) {
-        return value.length;
-      }
-      if (value is Iterable) {
-        return value.length;
-      }
-      return null;
-    }
-
-    String statusName(dynamic ticket) {
-      if (ticket is Map) {
-        final status = ticket['status'];
-        if (status is String) return status;
-        if (status is Map) return (status['name'] ?? '').toString();
-      }
-      final status = (ticket as dynamic).status;
-      if (status == null) return '';
-      if (status is String) return status;
-      if (status is Map) return (status['name'] ?? '').toString();
-      return ((status as dynamic).name ?? '').toString();
-    }
-
-    final companies = companiesAsync.maybeWhen(
-      data: safeLength,
-      orElse: () => null,
-    );
-    final flows = flowsAsync.maybeWhen(
-      data: safeLength,
-      orElse: () => null,
-    );
-    final openTickets = ticketsAsync.maybeWhen(
-      data: (l) => (l is Iterable)
-          ? l.where((t) => statusName(t) == 'open').length
-          : null,
-      orElse: () => null,
-    );
-    final resolvedTickets = ticketsAsync.maybeWhen(
-      data: (l) => (l is Iterable)
-          ? l.where((t) => statusName(t) == 'resolved').length
-          : null,
-      orElse: () => null,
-    );
-
     final cards = [
-      _KpiData(
+      _KpiCardData(
         label: 'Companies',
-        value: companies?.toString() ?? '—',
+        value: isLoading ? '—' : companyCount.toString(),
         subtitle: 'Active organizations',
         icon: Icons.business_rounded,
         color: AppColors.primary,
         route: AppRoutes.companies,
-        trend: '+2 this month',
         trendUp: true,
       ),
-      _KpiData(
+      _KpiCardData(
         label: 'Active Flows',
-        value: flows?.toString() ?? '—',
+        value: isLoading ? '—' : flowCount.toString(),
         subtitle: 'Automation pipelines',
         icon: Icons.account_tree_rounded,
         color: AppColors.accent,
         route: AppRoutes.flows,
-        trend: 'Running now',
         trendUp: true,
       ),
-      _KpiData(
+      _KpiCardData(
         label: 'Open Tickets',
-        value: openTickets?.toString() ?? '—',
+        value: isLoading ? '—' : openTickets.toString(),
         subtitle: 'Needs attention',
         icon: Icons.support_agent_rounded,
         color: AppColors.warning,
         route: AppRoutes.tickets,
-        trend: 'Pending review',
         trendUp: false,
       ),
-      _KpiData(
+      _KpiCardData(
         label: 'Resolved',
-        value: resolvedTickets?.toString() ?? '—',
+        value: isLoading ? '—' : resolvedTickets.toString(),
         subtitle: 'Closed tickets',
         icon: Icons.check_circle_rounded,
         color: AppColors.success,
         route: AppRoutes.tickets,
-        trend: 'All time',
         trendUp: true,
       ),
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
-      final isWide = constraints.maxWidth > 700;
-      if (isWide) {
+      final wide = constraints.maxWidth > 700;
+      if (wide) {
         return Row(
           children: cards.asMap().entries.map((e) {
             return Expanded(
@@ -377,71 +356,65 @@ class _KpiRow extends StatelessWidget {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: _KpiCard(data: cards[0])
-                    .animate(delay: 0.ms)
-                    .fadeIn()
-                    .scale(begin: const Offset(0.94, 0.94)),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _KpiCard(data: cards[1])
-                    .animate(delay: 80.ms)
-                    .fadeIn()
-                    .scale(begin: const Offset(0.94, 0.94)),
-              ),
-            ],
-          ),
+          Row(children: [
+            Expanded(
+              child: _KpiCard(data: cards[0])
+                  .animate(delay: 0.ms)
+                  .fadeIn()
+                  .scale(begin: const Offset(0.94, 0.94)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _KpiCard(data: cards[1])
+                  .animate(delay: 80.ms)
+                  .fadeIn()
+                  .scale(begin: const Offset(0.94, 0.94)),
+            ),
+          ]),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _KpiCard(data: cards[2])
-                    .animate(delay: 160.ms)
-                    .fadeIn()
-                    .scale(begin: const Offset(0.94, 0.94)),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _KpiCard(data: cards[3])
-                    .animate(delay: 240.ms)
-                    .fadeIn()
-                    .scale(begin: const Offset(0.94, 0.94)),
-              ),
-            ],
-          ),
+          Row(children: [
+            Expanded(
+              child: _KpiCard(data: cards[2])
+                  .animate(delay: 160.ms)
+                  .fadeIn()
+                  .scale(begin: const Offset(0.94, 0.94)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _KpiCard(data: cards[3])
+                  .animate(delay: 240.ms)
+                  .fadeIn()
+                  .scale(begin: const Offset(0.94, 0.94)),
+            ),
+          ]),
         ],
       );
     });
   }
 }
 
-class _KpiData {
+class _KpiCardData {
   final String label;
   final String value;
   final String subtitle;
   final IconData icon;
   final Color color;
   final String route;
-  final String trend;
   final bool trendUp;
 
-  const _KpiData({
+  const _KpiCardData({
     required this.label,
     required this.value,
     required this.subtitle,
     required this.icon,
     required this.color,
     required this.route,
-    required this.trend,
     required this.trendUp,
   });
 }
 
 class _KpiCard extends StatelessWidget {
-  final _KpiData data;
+  final _KpiCardData data;
 
   const _KpiCard({required this.data});
 
@@ -450,19 +423,15 @@ class _KpiCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
-
     return GestureDetector(
       onTap: () => context.go(data.route),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: cardBg,
+          color: isDark ? AppColors.darkCard : AppColors.lightCard,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark
-                ? AppColors.darkBorder
-                : AppColors.lightBorder,
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
           ),
           boxShadow: [
             BoxShadow(
@@ -497,36 +466,31 @@ class _KpiCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data.value,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: data.color,
-                    letterSpacing: -1,
-                    height: 1,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  data.label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: cs.onSurface,
-                  ),
-                ),
-                Text(
-                  data.subtitle,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.onSurface.withValues(alpha: 0.45),
-                  ),
-                ),
-              ],
+            Text(
+              data.value,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+                color: data.color,
+                letterSpacing: -1,
+                height: 1,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              data.label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurface,
+              ),
+            ),
+            Text(
+              data.subtitle,
+              style: TextStyle(
+                fontSize: 11,
+                color: cs.onSurface.withValues(alpha: 0.45),
+              ),
             ),
           ],
         ),
@@ -535,28 +499,31 @@ class _KpiCard extends StatelessWidget {
   }
 }
 
-// ────────────────────────────────────────────────────────────────
-// ACTIVITY LINE CHART
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// ACTIVITY LINE CHART (static demo data)
+// ─────────────────────────────────────────────────────────────
 
 class _ActivityLineChart extends StatelessWidget {
   static const _ticketData = [3.0, 7.0, 4.0, 10.0, 6.0, 8.0, 5.0];
   static const _flowData = [1.0, 4.0, 2.0, 6.0, 4.0, 5.0, 3.0];
   static const _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+  const _ActivityLineChart();
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return _ChartCard(
       title: 'Activity Overview',
       subtitle: 'Tickets & flows – last 7 days',
       trailing: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _Legend(color: AppColors.primary, label: 'Tickets'),
+          _ChartLegend(color: AppColors.primary, label: 'Tickets'),
           SizedBox(width: 12),
-          _Legend(color: AppColors.accent, label: 'Flows'),
+          _ChartLegend(color: AppColors.accent, label: 'Flows'),
         ],
       ),
       child: SizedBox(
@@ -577,9 +544,12 @@ class _ActivityLineChart extends StatelessWidget {
             ),
             borderData: FlBorderData(show: false),
             titlesData: FlTitlesData(
-              leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              leftTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles:
+                  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
@@ -589,7 +559,9 @@ class _ActivityLineChart extends StatelessWidget {
                     child: Text(
                       _days[v.toInt() % 7],
                       style: TextStyle(
-                          fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45)),
+                        fontSize: 11,
+                        color: cs.onSurface.withValues(alpha: 0.45),
+                      ),
                     ),
                   ),
                 ),
@@ -597,7 +569,8 @@ class _ActivityLineChart extends StatelessWidget {
             ),
             lineTouchData: LineTouchData(
               touchTooltipData: LineTouchTooltipData(
-                getTooltipColor: (_) => isDark ? AppColors.darkCard : Colors.white,
+                getTooltipColor: (_) =>
+                    isDark ? AppColors.darkCard : Colors.white,
                 tooltipRoundedRadius: 10,
                 getTooltipItems: (spots) => spots.map((s) {
                   final label = s.barIndex == 0 ? 'Tickets' : 'Flows';
@@ -606,15 +579,15 @@ class _ActivityLineChart extends StatelessWidget {
                   return LineTooltipItem(
                     '$label: ${s.y.toInt()}',
                     TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12),
+                      color: color,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
                   );
                 }).toList(),
               ),
             ),
             lineBarsData: [
-              // Tickets
               LineChartBarData(
                 spots: List.generate(
                     7, (i) => FlSpot(i.toDouble(), _ticketData[i])),
@@ -635,7 +608,6 @@ class _ActivityLineChart extends StatelessWidget {
                   ),
                 ),
               ),
-              // Flows
               LineChartBarData(
                 spots: List.generate(
                     7, (i) => FlSpot(i.toDouble(), _flowData[i])),
@@ -664,14 +636,14 @@ class _ActivityLineChart extends StatelessWidget {
   }
 }
 
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // TICKET STATUS DONUT
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 
 class _TicketStatusDonut extends StatefulWidget {
-  final AsyncValue<dynamic> ticketsAsync;
+  final List<Ticket> tickets;
 
-  const _TicketStatusDonut({required this.ticketsAsync});
+  const _TicketStatusDonut({required this.tickets});
 
   @override
   State<_TicketStatusDonut> createState() => _TicketStatusDonutState();
@@ -684,20 +656,12 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    final data = widget.ticketsAsync.maybeWhen(
-      data: (tickets) {
-        final list = tickets as List<dynamic>;
-        final open = list.where((t) => t.status.name == 'open').length;
-        final inProgress =
-            list.where((t) => t.status.name == 'inProgress').length;
-        final resolved =
-            list.where((t) => t.status.name == 'resolved').length;
-        final closed = list.where((t) => t.status.name == 'closed').length;
-        return <int>[open, inProgress, resolved, closed];
-      },
-      orElse: () => <int>[4, 3, 8, 2],
-    );
-
+    final counts = [
+      widget.tickets.where((t) => t.status == TicketStatus.open).length,
+      widget.tickets.where((t) => t.status == TicketStatus.inProgress).length,
+      widget.tickets.where((t) => t.status == TicketStatus.resolved).length,
+      widget.tickets.where((t) => t.status == TicketStatus.closed).length,
+    ];
     final labels = ['Open', 'In Progress', 'Resolved', 'Closed'];
     final colors = [
       AppColors.warning,
@@ -705,7 +669,7 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
       AppColors.success,
       AppColors.lightTextSecondary,
     ];
-    final total = data.fold<int>(0, (int a, int b) => a + b);
+    final total = counts.fold(0, (a, b) => a + b);
 
     return _ChartCard(
       title: 'Ticket Status',
@@ -716,14 +680,18 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
             height: 160,
             child: total == 0
                 ? Center(
-                    child: Text('No tickets',
-                        style: TextStyle(color: cs.onSurface.withValues(alpha: 0.4))))
+                    child: Text(
+                      'No tickets yet',
+                      style: TextStyle(
+                          color: cs.onSurface.withValues(alpha: 0.4)),
+                    ),
+                  )
                 : PieChart(
                     PieChartData(
                       sectionsSpace: 3,
                       centerSpaceRadius: 44,
                       pieTouchData: PieTouchData(
-                        touchCallback: (event, response) {
+                        touchCallback: (_, response) {
                           setState(() {
                             _touchedIndex =
                                 response?.touchedSection?.touchedSectionIndex ??
@@ -732,11 +700,11 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
                         },
                       ),
                       sections: List.generate(4, (i) {
-                        final isTouched = _touchedIndex == i;
+                        final touched = _touchedIndex == i;
                         return PieChartSectionData(
-                          value: data[i].toDouble(),
+                          value: counts[i].toDouble(),
                           color: colors[i],
-                          radius: isTouched ? 52 : 44,
+                          radius: touched ? 52 : 44,
                           showTitle: false,
                         );
                       }),
@@ -744,70 +712,75 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
                   ),
           ),
           const SizedBox(height: 16),
-          ...List.generate(4, (i) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 3),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          color: colors[i], shape: BoxShape.circle),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                        child: Text(labels[i],
-                            style: const TextStyle(fontSize: 12))),
-                    Text(
-                      data[i].toString(),
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
-              )),
+          ...List.generate(
+            4,
+            (i) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration:
+                        BoxDecoration(color: colors[i], shape: BoxShape.circle),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child:
+                        Text(labels[i], style: const TextStyle(fontSize: 12)),
+                  ),
+                  Text(
+                    counts[i].toString(),
+                    style: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     ).animate().fadeIn(delay: 300.ms);
   }
 }
 
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // PRIORITY BAR CHART
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 
 class _PriorityBarChart extends StatelessWidget {
-  final AsyncValue<dynamic> ticketsAsync;
+  final List<Ticket> tickets;
 
-  const _PriorityBarChart({required this.ticketsAsync});
+  const _PriorityBarChart({required this.tickets});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    final data = ticketsAsync.maybeWhen(
-      data: (tickets) {
-        final list = tickets as List<dynamic>;
-        return <double>[
-          list.where((t) => t.priority.name == 'low').length.toDouble(),
-          list.where((t) => t.priority.name == 'medium').length.toDouble(),
-          list.where((t) => t.priority.name == 'high').length.toDouble(),
-          list.where((t) => t.priority.name == 'urgent').length.toDouble(),
-        ];
-      },
-      orElse: () => <double>[3.0, 7.0, 5.0, 2.0],
-    );
+    final data = <double>[
+      tickets.where((t) => t.priority == TicketPriority.low).length.toDouble(),
+      tickets
+          .where((t) => t.priority == TicketPriority.medium)
+          .length
+          .toDouble(),
+      tickets.where((t) => t.priority == TicketPriority.high).length.toDouble(),
+      tickets
+          .where((t) => t.priority == TicketPriority.urgent)
+          .length
+          .toDouble(),
+    ];
 
-    final maxY = (data.reduce((double a, double b) => a > b ? a : b) + 2.0)
-        .clamp(4.0, 20.0);
+    final maxY = tickets.isEmpty
+        ? 8.0
+        : (data.reduce((a, b) => a > b ? a : b) + 2.0).clamp(4.0, 20.0);
 
-    final colors = [
+    const colors = [
       AppColors.success,
       AppColors.info,
       AppColors.warning,
       AppColors.error,
     ];
-    final labels = ['Low', 'Med', 'High', 'Urgent'];
+    const labels = ['Low', 'Med', 'High', 'Urgent'];
 
     return _ChartCard(
       title: 'Priority Breakdown',
@@ -846,8 +819,9 @@ class _PriorityBarChart extends StatelessWidget {
                       child: Text(
                         labels[idx],
                         style: TextStyle(
-                            fontSize: 11,
-                            color: cs.onSurface.withValues(alpha: 0.5)),
+                          fontSize: 11,
+                          color: cs.onSurface.withValues(alpha: 0.5),
+                        ),
                       ),
                     );
                   },
@@ -881,18 +855,19 @@ class _PriorityBarChart extends StatelessWidget {
   }
 }
 
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // RECENT TICKETS LIST
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 
 class _RecentTicketsList extends StatelessWidget {
-  final AsyncValue<dynamic> ticketsAsync;
+  final List<Ticket> tickets;
 
-  const _RecentTicketsList({required this.ticketsAsync});
+  const _RecentTicketsList({required this.tickets});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return _ChartCard(
       title: 'Recent Tickets',
@@ -906,216 +881,197 @@ class _RecentTicketsList extends StatelessWidget {
         ),
         child: const Text('View all', style: TextStyle(fontSize: 12)),
       ),
-      child: ticketsAsync.when(
-        loading: () => const _TicketShimmer(),
-        error: (e, _) => const Text('Error loading',
-            style: TextStyle(color: AppColors.error, fontSize: 13)),
-        data: (tickets) {
-          if (tickets.isEmpty) {
-            return Padding(
+      child: tickets.isEmpty
+          ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Center(
-                child: Text('No tickets yet',
-                    style: TextStyle(
-                        color: cs.onSurface.withValues(alpha: 0.4), fontSize: 13)),
-              ),
-            );
-          }
-          return Column(
-            children: tickets.take(5).map<Widget>((t) {
-              final priorityColor = {
-                    'low': AppColors.success,
-                    'medium': AppColors.info,
-                    'high': AppColors.warning,
-                    'urgent': AppColors.error,
-                  }[t.priority.name] ??
-                  AppColors.info;
-              final statusColor = {
-                    'open': AppColors.warning,
-                    'inProgress': AppColors.info,
-                    'resolved': AppColors.success,
-                    'closed': AppColors.lightTextSecondary,
-                  }[t.status.name] ??
-                  AppColors.info;
-
-              final isDarkCtx = Theme.of(context).brightness == Brightness.dark;
-              final innerBg = isDarkCtx
-                  ? AppColors.darkSurface
-                  : AppColors.lightSurface;
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: innerBg,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isDarkCtx
-                        ? AppColors.darkBorder
-                        : AppColors.lightBorder,
+                child: Text(
+                  'No tickets yet',
+                  style: TextStyle(
+                    color: cs.onSurface.withValues(alpha: 0.4),
+                    fontSize: 13,
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: priorityColor,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+              ),
+            )
+          : Column(
+              children: tickets.take(5).map((t) {
+                final priorityColor = _priorityColor(t.priority);
+                final statusColor = _statusColor(t.status);
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color:
+                        isDark ? AppColors.darkSurface : AppColors.lightSurface,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.lightBorder,
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            t.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontSize: 13, fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 2),
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: statusColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  t.status.displayName,
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      color: statusColor,
-                                      fontWeight: FontWeight.w600),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: priorityColor,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              t.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: statusColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                t.status.displayName,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: statusColor,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Icon(Icons.chevron_right_rounded,
-                        size: 16, color: cs.onSurface.withValues(alpha: 0.3)),
-                  ],
-                ),
-              );
-            }).toList(),
-          );
-        },
-      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 16,
+                        color: cs.onSurface.withValues(alpha: 0.3),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
     ).animate().fadeIn(delay: 350.ms);
   }
-}
 
-class _TicketShimmer extends StatelessWidget {
-  const _TicketShimmer();
+  Color _priorityColor(TicketPriority p) {
+    switch (p) {
+      case TicketPriority.low:
+        return AppColors.success;
+      case TicketPriority.medium:
+        return AppColors.info;
+      case TicketPriority.high:
+        return AppColors.warning;
+      case TicketPriority.urgent:
+        return AppColors.error;
+    }
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: List.generate(
-        3,
-        (_) => Container(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          height: 56,
-          decoration: BoxDecoration(
-            color: AppColors.lightBorder.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      ),
-    );
+  Color _statusColor(TicketStatus s) {
+    switch (s) {
+      case TicketStatus.open:
+        return AppColors.warning;
+      case TicketStatus.inProgress:
+        return AppColors.info;
+      case TicketStatus.resolved:
+        return AppColors.success;
+      case TicketStatus.closed:
+        return AppColors.lightTextSecondary;
+    }
   }
 }
 
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // PERFORMANCE METRICS
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 
 class _PerformanceSection extends StatelessWidget {
-  final AsyncValue<dynamic> ticketsAsync;
+  final List<Ticket> tickets;
 
-  const _PerformanceSection({required this.ticketsAsync});
+  const _PerformanceSection({required this.tickets});
 
   @override
   Widget build(BuildContext context) {
-    final metrics = ticketsAsync.maybeWhen(
-      data: (tickets) {
-        final list = tickets as List<dynamic>;
-        final total = list.length;
-        if (total == 0) {
-          return <_MetricData>[
-            const _MetricData('Resolution Rate', 0, AppColors.success),
-            const _MetricData('In Progress', 0, AppColors.info),
-            const _MetricData('SLA Compliance', 0, AppColors.primary),
-          ];
-        }
-        final resolved =
-            list.where((t) => t.status.name == 'resolved').length;
-        final inProgress =
-            list.where((t) => t.status.name == 'inProgress').length;
-        final nonUrgent =
-            list.where((t) => t.priority.name != 'urgent').length;
-        return <_MetricData>[
-          _MetricData('Resolution Rate', resolved / total, AppColors.success),
-          _MetricData('In Progress', inProgress / total, AppColors.info),
-          _MetricData('SLA Compliance', nonUrgent / total, AppColors.primary),
-        ];
-      },
-      orElse: () => <_MetricData>[
-        const _MetricData('Resolution Rate', 0.72, AppColors.success),
-        const _MetricData('In Progress', 0.18, AppColors.info),
-        const _MetricData('SLA Compliance', 0.85, AppColors.primary),
-      ],
-    );
+    final total = tickets.length;
+
+    final List<_MetricData> metrics;
+    if (total == 0) {
+      metrics = const [
+        _MetricData('Resolution Rate', 0.0, AppColors.success),
+        _MetricData('In Progress', 0.0, AppColors.info),
+        _MetricData('SLA Compliance', 0.0, AppColors.primary),
+      ];
+    } else {
+      final resolved =
+          tickets.where((t) => t.status == TicketStatus.resolved).length;
+      final inProgress =
+          tickets.where((t) => t.status == TicketStatus.inProgress).length;
+      final nonUrgent =
+          tickets.where((t) => t.priority != TicketPriority.urgent).length;
+      metrics = [
+        _MetricData('Resolution Rate', resolved / total, AppColors.success),
+        _MetricData('In Progress', inProgress / total, AppColors.info),
+        _MetricData('SLA Compliance', nonUrgent / total, AppColors.primary),
+      ];
+    }
 
     return _ChartCard(
       title: 'Performance Metrics',
       subtitle: 'Ticket KPIs at a glance',
       child: Column(
-        children: metrics
-            .map(
-              (m) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        children: metrics.map((m) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(m.label,
-                            style: const TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.w500)),
-                        Text(
-                          '${(m.value * 100).toInt()}%',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: m.color),
-                        ),
-                      ],
+                    Text(
+                      m.label,
+                      style: const TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.w500),
                     ),
-                    const SizedBox(height: 6),
-                    LinearPercentIndicator(
-                      lineHeight: 8,
-                      percent: m.value.clamp(0.0, 1.0),
-                      backgroundColor: m.color.withValues(alpha: 0.1),
-                      progressColor: m.color,
-                      barRadius: const Radius.circular(4),
-                      padding: EdgeInsets.zero,
-                      animation: true,
-                      animationDuration: 900,
+                    Text(
+                      '${(m.value * 100).toInt()}%',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: m.color,
+                      ),
                     ),
                   ],
                 ),
-              ),
-            )
-            .toList(),
+                const SizedBox(height: 6),
+                LinearPercentIndicator(
+                  lineHeight: 8,
+                  percent: m.value.clamp(0.0, 1.0),
+                  backgroundColor: m.color.withValues(alpha: 0.1),
+                  progressColor: m.color,
+                  barRadius: const Radius.circular(4),
+                  padding: EdgeInsets.zero,
+                  animation: true,
+                  animationDuration: 900,
+                ),
+              ],
+            ),
+          );
+        }).toList(),
       ),
     ).animate().fadeIn(delay: 450.ms);
   }
@@ -1129,35 +1085,37 @@ class _MetricData {
   const _MetricData(this.label, this.value, this.color);
 }
 
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // QUICK ACTIONS
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 
 class _QuickActionsSection extends StatelessWidget {
-  final _actions = const [
+  const _QuickActionsSection();
+
+  static const _actions = [
     (
-      'New Flow',
-      Icons.account_tree_rounded,
-      AppColors.primary,
-      AppRoutes.flows
+      label: 'New Flow',
+      icon: Icons.account_tree_rounded,
+      color: AppColors.primary,
+      route: AppRoutes.flows,
     ),
     (
-      'New Form',
-      Icons.dynamic_form_rounded,
-      AppColors.accent,
-      AppRoutes.forms
+      label: 'New Form',
+      icon: Icons.dynamic_form_rounded,
+      color: AppColors.accent,
+      route: AppRoutes.forms,
     ),
     (
-      'Add User',
-      Icons.person_add_rounded,
-      AppColors.success,
-      AppRoutes.users
+      label: 'Add User',
+      icon: Icons.person_add_rounded,
+      color: AppColors.success,
+      route: AppRoutes.users,
     ),
     (
-      'New Ticket',
-      Icons.support_agent_rounded,
-      AppColors.warning,
-      AppRoutes.tickets
+      label: 'New Ticket',
+      icon: Icons.support_agent_rounded,
+      color: AppColors.warning,
+      route: AppRoutes.tickets,
     ),
   ];
 
@@ -1169,27 +1127,32 @@ class _QuickActionsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Quick Actions',
-            style:
-                Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+        Text(
+          'Quick Actions',
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(fontWeight: FontWeight.w700),
+        ),
         const SizedBox(height: 12),
         LayoutBuilder(builder: (context, constraints) {
-          final isWide = constraints.maxWidth > 500;
+          final wide = constraints.maxWidth > 500;
           return Wrap(
             spacing: 12,
             runSpacing: 12,
             children: _actions.asMap().entries.map((e) {
-              final (label, icon, color, route) = e.value;
-              final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
+              final idx = e.key;
+              final action = e.value;
+              final cardWidth = wide
+                  ? (constraints.maxWidth - 36) / 4
+                  : (constraints.maxWidth - 12) / 2;
               return GestureDetector(
-                onTap: () => context.go(route),
+                onTap: () => context.go(action.route),
                 child: Container(
-                  width: isWide
-                      ? (constraints.maxWidth - 36) / 4
-                      : (constraints.maxWidth - 12) / 2,
+                  width: cardWidth,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: cardBg,
+                    color: isDark ? AppColors.darkCard : AppColors.lightCard,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isDark
@@ -1210,15 +1173,16 @@ class _QuickActionsSection extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.1),
+                          color: action.color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Icon(icon, color: color, size: 18),
+                        child:
+                            Icon(action.icon, color: action.color, size: 18),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          label,
+                          action.label,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -1226,12 +1190,18 @@ class _QuickActionsSection extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Icon(Icons.arrow_forward_ios_rounded,
-                          size: 12, color: color.withValues(alpha: 0.6)),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 12,
+                        color: action.color.withValues(alpha: 0.6),
+                      ),
                     ],
                   ),
                 ),
-              ).animate(delay: (e.key * 70).ms).fadeIn().slideX(begin: 0.05);
+              )
+                  .animate(delay: (idx * 70).ms)
+                  .fadeIn()
+                  .slideX(begin: 0.05);
             }).toList(),
           );
         }),
@@ -1240,9 +1210,9 @@ class _QuickActionsSection extends StatelessWidget {
   }
 }
 
-// ────────────────────────────────────────────────────────────────
-// SHARED CHART CARD WRAPPER
-// ────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// SHARED CHART CARD
+// ─────────────────────────────────────────────────────────────
 
 class _ChartCard extends StatelessWidget {
   final String title;
@@ -1262,13 +1232,11 @@ class _ChartCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardBg,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
@@ -1291,15 +1259,20 @@ class _ChartCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleSmall
-                          ?.copyWith(fontWeight: FontWeight.w700)),
-                  Text(subtitle,
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: cs.onSurface.withValues(alpha: 0.45))),
+                  Text(
+                    title,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: cs.onSurface.withValues(alpha: 0.45),
+                    ),
+                  ),
                 ],
               ),
               if (trailing != null) trailing!,
@@ -1313,11 +1286,11 @@ class _ChartCard extends StatelessWidget {
   }
 }
 
-class _Legend extends StatelessWidget {
+class _ChartLegend extends StatelessWidget {
   final Color color;
   final String label;
 
-  const _Legend({required this.color, required this.label});
+  const _ChartLegend({required this.color, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -1327,14 +1300,17 @@ class _Legend extends StatelessWidget {
         Container(
           width: 10,
           height: 3,
-          decoration: BoxDecoration(
-              color: color, borderRadius: BorderRadius.circular(2)),
+          decoration:
+              BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 5),
-        Text(label,
-            style: TextStyle(
-                fontSize: 11,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        ),
       ],
     );
   }
