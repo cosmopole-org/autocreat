@@ -6,8 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import '../../core/constants.dart';
 import '../../core/extensions.dart';
+import '../../data/demo_data.dart';
 import '../../models/ticket.dart';
+import '../../data/demo_overrides.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/demo_provider.dart';
 import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
 import '../../theme/app_colors.dart';
@@ -102,8 +105,20 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
       });
     });
 
-    final ticketAsync = ref.watch(ticketDetailProvider(widget.ticketId));
-    final currentUser = ref.watch(currentUserProvider);
+    final isDemo = ref.watch(isDemoModeProvider);
+    final demoTickets = ref.watch(demoTypedTicketsProvider).value ??
+        DemoData.tickets.map(Ticket.fromJson).toList();
+    final ticketAsync = isDemo
+        ? AsyncValue.data(
+            demoTickets.firstWhere(
+              (t) => t.id == widget.ticketId,
+              orElse: () => demoTickets.first,
+            ),
+          )
+        : ref.watch(ticketDetailProvider(widget.ticketId));
+    final currentUser = isDemo
+        ? ref.watch(demoCurrentUserProvider)
+        : ref.watch(currentUserProvider);
 
     return ticketAsync.when(
       loading: () =>

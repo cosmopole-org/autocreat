@@ -26,13 +26,13 @@ class AppColors {
   static const Color lightTextHint = Color(0xFFA1A1AA);
 
   // Dark theme
-  static const Color darkBg = Color(0xFF09090B);
-  static const Color darkSurface = Color(0xFF18181B);
-  static const Color darkCard = Color(0xFF1C1C1F);
-  static const Color darkBorder = Color(0xFF27272A);
+  static const Color darkBg = Color(0xFF0F172A);
+  static const Color darkSurface = Color(0xFF111B2E);
+  static const Color darkCard = Color(0xFF1A263D);
+  static const Color darkBorder = Color(0xFF29364F);
   static const Color darkText = Color(0xFFFAFAFA);
-  static const Color darkTextSecondary = Color(0xFFA1A1AA);
-  static const Color darkTextHint = Color(0xFF52525B);
+  static const Color darkTextSecondary = Color(0xFFB8C2D9);
+  static const Color darkTextHint = Color(0xFF7B8AA8);
 
   // Node colors
   static const Color nodeStart = Color(0xFF16A34A);

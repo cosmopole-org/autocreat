@@ -84,39 +84,53 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasLeading = loading || icon != null;
+    final indicator = const SizedBox(
+      width: 16,
+      height: 16,
+      child: CircularProgressIndicator(strokeWidth: 2),
+    );
+
     if (outlined) {
       return SizedBox(
         width: width,
-        child: OutlinedButton.icon(
-          onPressed: loading ? null : onPressed,
-          icon: loading
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : (icon != null ? Icon(icon, size: 18) : const SizedBox.shrink()),
-          label: Text(label),
-        ),
+        child: hasLeading
+            ? OutlinedButton.icon(
+                onPressed: loading ? null : onPressed,
+                icon: loading ? indicator : Icon(icon, size: 18),
+                label: Text(label, textAlign: TextAlign.center),
+              )
+            : OutlinedButton(
+                onPressed: loading ? null : onPressed,
+                child: Text(label, textAlign: TextAlign.center),
+              ),
       );
     }
     return SizedBox(
       width: width,
-      child: ElevatedButton.icon(
-        onPressed: loading ? null : onPressed,
-        style: color != null
-            ? ElevatedButton.styleFrom(backgroundColor: color)
-            : null,
-        icon: loading
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child:
-                    CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-              )
-            : (icon != null ? Icon(icon, size: 18) : const SizedBox.shrink()),
-        label: Text(label),
-      ),
+      child: hasLeading
+          ? ElevatedButton.icon(
+              onPressed: loading ? null : onPressed,
+              style: color != null
+                  ? ElevatedButton.styleFrom(backgroundColor: color)
+                  : null,
+              icon: loading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
+                    )
+                  : Icon(icon, size: 18),
+              label: Text(label, textAlign: TextAlign.center),
+            )
+          : ElevatedButton(
+              onPressed: loading ? null : onPressed,
+              style: color != null
+                  ? ElevatedButton.styleFrom(backgroundColor: color)
+                  : null,
+              child: Text(label, textAlign: TextAlign.center),
+            ),
     );
   }
 }
