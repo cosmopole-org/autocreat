@@ -506,7 +506,6 @@ class _CategoryDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 12),
