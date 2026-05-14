@@ -106,13 +106,13 @@ class AppColors {
   static const Color nodeStep = Color(0xFF4F46E5);
   static const Color nodeDecision = Color(0xFFD97706);
 
-  // Chart colors
+  // Chart colors — 400-level for vibrant rendering on both light & dark backgrounds
   static const List<Color> chartColors = [
-    Color(0xFF4F46E5),
-    Color(0xFF0891B2),
-    Color(0xFF16A34A),
-    Color(0xFFD97706),
-    Color(0xFFDC2626),
-    Color(0xFF7C3AED),
+    Color(0xFF6366F1),  // indigo-500 (bright primary)
+    Color(0xFF22D3EE),  // cyan-400  (bright accent)
+    Color(0xFF4ADE80),  // green-400 (bright success)
+    Color(0xFFFBBF24),  // amber-400 (bright warning)
+    Color(0xFF60A5FA),  // blue-400  (bright info)
+    Color(0xFFF87171),  // red-400   (bright error)
   ];
 }

@@ -83,30 +83,32 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
                             'Data Models',
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineSmall
                                 ?.copyWith(fontWeight: FontWeight.w800),
                           ),
-                          Text(
-                            'Define entity schemas and data structures',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
+                        ),
+                        AppButton(
+                          label: 'New Model',
+                          icon: Icons.add,
+                          onPressed: () => _createModel(context),
+                        ),
+                      ],
                     ),
-                    AppButton(
-                      label: 'New Model',
-                      icon: Icons.add,
-                      onPressed: () => _createModel(context),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Define entity schemas and data structures',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ).animate().fadeIn(duration: 300.ms),
@@ -208,8 +210,8 @@ class _ModelStatsRow extends StatelessWidget {
     final stats = [
       (Icons.data_object_rounded, 'Total Models', total.toString(), AppColors.info),
       (Icons.list_alt_rounded, 'Total Fields', totalFields.toString(), AppColors.primary),
-      (Icons.star_rounded, 'Required Fields', required.toString(), AppColors.warning),
-      (Icons.fingerprint_rounded, 'Unique Fields', unique.toString(), AppColors.success),
+      (Icons.star_rounded, 'Required', required.toString(), AppColors.warning),
+      (Icons.fingerprint_rounded, 'Unique', unique.toString(), AppColors.success),
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
@@ -268,14 +270,7 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
     final entries = widget.typeMap.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    final colors = [
-      AppColors.primary,
-      AppColors.accent,
-      AppColors.success,
-      AppColors.warning,
-      AppColors.info,
-      AppColors.error,
-    ];
+    final colors = AppColors.chartColors;
 
     final total = entries.fold<int>(0, (s, e) => s + e.value);
 

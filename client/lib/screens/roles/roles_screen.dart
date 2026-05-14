@@ -64,30 +64,32 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
                             'Roles & Permissions',
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineSmall
                                 ?.copyWith(fontWeight: FontWeight.w800),
                           ),
-                          Text(
-                            'Define access control roles for your organization',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
+                        ),
+                        AppButton(
+                          label: 'New Role',
+                          icon: Icons.add,
+                          onPressed: () => context.go('/roles/new/edit'),
+                        ),
+                      ],
                     ),
-                    AppButton(
-                      label: 'New Role',
-                      icon: Icons.add,
-                      onPressed: () => context.go('/roles/new/edit'),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Define access control roles for your organization',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ).animate().fadeIn(duration: 300.ms),
@@ -227,14 +229,7 @@ class _MembersBarChart extends StatelessWidget {
             .toDouble() +
         1;
 
-    final colors = [
-      AppColors.success,
-      AppColors.primary,
-      AppColors.accent,
-      AppColors.warning,
-      AppColors.info,
-      AppColors.error,
-    ];
+    final colors = AppColors.chartColors;
 
     return AppCard(
       padding: const EdgeInsets.all(20),

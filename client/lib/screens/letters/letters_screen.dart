@@ -79,29 +79,31 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header
-                      Row(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
                                   'Letter Templates',
                                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                         fontWeight: FontWeight.w800,
                                       ),
                                 ),
-                                Text(
-                                  'Manage reusable letter templates with dynamic variables',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
+                              ),
+                              AppButton(
+                                label: 'New Template',
+                                icon: Icons.add,
+                                onPressed: () => _createLetter(context),
+                              ),
+                            ],
                           ),
-                          AppButton(
-                            label: 'New Template',
-                            icon: Icons.add,
-                            onPressed: () => _createLetter(context),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Manage reusable letter templates with dynamic variables',
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
                       ).animate().fadeIn(duration: 300.ms),
@@ -276,13 +278,7 @@ class _CategoryChart extends StatelessWidget {
       catMap[cat] = (catMap[cat] ?? 0) + 1;
     }
     final cats = catMap.entries.toList();
-    final colors = [
-      AppColors.primary,
-      AppColors.accent,
-      AppColors.success,
-      AppColors.warning,
-      AppColors.info,
-    ];
+    final colors = AppColors.chartColors;
 
     return AppCard(
       padding: const EdgeInsets.all(20),
