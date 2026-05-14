@@ -25,6 +25,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
   bool _loading = true;
   bool _saving = false;
   Size _canvasSize = Size.zero;
+  bool _isMobileNodeEditorOpen = false;
 
   @override
   void initState() {
@@ -140,7 +141,10 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
   Widget build(BuildContext context) {
     final editorState = ref.watch(flowEditorProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isDesktop = MediaQuery.of(context).size.width > 900;
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = width >= 1100;
+    final isTablet = width >= 700 && width < 1100;
+    final isMobile = width < 700;
 
     if (_loading) {
       return const Scaffold(
@@ -154,9 +158,16 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go(AppRoutes.flows),
         ),
+        titleSpacing: 0,
         title: Row(
           children: [
-            Text(editorState.flow?.name ?? 'Flow Editor'),
+            Expanded(
+              child: Text(
+                editorState.flow?.name ?? 'Flow Editor',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             if (editorState.isDirty) ...[
               const SizedBox(width: 8),
               Container(
@@ -174,34 +185,40 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
           ],
         ),
         actions: [
-          // Zoom controls
-          IconButton(
-            icon: const Icon(Icons.remove, size: 18),
-            onPressed: () => ref
-                .read(flowEditorProvider.notifier)
-                .setScale(editorState.scale - 0.1),
-            tooltip: 'Zoom out',
-          ),
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkCard : AppColors.primarySurface,
-              borderRadius: BorderRadius.circular(8),
+          if (!isMobile) ...[
+            IconButton(
+              icon: const Icon(Icons.remove, size: 18),
+              onPressed: () => ref
+                  .read(flowEditorProvider.notifier)
+                  .setScale(editorState.scale - 0.1),
+              tooltip: 'Zoom out',
             ),
-            child: Text(
-              '${(editorState.scale * 100).toInt()}%',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkCard : AppColors.primarySurface,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${(editorState.scale * 100).toInt()}%',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add, size: 18),
-            onPressed: () => ref
-                .read(flowEditorProvider.notifier)
-                .setScale(editorState.scale + 0.1),
-            tooltip: 'Zoom in',
-          ),
-          const SizedBox(width: 8),
+            IconButton(
+              icon: const Icon(Icons.add, size: 18),
+              onPressed: () => ref
+                  .read(flowEditorProvider.notifier)
+                  .setScale(editorState.scale + 0.1),
+              tooltip: 'Zoom in',
+            ),
+            const SizedBox(width: 8),
+          ],
+          if (isMobile)
+            IconButton(
+              icon: const Icon(Icons.tune),
+              tooltip: 'Editor controls',
+              onPressed: () => _showMobileControls(context, editorState, isDark),
+            ),
           AppButton(
             label: 'Save',
             icon: Icons.save_outlined,
@@ -215,7 +232,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
         children: [
           // Toolbar
           Container(
-            width: 56,
+            width: isMobile ? 50 : 56,
             decoration: BoxDecoration(
               color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
               border: Border(
@@ -387,10 +404,10 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
           ),
 
           // Node properties panel
-          if (editorState.selectedNode != null)
+          if (editorState.selectedNode != null && !isMobile)
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              width: isDesktop ? 300 : 240,
+              width: isDesktop ? 340 : isTablet ? 280 : 240,
               child: FlowNodeEditor(
                 node: editorState.selectedNode!,
                 onUpdate: (updated) =>
@@ -402,6 +419,113 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
             ).animate().fadeIn(duration: 200.ms).slideX(begin: 0.1),
         ],
       ),
+      floatingActionButton: isMobile && editorState.selectedNode != null
+          ? FloatingActionButton.extended(
+              onPressed: () => _toggleMobileNodeEditor(editorState),
+              icon: Icon(_isMobileNodeEditorOpen ? Icons.close : Icons.tune),
+              label: Text(_isMobileNodeEditorOpen ? 'Hide properties' : 'Edit node'),
+            )
+          : null,
+    );
+  }
+
+  Future<void> _toggleMobileNodeEditor(FlowEditorState editorState) async {
+    if (_isMobileNodeEditorOpen) {
+      Navigator.of(context).pop();
+      return;
+    }
+    final selected = editorState.selectedNode;
+    if (selected == null) return;
+    setState(() => _isMobileNodeEditorOpen = true);
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.52,
+        minChildSize: 0.36,
+        maxChildSize: 0.9,
+        builder: (context, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: FlowNodeEditor(
+              node: selected,
+              onUpdate: (updated) =>
+                  ref.read(flowEditorProvider.notifier).updateNode(updated),
+              onDelete: () =>
+                  ref.read(flowEditorProvider.notifier).deleteNode(selected.id),
+            ),
+          ),
+        ),
+      ),
+    );
+    if (mounted) setState(() => _isMobileNodeEditorOpen = false);
+  }
+
+  void _showMobileControls(
+      BuildContext context, FlowEditorState editorState, bool isDark) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              _MobileActionChip(
+                label: 'Zoom -',
+                icon: Icons.remove,
+                onTap: () => ref.read(flowEditorProvider.notifier).setScale(editorState.scale - 0.1),
+              ),
+              _MobileActionChip(
+                label: 'Zoom +',
+                icon: Icons.add,
+                onTap: () => ref.read(flowEditorProvider.notifier).setScale(editorState.scale + 0.1),
+              ),
+              _MobileActionChip(
+                label: 'Fit screen',
+                icon: Icons.fit_screen,
+                onTap: () {
+                  ref.read(flowEditorProvider.notifier).setScale(1.0);
+                  ref.read(flowEditorProvider.notifier).setOffset(0, 0);
+                },
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkCard : AppColors.primarySurface,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text('Zoom ${(editorState.scale * 100).toInt()}%'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MobileActionChip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _MobileActionChip({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionChip(
+      avatar: Icon(icon, size: 18),
+      label: Text(label),
+      onPressed: onTap,
     );
   }
 }
