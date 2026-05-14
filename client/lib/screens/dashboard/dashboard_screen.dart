@@ -270,16 +270,49 @@ class _KpiRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final companies =
-        companiesAsync.maybeWhen(data: (l) => l.length, orElse: () => null);
-    final flows =
-        flowsAsync.maybeWhen(data: (l) => l.length, orElse: () => null);
+    int? safeLength(dynamic value) {
+      if (value is List) {
+        return value.length;
+      }
+      if (value is Iterable) {
+        return value.length;
+      }
+      return null;
+    }
+
+    String statusName(dynamic ticket) {
+      if (ticket is Map) {
+        final status = ticket['status'];
+        if (status is String) return status;
+        if (status is Map) return (status['name'] ?? '').toString();
+      }
+      final status = (ticket as dynamic).status;
+      if (status == null) return '';
+      if (status is String) return status;
+      if (status is Map) return (status['name'] ?? '').toString();
+      return ((status as dynamic).name ?? '').toString();
+    }
+
+    final companies = companiesAsync.maybeWhen(
+      data: safeLength,
+      orElse: () => null,
+    );
+    final flows = flowsAsync.maybeWhen(
+      data: safeLength,
+      orElse: () => null,
+    );
     final openTickets = ticketsAsync.maybeWhen(
-        data: (l) => l.where((t) => t.status.name == 'open').length,
-        orElse: () => null);
+      data: (l) => (l is Iterable)
+          ? l.where((t) => statusName(t) == 'open').length
+          : null,
+      orElse: () => null,
+    );
     final resolvedTickets = ticketsAsync.maybeWhen(
-        data: (l) => l.where((t) => t.status.name == 'resolved').length,
-        orElse: () => null);
+      data: (l) => (l is Iterable)
+          ? l.where((t) => statusName(t) == 'resolved').length
+          : null,
+      orElse: () => null,
+    );
 
     final cards = [
       _KpiData(
@@ -803,15 +836,21 @@ class _PriorityBarChart extends StatelessWidget {
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  getTitlesWidget: (v, _) => Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      labels[v.toInt()],
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: cs.onSurface.withValues(alpha: 0.5)),
-                    ),
-                  ),
+                  getTitlesWidget: (v, _) {
+                    final idx = v.toInt();
+                    if (idx < 0 || idx >= labels.length) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        labels[idx],
+                        style: TextStyle(
+                            fontSize: 11,
+                            color: cs.onSurface.withValues(alpha: 0.5)),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
