@@ -71,7 +71,7 @@ class DashboardScreen extends ConsumerWidget {
                   ],
                 );
               }
-              return Column(children: [
+              return Column(mainAxisSize: MainAxisSize.min, children: [
                 _ActivityLineChart(),
                 const SizedBox(height: 16),
                 _TicketStatusDonut(ticketsAsync: ticketsAsync),
@@ -92,7 +92,7 @@ class DashboardScreen extends ConsumerWidget {
                   ],
                 );
               }
-              return Column(children: [
+              return Column(mainAxisSize: MainAxisSize.min, children: [
                 _PriorityBarChart(ticketsAsync: ticketsAsync),
                 const SizedBox(height: 16),
                 _RecentTicketsList(ticketsAsync: ticketsAsync),
