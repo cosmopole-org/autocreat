@@ -130,7 +130,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         ],
 
         // ── Label ─────────────────────────────────────────────────
-        _FieldLabel('Node Label'),
+        const _FieldLabel('Node Label'),
         const SizedBox(height: 6),
         TextFormField(
           controller: _labelController,
@@ -143,7 +143,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 14),
 
         // ── Description ───────────────────────────────────────────
-        _FieldLabel('Description'),
+        const _FieldLabel('Description'),
         const SizedBox(height: 6),
         TextFormField(
           controller: _descController,
@@ -158,7 +158,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 16),
 
         // ── Role assignment ────────────────────────────────────────
-        _FieldLabel('Assigned Role'),
+        const _FieldLabel('Assigned Role'),
         const SizedBox(height: 6),
         rolesAsync.when(
           loading: () =>
@@ -186,7 +186,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 16),
 
         // ── Form assignment ───────────────────────────────────────
-        _FieldLabel('Assigned Form'),
+        const _FieldLabel('Assigned Form'),
         const SizedBox(height: 6),
         formsAsync.when(
           loading: () =>

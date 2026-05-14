@@ -714,7 +714,6 @@ class _SidebarDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
     final user = ref.watch(currentUserProvider);
     final unread = ref.watch(unreadTicketCountProvider);
 
