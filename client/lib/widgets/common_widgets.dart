@@ -141,7 +141,7 @@ class AppPageHeader extends ConsumerWidget {
 
         // Card decoration
         final cardRadius = BorderRadius.circular(20);
-        final primaryTint = AppColors.primary;
+        const primaryTint = AppColors.primary;
 
         if (glassMode) {
           return ClipRRect(

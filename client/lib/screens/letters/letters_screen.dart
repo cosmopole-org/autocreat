@@ -259,7 +259,7 @@ class _CategoryChart extends StatelessWidget {
       catMap[cat] = (catMap[cat] ?? 0) + 1;
     }
     final cats = catMap.entries.toList();
-    final colors = AppColors.chartColors;
+    const colors = AppColors.chartColors;
 
     return AppCard(
       padding: const EdgeInsets.all(20),

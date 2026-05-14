@@ -2,9 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import '../../core/constants.dart';
 import '../../core/extensions.dart';
 import '../../data/demo_data.dart';
 import '../../models/ticket.dart';
@@ -128,7 +126,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.pop(),
+            onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(ticket.title,
               maxLines: 1, overflow: TextOverflow.ellipsis),

@@ -242,7 +242,7 @@ class _FieldTypeChart extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
     final top = entries.take(6).toList();
 
-    final colors = AppColors.chartColors;
+    const colors = AppColors.chartColors;
 
     final maxVal = top.isEmpty ? 1.0 : top.first.value.toDouble();
 
