@@ -66,6 +66,7 @@ class GraphEditor extends StatefulWidget {
 
 class _GraphEditorState extends State<GraphEditor>
     with SingleTickerProviderStateMixin {
+  static const double _basePortHitRadius = 22;
   // Drag state
   String? _draggingNodeId;
   Offset? _dragStartCanvas;
@@ -124,10 +125,11 @@ class _GraphEditorState extends State<GraphEditor>
   Rect _nodeRect(FlowNode n) => Rect.fromLTWH(n.x, n.y, n.width, n.height);
 
   _Port? _hitPort(Offset canvas) {
+    final radius = _basePortHitRadius / widget.scale;
     for (final n in widget.nodes) {
       for (final port in _portsForNode(n)) {
         final c = _portCanvasOffset(n, port.side);
-        if ((canvas - c).distance < 10 / widget.scale) return port;
+        if ((canvas - c).distance < radius) return port;
       }
     }
     return null;
@@ -340,9 +342,9 @@ class _GraphEditorState extends State<GraphEditor>
 
   void _onPanEnd(DragEndDetails d) {
     if (_edgeSourcePort != null && _edgeDragCanvas != null) {
+      final destPort = _hitInputPort(_edgeDragCanvas!);
       final target = _hitNode(_edgeDragCanvas!);
-      final targetPort = _hitPort(_edgeDragCanvas!);
-      final destId = targetPort?.nodeId ?? target?.id;
+      final destId = destPort?.nodeId ?? target?.id;
       if (destId != null && destId != _edgeSourcePort!.nodeId) {
         final conditionLabel = _edgeSourcePort!.side == _PortSide.outputBottomYes
             ? 'Yes'
@@ -362,6 +364,12 @@ class _GraphEditorState extends State<GraphEditor>
       _isPanning = false;
       _panStartScreen = null;
     });
+  }
+
+  _Port? _hitInputPort(Offset canvas) {
+    final port = _hitPort(canvas);
+    if (port != null && port.side == _PortSide.inputLeft) return port;
+    return null;
   }
 
   void _onTapUp(TapUpDetails d) {
