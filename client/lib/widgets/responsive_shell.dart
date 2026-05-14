@@ -339,7 +339,7 @@ class _FloatingMobileBar extends ConsumerWidget {
                 tooltip: 'Toggle theme',
               ),
               const SizedBox(width: 2),
-              _GlassModeButton(compact: true),
+              const _GlassModeButton(compact: true),
               const SizedBox(width: 6),
               // Avatar
               if (user != null)

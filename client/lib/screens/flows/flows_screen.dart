@@ -301,8 +301,6 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final cardBg = isDark ? AppColors.darkCard : AppColors.lightCard;
-
     return AppCard(
       padding: const EdgeInsets.all(16),
       child: Row(
