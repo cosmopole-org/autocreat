@@ -34,7 +34,7 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
       'content': '',
       'deltaContent': {},
     });
-    if (context.mounted) context.go('/letters/${letter.id}/edit');
+    if (context.mounted) context.push('/letters/${letter.id}/edit');
   }
 
   @override
@@ -155,7 +155,7 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (context, i) => _LetterCard(
                         letter: filtered[i],
-                        onEdit: () => context.go('/letters/${filtered[i].id}/edit'),
+                        onEdit: () => context.push('/letters/${filtered[i].id}/edit'),
                         onDelete: () async {
                           final confirmed = await showDialog<bool>(
                             context: context,

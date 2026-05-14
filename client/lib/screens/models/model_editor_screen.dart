@@ -93,7 +93,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.models),
+          onPressed: () => context.pop(),
         ),
         title: Text(editorState.model?.name ?? 'Model Editor'),
         actions: [

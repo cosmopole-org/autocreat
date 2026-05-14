@@ -94,7 +94,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.forms),
+          onPressed: () => context.pop(),
         ),
         title: Row(
           children: [

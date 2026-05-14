@@ -82,7 +82,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                         actionLabel: 'Add User',
                         compactActionLabel: 'Add',
                         actionIcon: Icons.person_add_outlined,
-                        onAction: () => context.go('/users/new/edit'),
+                        onAction: () => context.push('/users/new/edit'),
                       ).animate().fadeIn(duration: 300.ms),
                       const SizedBox(height: 14),
 
@@ -164,7 +164,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                     subtitle: 'Try adjusting your search or filters',
                     icon: Icons.people_outline,
                     actionLabel: 'Add User',
-                    onAction: () => context.go('/users/new/edit'),
+                    onAction: () => context.push('/users/new/edit'),
                   ),
                 )
               else
@@ -176,7 +176,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                         user: filtered[i],
                         index: i,
                         onEdit: () =>
-                            context.go('/users/${filtered[i].id}/edit'),
+                            context.push('/users/${filtered[i].id}/edit'),
                         onDelete: () =>
                             _confirmDelete(context, filtered[i]),
                       ),

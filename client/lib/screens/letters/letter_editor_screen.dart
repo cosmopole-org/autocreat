@@ -136,7 +136,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.letters),
+          onPressed: () => context.pop(),
         ),
         title: TextField(
           controller: _nameController,

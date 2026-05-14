@@ -31,7 +31,7 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
       'name': 'New Model',
       'fields': [],
     });
-    if (context.mounted) context.go('/models/${model.id}/edit');
+    if (context.mounted) context.push('/models/${model.id}/edit');
   }
 
   @override
@@ -143,7 +143,7 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
                   child: _ModelCard(
                     model: filtered[i],
                     onEdit: () =>
-                        context.go('/models/${filtered[i].id}/edit'),
+                        context.push('/models/${filtered[i].id}/edit'),
                     onDelete: () async {
                       final confirmed = await showDialog<bool>(
                         context: context,

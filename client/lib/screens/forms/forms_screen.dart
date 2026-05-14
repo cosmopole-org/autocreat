@@ -33,7 +33,7 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
       'fields': [],
     });
     if (context.mounted) {
-      context.go('/forms/${form.id}/edit');
+      context.push('/forms/${form.id}/edit');
     }
   }
 
@@ -134,7 +134,7 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
               delegate: SliverChildBuilderDelegate(
                 (context, i) => _FormCard(
                   form: filtered[i],
-                  onEdit: () => context.go('/forms/${filtered[i].id}/edit'),
+                  onEdit: () => context.push('/forms/${filtered[i].id}/edit'),
                   onDelete: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,
