@@ -240,25 +240,25 @@ class _UserStatsRow extends StatelessWidget {
         mainAxisSpacing: 10,
         childAspectRatio: 1.6,
         children: [
-          _StatCard(
+          AppStatCard(
             icon: Icons.people_rounded,
             value: '$total',
             label: 'Total Members',
             color: AppColors.primary,
           ),
-          _StatCard(
+          AppStatCard(
             icon: Icons.check_circle_rounded,
             value: '$active',
             label: 'Active',
             color: AppColors.success,
           ),
-          _StatCard(
+          AppStatCard(
             icon: Icons.admin_panel_settings_rounded,
             value: '$admins',
             label: 'Admins',
             color: AppColors.warning,
           ),
-          _StatCard(
+          AppStatCard(
             icon: Icons.person_rounded,
             value: '$members',
             label: 'Members',
@@ -267,63 +267,6 @@ class _UserStatsRow extends StatelessWidget {
         ],
       );
     });
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-
-  const _StatCard({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return AppCard(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: color, size: 16),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: color,
-                  height: 1,
-                ),
-              ),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: cs.onSurface.withValues(alpha: 0.55),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }
 
