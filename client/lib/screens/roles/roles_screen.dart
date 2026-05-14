@@ -73,7 +73,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                   actionIcon: Icons.add,
                   onAction: () => context.go('/roles/new/edit'),
                 ).animate().fadeIn(duration: 300.ms),
-                const SizedBox(height: 18),
+                const SizedBox(height: 14),
 
                 // Stats
                 _RoleStatsRow(

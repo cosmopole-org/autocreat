@@ -126,7 +126,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                         actionIcon: Icons.add,
                         onAction: () => _showCreateTicket(context),
                       ).animate().fadeIn(duration: 300.ms),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 14),
 
                       // Stats row
                       _TicketStatsRow(tickets: tickets),

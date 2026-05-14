@@ -40,18 +40,13 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
     final companiesAsync = ref.watch(companyNotifierProvider);
 
     return Scaffold(
-      body: Column(
-        children: [
-          Padding(
-            padding: AppPageLayout.contentPadding(
-              context,
-              horizontal: 20,
-              bottom: 8,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AppPageHeader(
+      body: companiesAsync.when(
+        loading: () => CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: AppPageLayout.contentPadding(context, horizontal: 20),
+                child: AppPageHeader(
                   title: 'Companies',
                   description:
                       'Organize client and partner workspaces, monitor portfolio health, and keep each organization easy to find and manage.',
@@ -60,105 +55,120 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                   actionIcon: Icons.add,
                   onAction: () => _showCreateDialog(context),
                 ).animate().fadeIn(duration: 300.ms),
-                const SizedBox(height: 18),
-                SearchField(
-                  controller: _searchController,
-                  hintText: 'Search companies...',
-                  onChanged: (v) => setState(() => _search = v),
-                ),
-              ],
+              ),
             ),
-          ),
-          Expanded(
-            child: companiesAsync.when(
-              loading: () => const LoadingGrid(),
-              error: (e, _) => AppErrorWidget(
-                  message: e.toString(),
-                  onRetry: () =>
-                      ref.read(companyNotifierProvider.notifier).refresh()),
-              data: (companies) {
-                final filtered = _search.isEmpty
-                    ? companies
-                    : companies
-                        .where((c) => c.name
-                            .toLowerCase()
-                            .contains(_search.toLowerCase()))
-                        .toList();
+            const SliverFillRemaining(child: LoadingGrid()),
+          ],
+        ),
+        error: (e, _) => AppErrorWidget(
+          message: e.toString(),
+          onRetry: () => ref.read(companyNotifierProvider.notifier).refresh(),
+        ),
+        data: (companies) {
+          final filtered = _search.isEmpty
+              ? companies
+              : companies
+                  .where((c) =>
+                      c.name.toLowerCase().contains(_search.toLowerCase()))
+                  .toList();
 
-                if (filtered.isEmpty) {
-                  return EmptyState(
-                    title: _search.isEmpty
-                        ? 'No companies yet'
-                        : 'No results found',
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: AppPageLayout.contentPadding(context, horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppPageHeader(
+                        title: 'Companies',
+                        description:
+                            'Organize client and partner workspaces, monitor portfolio health, and keep each organization easy to find and manage.',
+                        actionLabel: 'New Company',
+                        compactActionLabel: 'New',
+                        actionIcon: Icons.add,
+                        onAction: () => _showCreateDialog(context),
+                      ).animate().fadeIn(duration: 300.ms),
+                      const SizedBox(height: 14),
+                      _CompanyStatsRow(companies: companies)
+                          .animate()
+                          .fadeIn(delay: 100.ms),
+                      const SizedBox(height: 14),
+                      SearchField(
+                        controller: _searchController,
+                        hintText: 'Search companies...',
+                        onChanged: (v) => setState(() => _search = v),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                  ),
+                ),
+              ),
+              if (filtered.isEmpty)
+                SliverFillRemaining(
+                  child: EmptyState(
+                    title: _search.isEmpty ? 'No companies yet' : 'No results found',
                     subtitle: _search.isEmpty
                         ? 'Create your first company to get started'
                         : null,
                     icon: Icons.business_outlined,
                     actionLabel: _search.isEmpty ? 'Create Company' : null,
-                    onAction: _search.isEmpty
-                        ? () => _showCreateDialog(context)
-                        : null,
-                  );
-                }
-
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                      child: _CompanyStatsRow(companies: companies),
-                    ),
-                    Expanded(
-                      child: GridView.builder(
-                        padding: const EdgeInsets.all(20),
-                        gridDelegate:
-                            const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 320,
-                          mainAxisExtent: 160,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
-                        itemCount: filtered.length,
-                        itemBuilder: (context, i) => _CompanyCard(
-                          company: filtered[i],
-                          onTap: () =>
-                              context.go('/companies/${filtered[i].id}'),
-                          onEdit: () => showDialog(
-                            context: context,
-                            builder: (_) => _CompanyDialog(
-                              company: filtered[i],
-                              onSave: (data) async {
-                                await ref
-                                    .read(companyNotifierProvider.notifier)
-                                    .updateItem(filtered[i].id, data);
-                              },
-                            ),
-                          ),
-                          onDelete: () async {
-                            final confirmed = await showDialog<bool>(
-                              context: context,
-                              builder: (_) => const ConfirmDialog(
-                                title: 'Delete Company',
-                                message:
-                                    'Are you sure you want to delete this company?',
-                              ),
-                            );
-                            if (confirmed == true) {
+                    onAction:
+                        _search.isEmpty ? () => _showCreateDialog(context) : null,
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                  sliver: SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) => _CompanyCard(
+                        company: filtered[i],
+                        onTap: () =>
+                            context.go('/companies/${filtered[i].id}'),
+                        onEdit: () => showDialog(
+                          context: context,
+                          builder: (_) => _CompanyDialog(
+                            company: filtered[i],
+                            onSave: (data) async {
                               await ref
                                   .read(companyNotifierProvider.notifier)
-                                  .delete(filtered[i].id);
-                            }
-                          },
-                        ).animate().fadeIn(
-                              delay: Duration(milliseconds: i * 50),
+                                  .updateItem(filtered[i].id, data);
+                            },
+                          ),
+                        ),
+                        onDelete: () async {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (_) => const ConfirmDialog(
+                              title: 'Delete Company',
+                              message:
+                                  'Are you sure you want to delete this company?',
                             ),
-                      ),
+                          );
+                          if (confirmed == true) {
+                            await ref
+                                .read(companyNotifierProvider.notifier)
+                                .delete(filtered[i].id);
+                          }
+                        },
+                      ).animate().fadeIn(
+                            delay: Duration(milliseconds: i * 50),
+                          ),
+                      childCount: filtered.length,
                     ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 320,
+                      mainAxisExtent: 160,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

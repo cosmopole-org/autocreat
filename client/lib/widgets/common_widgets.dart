@@ -34,10 +34,10 @@ class AppPageLayout {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PAGE HEADER
+// PAGE HEADER  –  full-width hero card with title, description, and action
 // ─────────────────────────────────────────────────────────────────────────────
 
-class AppPageHeader extends StatelessWidget {
+class AppPageHeader extends ConsumerWidget {
   final String title;
   final String description;
   final String? actionLabel;
@@ -58,16 +58,20 @@ class AppPageHeader extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final titleStyle = theme.textTheme.headlineSmall?.copyWith(
+    final isDark = theme.brightness == Brightness.dark;
+    final glassMode = ref.watch(glassModeProvider);
+
+    final titleStyle = theme.textTheme.titleLarge?.copyWith(
       fontWeight: FontWeight.w800,
-      height: 1.05,
-      letterSpacing: -0.6,
+      height: 1.1,
+      letterSpacing: -0.5,
+      color: theme.colorScheme.onSurface,
     );
     final descriptionStyle = theme.textTheme.bodySmall?.copyWith(
-      height: 1.35,
-      color: theme.colorScheme.onSurface.withValues(alpha: 0.62),
+      height: 1.5,
+      color: theme.colorScheme.onSurface.withValues(alpha: isDark ? 0.58 : 0.54),
     );
 
     return LayoutBuilder(
@@ -84,74 +88,156 @@ class AppPageHeader extends StatelessWidget {
                   )
                 : null);
 
-        final descriptionText = ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: isCompact ? double.infinity : 620,
-          ),
-          child: Text(description, style: descriptionStyle),
-        );
+        final descriptionText = Text(description, style: descriptionStyle);
 
+        Widget content;
         if (action == null) {
-          return Column(
+          content = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(title, style: titleStyle),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               descriptionText,
             ],
           );
-        }
-
-        if (isCompact) {
-          return Column(
+        } else if (isCompact) {
+          content = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (constraints.maxWidth < 340) ...[
-                Text(title, style: titleStyle),
-                const SizedBox(height: 12),
-                action,
-              ] else
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: Text(title, style: titleStyle)),
-                    const SizedBox(width: 14),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: action,
-                    ),
-                  ],
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: Text(title, style: titleStyle)),
+                  const SizedBox(width: 12),
+                  action,
+                ],
+              ),
               const SizedBox(height: 10),
               descriptionText,
             ],
           );
+        } else {
+          content = Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(title, style: titleStyle),
+                    const SizedBox(height: 8),
+                    descriptionText,
+                  ],
+                ),
+              ),
+              const SizedBox(width: 20),
+              action,
+            ],
+          );
         }
 
-        final copy = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(title, style: titleStyle),
-            const SizedBox(height: 10),
-            descriptionText,
-          ],
-        );
+        // Card decoration
+        final cardRadius = BorderRadius.circular(20);
+        final primaryTint = AppColors.primary;
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(child: copy),
-            const SizedBox(width: 16),
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: action,
+        if (glassMode) {
+          return ClipRRect(
+            borderRadius: cardRadius,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: cardRadius,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      primaryTint.withValues(alpha: isDark ? 0.18 : 0.10),
+                      (isDark ? Colors.white : Colors.white)
+                          .withValues(alpha: isDark ? 0.06 : 0.55),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: primaryTint.withValues(alpha: isDark ? 0.28 : 0.18),
+                  ),
+                ),
+                child: _cardContent(content, isDark, primaryTint),
+              ),
             ),
-          ],
+          );
+        }
+
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: cardRadius,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [
+                      primaryTint.withValues(alpha: 0.16),
+                      AppColors.darkCard,
+                    ]
+                  : [
+                      primaryTint.withValues(alpha: 0.06),
+                      Colors.white,
+                    ],
+            ),
+            border: Border.all(
+              color: primaryTint.withValues(alpha: isDark ? 0.22 : 0.13),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: primaryTint.withValues(alpha: isDark ? 0.10 : 0.07),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: cardRadius,
+            child: _cardContent(content, isDark, primaryTint),
+          ),
         );
       },
+    );
+  }
+
+  Widget _cardContent(Widget content, bool isDark, Color primaryTint) {
+    return Stack(
+      children: [
+        Positioned(
+          top: -28,
+          right: -28,
+          child: Container(
+            width: 110,
+            height: 110,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: primaryTint.withValues(alpha: isDark ? 0.13 : 0.08),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: -18,
+          right: 60,
+          child: Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primaryLight.withValues(alpha: isDark ? 0.08 : 0.05),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: content,
+        ),
+      ],
     );
   }
 }

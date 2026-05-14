@@ -84,7 +84,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                         actionIcon: Icons.person_add_outlined,
                         onAction: () => context.go('/users/new/edit'),
                       ).animate().fadeIn(duration: 300.ms),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 14),
 
                       // Stats row
                       _UserStatsRow(users: users),
