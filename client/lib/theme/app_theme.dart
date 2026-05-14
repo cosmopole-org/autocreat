@@ -249,9 +249,17 @@ class AppTheme {
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.lightTextSecondary,
         indicatorColor: AppColors.primary,
+        indicatorSize: TabBarIndicatorSize.tab,
+        indicator: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: glassMode ? 0.18 : 0.10),
+          borderRadius: BorderRadius.circular(glassMode ? 16 : 12),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: glassMode ? 0.28 : 0.16),
+          ),
+        ),
         labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
         unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w400, fontSize: 14),
-        dividerColor: AppColors.lightBorder,
+        dividerColor: glassMode ? Colors.transparent : AppColors.lightBorder,
       ),
       popupMenuTheme: PopupMenuThemeData(
         color: glassMode ? Colors.white.withValues(alpha: 0.74) : surface,
@@ -496,9 +504,17 @@ class AppTheme {
         labelColor: AppColors.primaryLight,
         unselectedLabelColor: AppColors.darkTextSecondary,
         indicatorColor: AppColors.primaryLight,
+        indicatorSize: TabBarIndicatorSize.tab,
+        indicator: BoxDecoration(
+          color: AppColors.primaryLight.withValues(alpha: glassMode ? 0.20 : 0.13),
+          borderRadius: BorderRadius.circular(glassMode ? 16 : 12),
+          border: Border.all(
+            color: AppColors.primaryLight.withValues(alpha: glassMode ? 0.30 : 0.18),
+          ),
+        ),
         labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
         unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w400, fontSize: 14),
-        dividerColor: AppColors.darkBorder,
+        dividerColor: glassMode ? Colors.transparent : AppColors.darkBorder,
       ),
       popupMenuTheme: PopupMenuThemeData(
         color: glassMode ? Colors.white.withValues(alpha: 0.10) : card,
