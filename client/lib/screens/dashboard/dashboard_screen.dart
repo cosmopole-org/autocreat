@@ -657,10 +657,10 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
     ];
     final labels = ['Open', 'In Progress', 'Resolved', 'Closed'];
     final colors = [
-      AppColors.warning,
-      AppColors.info,
-      AppColors.success,
-      AppColors.lightTextSecondary,
+      AppColors.chartColors[3], // amber (open)
+      AppColors.chartColors[4], // blue (in progress)
+      AppColors.chartColors[2], // green (resolved)
+      AppColors.chartColors[1], // cyan (closed)
     ];
     final total = counts.fold(0, (a, b) => a + b);
 

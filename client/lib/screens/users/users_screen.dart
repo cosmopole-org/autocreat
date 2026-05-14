@@ -298,14 +298,7 @@ class _RoleDonut extends StatelessWidget {
     final entries = roleCounts.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    final palette = [
-      AppColors.primary,
-      AppColors.accent,
-      AppColors.warning,
-      AppColors.success,
-      AppColors.info,
-      AppColors.error,
-    ];
+    final palette = AppColors.chartColors;
 
     return AppCard(
       padding: const EdgeInsets.all(20),

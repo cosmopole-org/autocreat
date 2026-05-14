@@ -74,30 +74,32 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
                             'Form Definitions',
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineSmall
                                 ?.copyWith(fontWeight: FontWeight.w800),
                           ),
-                          Text(
-                            'Build and manage data collection forms',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
+                        ),
+                        AppButton(
+                          label: 'New Form',
+                          icon: Icons.add,
+                          onPressed: () => _createForm(context),
+                        ),
+                      ],
                     ),
-                    AppButton(
-                      label: 'New Form',
-                      icon: Icons.add,
-                      onPressed: () => _createForm(context),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Build and manage data collection forms',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ).animate().fadeIn(duration: 300.ms),
@@ -260,14 +262,7 @@ class _FieldTypeChart extends StatelessWidget {
       ..sort((a, b) => b.value.compareTo(a.value));
     final top = entries.take(6).toList();
 
-    final colors = [
-      AppColors.primary,
-      AppColors.accent,
-      AppColors.success,
-      AppColors.warning,
-      AppColors.info,
-      AppColors.error,
-    ];
+    final colors = AppColors.chartColors;
 
     final maxVal = top.isEmpty ? 1.0 : top.first.value.toDouble();
 

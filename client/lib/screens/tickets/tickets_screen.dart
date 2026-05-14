@@ -393,10 +393,10 @@ class _PriorityBarChart extends StatelessWidget {
     final maxY =
         (data.reduce((a, b) => a > b ? a : b) + 2).clamp(4.0, 20.0);
     final colors = [
-      AppColors.success,
-      AppColors.info,
-      AppColors.warning,
-      AppColors.error,
+      AppColors.chartColors[2], // green
+      AppColors.chartColors[4], // blue
+      AppColors.chartColors[3], // amber
+      AppColors.chartColors[5], // red
     ];
     const labels = ['Low', 'Med', 'High', 'Urgent'];
 
@@ -512,10 +512,10 @@ class _StatusDonutState extends State<_StatusDonut> {
 
     final labels = ['Open', 'In Progress', 'Resolved', 'Closed'];
     final colors = [
-      AppColors.warning,
-      AppColors.info,
-      AppColors.success,
-      AppColors.lightTextSecondary,
+      AppColors.chartColors[3], // amber (open)
+      AppColors.chartColors[4], // blue (in progress)
+      AppColors.chartColors[2], // green (resolved)
+      AppColors.chartColors[1], // cyan (closed)
     ];
 
     return AppCard(
