@@ -29,6 +29,7 @@ class AppConstants {
   static const String refreshTokenKey = 'refresh_token';
   static const String userIdKey = 'user_id';
   static const String themeKey = 'theme_mode';
+  static const String glassModeKey = 'glass_mode';
   static const String lastCompanyKey = 'last_company_id';
 
   // App info

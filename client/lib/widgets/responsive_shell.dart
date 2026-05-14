@@ -246,15 +246,18 @@ class _FloatingMobileBar extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final unread = ref.watch(unreadTicketCountProvider);
     final user = ref.watch(currentUserProvider);
+    final glassMode = ref.watch(glassModeProvider);
 
-    final bgColor = isDark
-        ? AppColors.darkCard.withValues(alpha: 0.94)
-        : AppColors.lightCard.withValues(alpha: 0.94);
+    final bgColor = glassMode
+        ? Colors.white.withValues(alpha: isDark ? 0.11 : 0.58)
+        : isDark
+            ? AppColors.darkCard.withValues(alpha: 0.94)
+            : AppColors.lightCard.withValues(alpha: 0.94);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        filter: ImageFilter.blur(sigmaX: glassMode ? 24 : 16, sigmaY: glassMode ? 24 : 16),
         child: Container(
           decoration: BoxDecoration(
             color: bgColor,
@@ -265,6 +268,16 @@ class _FloatingMobileBar extends ConsumerWidget {
                   : Colors.black.withValues(alpha: 0.06),
               width: 1,
             ),
+            gradient: glassMode
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withValues(alpha: isDark ? 0.16 : 0.74),
+                      Colors.white.withValues(alpha: isDark ? 0.05 : 0.34),
+                    ],
+                  )
+                : null,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.10),
@@ -325,6 +338,8 @@ class _FloatingMobileBar extends ConsumerWidget {
                 onTap: () => ref.read(themeProvider.notifier).toggleTheme(),
                 tooltip: 'Toggle theme',
               ),
+              const SizedBox(width: 2),
+              _GlassModeButton(compact: true),
               const SizedBox(width: 6),
               // Avatar
               if (user != null)
@@ -387,11 +402,18 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
     final user = ref.watch(currentUserProvider);
     final unread = ref.watch(unreadTicketCountProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassMode = ref.watch(glassModeProvider);
 
-    final topBarBg =
-        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final topBarBg = glassMode
+        ? Colors.white.withValues(alpha: isDark ? 0.08 : 0.48)
+        : isDark
+            ? AppColors.darkSurface
+            : AppColors.lightSurface;
 
-    return Container(
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: glassMode ? 18 : 0, sigmaY: glassMode ? 18 : 0),
+        child: Container(
       height: 60,
       decoration: BoxDecoration(
         color: topBarBg,
@@ -430,7 +452,7 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
               child: Container(
                 height: 36,
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+                  color: glassMode ? Colors.white.withValues(alpha: isDark ? 0.08 : 0.42) : (isDark ? AppColors.darkSurface : AppColors.lightSurface),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
                 ),
@@ -487,6 +509,8 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
                     borderRadius: BorderRadius.circular(10)),
               ),
             ),
+            const SizedBox(width: 2),
+            const _GlassModeButton(),
             const SizedBox(width: 4),
             if (user != null)
               AvatarWidget(
@@ -495,6 +519,48 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
                 size: 34,
               ),
           ],
+        ),
+      ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class _GlassModeButton extends ConsumerWidget {
+  final bool compact;
+
+  const _GlassModeButton({this.compact = false});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final glassMode = ref.watch(glassModeProvider);
+    final cs = Theme.of(context).colorScheme;
+    final icon = glassMode ? Icons.blur_on_rounded : Icons.blur_off_rounded;
+
+    if (compact) {
+      return _BarIconButton(
+        icon: icon,
+        onTap: () => ref.read(glassModeProvider.notifier).toggleGlassMode(),
+        tooltip: glassMode ? 'Disable glass mode' : 'Enable glass mode',
+      );
+    }
+
+    return Tooltip(
+      message: glassMode ? 'Disable glass mode' : 'Enable glass mode',
+      child: IconButton(
+        icon: Icon(
+          icon,
+          size: 20,
+          color: glassMode ? AppColors.primary : cs.onSurface.withValues(alpha: 0.82),
+        ),
+        onPressed: () => ref.read(glassModeProvider.notifier).toggleGlassMode(),
+        style: IconButton.styleFrom(
+          backgroundColor: glassMode ? AppColors.primary.withValues(alpha: 0.12) : null,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       ),
     );
@@ -564,10 +630,14 @@ class _FullSidebar extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final user = ref.watch(currentUserProvider);
     final unread = ref.watch(unreadTicketCountProvider);
+    final glassMode = ref.watch(glassModeProvider);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final sidebarBg =
-        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final sidebarBg = glassMode
+        ? Colors.white.withValues(alpha: isDark ? 0.07 : 0.46)
+        : isDark
+            ? AppColors.darkSurface
+            : AppColors.lightSurface;
 
     return Container(
       width: 248,
@@ -633,10 +703,14 @@ class _CollapsedSidebar extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final unread = ref.watch(unreadTicketCountProvider);
     final user = ref.watch(currentUserProvider);
+    final glassMode = ref.watch(glassModeProvider);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final sidebarBg =
-        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final sidebarBg = glassMode
+        ? Colors.white.withValues(alpha: isDark ? 0.07 : 0.46)
+        : isDark
+            ? AppColors.darkSurface
+            : AppColors.lightSurface;
 
     return Container(
       width: 68,
@@ -716,10 +790,14 @@ class _SidebarDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
     final unread = ref.watch(unreadTicketCountProvider);
+    final glassMode = ref.watch(glassModeProvider);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final drawerBg =
-        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final drawerBg = glassMode
+        ? Colors.white.withValues(alpha: isDark ? 0.08 : 0.58)
+        : isDark
+            ? AppColors.darkSurface
+            : AppColors.lightSurface;
 
     return Drawer(
       backgroundColor: drawerBg,
@@ -769,17 +847,22 @@ class _SidebarDrawer extends ConsumerWidget {
 // SHARED SIDEBAR COMPONENTS
 // ────────────────────────────────────────────────────────────────
 
-class _SidebarUserCard extends StatelessWidget {
+class _SidebarUserCard extends ConsumerWidget {
   final dynamic user;
 
   const _SidebarUserCard({this.user});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final glassMode = ref.watch(glassModeProvider);
     if (user == null) return const SizedBox.shrink();
 
-    return Container(
+    return GlassSurface(
+      enabled: glassMode,
+      borderRadius: BorderRadius.circular(16),
+      color: glassMode ? AppColors.primary.withValues(alpha: 0.10) : null,
+      child: Container(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -818,6 +901,7 @@ class _SidebarUserCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -877,7 +961,7 @@ class _SidebarNavList extends StatelessWidget {
   }
 }
 
-class _NavTile extends StatelessWidget {
+class _NavTile extends ConsumerWidget {
   final _NavItem item;
   final bool selected;
   final int badgeCount;
@@ -891,8 +975,9 @@ class _NavTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final glassMode = ref.watch(glassModeProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
@@ -908,8 +993,13 @@ class _NavTile extends StatelessWidget {
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: selected
-                  ? AppColors.primary.withValues(alpha: 0.1)
-                  : Colors.transparent,
+                  ? AppColors.primary.withValues(alpha: glassMode ? 0.16 : 0.1)
+                  : glassMode
+                      ? Colors.white.withValues(alpha: 0.02)
+                      : Colors.transparent,
+              border: glassMode && selected
+                  ? Border.all(color: Colors.white.withValues(alpha: 0.18))
+                  : null,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -964,7 +1054,7 @@ class _NavTile extends StatelessWidget {
   }
 }
 
-class _NavIcon extends StatelessWidget {
+class _NavIcon extends ConsumerWidget {
   final _NavItem item;
   final bool selected;
   final int badgeCount;
@@ -978,8 +1068,9 @@ class _NavIcon extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final glassMode = ref.watch(glassModeProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
@@ -994,8 +1085,13 @@ class _NavIcon extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: selected
-                  ? AppColors.primary.withValues(alpha: 0.1)
-                  : Colors.transparent,
+                  ? AppColors.primary.withValues(alpha: glassMode ? 0.16 : 0.1)
+                  : glassMode
+                      ? Colors.white.withValues(alpha: 0.02)
+                      : Colors.transparent,
+              border: glassMode && selected
+                  ? Border.all(color: Colors.white.withValues(alpha: 0.18))
+                  : null,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Center(

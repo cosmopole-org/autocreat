@@ -1,14 +1,98 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shimmer/shimmer.dart';
+import '../providers/theme_provider.dart';
 import '../theme/app_colors.dart';
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GLASS SURFACE
+// ─────────────────────────────────────────────────────────────────────────────
+
+class GlassSurface extends StatelessWidget {
+  final Widget child;
+  final bool enabled;
+  final EdgeInsetsGeometry? padding;
+  final BorderRadiusGeometry borderRadius;
+  final Color? color;
+  final double blur;
+  final Border? border;
+  final List<BoxShadow>? boxShadow;
+
+  const GlassSurface({
+    super.key,
+    required this.child,
+    required this.enabled,
+    this.padding,
+    this.borderRadius = const BorderRadius.all(Radius.circular(20)),
+    this.color,
+    this.blur = 18,
+    this.border,
+    this.boxShadow,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final radius = borderRadius;
+    final container = Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: enabled
+            ? (color ?? Colors.white.withValues(alpha: isDark ? 0.10 : 0.56))
+            : color,
+        borderRadius: radius,
+        border: border ??
+            (enabled
+                ? Border.all(
+                    color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.58),
+                  )
+                : null),
+        gradient: enabled
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: isDark ? 0.14 : 0.70),
+                  Colors.white.withValues(alpha: isDark ? 0.045 : 0.32),
+                ],
+              )
+            : null,
+        boxShadow: boxShadow ??
+            (enabled
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.09),
+                      blurRadius: 26,
+                      offset: const Offset(0, 14),
+                    ),
+                  ]
+                : null),
+      ),
+      child: child,
+    );
+
+    if (!enabled) return container;
+
+    return ClipRRect(
+      borderRadius: radius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+        child: container,
+      ),
+    );
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // APP CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
-class AppCard extends StatelessWidget {
+class AppCard extends ConsumerWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
@@ -25,43 +109,76 @@ class AppCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final glassMode = ref.watch(glassModeProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final bgColor =
         color ?? (isDark ? AppColors.darkCard : AppColors.lightCard);
-    return AnimatedContainer(
+    final borderColor = selected
+        ? AppColors.primary
+        : glassMode
+            ? Colors.white.withValues(alpha: isDark ? 0.16 : 0.62)
+            : (isDark ? AppColors.darkBorder : AppColors.lightBorder);
+    final effectiveColor = glassMode
+        ? (color ?? Colors.white.withValues(alpha: isDark ? 0.10 : 0.56))
+        : bgColor;
+    final content = AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(16),
+        color: effectiveColor,
+        borderRadius: BorderRadius.circular(glassMode ? 22 : 16),
         border: Border.all(
-          color: selected
-              ? AppColors.primary
-              : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+          color: borderColor,
           width: selected ? 2 : 1,
         ),
+        gradient: glassMode
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: isDark ? 0.13 : 0.68),
+                  Colors.white.withValues(alpha: isDark ? 0.05 : 0.34),
+                ],
+              )
+            : null,
         boxShadow: [
           BoxShadow(
             color: selected
-                ? AppColors.primary.withValues(alpha: 0.14)
+                ? AppColors.primary.withValues(alpha: glassMode ? 0.22 : 0.14)
                 : Colors.black.withValues(alpha: isDark ? 0.22 : 0.06),
-            blurRadius: selected ? 12 : 8,
-            offset: const Offset(0, 3),
+            blurRadius: selected ? 18 : (glassMode ? 24 : 8),
+            offset: Offset(0, glassMode ? 10 : 3),
           ),
+          if (glassMode)
+            BoxShadow(
+              color: Colors.white.withValues(alpha: isDark ? 0.02 : 0.45),
+              blurRadius: 1,
+              offset: const Offset(0, 1),
+            ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(glassMode ? 22 : 16),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(glassMode ? 22 : 16),
           child: Padding(
             padding: padding ?? const EdgeInsets.all(16),
             child: child,
           ),
         ),
+      ),
+    );
+
+    if (!glassMode) return content;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: content,
       ),
     );
   }

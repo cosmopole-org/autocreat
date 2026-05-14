@@ -39,4 +39,24 @@ class ThemeNotifier extends Notifier<ThemeMode> {
   }
 }
 
+class GlassModeNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getBool(AppConstants.glassModeKey) ?? false;
+  }
+
+  Future<void> setGlassMode(bool enabled) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setBool(AppConstants.glassModeKey, enabled);
+    state = enabled;
+  }
+
+  Future<void> toggleGlassMode() async {
+    await setGlassMode(!state);
+  }
+}
+
 final themeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(ThemeNotifier.new);
+
+final glassModeProvider = NotifierProvider<GlassModeNotifier, bool>(GlassModeNotifier.new);
