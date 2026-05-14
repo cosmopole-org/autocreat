@@ -69,7 +69,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                 child: Padding(
                   padding: AppPageLayout.contentPadding(
                     context,
-                    horizontal: 16,
+                    horizontal: 20,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,7 +183,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (ctx, i) => Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
                       child: _UserCard(
                         user: filtered[i],
                         index: i,
@@ -289,7 +289,6 @@ class _RoleDonut extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Group users by role
     final roleCounts = <String, int>{};
@@ -308,20 +307,8 @@ class _RoleDonut extends StatelessWidget {
       AppColors.error,
     ];
 
-    return Container(
+    return AppCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -426,25 +413,11 @@ class _ActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final active = users.where((u) => u.isActive).length;
     final inactive = users.length - active;
 
-    return Container(
-      width: double.infinity,
+    return AppCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -599,24 +572,10 @@ class _UserCard extends StatelessWidget {
         ? '${user.createdAt!.day}/${user.createdAt!.month}/${user.createdAt!.year}'
         : null;
 
-    return GestureDetector(
+    return AppCard(
       onTap: onEdit,
-      child: Container(
-        decoration: BoxDecoration(
-          color: cs.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outline.withValues(alpha: 0.4)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
+      padding: const EdgeInsets.all(16),
+      child: Row(
             children: [
               // Avatar
               Stack(
@@ -747,8 +706,6 @@ class _UserCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
     )
         .animate()
         .fadeIn(delay: Duration(milliseconds: index * 50))
