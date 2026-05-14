@@ -51,10 +51,24 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
         : ref.watch(flowsProvider(widget.id));
 
     return companyAsync.when(
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) =>
-          Scaffold(body: AppErrorWidget(message: e.toString())),
+      loading: () => Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: () => context.pop(),
+          ),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: () => context.pop(),
+          ),
+        ),
+        body: AppErrorWidget(message: e.toString()),
+      ),
       data: (company) {
         // Capacity metrics (mock values to show progress indicators)
         final memberUsage = company.memberCount > 0
@@ -65,12 +79,16 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
             : 0.0;
 
         return Scaffold(
-          body: SingleChildScrollView(
-            padding: AppPageLayout.contentPadding(
-              context,
-              horizontal: 16,
-              bottom: 16,
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: () => context.pop(),
             ),
+            title: Text(company.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+            titleSpacing: 0,
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -246,7 +264,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12)),
                                 onTap: () =>
-                                    context.go('/flows/${f.id}/edit'),
+                                    context.push('/flows/${f.id}/edit'),
                               ))
                           .toList(),
                     );

@@ -204,7 +204,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                         ticket: filtered[i],
                         index: i,
                         onTap: () =>
-                            context.go('/tickets/${filtered[i].id}'),
+                            context.push('/tickets/${filtered[i].id}'),
                         onUpdateStatus: (s) async {
                           await ref
                               .read(ticketNotifierProvider.notifier)

@@ -53,7 +53,7 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
       'edges': [],
     });
     if (context.mounted) {
-      context.go('/flows/${flow.id}/edit');
+      context.push('/flows/${flow.id}/edit');
     }
   }
 
@@ -157,7 +157,7 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
               delegate: SliverChildBuilderDelegate(
                 (context, i) => _FlowCard(
                   flow: filtered[i],
-                  onEdit: () => context.go('/flows/${filtered[i].id}/edit'),
+                  onEdit: () => context.push('/flows/${filtered[i].id}/edit'),
                   onDelete: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,

@@ -71,7 +71,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                   actionLabel: 'New Role',
                   compactActionLabel: 'New',
                   actionIcon: Icons.add,
-                  onAction: () => context.go('/roles/new/edit'),
+                  onAction: () => context.push('/roles/new/edit'),
                 ).animate().fadeIn(duration: 300.ms),
                 const SizedBox(height: 14),
 
@@ -108,7 +108,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
               subtitle: 'Create roles to manage access control',
               icon: Icons.shield_outlined,
               actionLabel: 'Create Role',
-              onAction: () => context.go('/roles/new/edit'),
+              onAction: () => context.push('/roles/new/edit'),
             ),
           )
         else
@@ -120,7 +120,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                   padding: const EdgeInsets.only(bottom: 12),
                   child: _RoleCard(
                     role: filtered[i],
-                    onEdit: () => context.go('/roles/${filtered[i].id}/edit'),
+                    onEdit: () => context.push('/roles/${filtered[i].id}/edit'),
                     onDelete: () async {
                       final confirmed = await showDialog<bool>(
                         context: context,

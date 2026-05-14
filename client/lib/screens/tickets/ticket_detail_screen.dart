@@ -128,7 +128,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => context.go(AppRoutes.tickets),
+            onPressed: () => context.pop(),
           ),
           title: Text(ticket.title,
               maxLines: 1, overflow: TextOverflow.ellipsis),

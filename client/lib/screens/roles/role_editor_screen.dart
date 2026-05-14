@@ -78,7 +78,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
             .updateItem(_role!.id, data);
       }
       if (mounted) {
-        context.go(AppRoutes.roles);
+        context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('Role saved'),
@@ -129,7 +129,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.roles),
+          onPressed: () => context.pop(),
         ),
         title: Text(_role == null ? 'New Role' : 'Edit Role'),
         actions: [

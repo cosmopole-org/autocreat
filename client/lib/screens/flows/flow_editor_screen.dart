@@ -326,7 +326,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.go(AppRoutes.flows),
+          onPressed: () => context.pop(),
         ),
         titleSpacing: 0,
         title: Row(

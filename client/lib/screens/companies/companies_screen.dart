@@ -93,13 +93,13 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                       _CompanyStatsRow(companies: companies)
                           .animate()
                           .fadeIn(delay: 100.ms),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 24),
                       SearchField(
                         controller: _searchController,
                         hintText: 'Search companies...',
                         onChanged: (v) => setState(() => _search = v),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -125,7 +125,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                       (context, i) => _CompanyCard(
                         company: filtered[i],
                         onTap: () =>
-                            context.go('/companies/${filtered[i].id}'),
+                            context.push('/companies/${filtered[i].id}'),
                         onEdit: () => showDialog(
                           context: context,
                           builder: (_) => _CompanyDialog(

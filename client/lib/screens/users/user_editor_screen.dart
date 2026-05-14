@@ -90,7 +90,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
             .updateItem(_user!.id, data);
       }
       if (mounted) {
-        context.go(AppRoutes.users);
+        context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('User saved'),
@@ -138,7 +138,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.users),
+          onPressed: () => context.pop(),
         ),
         title: Text(_user == null ? 'New User' : 'Edit User'),
         actions: [
