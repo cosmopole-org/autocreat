@@ -88,7 +88,7 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                         actionIcon: Icons.add,
                         onAction: () => _createLetter(context),
                       ).animate().fadeIn(duration: 300.ms),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 14),
 
                       // Stats row
                       _StatsRow(
