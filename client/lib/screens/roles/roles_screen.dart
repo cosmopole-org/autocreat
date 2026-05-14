@@ -93,7 +93,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                     ),
                   ],
                 ).animate().fadeIn(duration: 300.ms),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
 
                 // Stats
                 _RoleStatsRow(
