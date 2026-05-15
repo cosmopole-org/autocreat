@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -8,9 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../../models/ticket.dart';
 import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
-import '../../providers/theme_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
+import '../../widgets/ios_tab_bar.dart';
 import '../../data/ui_text.dart';
 
 class TicketsScreen extends ConsumerStatefulWidget {
@@ -20,11 +18,16 @@ class TicketsScreen extends ConsumerStatefulWidget {
   ConsumerState<TicketsScreen> createState() => _TicketsScreenState();
 }
 
-class _TicketsScreenState extends ConsumerState<TicketsScreen>
-    with SingleTickerProviderStateMixin {
+class _TicketsScreenState extends ConsumerState<TicketsScreen> {
   final _searchController = TextEditingController();
   String _search = '';
-  late TabController _tabController;
+  int _selectedTabIndex = 0;
+
+  // Sticky tab bar state
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _headerKey = GlobalKey();
+  double _headerContentHeight = 400;
+  bool _showStickyBar = false;
 
   static List<String> get _tabs => [
         UiText.all,
@@ -37,18 +40,38 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _tabs.length, vsync: this);
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureHeader());
   }
 
   @override
   void dispose() {
     _searchController.dispose();
-    _tabController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
+  void _onScroll() {
+    final shouldShow = _scrollController.offset > _headerContentHeight;
+    if (shouldShow != _showStickyBar) {
+      setState(() => _showStickyBar = shouldShow);
+    }
+  }
+
+  void _measureHeader() {
+    if (!mounted) return;
+    final ctx = _headerKey.currentContext;
+    if (ctx == null) return;
+    final box = ctx.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final h = box.size.height;
+    if ((h - _headerContentHeight).abs() > 2) {
+      setState(() => _headerContentHeight = h);
+    }
+  }
+
   TicketStatus? get _selectedStatus {
-    switch (_tabController.index) {
+    switch (_selectedTabIndex) {
       case 1:
         return TicketStatus.open;
       case 2:
@@ -73,15 +96,28 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
     );
   }
 
+  void _selectTab(int index) {
+    setState(() => _selectedTabIndex = index);
+    // Re-measure after tab change so threshold stays accurate.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureHeader());
+  }
+
   @override
   Widget build(BuildContext context) {
     final ticketsAsync = ref.watch(ticketNotifierProvider);
+    final isMobile = MediaQuery.of(context).size.width < 768;
+    // On mobile the shell overrides MediaQuery.padding.top to equal the
+    // content start (below the floating bar). On tablet/desktop the body
+    // already starts beneath the top bar, so we pin at y=0.
+    final stickyTop = isMobile ? MediaQuery.of(context).padding.top : 0.0;
 
     ref.listen(realtimeStreamProvider, (_, next) {
       next.whenData((msg) {
         final type = msg['type'] as String? ?? '';
         if (type == 'ticket.created' || type == 'ticket.status_updated') {
           ref.invalidate(ticketNotifierProvider);
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => _measureHeader());
         }
       });
     });
@@ -109,10 +145,18 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                 .toList();
           }
 
-          return CustomScrollView(
+          final tabBar = IosTabBar(
+            tabs: _tabs,
+            selectedIndex: _selectedTabIndex,
+            onTabSelected: _selectTab,
+          );
+
+          final scrollView = CustomScrollView(
+            controller: _scrollController,
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
+                  key: _headerKey,
                   padding: AppPageLayout.contentPadding(
                     context,
                     horizontal: 20,
@@ -171,25 +215,14 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                         hintText: UiText.searchTickets,
                         onChanged: (v) => setState(() => _search = v),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                     ],
                   ),
                 ),
               ),
 
-              // Tab bar
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _TabBarDelegate(
-                  TabBar(
-                    controller: _tabController,
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    onTap: (_) => setState(() {}),
-                    tabs: _tabs.map((t) => Tab(text: t)).toList(),
-                  ),
-                ),
-              ),
+              // Inline tab bar (scrolls normally; hidden by sticky overlay when pinned)
+              SliverToBoxAdapter(child: tabBar),
 
               if (filtered.isEmpty)
                 SliverFillRemaining(
@@ -221,82 +254,42 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
               const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
             ],
           );
+
+          return Stack(
+            children: [
+              scrollView,
+
+              // Sticky tab bar overlay — appears once the inline tab bar
+              // has scrolled off the top, positioned correctly below the
+              // floating mobile bar (or at the very top of the body on
+              // tablet/desktop where the body already starts beneath the
+              // app bar).
+              if (_showStickyBar)
+                Positioned(
+                  top: stickyTop,
+                  left: 0,
+                  right: 0,
+                  child: IosTabBar(
+                    tabs: _tabs,
+                    selectedIndex: _selectedTabIndex,
+                    onTabSelected: _selectTab,
+                    isOverlay: true,
+                  )
+                      .animate()
+                      .slideY(
+                        begin: -0.6,
+                        end: 0,
+                        duration: 220.ms,
+                        curve: Curves.easeOutCubic,
+                      )
+                      .fadeIn(duration: 180.ms),
+                ),
+            ],
+          );
         },
       ),
     );
   }
-}
-
-// ── Tab Bar Delegate ───────────────────────────────────────────────
-
-class _TabBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar tabBar;
-
-  const _TabBarDelegate(this.tabBar);
-
-  @override
-  double get minExtent => tabBar.preferredSize.height;
-  @override
-  double get maxExtent => tabBar.preferredSize.height;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Consumer(
-      builder: (context, ref, _) {
-        final theme = Theme.of(context);
-        final cs = theme.colorScheme;
-        final isDark = theme.brightness == Brightness.dark;
-        final glassMode = ref.watch(glassModeProvider);
-        final backgroundColor = glassMode
-            ? Colors.white.withValues(alpha: isDark ? 0.08 : 0.54)
-            : cs.surface;
-
-        final decoratedTabBar = DecoratedBox(
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            gradient: glassMode
-                ? LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withValues(alpha: isDark ? 0.13 : 0.68),
-                      Colors.white.withValues(alpha: isDark ? 0.045 : 0.34),
-                    ],
-                  )
-                : null,
-            border: Border(
-              bottom: BorderSide(
-                color: glassMode
-                    ? Colors.white.withValues(alpha: isDark ? 0.14 : 0.56)
-                    : cs.outline.withValues(alpha: 0.55),
-              ),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.24 : 0.05),
-                blurRadius: glassMode ? 18 : 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: tabBar,
-        );
-
-        if (!glassMode) return decoratedTabBar;
-
-        return ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-            child: decoratedTabBar,
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  bool shouldRebuild(covariant _TabBarDelegate oldDelegate) => false;
 }
 
 // ── Stats Row ──────────────────────────────────────────────────────
