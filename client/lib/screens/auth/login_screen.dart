@@ -24,9 +24,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
-  static const _demoAccounts = [
-    {'email': 'demo@autocreat.io', 'password': MockUiText.demo123, 'label': MockUiText.demo},
-    {'email': 'admin@demo.com', 'password': 'password123', 'label': MockUiText.admin},
+  static final _demoAccounts = [
+    {
+      'email': 'demo@autocreat.io',
+      'password': MockUiText.demo123,
+      'label': MockUiText.demo
+    },
+    {
+      'email': 'admin@demo.com',
+      'password': 'password123',
+      'label': MockUiText.admin
+    },
   ];
 
   @override
@@ -48,7 +56,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             _passwordController.text,
           );
     } catch (e) {
-      setState(() => _errorMessage = e.toString().replaceAll(MockUiText.exception, ''));
+      setState(() =>
+          _errorMessage = e.toString().replaceAll(MockUiText.exception, ''));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -138,7 +147,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.auto_awesome, color: AppColors.primary, size: 28),
+              child: const Icon(Icons.auto_awesome,
+                  color: AppColors.primary, size: 28),
             ),
             const SizedBox(width: 12),
             Text(
@@ -178,10 +188,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             runSpacing: 8,
             children: _demoAccounts
                 .map((a) => ActionChip(
-                      label: Text(MockUiText.demoAccountLabel(a['label'] as String)),
+                      label: Text(
+                          MockUiText.demoAccountLabel(a['label'] as String)),
                       avatar: const Icon(Icons.person_outline, size: 14),
-                      onPressed: () => _fillDemo(
-                          Map<String, String>.from(a)),
+                      onPressed: () => _fillDemo(Map<String, String>.from(a)),
                     ))
                 .toList(),
           ).animate().fadeIn(delay: 300.ms, duration: 400.ms),
@@ -195,7 +205,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               decoration: BoxDecoration(
                 color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                border:
+                    Border.all(color: AppColors.error.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -205,8 +216,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Expanded(
                     child: Text(
                       _errorMessage!,
-                      style: const TextStyle(
-                          color: AppColors.error, fontSize: 13),
+                      style:
+                          const TextStyle(color: AppColors.error, fontSize: 13),
                     ),
                   ),
                 ],
@@ -217,19 +228,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: MockUiText.emailAddress,
-              prefixIcon: Icon(Icons.email_outlined, size: 20),
+              prefixIcon: const Icon(Icons.email_outlined, size: 20),
             ),
             validator: (v) {
               if (v == null || v.isEmpty) return MockUiText.emailIsRequired;
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                  .hasMatch(v)) {
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v)) {
                 return MockUiText.invalidEmail;
               }
               return null;
             },
-          ).animate().fadeIn(delay: 400.ms, duration: 400.ms).slideY(begin: 0.1),
+          )
+              .animate()
+              .fadeIn(delay: 400.ms, duration: 400.ms)
+              .slideY(begin: 0.1),
           const SizedBox(height: 16),
 
           // Password
@@ -256,7 +269,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               return null;
             },
             onFieldSubmitted: (_) => _login(),
-          ).animate().fadeIn(delay: 500.ms, duration: 400.ms).slideY(begin: 0.1),
+          )
+              .animate()
+              .fadeIn(delay: 500.ms, duration: 400.ms)
+              .slideY(begin: 0.1),
           const SizedBox(height: 8),
 
           Align(
@@ -281,7 +297,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             loading: _isLoading,
             icon: Icons.login,
             width: double.infinity,
-          ).animate().fadeIn(delay: 640.ms, duration: 400.ms).slideY(begin: 0.1),
+          )
+              .animate()
+              .fadeIn(delay: 640.ms, duration: 400.ms)
+              .slideY(begin: 0.1),
           const SizedBox(height: 20),
 
           Row(
@@ -354,13 +373,13 @@ class _DemoModeButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     MockUiText.tryDemoMode,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -369,7 +388,7 @@ class _DemoModeButton extends StatelessWidget {
                   ),
                   Text(
                     MockUiText.noAccountNeededExploreWithSampleData,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 11,
                     ),
@@ -385,9 +404,9 @@ class _DemoModeButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: Colors.white38),
               ),
-              child: const Text(
+              child: Text(
                 MockUiText.demo3,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
@@ -410,7 +429,11 @@ class _LeftPanel extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.primaryDark, AppColors.primary, AppColors.primaryLight],
+          colors: [
+            AppColors.primaryDark,
+            AppColors.primary,
+            AppColors.primaryLight
+          ],
         ),
       ),
       padding: const EdgeInsets.all(48),
@@ -429,24 +452,30 @@ class _LeftPanel extends StatelessWidget {
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
                 ),
-          ).animate().fadeIn(delay: 200.ms, duration: 600.ms).slideX(begin: -0.1),
+          )
+              .animate()
+              .fadeIn(delay: 200.ms, duration: 600.ms)
+              .slideX(begin: -0.1),
           const SizedBox(height: 16),
           Text(
             MockUiText.organizationalSystemBuilder,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: Colors.white.withValues(alpha: 0.85),
                 ),
-          ).animate().fadeIn(delay: 300.ms, duration: 600.ms).slideX(begin: -0.1),
+          )
+              .animate()
+              .fadeIn(delay: 300.ms, duration: 600.ms)
+              .slideX(begin: -0.1),
           const SizedBox(height: 40),
           ...[
-            (MockUiText.designComplexOrganizationalFlows, Icons.account_tree_outlined),
+            (
+              MockUiText.designComplexOrganizationalFlows,
+              Icons.account_tree_outlined
+            ),
             (MockUiText.buildFormsAndDataModels, Icons.dynamic_form_outlined),
             (MockUiText.manageRolesAndPermissions, Icons.shield_outlined),
             (MockUiText.communicateViaTickets, Icons.support_agent_outlined),
-          ]
-              .asMap()
-              .entries
-              .map(
+          ].asMap().entries.map(
                 (e) => Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: Row(
@@ -462,8 +491,8 @@ class _LeftPanel extends StatelessWidget {
                       const SizedBox(width: 12),
                       Text(
                         e.value.$1,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 14),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 14),
                       ),
                     ],
                   ).animate().fadeIn(

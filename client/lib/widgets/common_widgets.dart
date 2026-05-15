@@ -33,7 +33,6 @@ class AppPageLayout {
   }
 }
 
-
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE HEADER  –  full-width hero card with title, description, and action
 // ─────────────────────────────────────────────────────────────────────────────
@@ -72,7 +71,8 @@ class AppPageHeader extends ConsumerWidget {
     );
     final descriptionStyle = theme.textTheme.bodySmall?.copyWith(
       height: 1.5,
-      color: theme.colorScheme.onSurface.withValues(alpha: isDark ? 0.58 : 0.54),
+      color:
+          theme.colorScheme.onSurface.withValues(alpha: isDark ? 0.58 : 0.54),
     );
 
     return LayoutBuilder(
@@ -230,7 +230,8 @@ class AppPageHeader extends ConsumerWidget {
             height: 64,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primaryLight.withValues(alpha: isDark ? 0.08 : 0.05),
+              color: AppColors.primaryLight
+                  .withValues(alpha: isDark ? 0.08 : 0.05),
             ),
           ),
         ),
@@ -646,7 +647,8 @@ class _GlassButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final enabled = onPressed != null;
-    final accent = color ?? (isDark ? AppColors.primaryLight : AppColors.primary);
+    final accent =
+        color ?? (isDark ? AppColors.primaryLight : AppColors.primary);
     final foreground = outlined ? accent : Colors.white;
     final hasLeading = loading || icon != null;
 
@@ -679,7 +681,8 @@ class _GlassButton extends StatelessWidget {
                       ]
                     : [
                         accent.withValues(alpha: isDark ? 0.70 : 0.86),
-                        AppColors.accent.withValues(alpha: isDark ? 0.45 : 0.62),
+                        AppColors.accent
+                            .withValues(alpha: isDark ? 0.45 : 0.62),
                       ],
               ),
               boxShadow: [
@@ -706,7 +709,8 @@ class _GlassButton extends StatelessWidget {
                     child: Container(
                       width: 92,
                       height: 18,
-                      color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.26),
+                      color:
+                          Colors.white.withValues(alpha: isDark ? 0.10 : 0.26),
                     ),
                   ),
                 ),
@@ -718,7 +722,8 @@ class _GlassButton extends StatelessWidget {
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 46),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 13),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -799,22 +804,26 @@ class EmptyState extends ConsumerWidget {
               enabled: glassMode,
               borderRadius: BorderRadius.circular(28),
               blur: 20,
-              color: AppColors.primary.withValues(alpha: glassMode ? 0.12 : 0.0),
+              color:
+                  AppColors.primary.withValues(alpha: glassMode ? 0.12 : 0.0),
               child: Container(
                 width: 88,
                 height: 88,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.primary.withValues(alpha: glassMode ? 0.18 : 0.12),
-                      AppColors.primaryLight.withValues(alpha: glassMode ? 0.10 : 0.06),
+                      AppColors.primary
+                          .withValues(alpha: glassMode ? 0.18 : 0.12),
+                      AppColors.primaryLight
+                          .withValues(alpha: glassMode ? 0.10 : 0.06),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
-                      color: AppColors.primary.withValues(alpha: glassMode ? 0.26 : 0.18),
+                      color: AppColors.primary
+                          .withValues(alpha: glassMode ? 0.26 : 0.18),
                       width: 1.5),
                 ),
                 child: Icon(icon,
@@ -898,8 +907,7 @@ class LoadingList extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Shimmer.fromColors(
       baseColor: isDark ? AppColors.darkCard : AppColors.lightBorder,
-      highlightColor:
-          isDark ? AppColors.darkBorder : AppColors.lightSurface,
+      highlightColor: isDark ? AppColors.darkBorder : AppColors.lightSurface,
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: count,
@@ -1117,14 +1125,14 @@ class AppDivider extends ConsumerWidget {
 class ConfirmDialog extends ConsumerWidget {
   final String title;
   final String message;
-  final String confirmLabel;
+  final String? confirmLabel;
   final Color? confirmColor;
 
   const ConfirmDialog({
     super.key,
     required this.title,
     required this.message,
-    this.confirmLabel = MockUiText.delete,
+    this.confirmLabel,
     this.confirmColor,
   });
 
@@ -1147,7 +1155,7 @@ class ConfirmDialog extends ConsumerWidget {
               backgroundColor: confirmColor ?? AppColors.error,
               foregroundColor: Colors.white,
             ),
-            child: Text(confirmLabel),
+            child: Text(confirmLabel ?? MockUiText.delete),
           ),
         ],
       );
@@ -1177,7 +1185,7 @@ class ConfirmDialog extends ConsumerWidget {
                 ),
                 const SizedBox(width: 10),
                 AppButton(
-                  label: confirmLabel,
+                  label: confirmLabel ?? MockUiText.delete,
                   onPressed: () => Navigator.pop(context, true),
                   color: confirmColor ?? AppColors.error,
                 ),
@@ -1224,8 +1232,7 @@ class AvatarWidget extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(color: borderColor),
-            image:
-                DecorationImage(image: imageProvider, fit: BoxFit.cover),
+            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
           ),
         ),
         placeholder: (context, url) => _InitialsAvatar(
@@ -1300,13 +1307,13 @@ class _InitialsAvatar extends StatelessWidget {
 
 class SearchField extends StatefulWidget {
   final TextEditingController controller;
-  final String hintText;
+  final String? hintText;
   final ValueChanged<String>? onChanged;
 
   const SearchField({
     super.key,
     required this.controller,
-    this.hintText = MockUiText.searchEllipsis,
+    this.hintText,
     this.onChanged,
   });
 
@@ -1324,9 +1331,8 @@ class _SearchFieldState extends State<SearchField> {
         widget.onChanged?.call(v);
       },
       decoration: InputDecoration(
-        hintText: widget.hintText,
-        prefixIcon:
-            const Icon(Icons.search_rounded, size: 20),
+        hintText: widget.hintText ?? MockUiText.searchEllipsis,
+        prefixIcon: const Icon(Icons.search_rounded, size: 20),
         suffixIcon: widget.controller.text.isNotEmpty
             ? IconButton(
                 icon: const Icon(Icons.clear_rounded, size: 18),
@@ -1389,7 +1395,9 @@ class AppErrorWidget extends StatelessWidget {
             if (onRetry != null) ...[
               const SizedBox(height: 20),
               AppButton(
-                  label: MockUiText.retry, onPressed: onRetry, icon: Icons.refresh),
+                  label: MockUiText.retry,
+                  onPressed: onRetry,
+                  icon: Icons.refresh),
             ],
           ],
         ),

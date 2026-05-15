@@ -78,8 +78,7 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
     final filtered = _search.isEmpty
         ? flows
         : flows
-            .where(
-                (f) => f.name.toLowerCase().contains(_search.toLowerCase()))
+            .where((f) => f.name.toLowerCase().contains(_search.toLowerCase()))
             .toList();
 
     final active = flows.where((f) => f.status == 'active').length;
@@ -98,8 +97,8 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
                 // Header
                 AppPageHeader(
                   title: MockUiText.automationFlows,
-                  description:
-                      MockUiText.designReviewAndLaunchOrganizationalProcessFlowsWithClearStep,
+                  description: MockUiText
+                      .designReviewAndLaunchOrganizationalProcessFlowsWithClearStep,
                   actionLabel: MockUiText.newFlow,
                   compactActionLabel: MockUiText.newText,
                   actionIcon: Icons.add,
@@ -134,7 +133,6 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
             ),
           ),
         ),
-
         if (filtered.isEmpty)
           SliverFillRemaining(
             child: EmptyState(
@@ -162,7 +160,7 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
                   onDelete: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,
-                      builder: (_) => const ConfirmDialog(
+                      builder: (_) => ConfirmDialog(
                         title: MockUiText.deleteFlow,
                         message: MockUiText.thisWillDeleteTheFlowPermanently,
                       ),
@@ -202,25 +200,50 @@ class _FlowStatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      (Icons.account_tree_rounded, MockUiText.totalFlows, total.toString(), AppColors.primary),
-      (Icons.play_circle_rounded, MockUiText.active, active.toString(), AppColors.success),
-      (Icons.edit_note_rounded, MockUiText.draft, draft.toString(), AppColors.warning),
-      (Icons.hub_rounded, MockUiText.totalNodes, totalNodes.toString(), AppColors.accent),
+      (
+        Icons.account_tree_rounded,
+        MockUiText.totalFlows,
+        total.toString(),
+        AppColors.primary
+      ),
+      (
+        Icons.play_circle_rounded,
+        MockUiText.active,
+        active.toString(),
+        AppColors.success
+      ),
+      (
+        Icons.edit_note_rounded,
+        MockUiText.draft,
+        draft.toString(),
+        AppColors.warning
+      ),
+      (
+        Icons.hub_rounded,
+        MockUiText.totalNodes,
+        totalNodes.toString(),
+        AppColors.accent
+      ),
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
       final isWide = constraints.maxWidth > 700;
       final cards = stats
-          .map((s) => AppStatCard(icon: s.$1, label: s.$2, value: s.$3, color: s.$4))
+          .map((s) =>
+              AppStatCard(icon: s.$1, label: s.$2, value: s.$3, color: s.$4))
           .toList();
       if (isWide) {
         return Row(
-          children: cards.asMap().entries.map((e) => Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
-              child: e.value,
-            ),
-          )).toList(),
+          children: cards
+              .asMap()
+              .entries
+              .map((e) => Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+                      child: e.value,
+                    ),
+                  ))
+              .toList(),
         );
       }
       return Column(
@@ -319,7 +342,6 @@ class _FlowsChart extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-
           LayoutBuilder(builder: (context, constraints) {
             final isWide = constraints.maxWidth > 500;
             return isWide
@@ -384,9 +406,8 @@ class _FlowsChart extends StatelessWidget {
                 final idx = v.toInt();
                 if (idx >= flows.length) return const SizedBox();
                 final name = flows[idx].name;
-                final short = name.length > 10
-                    ? MockUiText.truncatedName(name)
-                    : name;
+                final short =
+                    name.length > 10 ? MockUiText.truncatedName(name) : name;
                 return Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(short,
@@ -422,8 +443,7 @@ class _FlowsChart extends StatelessWidget {
     );
   }
 
-  Widget _buildNodeTypeBreakdown(
-      Map<String, int> typeMap, ColorScheme cs) {
+  Widget _buildNodeTypeBreakdown(Map<String, int> typeMap, ColorScheme cs) {
     final nodeColors = {
       'start': AppColors.success,
       'end': AppColors.error,
@@ -440,8 +460,7 @@ class _FlowsChart extends StatelessWidget {
                 color: cs.onSurface.withValues(alpha: 0.7))),
         const SizedBox(height: 8),
         ...typeMap.entries.map((e) {
-          final color =
-              nodeColors[e.key] ?? AppColors.lightTextSecondary;
+          final color = nodeColors[e.key] ?? AppColors.lightTextSecondary;
           return Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: Row(
@@ -501,128 +520,128 @@ class _FlowCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     final steps = flow.nodes.where((n) => n.type == NodeType.step).length;
-    final decisions = flow.nodes.where((n) => n.type == NodeType.decision).length;
+    final decisions =
+        flow.nodes.where((n) => n.type == NodeType.decision).length;
 
     return AppCard(
       onTap: onEdit,
       padding: const EdgeInsets.all(18),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.account_tree_rounded,
-                      color: AppColors.primary, size: 20),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 10),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: _statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    flow.status.toUpperCase(),
-                    style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: _statusColor,
-                        letterSpacing: 0.5),
-                  ),
+                child: const Icon(Icons.account_tree_rounded,
+                    color: AppColors.primary, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: _statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                const Spacer(),
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert,
-                      size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                        value: 'edit', child: Text(MockUiText.openEditor)),
-                    PopupMenuItem(
-                        value: 'delete',
-                        child: Text(MockUiText.delete,
-                            style: TextStyle(color: AppColors.error))),
-                  ],
-                  onSelected: (v) {
-                    if (v == 'edit') onEdit();
-                    if (v == 'delete') onDelete();
-                  },
+                child: Text(
+                  flow.status.toUpperCase(),
+                  style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: _statusColor,
+                      letterSpacing: 0.5),
                 ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            Text(
-              flow.name,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w700),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-
-            if (flow.description != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                flow.description!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: cs.onSurface.withValues(alpha: 0.55),
-                    ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              ),
+              const Spacer(),
+              PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert,
+                    size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                      value: 'edit', child: Text(MockUiText.openEditor)),
+                  PopupMenuItem(
+                      value: 'delete',
+                      child: Text(MockUiText.delete,
+                          style: const TextStyle(color: AppColors.error))),
+                ],
+                onSelected: (v) {
+                  if (v == 'edit') onEdit();
+                  if (v == 'delete') onDelete();
+                },
               ),
             ],
+          ),
 
-            const Spacer(),
+          const SizedBox(height: 12),
 
-            // Flow stats chips
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                _FlowChip(
-                  icon: Icons.hub_rounded,
-                  label: MockUiText.nodesCount(flow.nodes.length),
-                  color: AppColors.primary,
-                ),
-                _FlowChip(
-                  icon: Icons.timeline_rounded,
-                  label: MockUiText.edgesCount(flow.edges.length),
-                  color: AppColors.accent,
-                ),
-                if (steps > 0)
-                  _FlowChip(
-                    icon: Icons.task_alt_rounded,
-                    label: MockUiText.stepsCount(steps),
-                    color: AppColors.success,
+          Text(
+            flow.name,
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+
+          if (flow.description != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              flow.description!,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: cs.onSurface.withValues(alpha: 0.55),
                   ),
-                if (decisions > 0)
-                  _FlowChip(
-                    icon: Icons.call_split_rounded,
-                    label: MockUiText.decisionsCount(decisions),
-                    color: AppColors.warning,
-                  ),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Icon(Icons.edit_outlined,
-                    size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
-              ],
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
-        ),
+
+          const Spacer(),
+
+          // Flow stats chips
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              _FlowChip(
+                icon: Icons.hub_rounded,
+                label: MockUiText.nodesCount(flow.nodes.length),
+                color: AppColors.primary,
+              ),
+              _FlowChip(
+                icon: Icons.timeline_rounded,
+                label: MockUiText.edgesCount(flow.edges.length),
+                color: AppColors.accent,
+              ),
+              if (steps > 0)
+                _FlowChip(
+                  icon: Icons.task_alt_rounded,
+                  label: MockUiText.stepsCount(steps),
+                  color: AppColors.success,
+                ),
+              if (decisions > 0)
+                _FlowChip(
+                  icon: Icons.call_split_rounded,
+                  label: MockUiText.decisionsCount(decisions),
+                  color: AppColors.warning,
+                ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Icon(Icons.edit_outlined,
+                  size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

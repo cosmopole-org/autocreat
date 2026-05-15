@@ -58,8 +58,7 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
     final filtered = _search.isEmpty
         ? forms
         : forms
-            .where(
-                (f) => f.name.toLowerCase().contains(_search.toLowerCase()))
+            .where((f) => f.name.toLowerCase().contains(_search.toLowerCase()))
             .toList();
 
     final active = forms.where((f) => f.status == 'active').length;
@@ -77,8 +76,8 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
                 // Header
                 AppPageHeader(
                   title: MockUiText.formDefinitions,
-                  description:
-                      MockUiText.buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif,
+                  description: MockUiText
+                      .buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif,
                   actionLabel: MockUiText.newForm,
                   compactActionLabel: MockUiText.newText,
                   actionIcon: Icons.add,
@@ -111,7 +110,6 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
             ),
           ),
         ),
-
         if (filtered.isEmpty)
           SliverFillRemaining(
             child: EmptyState(
@@ -139,7 +137,7 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
                   onDelete: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,
-                      builder: (_) => const ConfirmDialog(
+                      builder: (_) => ConfirmDialog(
                         title: MockUiText.deleteForm,
                         message: MockUiText.thisWillDeleteTheFormPermanently,
                       ),
@@ -179,25 +177,50 @@ class _FormsStatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      (Icons.dynamic_form_rounded, MockUiText.totalForms, total.toString(), AppColors.accent),
-      (Icons.check_circle_rounded, MockUiText.active, active.toString(), AppColors.success),
-      (Icons.edit_note_rounded, MockUiText.draft, draft.toString(), AppColors.warning),
-      (Icons.list_alt_rounded, MockUiText.totalFields, totalFields.toString(), AppColors.primary),
+      (
+        Icons.dynamic_form_rounded,
+        MockUiText.totalForms,
+        total.toString(),
+        AppColors.accent
+      ),
+      (
+        Icons.check_circle_rounded,
+        MockUiText.active,
+        active.toString(),
+        AppColors.success
+      ),
+      (
+        Icons.edit_note_rounded,
+        MockUiText.draft,
+        draft.toString(),
+        AppColors.warning
+      ),
+      (
+        Icons.list_alt_rounded,
+        MockUiText.totalFields,
+        totalFields.toString(),
+        AppColors.primary
+      ),
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
       final isWide = constraints.maxWidth > 700;
       final cards = stats
-          .map((s) => AppStatCard(icon: s.$1, label: s.$2, value: s.$3, color: s.$4))
+          .map((s) =>
+              AppStatCard(icon: s.$1, label: s.$2, value: s.$3, color: s.$4))
           .toList();
       if (isWide) {
         return Row(
-          children: cards.asMap().entries.map((e) => Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
-              child: e.value,
-            ),
-          )).toList(),
+          children: cards
+              .asMap()
+              .entries
+              .map((e) => Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+                      child: e.value,
+                    ),
+                  ))
+              .toList(),
         );
       }
       return Column(
@@ -264,8 +287,7 @@ class _FieldTypeChart extends StatelessWidget {
           if (top.isEmpty)
             Center(
               child: Text(MockUiText.noFieldsDefined,
-                  style:
-                      TextStyle(color: cs.onSurface.withValues(alpha: 0.4))),
+                  style: TextStyle(color: cs.onSurface.withValues(alpha: 0.4))),
             )
           else
             SizedBox(
@@ -369,141 +391,140 @@ class _FormCard extends StatelessWidget {
       onTap: onEdit,
       padding: const EdgeInsets.all(18),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.accent.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.dynamic_form_rounded,
-                      color: AppColors.accent, size: 20),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 10),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: _statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    form.status.toUpperCase(),
-                    style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: _statusColor,
-                        letterSpacing: 0.5),
-                  ),
+                child: const Icon(Icons.dynamic_form_rounded,
+                    color: AppColors.accent, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: _statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                const Spacer(),
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert,
-                      size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                        value: 'edit', child: Text(MockUiText.openEditor)),
-                    PopupMenuItem(
-                        value: 'delete',
-                        child: Text(MockUiText.delete,
-                            style: TextStyle(color: AppColors.error))),
-                  ],
-                  onSelected: (v) {
-                    if (v == 'edit') onEdit();
-                    if (v == 'delete') onDelete();
-                  },
+                child: Text(
+                  form.status.toUpperCase(),
+                  style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: _statusColor,
+                      letterSpacing: 0.5),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            Text(
-              form.name,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w700),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-
-            if (form.description != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                form.description!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: cs.onSurface.withValues(alpha: 0.55),
-                    ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              ),
+              const Spacer(),
+              PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert,
+                    size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                      value: 'edit', child: Text(MockUiText.openEditor)),
+                  PopupMenuItem(
+                      value: 'delete',
+                      child: Text(MockUiText.delete,
+                          style: const TextStyle(color: AppColors.error))),
+                ],
+                onSelected: (v) {
+                  if (v == 'edit') onEdit();
+                  if (v == 'delete') onDelete();
+                },
               ),
             ],
+          ),
+          const SizedBox(height: 12),
 
-            const Spacer(),
+          Text(
+            form.name,
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
 
-            // Field type mini tags
-            if (form.fields.isNotEmpty) ...[
-              Wrap(
-                spacing: 4,
-                runSpacing: 4,
-                children: form.fields
-                    .take(3)
-                    .map((f) => Container(
+          if (form.description != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              form.description!,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: cs.onSurface.withValues(alpha: 0.55),
+                  ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+
+          const Spacer(),
+
+          // Field type mini tags
+          if (form.fields.isNotEmpty) ...[
+            Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: form.fields
+                  .take(3)
+                  .map((f) => Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: cs.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          f.type.name,
+                          style: TextStyle(
+                              fontSize: 9,
+                              color: cs.onSurface.withValues(alpha: 0.6)),
+                        ),
+                      ))
+                  .toList()
+                ..addAll(form.fields.length > 3
+                    ? [
+                        Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: cs.surfaceContainerHighest,
+                            color: AppColors.primarySurface,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            f.type.name,
-                            style: TextStyle(
-                                fontSize: 9,
-                                color: cs.onSurface.withValues(alpha: 0.6)),
+                            MockUiText.moreCount(form.fields.length - 3),
+                            style: const TextStyle(
+                                fontSize: 9, color: AppColors.primary),
                           ),
-                        ))
-                    .toList()
-                  ..addAll(form.fields.length > 3
-                      ? [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: AppColors.primarySurface,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              MockUiText.moreCount(form.fields.length - 3),
-                              style: const TextStyle(
-                                  fontSize: 9, color: AppColors.primary),
-                            ),
-                          )
-                        ]
-                      : []),
-              ),
-              const SizedBox(height: 8),
-            ],
-
-            Row(
-              children: [
-                Icon(Icons.list_alt_rounded,
-                    size: 13, color: cs.onSurface.withValues(alpha: 0.4)),
-                const SizedBox(width: 4),
-                Text(
-                  MockUiText.fieldCount(form.fields.length),
-                  style: TextStyle(
-                      fontSize: 11, color: cs.onSurface.withValues(alpha: 0.55)),
-                ),
-                const Spacer(),
-                Icon(Icons.edit_outlined,
-                    size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
-              ],
+                        )
+                      ]
+                    : []),
             ),
+            const SizedBox(height: 8),
           ],
-        ),
+
+          Row(
+            children: [
+              Icon(Icons.list_alt_rounded,
+                  size: 13, color: cs.onSurface.withValues(alpha: 0.4)),
+              const SizedBox(width: 4),
+              Text(
+                MockUiText.fieldCount(form.fields.length),
+                style: TextStyle(
+                    fontSize: 11, color: cs.onSurface.withValues(alpha: 0.55)),
+              ),
+              const Spacer(),
+              Icon(Icons.edit_outlined,
+                  size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -46,15 +46,12 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
     final filtered = _search.isEmpty
         ? roles
         : roles
-            .where(
-                (r) => r.name.toLowerCase().contains(_search.toLowerCase()))
+            .where((r) => r.name.toLowerCase().contains(_search.toLowerCase()))
             .toList();
 
     final active = roles.where((r) => r.isActive).length;
-    final totalMembers =
-        roles.fold<int>(0, (s, r) => s + r.memberCount);
-    final totalPerms =
-        roles.fold<int>(0, (s, r) => s + r.permissions.length);
+    final totalMembers = roles.fold<int>(0, (s, r) => s + r.memberCount);
+    final totalPerms = roles.fold<int>(0, (s, r) => s + r.permissions.length);
 
     return CustomScrollView(
       slivers: [
@@ -67,8 +64,8 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                 // Header
                 AppPageHeader(
                   title: MockUiText.rolesPermissions,
-                  description:
-                      MockUiText.shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery,
+                  description: MockUiText
+                      .shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery,
                   actionLabel: MockUiText.newRole,
                   compactActionLabel: MockUiText.newText,
                   actionIcon: Icons.add,
@@ -87,7 +84,9 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
 
                 // Members per role chart
                 if (roles.isNotEmpty)
-                  _MembersBarChart(roles: roles).animate().fadeIn(delay: 200.ms),
+                  _MembersBarChart(roles: roles)
+                      .animate()
+                      .fadeIn(delay: 200.ms),
                 if (roles.isNotEmpty) const SizedBox(height: 20),
 
                 // Search
@@ -101,7 +100,6 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
             ),
           ),
         ),
-
         if (filtered.isEmpty)
           SliverFillRemaining(
             child: EmptyState(
@@ -125,7 +123,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                     onDelete: () async {
                       final confirmed = await showDialog<bool>(
                         context: context,
-                        builder: (_) => const ConfirmDialog(
+                        builder: (_) => ConfirmDialog(
                           title: MockUiText.deleteRole,
                           message: MockUiText.deleteThisRolePermanently,
                         ),
@@ -136,7 +134,9 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                             .delete(filtered[i].id);
                       }
                     },
-                  ).animate().fadeIn(delay: Duration(milliseconds: 60 + i * 50)),
+                  )
+                      .animate()
+                      .fadeIn(delay: Duration(milliseconds: 60 + i * 50)),
                 ),
                 childCount: filtered.length,
               ),
@@ -165,10 +165,30 @@ class _RoleStatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      (Icons.shield_rounded, MockUiText.totalRoles, total.toString(), AppColors.success),
-      (Icons.check_circle_rounded, MockUiText.active, active.toString(), AppColors.primary),
-      (Icons.people_rounded, MockUiText.totalMembers, totalMembers.toString(), AppColors.accent),
-      (Icons.lock_rounded, MockUiText.permissionSets, totalPerms.toString(), AppColors.warning),
+      (
+        Icons.shield_rounded,
+        MockUiText.totalRoles,
+        total.toString(),
+        AppColors.success
+      ),
+      (
+        Icons.check_circle_rounded,
+        MockUiText.active,
+        active.toString(),
+        AppColors.primary
+      ),
+      (
+        Icons.people_rounded,
+        MockUiText.totalMembers,
+        totalMembers.toString(),
+        AppColors.accent
+      ),
+      (
+        Icons.lock_rounded,
+        MockUiText.permissionSets,
+        totalPerms.toString(),
+        AppColors.warning
+      ),
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
@@ -186,7 +206,8 @@ class _RoleStatsRow extends StatelessWidget {
         itemCount: stats.length,
         itemBuilder: (context, i) {
           final (icon, label, value, color) = stats[i];
-          return AppStatCard(icon: icon, label: label, value: value, color: color);
+          return AppStatCard(
+              icon: icon, label: label, value: value, color: color);
         },
       );
     });
@@ -332,193 +353,188 @@ class _RoleCard extends StatelessWidget {
     final lvlColor = _levelColor(role.level);
 
     // Permission summary
-    final canCreate =
-        role.permissions.where((p) => p.canCreate).length;
+    final canCreate = role.permissions.where((p) => p.canCreate).length;
 
     return AppCard(
       onTap: onEdit,
       padding: const EdgeInsets.all(18),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top row
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(Icons.shield_rounded,
-                      color: AppColors.success, size: 22),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top row
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.success.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              role.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                child: const Icon(Icons.shield_rounded,
+                    color: AppColors.success, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            role.name,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: lvlColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(6),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: lvlColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            role.level.toUpperCase(),
+                            style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                                color: lvlColor,
+                                letterSpacing: 0.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (role.description != null)
+                      Text(
+                        role.description!,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: cs.onSurface.withValues(alpha: 0.55),
                             ),
-                            child: Text(
-                              role.level.toUpperCase(),
-                              style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w700,
-                                  color: lvlColor,
-                                  letterSpacing: 0.5),
-                            ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
+              ),
+              PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert,
+                    size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
+                itemBuilder: (_) => [
+                  PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
+                  PopupMenuItem(
+                      value: 'delete',
+                      child: Text(MockUiText.delete,
+                          style: const TextStyle(color: AppColors.error))),
+                ],
+                onSelected: (v) {
+                  if (v == 'edit') onEdit();
+                  if (v == 'delete') onDelete();
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 14),
+
+          // Permission summary row
+          Row(
+            children: [
+              _PermBadge(
+                icon: Icons.people_rounded,
+                label: MockUiText.membersCount(role.memberCount),
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 8),
+              _PermBadge(
+                icon: Icons.lock_open_rounded,
+                label: MockUiText.resourcesCount(role.permissions.length),
+                color: AppColors.accent,
+              ),
+              const SizedBox(width: 8),
+              _PermBadge(
+                icon: Icons.add_circle_outline,
+                label: MockUiText.canCreateCount(canCreate),
+                color: AppColors.success,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Resource chips
+          Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            children: role.permissions
+                .take(4)
+                .map((p) => Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 7, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: cs.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            p.canCreate && p.canDelete
+                                ? Icons.edit_rounded
+                                : Icons.visibility_rounded,
+                            size: 9,
+                            color: p.canCreate
+                                ? AppColors.success
+                                : AppColors.lightTextSecondary,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            p.resource,
+                            style: TextStyle(
+                                fontSize: 10,
+                                color: cs.onSurface.withValues(alpha: 0.65)),
                           ),
                         ],
                       ),
-                      if (role.description != null)
-                        Text(
-                          role.description!,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                color: cs.onSurface.withValues(alpha: 0.55),
-                              ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    ],
-                  ),
-                ),
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert,
-                      size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
-                  itemBuilder: (_) => [
-                    PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
-                    PopupMenuItem(
-                        value: 'delete',
-                        child: Text(MockUiText.delete,
-                            style: TextStyle(color: AppColors.error))),
-                  ],
-                  onSelected: (v) {
-                    if (v == 'edit') onEdit();
-                    if (v == 'delete') onDelete();
-                  },
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 14),
-
-            // Permission summary row
-            Row(
-              children: [
-                _PermBadge(
-                  icon: Icons.people_rounded,
-                  label: MockUiText.membersCount(role.memberCount),
-                  color: AppColors.primary,
-                ),
-                const SizedBox(width: 8),
-                _PermBadge(
-                  icon: Icons.lock_open_rounded,
-                  label: MockUiText.resourcesCount(role.permissions.length),
-                  color: AppColors.accent,
-                ),
-                const SizedBox(width: 8),
-                _PermBadge(
-                  icon: Icons.add_circle_outline,
-                  label: MockUiText.canCreateCount(canCreate),
-                  color: AppColors.success,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            // Resource chips
-            Wrap(
-              spacing: 5,
-              runSpacing: 5,
-              children: role.permissions
-                  .take(4)
-                  .map((p) => Container(
+                    ))
+                .toList()
+              ..addAll(role.permissions.length > 4
+                  ? [
+                      Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 7, vertical: 3),
                         decoration: BoxDecoration(
-                          color: cs.surfaceContainerHighest,
+                          color: AppColors.primarySurface,
                           borderRadius: BorderRadius.circular(5),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              p.canCreate && p.canDelete
-                                  ? Icons.edit_rounded
-                                  : Icons.visibility_rounded,
-                              size: 9,
-                              color: p.canCreate
-                                  ? AppColors.success
-                                  : AppColors.lightTextSecondary,
-                            ),
-                            const SizedBox(width: 3),
-                            Text(
-                              p.resource,
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  color: cs.onSurface.withValues(alpha: 0.65)),
-                            ),
-                          ],
+                        child: Text(
+                          MockUiText.moreCount(role.permissions.length - 4),
+                          style: const TextStyle(
+                              fontSize: 10, color: AppColors.primary),
                         ),
-                      ))
-                  .toList()
-                ..addAll(role.permissions.length > 4
-                    ? [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 7, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AppColors.primarySurface,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Text(
-                            MockUiText.moreCount(role.permissions.length - 4),
-                            style: const TextStyle(
-                                fontSize: 10, color: AppColors.primary),
-                          ),
-                        )
-                      ]
-                    : []),
-            ),
+                      )
+                    ]
+                  : []),
+          ),
 
-            const SizedBox(height: 10),
+          const SizedBox(height: 10),
 
-            // Status
-            Row(
-              children: [
-                StatusChip(
-                    status: role.isActive ? 'active' : 'inactive'),
-                const Spacer(),
-                Icon(Icons.edit_outlined,
-                    size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
-              ],
-            ),
-          ],
-        ),
+          // Status
+          Row(
+            children: [
+              StatusChip(status: role.isActive ? 'active' : 'inactive'),
+              const Spacer(),
+              Icon(Icons.edit_outlined,
+                  size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

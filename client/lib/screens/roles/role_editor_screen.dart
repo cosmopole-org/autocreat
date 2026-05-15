@@ -30,8 +30,14 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
   Role? _role;
 
   static const _resources = [
-    'companies', 'flows', 'forms', 'models',
-    'roles', 'users', 'letters', 'tickets',
+    'companies',
+    'flows',
+    'forms',
+    'models',
+    'roles',
+    'users',
+    'letters',
+    'tickets',
   ];
 
   @override
@@ -63,9 +69,8 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
     try {
       final data = {
         'name': _nameController.text,
-        'description': _descController.text.isNotEmpty
-            ? _descController.text
-            : null,
+        'description':
+            _descController.text.isNotEmpty ? _descController.text : null,
         'level': _level,
         'isActive': _isActive,
         'permissions': _permissions.map((p) => p.toJson()).toList(),
@@ -80,7 +85,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
       if (mounted) {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
               content: Text(MockUiText.roleSaved),
               backgroundColor: AppColors.success),
         );
@@ -89,7 +94,8 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.error(e)), backgroundColor: AppColors.error),
+              content: Text(MockUiText.error(e)),
+              backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -158,8 +164,8 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _nameController,
-                      decoration:
-                          InputDecoration(labelText: MockUiText.roleNameRequired),
+                      decoration: InputDecoration(
+                          labelText: MockUiText.roleNameRequired),
                       validator: (v) =>
                           v?.isEmpty ?? true ? MockUiText.nameIsRequired : null,
                     ),
@@ -173,7 +179,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
                       value: _level,
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                             value: 'owner', child: Text(MockUiText.owner)),
                         DropdownMenuItem(
@@ -186,8 +192,8 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                             value: 'viewer', child: Text(MockUiText.viewer)),
                       ],
                       onChanged: (v) => setState(() => _level = v!),
-                      decoration: const InputDecoration(
-                          labelText: MockUiText.accessLevel),
+                      decoration:
+                          InputDecoration(labelText: MockUiText.accessLevel),
                     ),
                     const SizedBox(height: 12),
                     SwitchListTile(
@@ -236,8 +242,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
-                                ?.copyWith(
-                                    color: AppColors.lightTextSecondary),
+                                ?.copyWith(color: AppColors.lightTextSecondary),
                           ),
                         ],
                       ),
@@ -259,8 +264,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                           style: Theme.of(context).textTheme.titleMedium),
                     ),
                     Padding(
-                      padding:
-                          const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                       child: Text(
                         MockUiText.configureCrudPermissionsPerResource,
                         style: Theme.of(context).textTheme.bodySmall,
@@ -275,7 +279,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                         dataRowHeight: 52,
                         headingTextStyle: const TextStyle(
                             fontWeight: FontWeight.w700, fontSize: 12),
-                        columns: const [
+                        columns: [
                           DataColumn2(
                               label: Text(MockUiText.resource),
                               size: ColumnSize.L),
@@ -327,8 +331,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                                 child: Checkbox(
                                   value: perm.canRead,
                                   onChanged: (v) => setState(() {
-                                    final updated =
-                                        perm.copyWith(canRead: v!);
+                                    final updated = perm.copyWith(canRead: v!);
                                     if (permIdx >= 0) {
                                       _permissions[permIdx] = updated;
                                     } else {

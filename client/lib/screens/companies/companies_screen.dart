@@ -49,8 +49,8 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                 padding: AppPageLayout.contentPadding(context, horizontal: 20),
                 child: AppPageHeader(
                   title: MockUiText.companies,
-                  description:
-                      MockUiText.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK,
+                  description: MockUiText
+                      .organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK,
                   actionLabel: MockUiText.newCompany,
                   compactActionLabel: MockUiText.newText,
                   actionIcon: Icons.add,
@@ -77,14 +77,15 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: AppPageLayout.contentPadding(context, horizontal: 20),
+                  padding:
+                      AppPageLayout.contentPadding(context, horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppPageHeader(
                         title: MockUiText.companies,
-                        description:
-                            MockUiText.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK,
+                        description: MockUiText
+                            .organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK,
                         actionLabel: MockUiText.newCompany,
                         compactActionLabel: MockUiText.newText,
                         actionIcon: Icons.add,
@@ -108,14 +109,18 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
               if (filtered.isEmpty)
                 SliverFillRemaining(
                   child: EmptyState(
-                    title: _search.isEmpty ? MockUiText.noCompaniesYet : MockUiText.noResultsFound,
+                    title: _search.isEmpty
+                        ? MockUiText.noCompaniesYet
+                        : MockUiText.noResultsFound,
                     subtitle: _search.isEmpty
                         ? MockUiText.createYourFirstCompanyToGetStarted
                         : null,
                     icon: Icons.business_outlined,
-                    actionLabel: _search.isEmpty ? MockUiText.createCompany : null,
-                    onAction:
-                        _search.isEmpty ? () => _showCreateDialog(context) : null,
+                    actionLabel:
+                        _search.isEmpty ? MockUiText.createCompany : null,
+                    onAction: _search.isEmpty
+                        ? () => _showCreateDialog(context)
+                        : null,
                   ),
                 )
               else
@@ -141,10 +146,10 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                         onDelete: () async {
                           final confirmed = await showDialog<bool>(
                             context: context,
-                            builder: (_) => const ConfirmDialog(
+                            builder: (_) => ConfirmDialog(
                               title: MockUiText.deleteCompany,
-                              message:
-                                  MockUiText.areYouSureYouWantToDeleteThisCompany,
+                              message: MockUiText
+                                  .areYouSureYouWantToDeleteThisCompany,
                             ),
                           );
                           if (confirmed == true) {
@@ -307,7 +312,7 @@ class _CompanyCard extends StatelessWidget {
                   PopupMenuItem(
                       value: 'delete',
                       child: Text(MockUiText.delete,
-                          style: TextStyle(color: AppColors.error))),
+                          style: const TextStyle(color: AppColors.error))),
                 ],
                 onSelected: (v) {
                   if (v == 'edit') onEdit();
@@ -321,13 +326,10 @@ class _CompanyCard extends StatelessWidget {
             children: [
               StatusChip(status: company.status),
               const Spacer(),
-              _InfoChip(
-                  icon: Icons.people,
-                  label: '${company.memberCount}'),
+              _InfoChip(icon: Icons.people, label: '${company.memberCount}'),
               const SizedBox(width: 8),
               _InfoChip(
-                  icon: Icons.account_tree,
-                  label: '${company.flowCount}'),
+                  icon: Icons.account_tree, label: '${company.flowCount}'),
             ],
           ),
         ],
@@ -375,8 +377,7 @@ class _CompanyDialogState extends State<_CompanyDialog> {
   @override
   void initState() {
     super.initState();
-    _nameController =
-        TextEditingController(text: widget.company?.name ?? '');
+    _nameController = TextEditingController(text: widget.company?.name ?? '');
     _descController =
         TextEditingController(text: widget.company?.description ?? '');
     _industryController =
@@ -397,8 +398,9 @@ class _CompanyDialogState extends State<_CompanyDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title:
-          Text(widget.company == null ? MockUiText.newCompany : MockUiText.editCompany),
+      title: Text(widget.company == null
+          ? MockUiText.newCompany
+          : MockUiText.editCompany),
       content: SizedBox(
         width: 400,
         child: Form(
@@ -408,7 +410,8 @@ class _CompanyDialogState extends State<_CompanyDialog> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: MockUiText.companyNameRequired),
+                decoration:
+                    InputDecoration(labelText: MockUiText.companyNameRequired),
                 validator: (v) =>
                     v?.isEmpty ?? true ? MockUiText.nameIsRequired : null,
               ),

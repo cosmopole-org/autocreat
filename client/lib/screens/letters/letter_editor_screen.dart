@@ -14,8 +14,7 @@ class LetterEditorScreen extends ConsumerStatefulWidget {
   const LetterEditorScreen({super.key, required this.letterId});
 
   @override
-  ConsumerState<LetterEditorScreen> createState() =>
-      _LetterEditorScreenState();
+  ConsumerState<LetterEditorScreen> createState() => _LetterEditorScreenState();
 }
 
 class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
@@ -67,9 +66,8 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
 
       final data = {
         'name': _nameController.text,
-        'description': _descController.text.isNotEmpty
-            ? _descController.text
-            : null,
+        'description':
+            _descController.text.isNotEmpty ? _descController.text : null,
         'content': plainText,
         MockUiText.deltacontent: {'ops': delta.toJson()},
         'status': 'draft',
@@ -86,7 +84,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
               content: Text(MockUiText.templateSaved),
               backgroundColor: AppColors.success),
         );
@@ -95,7 +93,8 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.error(e)), backgroundColor: AppColors.error),
+              content: Text(MockUiText.error(e)),
+              backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -140,7 +139,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
         ),
         title: TextField(
           controller: _nameController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: MockUiText.templateName,
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
@@ -208,16 +207,13 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
           // Attachments strip
           if (_attachments.isNotEmpty)
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color:
-                    isDark ? AppColors.darkCard : AppColors.primarySurface,
+                color: isDark ? AppColors.darkCard : AppColors.primarySurface,
                 border: Border(
                   bottom: BorderSide(
-                    color: isDark
-                        ? AppColors.darkBorder
-                        : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                   ),
                 ),
               ),
@@ -248,7 +244,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                       onPressed: _pickAttachment,
                       icon: const Icon(Icons.add, size: 14),
                       label: Text(MockUiText.addMore,
-                          style: TextStyle(fontSize: 11)),
+                          style: const TextStyle(fontSize: 11)),
                       style: TextButton.styleFrom(
                         minimumSize: Size.zero,
                         padding: const EdgeInsets.symmetric(
@@ -273,7 +269,8 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                     color: isDark ? AppColors.darkCard : Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                      color:
+                          isDark ? AppColors.darkBorder : AppColors.lightBorder,
                     ),
                   ),
                   padding: const EdgeInsets.all(32),
@@ -281,7 +278,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                     controller: _quillController,
                     focusNode: _focusNode,
                     scrollController: _scrollController,
-                    configurations: const QuillEditorConfigurations(
+                    configurations: QuillEditorConfigurations(
                       placeholder: MockUiText.startWritingYourLetterTemplate,
                       padding: EdgeInsets.zero,
                       autoFocus: false,
@@ -308,8 +305,9 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                MockUiText.useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV,
+              Text(
+                MockUiText
+                    .useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV,
               ),
               const SizedBox(height: 16),
               ...[

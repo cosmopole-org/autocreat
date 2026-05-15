@@ -21,8 +21,7 @@ class TicketDetailScreen extends ConsumerStatefulWidget {
   const TicketDetailScreen({super.key, required this.ticketId});
 
   @override
-  ConsumerState<TicketDetailScreen> createState() =>
-      _TicketDetailScreenState();
+  ConsumerState<TicketDetailScreen> createState() => _TicketDetailScreenState();
 }
 
 class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
@@ -60,7 +59,8 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     try {
       final repo = ref.read(ticketRepositoryProvider);
       final attachments = _attachmentName != null ? [_attachmentName!] : null;
-      await repo.sendMessage(ticket.id, content.isNotEmpty ? content : MockUiText.attachment, attachments);
+      await repo.sendMessage(ticket.id,
+          content.isNotEmpty ? content : MockUiText.attachment, attachments);
       _messageController.clear();
       setState(() => _attachmentName = null);
       ref.invalidate(ticketDetailProvider(ticket.id));
@@ -129,8 +129,8 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
             icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Text(ticket.title,
-              maxLines: 1, overflow: TextOverflow.ellipsis),
+          title:
+              Text(ticket.title, maxLines: 1, overflow: TextOverflow.ellipsis),
           actions: [
             DropdownButton<TicketStatus>(
               value: ticket.status,
@@ -163,18 +163,17 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                 children: [
                   Expanded(
                     child: ticket.messages.isEmpty
-                        ? const Center(
+                        ? Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.chat_bubble_outline,
+                                const Icon(Icons.chat_bubble_outline,
                                     size: 48,
                                     color: AppColors.lightTextSecondary),
-                                SizedBox(height: 12),
+                                const SizedBox(height: 12),
                                 Text(MockUiText.noMessagesYet,
-                                    style: TextStyle(
-                                        color:
-                                            AppColors.lightTextSecondary)),
+                                    style: const TextStyle(
+                                        color: AppColors.lightTextSecondary)),
                               ],
                             ),
                           )
@@ -186,8 +185,9 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                               message: ticket.messages[i],
                               isOwn: ticket.messages[i].senderId ==
                                   currentUser?.id,
-                            ).animate().fadeIn(
-                                delay: Duration(milliseconds: i * 30)),
+                            )
+                                .animate()
+                                .fadeIn(delay: Duration(milliseconds: i * 30)),
                           ),
                   ),
 
@@ -228,8 +228,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                     decoration: BoxDecoration(
                       border: Border(
                         top: BorderSide(
-                          color: Theme.of(context).brightness ==
-                                  Brightness.dark
+                          color: Theme.of(context).brightness == Brightness.dark
                               ? AppColors.darkBorder
                               : AppColors.lightBorder,
                         ),
@@ -250,9 +249,9 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                         Expanded(
                           child: TextField(
                             controller: _messageController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: MockUiText.typeAMessage,
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                             ),
                             maxLines: 3,
                             minLines: 1,
@@ -263,16 +262,14 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                         SizedBox(
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: _sending
-                                ? null
-                                : () => _sendMessage(ticket),
+                            onPressed:
+                                _sending ? null : () => _sendMessage(ticket),
                             child: _sending
                                 ? const SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white),
+                                        strokeWidth: 2, color: Colors.white),
                                   )
                                 : const Icon(Icons.send),
                           ),
@@ -378,11 +375,11 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                       child: Row(
                         children: [
                           Icon(Icons.flag_outlined,
-                              color: _priorityColor(ticket.priority),
-                              size: 16),
+                              color: _priorityColor(ticket.priority), size: 16),
                           const SizedBox(width: 8),
                           Text(
-                            MockUiText.priorityLabel(ticket.priority.displayName),
+                            MockUiText.priorityLabel(
+                                ticket.priority.displayName),
                             style: TextStyle(
                                 color: _priorityColor(ticket.priority),
                                 fontWeight: FontWeight.w600,
@@ -400,9 +397,8 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                         spacing: 4,
                         runSpacing: 4,
                         children: ticket.tags
-                            .map((t) => Chip(
-                                label: Text(t),
-                                padding: EdgeInsets.zero))
+                            .map((t) =>
+                                Chip(label: Text(t), padding: EdgeInsets.zero))
                             .toList(),
                       ),
                     ],
@@ -435,10 +431,10 @@ class _MessageBubble extends StatelessWidget {
         children: [
           if (!isOwn) ...[
             AvatarWidget(
-              initials: message.senderName != null &&
-                      message.senderName!.isNotEmpty
-                  ? message.senderName![0]
-                  : '?',
+              initials:
+                  message.senderName != null && message.senderName!.isNotEmpty
+                      ? message.senderName![0]
+                      : '?',
               size: 32,
               imageUrl: message.senderAvatar,
             ),
@@ -446,9 +442,8 @@ class _MessageBubble extends StatelessWidget {
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment: isOwn
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  isOwn ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 if (!isOwn && message.senderName != null)
                   Padding(
@@ -466,9 +461,7 @@ class _MessageBubble extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isOwn
                               ? AppColors.primary.withValues(alpha: 0.8)
-                              : (isDark
-                                  ? AppColors.darkCard
-                                  : Colors.white),
+                              : (isDark ? AppColors.darkCard : Colors.white),
                           borderRadius: BorderRadius.circular(8),
                           border: isOwn
                               ? null
@@ -482,25 +475,23 @@ class _MessageBubble extends StatelessWidget {
                           children: [
                             Icon(Icons.attach_file,
                                 size: 14,
-                                color: isOwn
-                                    ? Colors.white
-                                    : AppColors.primary),
+                                color:
+                                    isOwn ? Colors.white : AppColors.primary),
                             const SizedBox(width: 6),
                             Text(
                               a,
                               style: TextStyle(
                                   fontSize: 12,
-                                  color: isOwn
-                                      ? Colors.white
-                                      : AppColors.primary),
+                                  color:
+                                      isOwn ? Colors.white : AppColors.primary),
                             ),
                           ],
                         ),
                       )),
                 ],
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
                     color: isOwn
                         ? AppColors.primary
@@ -524,9 +515,7 @@ class _MessageBubble extends StatelessWidget {
                     style: TextStyle(
                       color: isOwn
                           ? Colors.white
-                          : (isDark
-                              ? AppColors.darkText
-                              : AppColors.lightText),
+                          : (isDark ? AppColors.darkText : AppColors.lightText),
                       fontSize: 14,
                     ),
                   ),
@@ -545,10 +534,10 @@ class _MessageBubble extends StatelessWidget {
           if (isOwn) ...[
             const SizedBox(width: 8),
             AvatarWidget(
-              initials: message.senderName != null &&
-                      message.senderName!.isNotEmpty
-                  ? message.senderName![0]
-                  : '?',
+              initials:
+                  message.senderName != null && message.senderName!.isNotEmpty
+                      ? message.senderName![0]
+                      : '?',
               size: 32,
               imageUrl: message.senderAvatar,
             ),

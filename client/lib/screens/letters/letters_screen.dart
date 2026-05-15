@@ -55,7 +55,10 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
   }
 
   Widget _buildContent(BuildContext context, List<LetterTemplate> letters) {
-    final categories = letters.map((l) => l.category ?? MockUiText.uncategorized).toSet().toList();
+    final categories = letters
+        .map((l) => l.category ?? MockUiText.uncategorized)
+        .toSet()
+        .toList();
     final filtered = letters.where((l) {
       final matchesSearch = _search.isEmpty ||
           l.name.toLowerCase().contains(_search.toLowerCase());
@@ -82,8 +85,8 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                       // Header
                       AppPageHeader(
                         title: MockUiText.letterTemplates,
-                        description:
-                            MockUiText.manageReusableLetterTemplatesWithDynamicVariablesReadyToSend,
+                        description: MockUiText
+                            .manageReusableLetterTemplatesWithDynamicVariablesReadyToSend,
                         actionLabel: MockUiText.newTemplate,
                         compactActionLabel: MockUiText.newText,
                         actionIcon: Icons.add,
@@ -122,7 +125,8 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                             _CategoryDropdown(
                               categories: categories,
                               selected: _categoryFilter,
-                              onChanged: (v) => setState(() => _categoryFilter = v),
+                              onChanged: (v) =>
+                                  setState(() => _categoryFilter = v),
                             ),
                           ],
                         ],
@@ -132,7 +136,6 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                   ),
                 ),
               ),
-
               if (filtered.isEmpty)
                 SliverFillRemaining(
                   child: EmptyState(
@@ -147,7 +150,8 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                   sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 360,
                       mainAxisExtent: 210,
                       crossAxisSpacing: 14,
@@ -156,13 +160,15 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (context, i) => _LetterCard(
                         letter: filtered[i],
-                        onEdit: () => context.push('/letters/${filtered[i].id}/edit'),
+                        onEdit: () =>
+                            context.push('/letters/${filtered[i].id}/edit'),
                         onDelete: () async {
                           final confirmed = await showDialog<bool>(
                             context: context,
-                            builder: (_) => const ConfirmDialog(
+                            builder: (_) => ConfirmDialog(
                               title: MockUiText.deleteTemplate,
-                              message: MockUiText.deleteThisLetterTemplatePermanently,
+                              message: MockUiText
+                                  .deleteThisLetterTemplatePermanently,
                             ),
                           );
                           if (confirmed == true) {
@@ -171,7 +177,9 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                                 .delete(filtered[i].id);
                           }
                         },
-                      ).animate().fadeIn(delay: Duration(milliseconds: 60 + i * 50)),
+                      )
+                          .animate()
+                          .fadeIn(delay: Duration(milliseconds: 60 + i * 50)),
                       childCount: filtered.length,
                     ),
                   ),
@@ -202,25 +210,50 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      (Icons.mail_rounded, MockUiText.totalTemplates, total.toString(), AppColors.primary),
-      (Icons.check_circle_rounded, MockUiText.active, active.toString(), AppColors.success),
-      (Icons.edit_note_rounded, MockUiText.draft, draft.toString(), AppColors.warning),
-      (Icons.code_rounded, MockUiText.totalVariables, totalVars.toString(), AppColors.accent),
+      (
+        Icons.mail_rounded,
+        MockUiText.totalTemplates,
+        total.toString(),
+        AppColors.primary
+      ),
+      (
+        Icons.check_circle_rounded,
+        MockUiText.active,
+        active.toString(),
+        AppColors.success
+      ),
+      (
+        Icons.edit_note_rounded,
+        MockUiText.draft,
+        draft.toString(),
+        AppColors.warning
+      ),
+      (
+        Icons.code_rounded,
+        MockUiText.totalVariables,
+        totalVars.toString(),
+        AppColors.accent
+      ),
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
       final isWide = constraints.maxWidth > 700;
       final cards = stats
-          .map((s) => AppStatCard(icon: s.$1, label: s.$2, value: s.$3, color: s.$4))
+          .map((s) =>
+              AppStatCard(icon: s.$1, label: s.$2, value: s.$3, color: s.$4))
           .toList();
       if (isWide) {
         return Row(
-          children: cards.asMap().entries.map((e) => Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
-              child: e.value,
-            ),
-          )).toList(),
+          children: cards
+              .asMap()
+              .entries
+              .map((e) => Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+                      child: e.value,
+                    ),
+                  ))
+              .toList(),
         );
       }
       return Column(
@@ -286,7 +319,8 @@ class _CategoryChart extends StatelessWidget {
               ),
               // Variable usage indicator
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -297,7 +331,10 @@ class _CategoryChart extends StatelessWidget {
                     const Icon(Icons.code, size: 12, color: AppColors.primary),
                     const SizedBox(width: 4),
                     Text(
-                      MockUiText.avgVars((letters.fold<int>(0, (s, l) => s + l.variables.length) / (letters.isEmpty ? 1 : letters.length)).toStringAsFixed(1)),
+                      MockUiText.avgVars((letters.fold<int>(
+                                  0, (s, l) => s + l.variables.length) /
+                              (letters.isEmpty ? 1 : letters.length))
+                          .toStringAsFixed(1)),
                       style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.primary,
@@ -357,14 +394,15 @@ class _CategoryChart extends StatelessWidget {
     );
   }
 
-  Widget _buildLegend(
-      List<MapEntry<String, int>> cats, List<Color> colors, BuildContext context) {
+  Widget _buildLegend(List<MapEntry<String, int>> cats, List<Color> colors,
+      BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: cats.asMap().entries.map((e) {
         final color = colors[e.key % colors.length];
-        final pct = (e.value.value / cats.fold<int>(0, (s, c) => s + c.value) * 100)
-            .toStringAsFixed(0);
+        final pct =
+            (e.value.value / cats.fold<int>(0, (s, c) => s + c.value) * 100)
+                .toStringAsFixed(0);
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
@@ -382,9 +420,7 @@ class _CategoryChart extends StatelessWidget {
               ),
               Text(MockUiText.distributionLegend(e.value.value, pct),
                   style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: color)),
+                      fontSize: 12, fontWeight: FontWeight.w700, color: color)),
             ],
           ),
         );
@@ -420,10 +456,10 @@ class _CategoryDropdown extends StatelessWidget {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String?>(
           value: selected,
-          hint: Text(MockUiText.allCategories, style: TextStyle(fontSize: 13)),
+          hint: Text(MockUiText.allCategories, style: const TextStyle(fontSize: 13)),
           style: TextStyle(fontSize: 13, color: cs.onSurface),
           items: [
-            const DropdownMenuItem<String?>(
+            DropdownMenuItem<String?>(
               value: null,
               child: Text(MockUiText.allCategories),
             ),
@@ -472,131 +508,131 @@ class _LetterCard extends StatelessWidget {
       onTap: onEdit,
       padding: const EdgeInsets.all(18),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top row: icon + status + menu
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.warning.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.mail_rounded,
-                      color: AppColors.warning, size: 20),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top row: icon + status + menu
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 10),
+                child: const Icon(Icons.mail_rounded,
+                    color: AppColors.warning, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: _statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  letter.status.toUpperCase(),
+                  style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: _statusColor,
+                      letterSpacing: 0.5),
+                ),
+              ),
+              const Spacer(),
+              PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert,
+                    size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
+                itemBuilder: (_) => [
+                  PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
+                  PopupMenuItem(
+                      value: 'delete',
+                      child: Text(MockUiText.delete,
+                          style: const TextStyle(color: AppColors.error))),
+                ],
+                onSelected: (v) {
+                  if (v == 'edit') onEdit();
+                  if (v == 'delete') onDelete();
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Name
+          Text(
+            letter.name,
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+
+          // Description
+          if (letter.description != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              letter.description!,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: cs.onSurface.withValues(alpha: 0.55),
+                  ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+
+          const Spacer(),
+
+          // Footer: category + variable count
+          Row(
+            children: [
+              if (letter.category != null) ...[
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: _statusColor.withValues(alpha: 0.1),
+                    color: AppColors.primarySurface,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    letter.status.toUpperCase(),
-                    style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: _statusColor,
-                        letterSpacing: 0.5),
+                    letter.category!,
+                    style: const TextStyle(
+                        fontSize: 10,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500),
                   ),
                 ),
-                const Spacer(),
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert,
-                      size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
-                  itemBuilder: (_) => [
-                    PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
-                    PopupMenuItem(
-                        value: 'delete',
-                        child: Text(MockUiText.delete,
-                            style: TextStyle(color: AppColors.error))),
-                  ],
-                  onSelected: (v) {
-                    if (v == 'edit') onEdit();
-                    if (v == 'delete') onDelete();
-                  },
-                ),
+                const SizedBox(width: 6),
               ],
-            ),
-            const SizedBox(height: 12),
-
-            // Name
-            Text(
-              letter.name,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w700),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-
-            // Description
-            if (letter.description != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                letter.description!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: cs.onSurface.withValues(alpha: 0.55),
-                    ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-
-            const Spacer(),
-
-            // Footer: category + variable count
-            Row(
-              children: [
-                if (letter.category != null) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: AppColors.primarySurface,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      letter.category!,
-                      style: const TextStyle(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: cs.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.code,
+                        size: 10, color: cs.onSurface.withValues(alpha: 0.5)),
+                    const SizedBox(width: 3),
+                    Text(
+                      MockUiText.varsCount(letter.variables.length),
+                      style: TextStyle(
                           fontSize: 10,
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w500),
+                          color: cs.onSurface.withValues(alpha: 0.6)),
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                ],
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: cs.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.code, size: 10,
-                          color: cs.onSurface.withValues(alpha: 0.5)),
-                      const SizedBox(width: 3),
-                      Text(
-                        MockUiText.varsCount(letter.variables.length),
-                        style: TextStyle(
-                            fontSize: 10,
-                            color: cs.onSurface.withValues(alpha: 0.6)),
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
-                const Spacer(),
-                Icon(Icons.edit_outlined,
-                    size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
-              ],
-            ),
-          ],
-        ),
+              ),
+              const Spacer(),
+              Icon(Icons.edit_outlined,
+                  size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

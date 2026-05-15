@@ -119,8 +119,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                 onPressed: widget.onDelete,
                 tooltip: MockUiText.deleteNode,
                 style: IconButton.styleFrom(
-                  backgroundColor:
-                      AppColors.error.withValues(alpha: 0.07),
+                  backgroundColor: AppColors.error.withValues(alpha: 0.07),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),
@@ -135,9 +134,9 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 6),
         TextFormField(
           controller: _labelController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: MockUiText.enterLabelEllipsis,
-            prefixIcon: Icon(Icons.label_outline_rounded, size: 18),
+            prefixIcon: const Icon(Icons.label_outline_rounded, size: 18),
           ),
           onChanged: (v) => widget.onUpdate(node.copyWith(label: v)),
         ),
@@ -148,13 +147,12 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 6),
         TextFormField(
           controller: _descController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: MockUiText.optionalDescriptionEllipsis,
-            prefixIcon: Icon(Icons.notes_rounded, size: 18),
+            prefixIcon: const Icon(Icons.notes_rounded, size: 18),
           ),
           maxLines: 2,
-          onChanged: (v) =>
-              widget.onUpdate(node.copyWith(description: v)),
+          onChanged: (v) => widget.onUpdate(node.copyWith(description: v)),
         ),
         const SizedBox(height: 16),
 
@@ -162,25 +160,20 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         _FieldLabel(MockUiText.assignedRole),
         const SizedBox(height: 6),
         rolesAsync.when(
-          loading: () =>
-              const LinearProgressIndicator(minHeight: 2),
-          error: (_, __) =>
-              _ErrorTile(MockUiText.errorLoadingRoles),
+          loading: () => const LinearProgressIndicator(minHeight: 2),
+          error: (_, __) => _ErrorTile(MockUiText.errorLoadingRoles),
           data: (roles) => DropdownButtonFormField<String?>(
             value: node.assignedRoleId,
             items: [
-              const DropdownMenuItem(
-                  value: null,
-                  child: Text(MockUiText.noRoleAssigned)),
-              ...roles.map((r) => DropdownMenuItem(
-                  value: r.id, child: Text(r.name))),
+              DropdownMenuItem(
+                  value: null, child: Text(MockUiText.noRoleAssigned)),
+              ...roles.map(
+                  (r) => DropdownMenuItem(value: r.id, child: Text(r.name))),
             ],
-            onChanged: (v) =>
-                widget.onUpdate(node.copyWith(assignedRoleId: v)),
-            decoration: const InputDecoration(
+            onChanged: (v) => widget.onUpdate(node.copyWith(assignedRoleId: v)),
+            decoration: InputDecoration(
               hintText: MockUiText.selectRoleEllipsis,
-              prefixIcon:
-                  Icon(Icons.shield_outlined, size: 18),
+              prefixIcon: const Icon(Icons.shield_outlined, size: 18),
             ),
           ),
         ),
@@ -190,25 +183,20 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         _FieldLabel(MockUiText.assignedForm),
         const SizedBox(height: 6),
         formsAsync.when(
-          loading: () =>
-              const LinearProgressIndicator(minHeight: 2),
-          error: (_, __) =>
-              _ErrorTile(MockUiText.errorLoadingForms),
+          loading: () => const LinearProgressIndicator(minHeight: 2),
+          error: (_, __) => _ErrorTile(MockUiText.errorLoadingForms),
           data: (forms) => DropdownButtonFormField<String?>(
             value: node.assignedFormId,
             items: [
-              const DropdownMenuItem(
-                  value: null,
-                  child: Text(MockUiText.noFormAssigned)),
-              ...forms.map((f) => DropdownMenuItem(
-                  value: f.id, child: Text(f.name))),
+              DropdownMenuItem(
+                  value: null, child: Text(MockUiText.noFormAssigned)),
+              ...forms.map(
+                  (f) => DropdownMenuItem(value: f.id, child: Text(f.name))),
             ],
-            onChanged: (v) =>
-                widget.onUpdate(node.copyWith(assignedFormId: v)),
-            decoration: const InputDecoration(
+            onChanged: (v) => widget.onUpdate(node.copyWith(assignedFormId: v)),
+            decoration: InputDecoration(
               hintText: MockUiText.selectFormEllipsis,
-              prefixIcon:
-                  Icon(Icons.dynamic_form_outlined, size: 18),
+              prefixIcon: const Icon(Icons.dynamic_form_outlined, size: 18),
             ),
           ),
         ),
@@ -266,8 +254,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: AppColors.primary
-                                .withValues(alpha: 0.6),
+                            color: AppColors.primary.withValues(alpha: 0.6),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -276,8 +263,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                           child: Text(
                             branch.label,
                             style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13),
+                                fontWeight: FontWeight.w600, fontSize: 13),
                           ),
                         ),
                         if (branch.isDefault)
@@ -285,12 +271,11 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: AppColors.success
-                                  .withValues(alpha: 0.12),
+                              color: AppColors.success.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(MockUiText.defaultText,
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 9,
                                     color: AppColors.success,
                                     fontWeight: FontWeight.w700)),
@@ -299,17 +284,15 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                         GestureDetector(
                           onTap: () {
                             final newBranches =
-                                List<BranchCondition>.from(
-                                    node.branches)
+                                List<BranchCondition>.from(node.branches)
                                   ..removeAt(e.key);
-                            widget.onUpdate(node.copyWith(
-                                branches: newBranches));
+                            widget
+                                .onUpdate(node.copyWith(branches: newBranches));
                           },
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: AppColors.error
-                                  .withValues(alpha: 0.1),
+                              color: AppColors.error.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Icon(
@@ -329,18 +312,14 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 10),
-                        fillColor: isDark
-                            ? AppColors.darkCard
-                            : Colors.white,
+                        fillColor: isDark ? AppColors.darkCard : Colors.white,
                       ),
                       style: const TextStyle(fontSize: 12),
                       onChanged: (v) {
                         final newBranches =
                             List<BranchCondition>.from(node.branches);
-                        newBranches[e.key] =
-                            branch.copyWith(condition: v);
-                        widget.onUpdate(
-                            node.copyWith(branches: newBranches));
+                        newBranches[e.key] = branch.copyWith(condition: v);
+                        widget.onUpdate(node.copyWith(branches: newBranches));
                       },
                     ),
                   ],
@@ -361,9 +340,8 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
           children: [
             Icon(Icons.location_on_outlined,
                 size: 13,
-                color: isDark
-                    ? AppColors.darkTextHint
-                    : AppColors.lightTextHint),
+                color:
+                    isDark ? AppColors.darkTextHint : AppColors.lightTextHint),
             const SizedBox(width: 5),
             Text(MockUiText.position,
                 style: Theme.of(context).textTheme.labelSmall),
@@ -415,9 +393,8 @@ class _FieldLabel extends StatelessWidget {
       style: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w600,
-        color: isDark
-            ? AppColors.darkTextSecondary
-            : AppColors.lightTextSecondary,
+        color:
+            isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
         letterSpacing: 0.1,
       ),
     );
@@ -442,8 +419,7 @@ class _ErrorTile extends StatelessWidget {
               size: 16, color: AppColors.error),
           const SizedBox(width: 8),
           Text(message,
-              style: const TextStyle(
-                  color: AppColors.error, fontSize: 12)),
+              style: const TextStyle(color: AppColors.error, fontSize: 12)),
         ],
       ),
     );

@@ -15,7 +15,8 @@ extension AppLanguageX on AppLanguage {
       };
 
   Locale get locale => Locale(code);
-  TextDirection get textDirection => this == AppLanguage.persian ? TextDirection.rtl : TextDirection.ltr;
+  TextDirection get textDirection =>
+      this == AppLanguage.persian ? TextDirection.rtl : TextDirection.ltr;
   String get nativeLabel => switch (this) {
         AppLanguage.english => 'English',
         AppLanguage.persian => 'فارسی',
@@ -25,7 +26,8 @@ extension AppLanguageX on AppLanguage {
         AppLanguage.persian => 'فا',
       };
 
-  static AppLanguage fromCode(String? code) => code == 'fa' ? AppLanguage.persian : AppLanguage.english;
+  static AppLanguage fromCode(String? code) =>
+      code == 'fa' ? AppLanguage.persian : AppLanguage.english;
 }
 
 enum _UiTextKey {
@@ -469,13 +471,17 @@ class MockUiText {
     _language = language;
   }
 
-  static String _text(_UiTextKey key) => (_language == AppLanguage.persian ? _persian : _english)[key] ?? _english[key] ?? key.name;
+  static String _text(_UiTextKey key) =>
+      (_language == AppLanguage.persian ? _persian : _english)[key] ??
+      _english[key] ??
+      key.name;
 
   static const Map<_UiTextKey, String> _english = {
     _UiTextKey.exception: "Exception: ",
     _UiTextKey.autocreat: "AutoCreat",
     _UiTextKey.createYourAccount: "Create your account",
-    _UiTextKey.startBuildingYourOrganizationalSystem: "Start building your organizational system",
+    _UiTextKey.startBuildingYourOrganizationalSystem:
+        "Start building your organizational system",
     _UiTextKey.firstName: "First name",
     _UiTextKey.requiredText: "Required",
     _UiTextKey.lastName: "Last name",
@@ -495,7 +501,8 @@ class MockUiText {
     _UiTextKey.demo: "Demo",
     _UiTextKey.admin: "Admin",
     _UiTextKey.welcomeBack: "Welcome back",
-    _UiTextKey.signInToYourOrganizationAccount: "Sign in to your organization account",
+    _UiTextKey.signInToYourOrganizationAccount:
+        "Sign in to your organization account",
     _UiTextKey.passwordTooShort: "Password too short",
     _UiTextKey.forgotPassword: "Forgot password?",
     _UiTextKey.signIn3: "Sign In",
@@ -503,9 +510,11 @@ class MockUiText {
     _UiTextKey.createAccount3: "Create account",
     _UiTextKey.demo3: "DEMO",
     _UiTextKey.tryDemoMode: "Try Demo Mode",
-    _UiTextKey.noAccountNeededExploreWithSampleData: "No account needed — explore with sample data",
+    _UiTextKey.noAccountNeededExploreWithSampleData:
+        "No account needed — explore with sample data",
     _UiTextKey.organizationalSystemBuilder: "Organizational System Builder",
-    _UiTextKey.designComplexOrganizationalFlows: "Design complex organizational flows",
+    _UiTextKey.designComplexOrganizationalFlows:
+        "Design complex organizational flows",
     _UiTextKey.buildFormsAndDataModels: "Build forms and data models",
     _UiTextKey.manageRolesAndPermissions: "Manage roles and permissions",
     _UiTextKey.communicateViaTickets: "Communicate via tickets",
@@ -534,19 +543,23 @@ class MockUiText {
     _UiTextKey.deleteNode: "Delete node",
     _UiTextKey.close: "Close",
     _UiTextKey.startBuildingYourFlow: "Start building your flow",
-    _UiTextKey.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft: "Tap here to add a Start node,\nor use the toolbar on the left.",
+    _UiTextKey.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft:
+        "Tap here to add a Start node,\nor use the toolbar on the left.",
     _UiTextKey.newFlow: "New Flow",
     _UiTextKey.start: "Start",
     _UiTextKey.end: "End",
     _UiTextKey.automationFlows: "Automation Flows",
-    _UiTextKey.designReviewAndLaunchOrganizationalProcessFlowsWithClearStep: "Design, review, and launch organizational process flows with clear steps, connected decisions, and measurable outcomes.",
+    _UiTextKey.designReviewAndLaunchOrganizationalProcessFlowsWithClearStep:
+        "Design, review, and launch organizational process flows with clear steps, connected decisions, and measurable outcomes.",
     _UiTextKey.newText: "New",
     _UiTextKey.searchFlows: "Search flows...",
     _UiTextKey.noFlowsYet: "No flows yet",
-    _UiTextKey.createYourFirstOrganizationalFlow: "Create your first organizational flow",
+    _UiTextKey.createYourFirstOrganizationalFlow:
+        "Create your first organizational flow",
     _UiTextKey.createFlow: "Create Flow",
     _UiTextKey.deleteFlow: "Delete Flow",
-    _UiTextKey.thisWillDeleteTheFlowPermanently: "This will delete the flow permanently.",
+    _UiTextKey.thisWillDeleteTheFlowPermanently:
+        "This will delete the flow permanently.",
     _UiTextKey.totalFlows: "Total Flows",
     _UiTextKey.active: "Active",
     _UiTextKey.draft: "Draft",
@@ -581,15 +594,18 @@ class MockUiText {
     _UiTextKey.created: "Created",
     _UiTextKey.text: ".",
     _UiTextKey.companies: "Companies",
-    _UiTextKey.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK: "Organize client and partner workspaces, monitor portfolio health, and keep each organization easy to find and manage.",
+    _UiTextKey.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK:
+        "Organize client and partner workspaces, monitor portfolio health, and keep each organization easy to find and manage.",
     _UiTextKey.newCompany: "New Company",
     _UiTextKey.searchCompanies: "Search companies...",
     _UiTextKey.noCompaniesYet: "No companies yet",
     _UiTextKey.noResultsFound: "No results found",
-    _UiTextKey.createYourFirstCompanyToGetStarted: "Create your first company to get started",
+    _UiTextKey.createYourFirstCompanyToGetStarted:
+        "Create your first company to get started",
     _UiTextKey.createCompany: "Create Company",
     _UiTextKey.deleteCompany: "Delete Company",
-    _UiTextKey.areYouSureYouWantToDeleteThisCompany: "Are you sure you want to delete this company?",
+    _UiTextKey.areYouSureYouWantToDeleteThisCompany:
+        "Are you sure you want to delete this company?",
     _UiTextKey.edit: "Edit",
     _UiTextKey.editCompany: "Edit Company",
     _UiTextKey.companyNameRequired: "Company name *",
@@ -610,17 +626,21 @@ class MockUiText {
     _UiTextKey.add: "Add",
     _UiTextKey.newForm: "New Form",
     _UiTextKey.formDefinitions: "Form Definitions",
-    _UiTextKey.buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif: "Build structured forms that capture reliable data, guide users beautifully, and feed your workflows without friction.",
+    _UiTextKey.buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif:
+        "Build structured forms that capture reliable data, guide users beautifully, and feed your workflows without friction.",
     _UiTextKey.searchForms: "Search forms...",
     _UiTextKey.noFormsYet: "No forms yet",
-    _UiTextKey.createYourFirstFormDefinition: "Create your first form definition",
+    _UiTextKey.createYourFirstFormDefinition:
+        "Create your first form definition",
     _UiTextKey.createForm: "Create Form",
     _UiTextKey.deleteForm: "Delete Form",
-    _UiTextKey.thisWillDeleteTheFormPermanently: "This will delete the form permanently.",
+    _UiTextKey.thisWillDeleteTheFormPermanently:
+        "This will delete the form permanently.",
     _UiTextKey.totalForms: "Total Forms",
     _UiTextKey.totalFields: "Total Fields",
     _UiTextKey.fieldTypesDistribution: "Field Types Distribution",
-    _UiTextKey.countOfEachFieldTypeAcrossAllForms: "Count of each field type across all forms",
+    _UiTextKey.countOfEachFieldTypeAcrossAllForms:
+        "Count of each field type across all forms",
     _UiTextKey.noFieldsDefined: "No fields defined",
     _UiTextKey.userSaved: "User saved",
     _UiTextKey.newUser: "New User",
@@ -633,7 +653,8 @@ class MockUiText {
     _UiTextKey.emailRequired: "Email *",
     _UiTextKey.phone: "Phone",
     _UiTextKey.passwordRequired: "Password *",
-    _UiTextKey.newPasswordLeaveBlankToKeep: "New password (leave blank to keep)",
+    _UiTextKey.newPasswordLeaveBlankToKeep:
+        "New password (leave blank to keep)",
     _UiTextKey.access: "Access",
     _UiTextKey.noRole: "No role",
     _UiTextKey.assignedRole3: "Assigned role",
@@ -641,11 +662,13 @@ class MockUiText {
     _UiTextKey.inactiveUsersCannotLogIn: "Inactive users cannot log in",
     _UiTextKey.all: "All",
     _UiTextKey.teamMembers: "Team Members",
-    _UiTextKey.inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol: "Invite teammates, understand account activity, and balance roles so collaboration stays organized and secure.",
+    _UiTextKey.inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol:
+        "Invite teammates, understand account activity, and balance roles so collaboration stays organized and secure.",
     _UiTextKey.addUser: "Add User",
     _UiTextKey.searchMembers: "Search members...",
     _UiTextKey.noMembersFound: "No members found",
-    _UiTextKey.tryAdjustingYourSearchOrFilters: "Try adjusting your search or filters",
+    _UiTextKey.tryAdjustingYourSearchOrFilters:
+        "Try adjusting your search or filters",
     _UiTextKey.removeUser: "Remove User",
     _UiTextKey.removeThisUserFromTheSystem: "Remove this user from the system?",
     _UiTextKey.totalMembers: "Total Members",
@@ -668,29 +691,34 @@ class MockUiText {
     _UiTextKey.accessLevel: "Access level",
     _UiTextKey.permissionCoverage: "Permission Coverage",
     _UiTextKey.permissions: "Permissions",
-    _UiTextKey.configureCrudPermissionsPerResource: "Configure CRUD permissions per resource",
+    _UiTextKey.configureCrudPermissionsPerResource:
+        "Configure CRUD permissions per resource",
     _UiTextKey.resource: "Resource",
     _UiTextKey.create: "Create",
     _UiTextKey.read: "Read",
     _UiTextKey.update: "Update",
     _UiTextKey.rolesPermissions: "Roles & Permissions",
-    _UiTextKey.shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery: "Shape secure access policies, clarify responsibilities, and give every teammate exactly the permissions they need.",
+    _UiTextKey.shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery:
+        "Shape secure access policies, clarify responsibilities, and give every teammate exactly the permissions they need.",
     _UiTextKey.searchRoles: "Search roles...",
     _UiTextKey.noRolesYet: "No roles yet",
-    _UiTextKey.createRolesToManageAccessControl: "Create roles to manage access control",
+    _UiTextKey.createRolesToManageAccessControl:
+        "Create roles to manage access control",
     _UiTextKey.createRole: "Create Role",
     _UiTextKey.deleteRole: "Delete Role",
     _UiTextKey.deleteThisRolePermanently: "Delete this role permanently?",
     _UiTextKey.totalRoles: "Total Roles",
     _UiTextKey.permissionSets: "Permission Sets",
     _UiTextKey.membersPerRole: "Members per Role",
-    _UiTextKey.howManyUsersAreAssignedToEachRole: "How many users are assigned to each role",
+    _UiTextKey.howManyUsersAreAssignedToEachRole:
+        "How many users are assigned to each role",
     _UiTextKey.open: "Open",
     _UiTextKey.inProgress: "In Progress",
     _UiTextKey.resolved: "Resolved",
     _UiTextKey.closed: "Closed",
     _UiTextKey.supportTickets: "Support Tickets",
-    _UiTextKey.trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut: "Track customer requests, prioritize urgent work, and keep every resolution moving from one polished command center.",
+    _UiTextKey.trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut:
+        "Track customer requests, prioritize urgent work, and keep every resolution moving from one polished command center.",
     _UiTextKey.newTicket: "New Ticket",
     _UiTextKey.searchTickets: "Search tickets...",
     _UiTextKey.noTicketsFound: "No tickets found",
@@ -728,9 +756,11 @@ class MockUiText {
     _UiTextKey.attach: "Attach",
     _UiTextKey.variables: "Variables",
     _UiTextKey.addMore: "Add more",
-    _UiTextKey.startWritingYourLetterTemplate: "Start writing your letter template...",
+    _UiTextKey.startWritingYourLetterTemplate:
+        "Start writing your letter template...",
     _UiTextKey.availableVariables: "Available Variables",
-    _UiTextKey.useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV: "Use these variables in your template. They will be replaced with actual values when the letter is generated.",
+    _UiTextKey.useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV:
+        "Use these variables in your template. They will be replaced with actual values when the letter is generated.",
     _UiTextKey.userSFullName: "User's full name",
     _UiTextKey.userSEmail: "User's email",
     _UiTextKey.companyName: "Company name",
@@ -739,14 +769,17 @@ class MockUiText {
     _UiTextKey.newLetterTemplate: "New Letter Template",
     _UiTextKey.uncategorized: "Uncategorized",
     _UiTextKey.letterTemplates: "Letter Templates",
-    _UiTextKey.manageReusableLetterTemplatesWithDynamicVariablesReadyToSend: "Manage reusable letter templates with dynamic variables, ready-to-send language, and consistent branded communication.",
+    _UiTextKey.manageReusableLetterTemplatesWithDynamicVariablesReadyToSend:
+        "Manage reusable letter templates with dynamic variables, ready-to-send language, and consistent branded communication.",
     _UiTextKey.newTemplate: "New Template",
     _UiTextKey.searchTemplates: "Search templates...",
     _UiTextKey.noLetterTemplates: "No letter templates",
-    _UiTextKey.createReusableLetterTemplates: "Create reusable letter templates",
+    _UiTextKey.createReusableLetterTemplates:
+        "Create reusable letter templates",
     _UiTextKey.createTemplate: "Create Template",
     _UiTextKey.deleteTemplate: "Delete Template",
-    _UiTextKey.deleteThisLetterTemplatePermanently: "Delete this letter template permanently?",
+    _UiTextKey.deleteThisLetterTemplatePermanently:
+        "Delete this letter template permanently?",
     _UiTextKey.totalTemplates: "Total Templates",
     _UiTextKey.totalVariables: "Total Variables",
     _UiTextKey.templatesByCategory: "Templates by Category",
@@ -774,7 +807,8 @@ class MockUiText {
     _UiTextKey.oct: "Oct",
     _UiTextKey.nov: "Nov",
     _UiTextKey.dec: "Dec",
-    _UiTextKey.hereSWhatSHappeningInYourOrganizationToday: "Here's what's happening in your organization today.",
+    _UiTextKey.hereSWhatSHappeningInYourOrganizationToday:
+        "Here's what's happening in your organization today.",
     _UiTextKey.activeOrganizations: "Active organizations",
     _UiTextKey.activeFlows: "Active Flows",
     _UiTextKey.automationPipelines: "Automation pipelines",
@@ -800,7 +834,8 @@ class MockUiText {
     _UiTextKey.modelInfo: "Model Info",
     _UiTextKey.modelNameRequired: "Model name *",
     _UiTextKey.addField: "Add Field",
-    _UiTextKey.noFieldsYetAddYourFirstField: "No fields yet. Add your first field.",
+    _UiTextKey.noFieldsYetAddYourFirstField:
+        "No fields yet. Add your first field.",
     _UiTextKey.jsonSchemaPreview: "JSON Schema Preview",
     _UiTextKey.text3: " : ",
     _UiTextKey.unique: " · Unique",
@@ -809,7 +844,8 @@ class MockUiText {
     _UiTextKey.fieldType: "Field type",
     _UiTextKey.newModel: "New Model",
     _UiTextKey.dataModels: "Data Models",
-    _UiTextKey.defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation: "Define durable entity schemas, organize fields, and keep your operational data consistent across every product surface.",
+    _UiTextKey.defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation:
+        "Define durable entity schemas, organize fields, and keep your operational data consistent across every product surface.",
     _UiTextKey.searchModels: "Search models...",
     _UiTextKey.noModelsYet: "No models yet",
     _UiTextKey.defineYourDataStructures: "Define your data structures",
@@ -818,7 +854,8 @@ class MockUiText {
     _UiTextKey.deleteThisModelPermanently: "Delete this model permanently?",
     _UiTextKey.totalModels: "Total Models",
     _UiTextKey.fieldTypeDistribution: "Field Type Distribution",
-    _UiTextKey.breakdownOfFieldTypesAcrossAllModels: "Breakdown of field types across all models",
+    _UiTextKey.breakdownOfFieldTypesAcrossAllModels:
+        "Breakdown of field types across all models",
     _UiTextKey.editLabel: "Edit label",
     _UiTextKey.deleteEdge: "Delete edge",
     _UiTextKey.yes: "Yes",
@@ -901,7 +938,8 @@ class MockUiText {
     _UiTextKey.exception: "استثنا: ",
     _UiTextKey.autocreat: "اتوکریت",
     _UiTextKey.createYourAccount: "ایجاد حساب کاربری",
-    _UiTextKey.startBuildingYourOrganizationalSystem: "ساخت سیستم سازمانی خود را شروع کنید",
+    _UiTextKey.startBuildingYourOrganizationalSystem:
+        "ساخت سیستم سازمانی خود را شروع کنید",
     _UiTextKey.firstName: "نام",
     _UiTextKey.requiredText: "الزامی",
     _UiTextKey.lastName: "نام خانوادگی",
@@ -929,9 +967,11 @@ class MockUiText {
     _UiTextKey.createAccount3: "ایجاد حساب",
     _UiTextKey.demo3: "نمایشی",
     _UiTextKey.tryDemoMode: "ورود به حالت نمایشی",
-    _UiTextKey.noAccountNeededExploreWithSampleData: "بدون نیاز به حساب — با داده‌های نمونه کاوش کنید",
+    _UiTextKey.noAccountNeededExploreWithSampleData:
+        "بدون نیاز به حساب — با داده‌های نمونه کاوش کنید",
     _UiTextKey.organizationalSystemBuilder: "سازنده سیستم سازمانی",
-    _UiTextKey.designComplexOrganizationalFlows: "طراحی جریان‌های سازمانی پیچیده",
+    _UiTextKey.designComplexOrganizationalFlows:
+        "طراحی جریان‌های سازمانی پیچیده",
     _UiTextKey.buildFormsAndDataModels: "ساخت فرم‌ها و مدل‌های داده",
     _UiTextKey.manageRolesAndPermissions: "مدیریت نقش‌ها و مجوزها",
     _UiTextKey.communicateViaTickets: "ارتباط از طریق تیکت‌ها",
@@ -960,19 +1000,22 @@ class MockUiText {
     _UiTextKey.deleteNode: "حذف گره",
     _UiTextKey.close: "بستن",
     _UiTextKey.startBuildingYourFlow: "شروع ساخت خود جریان",
-    _UiTextKey.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft: "tap Here To افزودن A شروع گره Nor Use The Toolbar On The Left",
+    _UiTextKey.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft:
+        "tap Here To افزودن A شروع گره Nor Use The Toolbar On The Left",
     _UiTextKey.newFlow: "جدید جریان",
     _UiTextKey.start: "شروع",
     _UiTextKey.end: "end",
     _UiTextKey.automationFlows: "اتوماسیون جریان‌ها",
-    _UiTextKey.designReviewAndLaunchOrganizationalProcessFlowsWithClearStep: "design Review And Launch سازمانی Process جریان‌ها With Clear Step",
+    _UiTextKey.designReviewAndLaunchOrganizationalProcessFlowsWithClearStep:
+        "design Review And Launch سازمانی Process جریان‌ها With Clear Step",
     _UiTextKey.newText: "جدید",
     _UiTextKey.searchFlows: "جستجو جریان‌ها",
     _UiTextKey.noFlowsYet: "بدون جریان‌ها Yet",
     _UiTextKey.createYourFirstOrganizationalFlow: "ایجاد خود نام سازمانی جریان",
     _UiTextKey.createFlow: "ایجاد جریان",
     _UiTextKey.deleteFlow: "حذف جریان",
-    _UiTextKey.thisWillDeleteTheFlowPermanently: "this Will حذف The جریان Permanently",
+    _UiTextKey.thisWillDeleteTheFlowPermanently:
+        "this Will حذف The جریان Permanently",
     _UiTextKey.totalFlows: "کل جریان‌ها",
     _UiTextKey.active: "فعال",
     _UiTextKey.draft: "پیش‌نویس",
@@ -1007,15 +1050,18 @@ class MockUiText {
     _UiTextKey.created: "created",
     _UiTextKey.text: ".",
     _UiTextKey.companies: "شرکت‌ها",
-    _UiTextKey.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK: "organize Client And Partner Workspaces Monitor Portfolio Health And K",
+    _UiTextKey.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK:
+        "organize Client And Partner Workspaces Monitor Portfolio Health And K",
     _UiTextKey.newCompany: "شرکت جدید",
     _UiTextKey.searchCompanies: "جستجو Companies",
     _UiTextKey.noCompaniesYet: "بدون Companies Yet",
     _UiTextKey.noResultsFound: "بدون Results Found",
-    _UiTextKey.createYourFirstCompanyToGetStarted: "ایجاد خود نام شرکت To Get Started",
+    _UiTextKey.createYourFirstCompanyToGetStarted:
+        "ایجاد خود نام شرکت To Get Started",
     _UiTextKey.createCompany: "ایجاد شرکت",
     _UiTextKey.deleteCompany: "حذف شرکت",
-    _UiTextKey.areYouSureYouWantToDeleteThisCompany: "are You Sure You Want To حذف This شرکت",
+    _UiTextKey.areYouSureYouWantToDeleteThisCompany:
+        "are You Sure You Want To حذف This شرکت",
     _UiTextKey.edit: "ویرایش",
     _UiTextKey.editCompany: "ویرایش شرکت",
     _UiTextKey.companyNameRequired: "شرکت نام الزامی",
@@ -1036,17 +1082,20 @@ class MockUiText {
     _UiTextKey.add: "افزودن",
     _UiTextKey.newForm: "فرم جدید",
     _UiTextKey.formDefinitions: "فرم Definitions",
-    _UiTextKey.buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif: "build Structured فرم‌ها That Capture Reliable داده Guide کاربران Beautif",
+    _UiTextKey.buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif:
+        "build Structured فرم‌ها That Capture Reliable داده Guide کاربران Beautif",
     _UiTextKey.searchForms: "جستجو فرم‌ها",
     _UiTextKey.noFormsYet: "بدون فرم‌ها Yet",
     _UiTextKey.createYourFirstFormDefinition: "ایجاد خود نام فرم Definition",
     _UiTextKey.createForm: "ایجاد فرم",
     _UiTextKey.deleteForm: "حذف فرم",
-    _UiTextKey.thisWillDeleteTheFormPermanently: "this Will حذف The فرم Permanently",
+    _UiTextKey.thisWillDeleteTheFormPermanently:
+        "this Will حذف The فرم Permanently",
     _UiTextKey.totalForms: "کل فرم‌ها",
     _UiTextKey.totalFields: "کل فیلدها",
     _UiTextKey.fieldTypesDistribution: "فیلد انواع توزیع",
-    _UiTextKey.countOfEachFieldTypeAcrossAllForms: "count Of Each فیلد نوع Across همه فرم‌ها",
+    _UiTextKey.countOfEachFieldTypeAcrossAllForms:
+        "count Of Each فیلد نوع Across همه فرم‌ها",
     _UiTextKey.noFieldsDefined: "بدون فیلدها Defined",
     _UiTextKey.userSaved: "کاربر ذخیره شد",
     _UiTextKey.newUser: "کاربر جدید",
@@ -1067,11 +1116,13 @@ class MockUiText {
     _UiTextKey.inactiveUsersCannotLogIn: "inactive کاربران Cannot Log In",
     _UiTextKey.all: "همه",
     _UiTextKey.teamMembers: "team اعضا",
-    _UiTextKey.inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol: "invite Teammates Understand حساب فعالیت And Balance نقش‌ها So Col",
+    _UiTextKey.inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol:
+        "invite Teammates Understand حساب فعالیت And Balance نقش‌ها So Col",
     _UiTextKey.addUser: "افزودن کاربر",
     _UiTextKey.searchMembers: "جستجو اعضا",
     _UiTextKey.noMembersFound: "بدون اعضا Found",
-    _UiTextKey.tryAdjustingYourSearchOrFilters: "try Adjusting خود جستجو Or فیلترها",
+    _UiTextKey.tryAdjustingYourSearchOrFilters:
+        "try Adjusting خود جستجو Or فیلترها",
     _UiTextKey.removeUser: "حذف کاربر",
     _UiTextKey.removeThisUserFromTheSystem: "حذف This کاربر From The سیستم",
     _UiTextKey.totalMembers: "کل اعضا",
@@ -1094,29 +1145,34 @@ class MockUiText {
     _UiTextKey.accessLevel: "دسترسی سطح",
     _UiTextKey.permissionCoverage: "مجوز Coverage",
     _UiTextKey.permissions: "مجوزها",
-    _UiTextKey.configureCrudPermissionsPerResource: "configure Crud مجوزها Per Resource",
+    _UiTextKey.configureCrudPermissionsPerResource:
+        "configure Crud مجوزها Per Resource",
     _UiTextKey.resource: "resource",
     _UiTextKey.create: "ایجاد",
     _UiTextKey.read: "read",
     _UiTextKey.update: "update",
     _UiTextKey.rolesPermissions: "نقش‌ها مجوزها",
-    _UiTextKey.shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery: "shape Secure دسترسی Policies Clarify Responsibilities And Give Every",
+    _UiTextKey.shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery:
+        "shape Secure دسترسی Policies Clarify Responsibilities And Give Every",
     _UiTextKey.searchRoles: "جستجو نقش‌ها",
     _UiTextKey.noRolesYet: "بدون نقش‌ها Yet",
-    _UiTextKey.createRolesToManageAccessControl: "ایجاد نقش‌ها To Manage دسترسی Control",
+    _UiTextKey.createRolesToManageAccessControl:
+        "ایجاد نقش‌ها To Manage دسترسی Control",
     _UiTextKey.createRole: "ایجاد نقش",
     _UiTextKey.deleteRole: "حذف نقش",
     _UiTextKey.deleteThisRolePermanently: "حذف This نقش Permanently",
     _UiTextKey.totalRoles: "کل نقش‌ها",
     _UiTextKey.permissionSets: "مجوز Sets",
     _UiTextKey.membersPerRole: "اعضا Per نقش",
-    _UiTextKey.howManyUsersAreAssignedToEachRole: "how Many کاربران Are Assigned To Each نقش",
+    _UiTextKey.howManyUsersAreAssignedToEachRole:
+        "how Many کاربران Are Assigned To Each نقش",
     _UiTextKey.open: "باز",
     _UiTextKey.inProgress: "در حال انجام",
     _UiTextKey.resolved: "حل‌شده",
     _UiTextKey.closed: "بسته",
     _UiTextKey.supportTickets: "support تیکت‌ها",
-    _UiTextKey.trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut: "track Customer Requests Prioritize Urgent Work And Keep Every Resolut",
+    _UiTextKey.trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut:
+        "track Customer Requests Prioritize Urgent Work And Keep Every Resolut",
     _UiTextKey.newTicket: "تیکت جدید",
     _UiTextKey.searchTickets: "جستجو تیکت‌ها",
     _UiTextKey.noTicketsFound: "بدون تیکت‌ها Found",
@@ -1156,7 +1212,8 @@ class MockUiText {
     _UiTextKey.addMore: "افزودن More",
     _UiTextKey.startWritingYourLetterTemplate: "شروع Writing خود نامه قالب",
     _UiTextKey.availableVariables: "available متغیرها",
-    _UiTextKey.useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV: "use These متغیرها In خود قالب They Will Be Replaced With Actual V",
+    _UiTextKey.useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV:
+        "use These متغیرها In خود قالب They Will Be Replaced With Actual V",
     _UiTextKey.userSFullName: "کاربر S Full نام",
     _UiTextKey.userSEmail: "کاربر S ایمیل",
     _UiTextKey.companyName: "شرکت نام",
@@ -1165,14 +1222,16 @@ class MockUiText {
     _UiTextKey.newLetterTemplate: "جدید نامه قالب",
     _UiTextKey.uncategorized: "uncategorized",
     _UiTextKey.letterTemplates: "نامه قالب‌ها",
-    _UiTextKey.manageReusableLetterTemplatesWithDynamicVariablesReadyToSend: "manage Reusable نامه قالب‌ها With Dynamic متغیرها Ready To Send",
+    _UiTextKey.manageReusableLetterTemplatesWithDynamicVariablesReadyToSend:
+        "manage Reusable نامه قالب‌ها With Dynamic متغیرها Ready To Send",
     _UiTextKey.newTemplate: "قالب جدید",
     _UiTextKey.searchTemplates: "جستجو قالب‌ها",
     _UiTextKey.noLetterTemplates: "بدون نامه قالب‌ها",
     _UiTextKey.createReusableLetterTemplates: "ایجاد Reusable نامه قالب‌ها",
     _UiTextKey.createTemplate: "ایجاد قالب",
     _UiTextKey.deleteTemplate: "حذف قالب",
-    _UiTextKey.deleteThisLetterTemplatePermanently: "حذف This نامه قالب Permanently",
+    _UiTextKey.deleteThisLetterTemplatePermanently:
+        "حذف This نامه قالب Permanently",
     _UiTextKey.totalTemplates: "کل قالب‌ها",
     _UiTextKey.totalVariables: "کل متغیرها",
     _UiTextKey.templatesByCategory: "قالب‌ها By دسته",
@@ -1200,7 +1259,8 @@ class MockUiText {
     _UiTextKey.oct: "oct",
     _UiTextKey.nov: "nov",
     _UiTextKey.dec: "dec",
-    _UiTextKey.hereSWhatSHappeningInYourOrganizationToday: "here S What S Happening In خود سازمان Today",
+    _UiTextKey.hereSWhatSHappeningInYourOrganizationToday:
+        "here S What S Happening In خود سازمان Today",
     _UiTextKey.activeOrganizations: "فعال Organizations",
     _UiTextKey.activeFlows: "فعال جریان‌ها",
     _UiTextKey.automationPipelines: "اتوماسیون Pipelines",
@@ -1226,7 +1286,8 @@ class MockUiText {
     _UiTextKey.modelInfo: "مدل اطلاعات",
     _UiTextKey.modelNameRequired: "مدل نام الزامی",
     _UiTextKey.addField: "افزودن فیلد",
-    _UiTextKey.noFieldsYetAddYourFirstField: "بدون فیلدها Yet افزودن خود نام فیلد",
+    _UiTextKey.noFieldsYetAddYourFirstField:
+        "بدون فیلدها Yet افزودن خود نام فیلد",
     _UiTextKey.jsonSchemaPreview: "json Schema Preview",
     _UiTextKey.text3: " : ",
     _UiTextKey.unique: "unique",
@@ -1235,7 +1296,8 @@ class MockUiText {
     _UiTextKey.fieldType: "فیلد نوع",
     _UiTextKey.newModel: "مدل جدید",
     _UiTextKey.dataModels: "داده مدل‌ها",
-    _UiTextKey.defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation: "define Durable Entity Schemas Organize فیلدها And Keep خود Operation",
+    _UiTextKey.defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation:
+        "define Durable Entity Schemas Organize فیلدها And Keep خود Operation",
     _UiTextKey.searchModels: "جستجو مدل‌ها",
     _UiTextKey.noModelsYet: "بدون مدل‌ها Yet",
     _UiTextKey.defineYourDataStructures: "define خود داده Structures",
@@ -1244,7 +1306,8 @@ class MockUiText {
     _UiTextKey.deleteThisModelPermanently: "حذف This مدل Permanently",
     _UiTextKey.totalModels: "کل مدل‌ها",
     _UiTextKey.fieldTypeDistribution: "فیلد نوع توزیع",
-    _UiTextKey.breakdownOfFieldTypesAcrossAllModels: "breakdown Of فیلد انواع Across همه مدل‌ها",
+    _UiTextKey.breakdownOfFieldTypesAcrossAllModels:
+        "breakdown Of فیلد انواع Across همه مدل‌ها",
     _UiTextKey.editLabel: "ویرایش Label",
     _UiTextKey.deleteEdge: "حذف یال",
     _UiTextKey.yes: "بله",
@@ -1326,27 +1389,32 @@ class MockUiText {
   static String get exception => _text(_UiTextKey.exception);
   static String get autocreat => _text(_UiTextKey.autocreat);
   static String get createYourAccount => _text(_UiTextKey.createYourAccount);
-  static String get startBuildingYourOrganizationalSystem => _text(_UiTextKey.startBuildingYourOrganizationalSystem);
+  static String get startBuildingYourOrganizationalSystem =>
+      _text(_UiTextKey.startBuildingYourOrganizationalSystem);
   static String get firstName => _text(_UiTextKey.firstName);
   static String get requiredText => _text(_UiTextKey.requiredText);
   static String get lastName => _text(_UiTextKey.lastName);
   static String get emailAddress => _text(_UiTextKey.emailAddress);
   static String get emailIsRequired => _text(_UiTextKey.emailIsRequired);
   static String get invalidEmail => _text(_UiTextKey.invalidEmail);
-  static String get companyNameOptional => _text(_UiTextKey.companyNameOptional);
+  static String get companyNameOptional =>
+      _text(_UiTextKey.companyNameOptional);
   static String get password => _text(_UiTextKey.password);
   static String get passwordIsRequired => _text(_UiTextKey.passwordIsRequired);
   static String get atLeast8Characters => _text(_UiTextKey.atLeast8Characters);
   static String get confirmPassword => _text(_UiTextKey.confirmPassword);
-  static String get passwordsDoNotMatch => _text(_UiTextKey.passwordsDoNotMatch);
+  static String get passwordsDoNotMatch =>
+      _text(_UiTextKey.passwordsDoNotMatch);
   static String get createAccount => _text(_UiTextKey.createAccount);
-  static String get alreadyHaveAnAccount => _text(_UiTextKey.alreadyHaveAnAccount);
+  static String get alreadyHaveAnAccount =>
+      _text(_UiTextKey.alreadyHaveAnAccount);
   static String get signIn => _text(_UiTextKey.signIn);
   static String get demo123 => _text(_UiTextKey.demo123);
   static String get demo => _text(_UiTextKey.demo);
   static String get admin => _text(_UiTextKey.admin);
   static String get welcomeBack => _text(_UiTextKey.welcomeBack);
-  static String get signInToYourOrganizationAccount => _text(_UiTextKey.signInToYourOrganizationAccount);
+  static String get signInToYourOrganizationAccount =>
+      _text(_UiTextKey.signInToYourOrganizationAccount);
   static String get passwordTooShort => _text(_UiTextKey.passwordTooShort);
   static String get forgotPassword => _text(_UiTextKey.forgotPassword);
   static String get signIn3 => _text(_UiTextKey.signIn3);
@@ -1354,12 +1422,18 @@ class MockUiText {
   static String get createAccount3 => _text(_UiTextKey.createAccount3);
   static String get demo3 => _text(_UiTextKey.demo3);
   static String get tryDemoMode => _text(_UiTextKey.tryDemoMode);
-  static String get noAccountNeededExploreWithSampleData => _text(_UiTextKey.noAccountNeededExploreWithSampleData);
-  static String get organizationalSystemBuilder => _text(_UiTextKey.organizationalSystemBuilder);
-  static String get designComplexOrganizationalFlows => _text(_UiTextKey.designComplexOrganizationalFlows);
-  static String get buildFormsAndDataModels => _text(_UiTextKey.buildFormsAndDataModels);
-  static String get manageRolesAndPermissions => _text(_UiTextKey.manageRolesAndPermissions);
-  static String get communicateViaTickets => _text(_UiTextKey.communicateViaTickets);
+  static String get noAccountNeededExploreWithSampleData =>
+      _text(_UiTextKey.noAccountNeededExploreWithSampleData);
+  static String get organizationalSystemBuilder =>
+      _text(_UiTextKey.organizationalSystemBuilder);
+  static String get designComplexOrganizationalFlows =>
+      _text(_UiTextKey.designComplexOrganizationalFlows);
+  static String get buildFormsAndDataModels =>
+      _text(_UiTextKey.buildFormsAndDataModels);
+  static String get manageRolesAndPermissions =>
+      _text(_UiTextKey.manageRolesAndPermissions);
+  static String get communicateViaTickets =>
+      _text(_UiTextKey.communicateViaTickets);
   static String get flowSaved => _text(_UiTextKey.flowSaved);
   static String get editNodeLabel => _text(_UiTextKey.editNodeLabel);
   static String get label => _text(_UiTextKey.label);
@@ -1384,33 +1458,42 @@ class MockUiText {
   static String get nodeProperties => _text(_UiTextKey.nodeProperties);
   static String get deleteNode => _text(_UiTextKey.deleteNode);
   static String get close => _text(_UiTextKey.close);
-  static String get startBuildingYourFlow => _text(_UiTextKey.startBuildingYourFlow);
-  static String get tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft => _text(_UiTextKey.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft);
+  static String get startBuildingYourFlow =>
+      _text(_UiTextKey.startBuildingYourFlow);
+  static String get tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft =>
+      _text(_UiTextKey.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft);
   static String get newFlow => _text(_UiTextKey.newFlow);
   static String get start => _text(_UiTextKey.start);
   static String get end => _text(_UiTextKey.end);
   static String get automationFlows => _text(_UiTextKey.automationFlows);
-  static String get designReviewAndLaunchOrganizationalProcessFlowsWithClearStep => _text(_UiTextKey.designReviewAndLaunchOrganizationalProcessFlowsWithClearStep);
+  static String
+      get designReviewAndLaunchOrganizationalProcessFlowsWithClearStep =>
+          _text(_UiTextKey
+              .designReviewAndLaunchOrganizationalProcessFlowsWithClearStep);
   static String get newText => _text(_UiTextKey.newText);
   static String get searchFlows => _text(_UiTextKey.searchFlows);
   static String get noFlowsYet => _text(_UiTextKey.noFlowsYet);
-  static String get createYourFirstOrganizationalFlow => _text(_UiTextKey.createYourFirstOrganizationalFlow);
+  static String get createYourFirstOrganizationalFlow =>
+      _text(_UiTextKey.createYourFirstOrganizationalFlow);
   static String get createFlow => _text(_UiTextKey.createFlow);
   static String get deleteFlow => _text(_UiTextKey.deleteFlow);
-  static String get thisWillDeleteTheFlowPermanently => _text(_UiTextKey.thisWillDeleteTheFlowPermanently);
+  static String get thisWillDeleteTheFlowPermanently =>
+      _text(_UiTextKey.thisWillDeleteTheFlowPermanently);
   static String get totalFlows => _text(_UiTextKey.totalFlows);
   static String get active => _text(_UiTextKey.active);
   static String get draft => _text(_UiTextKey.draft);
   static String get totalNodes => _text(_UiTextKey.totalNodes);
   static String get flowComplexity => _text(_UiTextKey.flowComplexity);
-  static String get nodesAndEdgesPerFlow => _text(_UiTextKey.nodesAndEdgesPerFlow);
+  static String get nodesAndEdgesPerFlow =>
+      _text(_UiTextKey.nodesAndEdgesPerFlow);
   static String get nodeTypes => _text(_UiTextKey.nodeTypes);
   static String get openEditor => _text(_UiTextKey.openEditor);
   static String get delete => _text(_UiTextKey.delete);
   static String get nodeLabel => _text(_UiTextKey.nodeLabel);
   static String get enterLabelEllipsis => _text(_UiTextKey.enterLabelEllipsis);
   static String get description => _text(_UiTextKey.description);
-  static String get optionalDescriptionEllipsis => _text(_UiTextKey.optionalDescriptionEllipsis);
+  static String get optionalDescriptionEllipsis =>
+      _text(_UiTextKey.optionalDescriptionEllipsis);
   static String get assignedRole => _text(_UiTextKey.assignedRole);
   static String get errorLoadingRoles => _text(_UiTextKey.errorLoadingRoles);
   static String get noRoleAssigned => _text(_UiTextKey.noRoleAssigned);
@@ -1422,7 +1505,8 @@ class MockUiText {
   static String get branches => _text(_UiTextKey.branches);
   static String get addBranch => _text(_UiTextKey.addBranch);
   static String get defaultText => _text(_UiTextKey.defaultText);
-  static String get conditionEGStatusApproved => _text(_UiTextKey.conditionEGStatusApproved);
+  static String get conditionEGStatusApproved =>
+      _text(_UiTextKey.conditionEGStatusApproved);
   static String get position => _text(_UiTextKey.position);
   static String get capacity => _text(_UiTextKey.capacity);
   static String get members => _text(_UiTextKey.members);
@@ -1432,25 +1516,32 @@ class MockUiText {
   static String get created => _text(_UiTextKey.created);
   static String get text => _text(_UiTextKey.text);
   static String get companies => _text(_UiTextKey.companies);
-  static String get organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK => _text(_UiTextKey.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK);
+  static String
+      get organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK =>
+          _text(_UiTextKey
+              .organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK);
   static String get newCompany => _text(_UiTextKey.newCompany);
   static String get searchCompanies => _text(_UiTextKey.searchCompanies);
   static String get noCompaniesYet => _text(_UiTextKey.noCompaniesYet);
   static String get noResultsFound => _text(_UiTextKey.noResultsFound);
-  static String get createYourFirstCompanyToGetStarted => _text(_UiTextKey.createYourFirstCompanyToGetStarted);
+  static String get createYourFirstCompanyToGetStarted =>
+      _text(_UiTextKey.createYourFirstCompanyToGetStarted);
   static String get createCompany => _text(_UiTextKey.createCompany);
   static String get deleteCompany => _text(_UiTextKey.deleteCompany);
-  static String get areYouSureYouWantToDeleteThisCompany => _text(_UiTextKey.areYouSureYouWantToDeleteThisCompany);
+  static String get areYouSureYouWantToDeleteThisCompany =>
+      _text(_UiTextKey.areYouSureYouWantToDeleteThisCompany);
   static String get edit => _text(_UiTextKey.edit);
   static String get editCompany => _text(_UiTextKey.editCompany);
-  static String get companyNameRequired => _text(_UiTextKey.companyNameRequired);
+  static String get companyNameRequired =>
+      _text(_UiTextKey.companyNameRequired);
   static String get nameIsRequired => _text(_UiTextKey.nameIsRequired);
   static String get industry => _text(_UiTextKey.industry);
   static String get formSaved => _text(_UiTextKey.formSaved);
   static String get formEditor => _text(_UiTextKey.formEditor);
   static String get fieldTypes => _text(_UiTextKey.fieldTypes);
   static String get formName => _text(_UiTextKey.formName);
-  static String get clickAFieldTypeToAddIt => _text(_UiTextKey.clickAFieldTypeToAddIt);
+  static String get clickAFieldTypeToAddIt =>
+      _text(_UiTextKey.clickAFieldTypeToAddIt);
   static String get requiredText3 => _text(_UiTextKey.requiredText3);
   static String get fieldProperties => _text(_UiTextKey.fieldProperties);
   static String get placeholder => _text(_UiTextKey.placeholder);
@@ -1461,17 +1552,24 @@ class MockUiText {
   static String get add => _text(_UiTextKey.add);
   static String get newForm => _text(_UiTextKey.newForm);
   static String get formDefinitions => _text(_UiTextKey.formDefinitions);
-  static String get buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif => _text(_UiTextKey.buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif);
+  static String
+      get buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif =>
+          _text(_UiTextKey
+              .buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif);
   static String get searchForms => _text(_UiTextKey.searchForms);
   static String get noFormsYet => _text(_UiTextKey.noFormsYet);
-  static String get createYourFirstFormDefinition => _text(_UiTextKey.createYourFirstFormDefinition);
+  static String get createYourFirstFormDefinition =>
+      _text(_UiTextKey.createYourFirstFormDefinition);
   static String get createForm => _text(_UiTextKey.createForm);
   static String get deleteForm => _text(_UiTextKey.deleteForm);
-  static String get thisWillDeleteTheFormPermanently => _text(_UiTextKey.thisWillDeleteTheFormPermanently);
+  static String get thisWillDeleteTheFormPermanently =>
+      _text(_UiTextKey.thisWillDeleteTheFormPermanently);
   static String get totalForms => _text(_UiTextKey.totalForms);
   static String get totalFields => _text(_UiTextKey.totalFields);
-  static String get fieldTypesDistribution => _text(_UiTextKey.fieldTypesDistribution);
-  static String get countOfEachFieldTypeAcrossAllForms => _text(_UiTextKey.countOfEachFieldTypeAcrossAllForms);
+  static String get fieldTypesDistribution =>
+      _text(_UiTextKey.fieldTypesDistribution);
+  static String get countOfEachFieldTypeAcrossAllForms =>
+      _text(_UiTextKey.countOfEachFieldTypeAcrossAllForms);
   static String get noFieldsDefined => _text(_UiTextKey.noFieldsDefined);
   static String get userSaved => _text(_UiTextKey.userSaved);
   static String get newUser => _text(_UiTextKey.newUser);
@@ -1484,25 +1582,33 @@ class MockUiText {
   static String get emailRequired => _text(_UiTextKey.emailRequired);
   static String get phone => _text(_UiTextKey.phone);
   static String get passwordRequired => _text(_UiTextKey.passwordRequired);
-  static String get newPasswordLeaveBlankToKeep => _text(_UiTextKey.newPasswordLeaveBlankToKeep);
+  static String get newPasswordLeaveBlankToKeep =>
+      _text(_UiTextKey.newPasswordLeaveBlankToKeep);
   static String get access => _text(_UiTextKey.access);
   static String get noRole => _text(_UiTextKey.noRole);
   static String get assignedRole3 => _text(_UiTextKey.assignedRole3);
   static String get activeAccount => _text(_UiTextKey.activeAccount);
-  static String get inactiveUsersCannotLogIn => _text(_UiTextKey.inactiveUsersCannotLogIn);
+  static String get inactiveUsersCannotLogIn =>
+      _text(_UiTextKey.inactiveUsersCannotLogIn);
   static String get all => _text(_UiTextKey.all);
   static String get teamMembers => _text(_UiTextKey.teamMembers);
-  static String get inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol => _text(_UiTextKey.inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol);
+  static String
+      get inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol =>
+          _text(_UiTextKey
+              .inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol);
   static String get addUser => _text(_UiTextKey.addUser);
   static String get searchMembers => _text(_UiTextKey.searchMembers);
   static String get noMembersFound => _text(_UiTextKey.noMembersFound);
-  static String get tryAdjustingYourSearchOrFilters => _text(_UiTextKey.tryAdjustingYourSearchOrFilters);
+  static String get tryAdjustingYourSearchOrFilters =>
+      _text(_UiTextKey.tryAdjustingYourSearchOrFilters);
   static String get removeUser => _text(_UiTextKey.removeUser);
-  static String get removeThisUserFromTheSystem => _text(_UiTextKey.removeThisUserFromTheSystem);
+  static String get removeThisUserFromTheSystem =>
+      _text(_UiTextKey.removeThisUserFromTheSystem);
   static String get totalMembers => _text(_UiTextKey.totalMembers);
   static String get admins => _text(_UiTextKey.admins);
   static String get roleDistribution => _text(_UiTextKey.roleDistribution);
-  static String get membersByAssignedRole => _text(_UiTextKey.membersByAssignedRole);
+  static String get membersByAssignedRole =>
+      _text(_UiTextKey.membersByAssignedRole);
   static String get statusOverview => _text(_UiTextKey.statusOverview);
   static String get accountActivity => _text(_UiTextKey.accountActivity);
   static String get inactive => _text(_UiTextKey.inactive);
@@ -1519,42 +1625,55 @@ class MockUiText {
   static String get accessLevel => _text(_UiTextKey.accessLevel);
   static String get permissionCoverage => _text(_UiTextKey.permissionCoverage);
   static String get permissions => _text(_UiTextKey.permissions);
-  static String get configureCrudPermissionsPerResource => _text(_UiTextKey.configureCrudPermissionsPerResource);
+  static String get configureCrudPermissionsPerResource =>
+      _text(_UiTextKey.configureCrudPermissionsPerResource);
   static String get resource => _text(_UiTextKey.resource);
   static String get create => _text(_UiTextKey.create);
   static String get read => _text(_UiTextKey.read);
   static String get update => _text(_UiTextKey.update);
   static String get rolesPermissions => _text(_UiTextKey.rolesPermissions);
-  static String get shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery => _text(_UiTextKey.shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery);
+  static String
+      get shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery =>
+          _text(_UiTextKey
+              .shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery);
   static String get searchRoles => _text(_UiTextKey.searchRoles);
   static String get noRolesYet => _text(_UiTextKey.noRolesYet);
-  static String get createRolesToManageAccessControl => _text(_UiTextKey.createRolesToManageAccessControl);
+  static String get createRolesToManageAccessControl =>
+      _text(_UiTextKey.createRolesToManageAccessControl);
   static String get createRole => _text(_UiTextKey.createRole);
   static String get deleteRole => _text(_UiTextKey.deleteRole);
-  static String get deleteThisRolePermanently => _text(_UiTextKey.deleteThisRolePermanently);
+  static String get deleteThisRolePermanently =>
+      _text(_UiTextKey.deleteThisRolePermanently);
   static String get totalRoles => _text(_UiTextKey.totalRoles);
   static String get permissionSets => _text(_UiTextKey.permissionSets);
   static String get membersPerRole => _text(_UiTextKey.membersPerRole);
-  static String get howManyUsersAreAssignedToEachRole => _text(_UiTextKey.howManyUsersAreAssignedToEachRole);
+  static String get howManyUsersAreAssignedToEachRole =>
+      _text(_UiTextKey.howManyUsersAreAssignedToEachRole);
   static String get open => _text(_UiTextKey.open);
   static String get inProgress => _text(_UiTextKey.inProgress);
   static String get resolved => _text(_UiTextKey.resolved);
   static String get closed => _text(_UiTextKey.closed);
   static String get supportTickets => _text(_UiTextKey.supportTickets);
-  static String get trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut => _text(_UiTextKey.trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut);
+  static String
+      get trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut =>
+          _text(_UiTextKey
+              .trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut);
   static String get newTicket => _text(_UiTextKey.newTicket);
   static String get searchTickets => _text(_UiTextKey.searchTickets);
   static String get noTicketsFound => _text(_UiTextKey.noTicketsFound);
-  static String get tryAdjustingYourFilters => _text(_UiTextKey.tryAdjustingYourFilters);
+  static String get tryAdjustingYourFilters =>
+      _text(_UiTextKey.tryAdjustingYourFilters);
   static String get total => _text(_UiTextKey.total);
   static String get low => _text(_UiTextKey.low);
   static String get med => _text(_UiTextKey.med);
   static String get high => _text(_UiTextKey.high);
   static String get urgent => _text(_UiTextKey.urgent);
   static String get priorityBreakdown => _text(_UiTextKey.priorityBreakdown);
-  static String get ticketsByPriorityLevel => _text(_UiTextKey.ticketsByPriorityLevel);
+  static String get ticketsByPriorityLevel =>
+      _text(_UiTextKey.ticketsByPriorityLevel);
   static String get statusDistribution => _text(_UiTextKey.statusDistribution);
-  static String get currentTicketStates => _text(_UiTextKey.currentTicketStates);
+  static String get currentTicketStates =>
+      _text(_UiTextKey.currentTicketStates);
   static String get noData => _text(_UiTextKey.noData);
   static String get dueToday => _text(_UiTextKey.dueToday);
   static String get titleRequired => _text(_UiTextKey.titleRequired);
@@ -1579,9 +1698,13 @@ class MockUiText {
   static String get attach => _text(_UiTextKey.attach);
   static String get variables => _text(_UiTextKey.variables);
   static String get addMore => _text(_UiTextKey.addMore);
-  static String get startWritingYourLetterTemplate => _text(_UiTextKey.startWritingYourLetterTemplate);
+  static String get startWritingYourLetterTemplate =>
+      _text(_UiTextKey.startWritingYourLetterTemplate);
   static String get availableVariables => _text(_UiTextKey.availableVariables);
-  static String get useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV => _text(_UiTextKey.useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV);
+  static String
+      get useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV =>
+          _text(_UiTextKey
+              .useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV);
   static String get userSFullName => _text(_UiTextKey.userSFullName);
   static String get userSEmail => _text(_UiTextKey.userSEmail);
   static String get companyName => _text(_UiTextKey.companyName);
@@ -1590,18 +1713,25 @@ class MockUiText {
   static String get newLetterTemplate => _text(_UiTextKey.newLetterTemplate);
   static String get uncategorized => _text(_UiTextKey.uncategorized);
   static String get letterTemplates => _text(_UiTextKey.letterTemplates);
-  static String get manageReusableLetterTemplatesWithDynamicVariablesReadyToSend => _text(_UiTextKey.manageReusableLetterTemplatesWithDynamicVariablesReadyToSend);
+  static String
+      get manageReusableLetterTemplatesWithDynamicVariablesReadyToSend =>
+          _text(_UiTextKey
+              .manageReusableLetterTemplatesWithDynamicVariablesReadyToSend);
   static String get newTemplate => _text(_UiTextKey.newTemplate);
   static String get searchTemplates => _text(_UiTextKey.searchTemplates);
   static String get noLetterTemplates => _text(_UiTextKey.noLetterTemplates);
-  static String get createReusableLetterTemplates => _text(_UiTextKey.createReusableLetterTemplates);
+  static String get createReusableLetterTemplates =>
+      _text(_UiTextKey.createReusableLetterTemplates);
   static String get createTemplate => _text(_UiTextKey.createTemplate);
   static String get deleteTemplate => _text(_UiTextKey.deleteTemplate);
-  static String get deleteThisLetterTemplatePermanently => _text(_UiTextKey.deleteThisLetterTemplatePermanently);
+  static String get deleteThisLetterTemplatePermanently =>
+      _text(_UiTextKey.deleteThisLetterTemplatePermanently);
   static String get totalTemplates => _text(_UiTextKey.totalTemplates);
   static String get totalVariables => _text(_UiTextKey.totalVariables);
-  static String get templatesByCategory => _text(_UiTextKey.templatesByCategory);
-  static String get distributionAcrossCategories => _text(_UiTextKey.distributionAcrossCategories);
+  static String get templatesByCategory =>
+      _text(_UiTextKey.templatesByCategory);
+  static String get distributionAcrossCategories =>
+      _text(_UiTextKey.distributionAcrossCategories);
   static String get allCategories => _text(_UiTextKey.allCategories);
   static String get goodMorning => _text(_UiTextKey.goodMorning);
   static String get goodAfternoon => _text(_UiTextKey.goodAfternoon);
@@ -1625,18 +1755,23 @@ class MockUiText {
   static String get oct => _text(_UiTextKey.oct);
   static String get nov => _text(_UiTextKey.nov);
   static String get dec => _text(_UiTextKey.dec);
-  static String get hereSWhatSHappeningInYourOrganizationToday => _text(_UiTextKey.hereSWhatSHappeningInYourOrganizationToday);
-  static String get activeOrganizations => _text(_UiTextKey.activeOrganizations);
+  static String get hereSWhatSHappeningInYourOrganizationToday =>
+      _text(_UiTextKey.hereSWhatSHappeningInYourOrganizationToday);
+  static String get activeOrganizations =>
+      _text(_UiTextKey.activeOrganizations);
   static String get activeFlows => _text(_UiTextKey.activeFlows);
-  static String get automationPipelines => _text(_UiTextKey.automationPipelines);
+  static String get automationPipelines =>
+      _text(_UiTextKey.automationPipelines);
   static String get openTickets => _text(_UiTextKey.openTickets);
   static String get needsAttention => _text(_UiTextKey.needsAttention);
   static String get closedTickets => _text(_UiTextKey.closedTickets);
   static String get activityOverview => _text(_UiTextKey.activityOverview);
-  static String get ticketsFlowsLast7Days => _text(_UiTextKey.ticketsFlowsLast7Days);
+  static String get ticketsFlowsLast7Days =>
+      _text(_UiTextKey.ticketsFlowsLast7Days);
   static String get tickets => _text(_UiTextKey.tickets);
   static String get ticketStatus => _text(_UiTextKey.ticketStatus);
-  static String get distributionOverview => _text(_UiTextKey.distributionOverview);
+  static String get distributionOverview =>
+      _text(_UiTextKey.distributionOverview);
   static String get noTicketsYet => _text(_UiTextKey.noTicketsYet);
   static String get recentTickets => _text(_UiTextKey.recentTickets);
   static String get latestActivity => _text(_UiTextKey.latestActivity);
@@ -1644,14 +1779,16 @@ class MockUiText {
   static String get resolutionRate => _text(_UiTextKey.resolutionRate);
   static String get slaCompliance => _text(_UiTextKey.slaCompliance);
   static String get performanceMetrics => _text(_UiTextKey.performanceMetrics);
-  static String get ticketKpisAtAGlance => _text(_UiTextKey.ticketKpisAtAGlance);
+  static String get ticketKpisAtAGlance =>
+      _text(_UiTextKey.ticketKpisAtAGlance);
   static String get quickActions => _text(_UiTextKey.quickActions);
   static String get modelSaved => _text(_UiTextKey.modelSaved);
   static String get modelEditor => _text(_UiTextKey.modelEditor);
   static String get modelInfo => _text(_UiTextKey.modelInfo);
   static String get modelNameRequired => _text(_UiTextKey.modelNameRequired);
   static String get addField => _text(_UiTextKey.addField);
-  static String get noFieldsYetAddYourFirstField => _text(_UiTextKey.noFieldsYetAddYourFirstField);
+  static String get noFieldsYetAddYourFirstField =>
+      _text(_UiTextKey.noFieldsYetAddYourFirstField);
   static String get jsonSchemaPreview => _text(_UiTextKey.jsonSchemaPreview);
   static String get text3 => _text(_UiTextKey.text3);
   static String get unique => _text(_UiTextKey.unique);
@@ -1660,16 +1797,23 @@ class MockUiText {
   static String get fieldType => _text(_UiTextKey.fieldType);
   static String get newModel => _text(_UiTextKey.newModel);
   static String get dataModels => _text(_UiTextKey.dataModels);
-  static String get defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation => _text(_UiTextKey.defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation);
+  static String
+      get defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation =>
+          _text(_UiTextKey
+              .defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation);
   static String get searchModels => _text(_UiTextKey.searchModels);
   static String get noModelsYet => _text(_UiTextKey.noModelsYet);
-  static String get defineYourDataStructures => _text(_UiTextKey.defineYourDataStructures);
+  static String get defineYourDataStructures =>
+      _text(_UiTextKey.defineYourDataStructures);
   static String get createModel => _text(_UiTextKey.createModel);
   static String get deleteModel => _text(_UiTextKey.deleteModel);
-  static String get deleteThisModelPermanently => _text(_UiTextKey.deleteThisModelPermanently);
+  static String get deleteThisModelPermanently =>
+      _text(_UiTextKey.deleteThisModelPermanently);
   static String get totalModels => _text(_UiTextKey.totalModels);
-  static String get fieldTypeDistribution => _text(_UiTextKey.fieldTypeDistribution);
-  static String get breakdownOfFieldTypesAcrossAllModels => _text(_UiTextKey.breakdownOfFieldTypesAcrossAllModels);
+  static String get fieldTypeDistribution =>
+      _text(_UiTextKey.fieldTypeDistribution);
+  static String get breakdownOfFieldTypesAcrossAllModels =>
+      _text(_UiTextKey.breakdownOfFieldTypesAcrossAllModels);
   static String get editLabel => _text(_UiTextKey.editLabel);
   static String get deleteEdge => _text(_UiTextKey.deleteEdge);
   static String get yes => _text(_UiTextKey.yes);
@@ -1703,7 +1847,8 @@ class MockUiText {
   static String get selectDate => _text(_UiTextKey.selectDate);
   static String get selectTime => _text(_UiTextKey.selectTime);
   static String get clickToUploadFile => _text(_UiTextKey.clickToUploadFile);
-  static String get anyFileTypeSupported => _text(_UiTextKey.anyFileTypeSupported);
+  static String get anyFileTypeSupported =>
+      _text(_UiTextKey.anyFileTypeSupported);
   static String get clickToUploadImage => _text(_UiTextKey.clickToUploadImage);
   static String get pngJpgGifSupported => _text(_UiTextKey.pngJpgGifSupported);
   static String get pickAColor => _text(_UiTextKey.pickAColor);
@@ -1747,53 +1892,105 @@ class MockUiText {
   static String get requiredAsterisk => _text(_UiTextKey.requiredAsterisk);
   static String get schemaSeparator => _text(_UiTextKey.schemaSeparator);
 
-  static String languageToggleTooltip(AppLanguage nextLanguage) => nextLanguage == AppLanguage.persian ? 'Switch to فارسی' : 'تغییر به English';
+  static String languageToggleTooltip(AppLanguage nextLanguage) =>
+      nextLanguage == AppLanguage.persian
+          ? 'Switch to فارسی'
+          : 'تغییر به English';
 
-  static String exceptionMessage(Object? message) => isPersian ? 'استثنا: ${message ?? ''}' : 'Exception: ${message ?? ''}';
-  static String errorLoadingFlow(Object error) => isPersian ? 'خطا در بارگذاری جریان: $error' : 'Error loading flow: $error';
-  static String errorSaving(Object error) => isPersian ? 'خطا در ذخیره‌سازی: $error' : 'Error saving: $error';
-  static String error(Object error) => isPersian ? 'خطا: $error' : 'Error: $error';
-  static String demoAccountLabel(String label) => isPersian ? 'نمایشی: $label' : 'Demo: $label';
-  static String zoomPercent(num scale) => isPersian ? 'بزرگ‌نمایی: ${(scale * 100).toInt()}٪' : 'Zoom: ${(scale * 100).toInt()}%';
-  static String percent(num value) => isPersian ? '${(value * 100).toInt()}٪' : '${(value * 100).toInt()}%';
-  static String nodesAndEdges(int nodes, int edges) => isPersian ? '$nodes گره · $edges یال' : '$nodes nodes · $edges edges';
-  static String nodesCount(int nodes) => isPersian ? '$nodes گره' : '$nodes nodes';
-  static String edgesCount(int edges) => isPersian ? '$edges یال' : '$edges edges';
-  static String stepsCount(int steps) => isPersian ? '$steps مرحله' : '$steps steps';
-  static String decisionsCount(int decisions) => isPersian ? '$decisions تصمیم' : '$decisions decisions';
-  static String totalEdges(int totalEdges) => isPersian ? 'کل $totalEdges یال' : '$totalEdges edges total';
+  static String exceptionMessage(Object? message) =>
+      isPersian ? 'استثنا: ${message ?? ''}' : 'Exception: ${message ?? ''}';
+  static String errorLoadingFlow(Object error) => isPersian
+      ? 'خطا در بارگذاری جریان: $error'
+      : 'Error loading flow: $error';
+  static String errorSaving(Object error) =>
+      isPersian ? 'خطا در ذخیره‌سازی: $error' : 'Error saving: $error';
+  static String error(Object error) =>
+      isPersian ? 'خطا: $error' : 'Error: $error';
+  static String demoAccountLabel(String label) =>
+      isPersian ? 'نمایشی: $label' : 'Demo: $label';
+  static String zoomPercent(num scale) => isPersian
+      ? 'بزرگ‌نمایی: ${(scale * 100).toInt()}٪'
+      : 'Zoom: ${(scale * 100).toInt()}%';
+  static String percent(num value) =>
+      isPersian ? '${(value * 100).toInt()}٪' : '${(value * 100).toInt()}%';
+  static String nodesAndEdges(int nodes, int edges) =>
+      isPersian ? '$nodes گره · $edges یال' : '$nodes nodes · $edges edges';
+  static String nodesCount(int nodes) =>
+      isPersian ? '$nodes گره' : '$nodes nodes';
+  static String edgesCount(int edges) =>
+      isPersian ? '$edges یال' : '$edges edges';
+  static String stepsCount(int steps) =>
+      isPersian ? '$steps مرحله' : '$steps steps';
+  static String decisionsCount(int decisions) =>
+      isPersian ? '$decisions تصمیم' : '$decisions decisions';
+  static String totalEdges(int totalEdges) =>
+      isPersian ? 'کل $totalEdges یال' : '$totalEdges edges total';
   static String chartValue(String label, int value) => '$label: $value';
-  static String branchName(int branchNumber) => isPersian ? 'شاخه $branchNumber' : 'Branch $branchNumber';
-  static String nodePosition(num x, num y) => isPersian ? 'x: ${x.toInt()}،  y: ${y.toInt()}' : 'x: ${x.toInt()},  y: ${y.toInt()}';
+  static String branchName(int branchNumber) =>
+      isPersian ? 'شاخه $branchNumber' : 'Branch $branchNumber';
+  static String nodePosition(num x, num y) => isPersian
+      ? 'x: ${x.toInt()}،  y: ${y.toInt()}'
+      : 'x: ${x.toInt()},  y: ${y.toInt()}';
   static String capacityRatio(int count, int max) => '$count / $max';
-  static String joined(String joined) => isPersian ? 'پیوسته در $joined' : 'Joined $joined';
-  static String fieldCount(int count) => isPersian ? '$count فیلد' : '$count fields';
-  static String requiredCount(int count) => isPersian ? '$count الزامی' : '$count req';
-  static String uniqueCount(int count) => isPersian ? '$count یکتا' : '$count unique';
-  static String moreCount(int count) => isPersian ? '+$count مورد دیگر' : '+$count more';
-  static String distributionSlice(Object label, Object value) => '$label: $value';
-  static String distributionLegend(Object value, Object percent) => isPersian ? '$value ($percent٪)' : '$value ($percent%)';
-  static String userInitials(String firstName, String lastName) => '${firstName[0]}${lastName[0]}';
-  static String initialsFromParts(String firstInitial, String lastInitial) => '$firstInitial$lastInitial'.toUpperCase();
-  static String rgbHex(int red, int green, int blue) => '#${red.toRadixString(16).padLeft(2, '0')}${green.toRadixString(16).padLeft(2, '0')}${blue.toRadixString(16).padLeft(2, '0')}'.toUpperCase();
-  static String userFullName(String firstName, String lastName) => isPersian ? '$lastName $firstName' : '$firstName $lastName';
-  static String greetingLine(String greeting, String firstName) => isPersian ? '$greeting، $firstName!' : '$greeting, $firstName!';
-  static String dateLine(String dayName, int day, String monthName, int year) => isPersian ? '$dayName، $day $monthName $year' : '$dayName, $day $monthName $year';
-  static String timeLine(int hour, int minute) => '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+  static String joined(String joined) =>
+      isPersian ? 'پیوسته در $joined' : 'Joined $joined';
+  static String fieldCount(int count) =>
+      isPersian ? '$count فیلد' : '$count fields';
+  static String requiredCount(int count) =>
+      isPersian ? '$count الزامی' : '$count req';
+  static String uniqueCount(int count) =>
+      isPersian ? '$count یکتا' : '$count unique';
+  static String moreCount(int count) =>
+      isPersian ? '+$count مورد دیگر' : '+$count more';
+  static String distributionSlice(Object label, Object value) =>
+      '$label: $value';
+  static String distributionLegend(Object value, Object percent) =>
+      isPersian ? '$value ($percent٪)' : '$value ($percent%)';
+  static String userInitials(String firstName, String lastName) =>
+      '${firstName[0]}${lastName[0]}';
+  static String initialsFromParts(String firstInitial, String lastInitial) =>
+      '$firstInitial$lastInitial'.toUpperCase();
+  static String rgbHex(int red, int green, int blue) =>
+      '#${red.toRadixString(16).padLeft(2, '0')}${green.toRadixString(16).padLeft(2, '0')}${blue.toRadixString(16).padLeft(2, '0')}'
+          .toUpperCase();
+  static String userFullName(String firstName, String lastName) =>
+      isPersian ? '$lastName $firstName' : '$firstName $lastName';
+  static String greetingLine(String greeting, String firstName) =>
+      isPersian ? '$greeting، $firstName!' : '$greeting, $firstName!';
+  static String dateLine(String dayName, int day, String monthName, int year) =>
+      isPersian
+          ? '$dayName، $day $monthName $year'
+          : '$dayName, $day $monthName $year';
+  static String timeLine(int hour, int minute) =>
+      '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
   static String truncatedName(String name) => '${name.substring(0, 9)}…';
-  static String optionNumber(int optionNumber) => isPersian ? 'گزینه $optionNumber' : 'Option $optionNumber';
-  static String crudCoverage(num coverage) => isPersian ? '${(coverage * 100).toInt()}٪ از عملیات CRUD در همه منابع اعطا شده است.' : '${(coverage * 100).toInt()}% of CRUD operations are granted across all resources.';
+  static String optionNumber(int optionNumber) =>
+      isPersian ? 'گزینه $optionNumber' : 'Option $optionNumber';
+  static String crudCoverage(num coverage) => isPersian
+      ? '${(coverage * 100).toInt()}٪ از عملیات CRUD در همه منابع اعطا شده است.'
+      : '${(coverage * 100).toInt()}% of CRUD operations are granted across all resources.';
   static String truncatedName7(String name) => '${name.substring(0, 7)}…';
-  static String membersCount(int count) => isPersian ? '$count عضو' : '$count members';
-  static String resourcesCount(int count) => isPersian ? '$count منبع' : '$count resources';
-  static String canCreateCount(int count) => isPersian ? '$count ایجاد' : '$count create';
-  static String dueInDays(int days) => isPersian ? 'سررسید تا ${days} روز' : 'Due in ${days}d';
-  static String daysOverdue(int days) => isPersian ? '${days} روز تأخیر' : '${days}d overdue';
-  static String priorityLabel(String priority) => isPersian ? 'اولویت $priority' : '$priority priority';
-  static String fileCount(int count) => isPersian ? '$count فایل' : '$count file${count > 1 ? 's' : ''}';
-  static String avgVars(String average) => isPersian ? 'میانگین $average متغیر' : 'Avg $average vars';
-  static String varsCount(int count) => isPersian ? '$count متغیر' : '$count vars';
-  static String fieldsTitle(int count) => isPersian ? 'فیلدها ($count)' : 'Fields ($count)';
-  static String schemaField(String name, String type, bool required) => '  "$name": "$type"${required ? (isPersian ? ' (الزامی)' : ' (required)') : ''}';
+  static String membersCount(int count) =>
+      isPersian ? '$count عضو' : '$count members';
+  static String resourcesCount(int count) =>
+      isPersian ? '$count منبع' : '$count resources';
+  static String canCreateCount(int count) =>
+      isPersian ? '$count ایجاد' : '$count create';
+  static String dueInDays(int days) =>
+      isPersian ? 'سررسید تا $days روز' : 'Due in ${days}d';
+  static String daysOverdue(int days) =>
+      isPersian ? '$days روز تأخیر' : '${days}d overdue';
+  static String priorityLabel(String priority) =>
+      isPersian ? 'اولویت $priority' : '$priority priority';
+  static String fileCount(int count) =>
+      isPersian ? '$count فایل' : '$count file${count > 1 ? 's' : ''}';
+  static String avgVars(String average) =>
+      isPersian ? 'میانگین $average متغیر' : 'Avg $average vars';
+  static String varsCount(int count) =>
+      isPersian ? '$count متغیر' : '$count vars';
+  static String fieldsTitle(int count) =>
+      isPersian ? 'فیلدها ($count)' : 'Fields ($count)';
+  static String schemaField(String name, String type, bool required) =>
+      '  "$name": "$type"${required ? (isPersian ? ' (الزامی)' : ' (required)') : ''}';
   static String schemaObject(String fields) => '{\n$fields\n}';
 }

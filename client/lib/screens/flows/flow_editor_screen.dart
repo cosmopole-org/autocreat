@@ -58,7 +58,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
       await ref.read(flowEditorProvider.notifier).save(repo);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(MockUiText.flowSaved),
             backgroundColor: AppColors.success,
           ),
@@ -260,12 +260,8 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                         label: MockUiText.fitScreen,
                         color: AppColors.accent,
                         onTap: () {
-                          ref
-                              .read(flowEditorProvider.notifier)
-                              .setScale(1.0);
-                          ref
-                              .read(flowEditorProvider.notifier)
-                              .setOffset(0, 0);
+                          ref.read(flowEditorProvider.notifier).setScale(1.0);
+                          ref.read(flowEditorProvider.notifier).setOffset(0, 0);
                           Navigator.pop(ctx);
                         },
                       ),
@@ -317,10 +313,8 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
       );
     }
 
-    final toolbarBg =
-        isDark ? AppColors.darkSurface : AppColors.lightCard;
-    final toolbarBorder =
-        isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final toolbarBg = isDark ? AppColors.darkSurface : AppColors.lightCard;
+    final toolbarBorder = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     return Scaffold(
       appBar: AppBar(
@@ -341,17 +335,16 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
             if (editorState.isDirty) ...[
               const SizedBox(width: 8),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.warning.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                       color: AppColors.warning.withValues(alpha: 0.35)),
                 ),
-                child: const Text(
+                child: Text(
                   MockUiText.unsaved,
-                  style: TextStyle(fontSize: 11, color: AppColors.warning),
+                  style: const TextStyle(fontSize: 11, color: AppColors.warning),
                 ),
               ),
             ],
@@ -367,18 +360,16 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
               tooltip: MockUiText.zoomOut3,
             ),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkSurface
-                    : AppColors.primarySurface,
+                color:
+                    isDark ? AppColors.darkSurface : AppColors.primarySurface,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 MockUiText.percent(editorState.scale),
-                style: const TextStyle(
-                    fontSize: 12, fontWeight: FontWeight.w600),
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
               ),
             ),
             IconButton(
@@ -547,9 +538,8 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                     offsetX: editorState.offsetX,
                     offsetY: editorState.offsetY,
                     viewportSize: _canvasSize,
-                    onTap: (dx, dy) => ref
-                        .read(flowEditorProvider.notifier)
-                        .setOffset(dx, dy),
+                    onTap: (dx, dy) =>
+                        ref.read(flowEditorProvider.notifier).setOffset(dx, dy),
                   ),
                 ).animate().fadeIn(delay: 500.ms),
 
@@ -558,8 +548,8 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                   left: 12,
                   bottom: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: isDark
                           ? AppColors.darkCard.withValues(alpha: 0.92)
@@ -572,15 +562,16 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color:
-                              Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.3 : 0.06),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
                       ],
                     ),
                     child: Text(
-                      MockUiText.nodesAndEdges(editorState.nodes.length, editorState.edges.length),
+                      MockUiText.nodesAndEdges(
+                          editorState.nodes.length, editorState.edges.length),
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                   ),
@@ -593,12 +584,15 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
           if (editorState.selectedNode != null && !isMobile)
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              width: isDesktop ? 340 : isTablet ? 290 : 240,
+              width: isDesktop
+                  ? 340
+                  : isTablet
+                      ? 290
+                      : 240,
               child: FlowNodeEditor(
                 node: editorState.selectedNode!,
-                onUpdate: (updated) => ref
-                    .read(flowEditorProvider.notifier)
-                    .updateNode(updated),
+                onUpdate: (updated) =>
+                    ref.read(flowEditorProvider.notifier).updateNode(updated),
                 onDelete: () => ref
                     .read(flowEditorProvider.notifier)
                     .deleteNode(editorState.selectedNode!.id),
@@ -644,12 +638,10 @@ class _NodePropertiesSheet extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: sheetBg,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(28)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black
-                    .withValues(alpha: isDark ? 0.55 : 0.16),
+                color: Colors.black.withValues(alpha: isDark ? 0.55 : 0.16),
                 blurRadius: 32,
                 spreadRadius: 0,
                 offset: const Offset(0, -6),
@@ -673,8 +665,7 @@ class _NodePropertiesSheet extends StatelessWidget {
 
               // ── Sheet header ─────────────────────────────────
               Padding(
-                padding:
-                    const EdgeInsets.fromLTRB(20, 6, 12, 12),
+                padding: const EdgeInsets.fromLTRB(20, 6, 12, 12),
                 child: Row(
                   children: [
                     Container(
@@ -736,8 +727,7 @@ class _NodePropertiesSheet extends StatelessWidget {
                     const SizedBox(width: 4),
                     IconButton(
                       icon: Icon(Icons.keyboard_arrow_down_rounded,
-                          color: cs.onSurface.withValues(alpha: 0.5),
-                          size: 26),
+                          color: cs.onSurface.withValues(alpha: 0.5), size: 26),
                       onPressed: () => Navigator.of(context).pop(),
                       tooltip: MockUiText.close,
                     ),
@@ -747,9 +737,7 @@ class _NodePropertiesSheet extends StatelessWidget {
 
               Divider(
                   height: 1,
-                  color: isDark
-                      ? AppColors.darkBorder
-                      : AppColors.lightBorder),
+                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
 
               // ── Scrollable properties ─────────────────────────
               Expanded(
@@ -812,9 +800,7 @@ class _ControlButton extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: color),
+                    fontSize: 13, fontWeight: FontWeight.w600, color: color),
               ),
             ],
           ),
@@ -850,16 +836,14 @@ class _EmptyCanvasHint extends StatelessWidget {
             onTap: onAddNode,
             borderRadius: BorderRadius.circular(20),
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 56, vertical: 48),
+              padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 48),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color:
-                          AppColors.primary.withValues(alpha: 0.08),
+                      color: AppColors.primary.withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -871,13 +855,11 @@ class _EmptyCanvasHint extends StatelessWidget {
                   const SizedBox(height: 20),
                   Text(
                     MockUiText.startBuildingYourFlow,
-                    style:
-                        Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: isDark
-                                  ? AppColors.darkText
-                                  : AppColors.lightText,
-                              fontWeight: FontWeight.w600,
-                            ),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color:
+                              isDark ? AppColors.darkText : AppColors.lightText,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   Text(

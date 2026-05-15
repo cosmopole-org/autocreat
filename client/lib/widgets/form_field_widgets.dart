@@ -32,7 +32,8 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
   @override
   void initState() {
     super.initState();
-    _textController = TextEditingController(text: widget.value?.toString() ?? '');
+    _textController =
+        TextEditingController(text: widget.value?.toString() ?? '');
   }
 
   @override
@@ -59,7 +60,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                 if (widget.field.required) ...[
                   const SizedBox(width: 4),
                   Text(MockUiText.requiredAsterisk,
-                      style: TextStyle(color: AppColors.error, fontSize: 14)),
+                      style: const TextStyle(color: AppColors.error, fontSize: 14)),
                 ],
               ],
             ),
@@ -116,7 +117,8 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
         return DropdownButtonFormField<String>(
           value: widget.value as String?,
           items: widget.field.options
-              .map((o) => DropdownMenuItem(value: o.value, child: Text(o.label)))
+              .map(
+                  (o) => DropdownMenuItem(value: o.value, child: Text(o.label)))
               .toList(),
           onChanged: widget.readOnly ? null : (v) => widget.onChanged?.call(v),
           decoration: InputDecoration(
@@ -151,8 +153,9 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
       case FormFieldType.checkbox:
         return CheckboxListTile(
           title: Text(widget.field.label),
-          subtitle:
-              widget.field.helpText != null ? Text(widget.field.helpText!) : null,
+          subtitle: widget.field.helpText != null
+              ? Text(widget.field.helpText!)
+              : null,
           value: widget.value as bool? ?? false,
           onChanged: widget.readOnly ? null : (v) => widget.onChanged?.call(v),
           contentPadding: EdgeInsets.zero,
@@ -166,8 +169,9 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                     title: Text(o.label),
                     value: o.value,
                     groupValue: selected,
-                    onChanged:
-                        widget.readOnly ? null : (v) => widget.onChanged?.call(v),
+                    onChanged: widget.readOnly
+                        ? null
+                        : (v) => widget.onChanged?.call(v),
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                   ))
@@ -207,7 +211,8 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
               ? null
               : () async {
                   final localizations = MaterialLocalizations.of(context);
-                  final alwaysUse24h = MediaQuery.alwaysUse24HourFormatOf(context);
+                  final alwaysUse24h =
+                      MediaQuery.alwaysUse24HourFormatOf(context);
                   final time = await showTimePicker(
                     context: context,
                     initialTime: TimeOfDay.now(),
@@ -216,7 +221,8 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                   widget.onChanged?.call(
                     time == null
                         ? null
-                        : localizations.formatTimeOfDay(time, alwaysUse24HourFormat: alwaysUse24h),
+                        : localizations.formatTimeOfDay(time,
+                            alwaysUse24HourFormat: alwaysUse24h),
                   );
                 },
           child: InputDecorator(
@@ -398,9 +404,8 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
         );
 
       case FormFieldType.color:
-        final color = widget.value is int
-            ? Color(widget.value as int)
-            : _selectedColor;
+        final color =
+            widget.value is int ? Color(widget.value as int) : _selectedColor;
         return GestureDetector(
           onTap: widget.readOnly
               ? null
@@ -414,7 +419,10 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                           pickerColor: color,
                           onColorChanged: (c) {
                             setState(() => _selectedColor = c);
-                            widget.onChanged?.call(((c.a * 255).round() << 24) | ((c.r * 255).round() << 16) | ((c.g * 255).round() << 8) | (c.b * 255).round());
+                            widget.onChanged?.call(((c.a * 255).round() << 24) |
+                                ((c.r * 255).round() << 16) |
+                                ((c.g * 255).round() << 8) |
+                                (c.b * 255).round());
                           },
                         ),
                       ),
@@ -436,7 +444,8 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
             ),
             child: Center(
               child: Text(
-                MockUiText.rgbHex((color.r * 255).round(), (color.g * 255).round(), (color.b * 255).round()),
+                MockUiText.rgbHex((color.r * 255).round(),
+                    (color.g * 255).round(), (color.b * 255).round()),
                 style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -463,7 +472,8 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
             ),
             Switch(
               value: widget.value as bool? ?? false,
-              onChanged: widget.readOnly ? null : (v) => widget.onChanged?.call(v),
+              onChanged:
+                  widget.readOnly ? null : (v) => widget.onChanged?.call(v),
             ),
           ],
         );
@@ -494,15 +504,15 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
             border: Border.all(color: AppColors.lightBorder),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: const Center(
+          child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.draw_outlined,
+                const Icon(Icons.draw_outlined,
                     size: 32, color: AppColors.lightTextSecondary),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(MockUiText.signHere,
-                    style: TextStyle(color: AppColors.lightTextSecondary)),
+                    style: const TextStyle(color: AppColors.lightTextSecondary)),
               ],
             ),
           ),
@@ -538,7 +548,11 @@ class _TableField extends StatefulWidget {
 
 class _TableFieldState extends State<_TableField> {
   final List<List<String>> _rows = [];
-  final List<String> _headers = [MockUiText.column1, MockUiText.column2, MockUiText.column3];
+  final List<String> _headers = [
+    MockUiText.column1,
+    MockUiText.column2,
+    MockUiText.column3
+  ];
 
   @override
   Widget build(BuildContext context) {

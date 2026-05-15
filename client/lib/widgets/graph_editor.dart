@@ -188,8 +188,7 @@ class _GraphEditorState extends State<GraphEditor>
     }
   }
 
-  bool _isOutputPort(_PortSide side) =>
-      side != _PortSide.inputLeft;
+  bool _isOutputPort(_PortSide side) => side != _PortSide.inputLeft;
 
   // ── bezier helpers ─────────────────────────────────────────────────────────
 
@@ -229,13 +228,15 @@ class _GraphEditorState extends State<GraphEditor>
         widget.onEdgeDelete?.call(widget.selectedEdgeId!);
       }
     } else if (event.logicalKey == LogicalKeyboardKey.escape) {
-      widget.onNodeTap?.call(const FlowNode(id: '', label: '', type: NodeType.step));
+      widget.onNodeTap
+          ?.call(const FlowNode(id: '', label: '', type: NodeType.step));
     }
   }
 
   // ── context menu ──────────────────────────────────────────────────────────
 
-  bool get _glassMode => ProviderScope.containerOf(context, listen: false).read(glassModeProvider);
+  bool get _glassMode =>
+      ProviderScope.containerOf(context, listen: false).read(glassModeProvider);
 
   Color _contextMenuColor() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -277,9 +278,9 @@ class _GraphEditorState extends State<GraphEditor>
       shape: _contextMenuShape(),
       items: <PopupMenuEntry<Object?>>[
         PopupMenuItem<Object?>(
-          child: const Row(children: [
-            Icon(Icons.edit_outlined, size: 16),
-            SizedBox(width: 8),
+          child: Row(children: [
+            const Icon(Icons.edit_outlined, size: 16),
+            const SizedBox(width: 8),
             Text(MockUiText.editLabel),
           ]),
           onTap: () =>
@@ -287,11 +288,11 @@ class _GraphEditorState extends State<GraphEditor>
         ),
         const PopupMenuDivider(height: 1),
         PopupMenuItem<Object?>(
-          child: const Row(children: [
-            Icon(Icons.delete_outline, size: 16, color: AppColors.error),
-            SizedBox(width: 8),
+          child: Row(children: [
+            const Icon(Icons.delete_outline, size: 16, color: AppColors.error),
+            const SizedBox(width: 8),
             Text(MockUiText.deleteNode,
-                style: TextStyle(color: AppColors.error)),
+                style: const TextStyle(color: AppColors.error)),
           ]),
           onTap: () => widget.onNodeDelete?.call(node.id),
         ),
@@ -316,11 +317,11 @@ class _GraphEditorState extends State<GraphEditor>
       shape: _contextMenuShape(),
       items: <PopupMenuEntry<Object?>>[
         PopupMenuItem<Object?>(
-          child: const Row(children: [
-            Icon(Icons.delete_outline, size: 16, color: AppColors.error),
-            SizedBox(width: 8),
+          child: Row(children: [
+            const Icon(Icons.delete_outline, size: 16, color: AppColors.error),
+            const SizedBox(width: 8),
             Text(MockUiText.deleteEdge,
-                style: TextStyle(color: AppColors.error)),
+                style: const TextStyle(color: AppColors.error)),
           ]),
           onTap: () => widget.onEdgeDelete?.call(edge.id),
         ),
@@ -368,8 +369,8 @@ class _GraphEditorState extends State<GraphEditor>
       final dx = canvas.dx - _dragStartCanvas!.dx;
       final dy = canvas.dy - _dragStartCanvas!.dy;
       final node = widget.nodes.firstWhere((n) => n.id == _draggingNodeId);
-      widget.onNodeMoved
-          ?.call(node.copyWith(x: _nodeStartPos!.dx + dx, y: _nodeStartPos!.dy + dy));
+      widget.onNodeMoved?.call(
+          node.copyWith(x: _nodeStartPos!.dx + dx, y: _nodeStartPos!.dy + dy));
     } else if (_isPanning) {
       final dx = d.localPosition.dx - _panStartScreen!.dx;
       final dy = d.localPosition.dy - _panStartScreen!.dy;
@@ -383,11 +384,12 @@ class _GraphEditorState extends State<GraphEditor>
       final target = _hitNode(_edgeDragCanvas!);
       final destId = destPort?.nodeId ?? target?.id;
       if (destId != null && destId != _edgeSourcePort!.nodeId) {
-        final conditionLabel = _edgeSourcePort!.side == _PortSide.outputBottomYes
-            ? MockUiText.yes
-            : _edgeSourcePort!.side == _PortSide.outputBottomNo
-                ? MockUiText.no
-                : null;
+        final conditionLabel =
+            _edgeSourcePort!.side == _PortSide.outputBottomYes
+                ? MockUiText.yes
+                : _edgeSourcePort!.side == _PortSide.outputBottomNo
+                    ? MockUiText.no
+                    : null;
         widget.onEdgeCreate?.call(_edgeSourcePort!.nodeId, destId,
             conditionLabel: conditionLabel);
       }
@@ -455,10 +457,8 @@ class _GraphEditorState extends State<GraphEditor>
     final newScale = (widget.scale + delta).clamp(0.2, 4.0);
     // Zoom towards cursor position
     final cursorCanvas = _screenToCanvas(e.localPosition);
-    final newOffX =
-        e.localPosition.dx - cursorCanvas.dx * newScale;
-    final newOffY =
-        e.localPosition.dy - cursorCanvas.dy * newScale;
+    final newOffX = e.localPosition.dx - cursorCanvas.dx * newScale;
+    final newOffY = e.localPosition.dy - cursorCanvas.dy * newScale;
     widget.onScaleChanged?.call(newScale);
     widget.onOffsetChanged?.call(newOffX, newOffY);
   }
@@ -547,18 +547,15 @@ class _GraphPainter extends CustomPainter {
   bool get isDark => brightness == Brightness.dark;
   Color get bgColor =>
       isDark ? const Color(0xFF0F1420) : const Color(0xFFF0F4FF);
-  Color get dotColor => isDark
-      ? const Color(0xFF2A3050)
-      : const Color(0xFFDDE2F5);
+  Color get dotColor =>
+      isDark ? const Color(0xFF2A3050) : const Color(0xFFDDE2F5);
   Color get edgeColor =>
       isDark ? const Color(0xFF4A5280) : const Color(0xFFB0BCEA);
   Color get edgeSelectedColor => AppColors.primary;
-  Color get nodeBg =>
-      isDark ? const Color(0xFF1C2333) : Colors.white;
+  Color get nodeBg => isDark ? const Color(0xFF1C2333) : Colors.white;
   Color get nodeBorder =>
       isDark ? const Color(0xFF2D3555) : const Color(0xFFDDE2F5);
-  Color get textPrimary =>
-      isDark ? AppColors.darkText : AppColors.lightText;
+  Color get textPrimary => isDark ? AppColors.darkText : AppColors.lightText;
   Color get textSecondary => AppColors.lightTextSecondary;
 
   Offset canvasToScreen(Offset c) =>
@@ -697,8 +694,7 @@ class _GraphPainter extends CustomPainter {
 
     final path = Path()
       ..moveTo(p0.dx, p0.dy)
-      ..cubicTo(
-          ctrl.$1.dx, ctrl.$1.dy, ctrl.$2.dx, ctrl.$2.dy, p3.dx, p3.dy);
+      ..cubicTo(ctrl.$1.dx, ctrl.$1.dy, ctrl.$2.dx, ctrl.$2.dy, p3.dx, p3.dy);
 
     if (isSelected) {
       // Glow under
@@ -732,8 +728,8 @@ class _GraphPainter extends CustomPainter {
     }
 
     // Arrowhead at target
-    _drawArrow(canvas, ctrl.$2, p3,
-        isSelected ? edgeSelectedColor : edgeColor, isSelected ? 2.0 : 1.6);
+    _drawArrow(canvas, ctrl.$2, p3, isSelected ? edgeSelectedColor : edgeColor,
+        isSelected ? 2.0 : 1.6);
 
     // Label
     if (e.label != null && e.label!.isNotEmpty) {
@@ -797,7 +793,11 @@ class _GraphPainter extends CustomPainter {
         to.dy - arrowSize * math.sin(angle + 0.38),
       )
       ..close();
-    canvas.drawPath(arrowPath, Paint()..color = color..style = PaintingStyle.fill);
+    canvas.drawPath(
+        arrowPath,
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.fill);
   }
 
   void _drawEdgeLabel(Canvas canvas, String label, Offset pos, bool selected) {
@@ -856,7 +856,8 @@ class _GraphPainter extends CustomPainter {
     );
 
     // Left accent bar
-    final barRect = Rect.fromLTWH(rect.left, rect.top, 5 * scale.clamp(0.8, 1.2), rect.height);
+    final barRect = Rect.fromLTWH(
+        rect.left, rect.top, 5 * scale.clamp(0.8, 1.2), rect.height);
     canvas.drawRRect(
       RRect.fromRectAndCorners(barRect,
           topLeft: const Radius.circular(14),
@@ -867,7 +868,8 @@ class _GraphPainter extends CustomPainter {
     // Status badge for decision (small "?" in top-right corner)
     if (n.type == NodeType.decision) {
       const badgeR = 9.0;
-      final badgeCenter = Offset(rect.right - badgeR - 4, rect.top + badgeR + 4);
+      final badgeCenter =
+          Offset(rect.right - badgeR - 4, rect.top + badgeR + 4);
       canvas.drawCircle(
         badgeCenter,
         badgeR,
@@ -886,8 +888,8 @@ class _GraphPainter extends CustomPainter {
     // Icon
     final iconOffset = Offset(rect.left + 12 * scale.clamp(0.7, 1.3),
         rect.center.dy - 10 * scale.clamp(0.7, 1.3));
-    _paintIcon(canvas, AppUtils.getNodeTypeIcon(n.type.name), iconOffset,
-        color, 18 * scale.clamp(0.7, 1.3));
+    _paintIcon(canvas, AppUtils.getNodeTypeIcon(n.type.name), iconOffset, color,
+        18 * scale.clamp(0.7, 1.3));
 
     // Label
     final labelX = rect.left + 38 * scale.clamp(0.7, 1.3);
@@ -913,7 +915,8 @@ class _GraphPainter extends CustomPainter {
 
     // Role/Form badge if assigned
     if (n.assignedRoleId != null || n.assignedFormId != null) {
-      final badgeText = n.assignedFormId != null ? MockUiText.form : MockUiText.role;
+      final badgeText =
+          n.assignedFormId != null ? MockUiText.form : MockUiText.role;
       final bp = Offset(rect.right - 36, rect.bottom - 16);
       canvas.drawRRect(
         RRect.fromRectAndRadius(
@@ -944,7 +947,8 @@ class _GraphPainter extends CustomPainter {
 
     final isSelected = n.id == selectedNodeId;
     final color = AppUtils.getNodeTypeColor(n.type.name);
-    final showPorts = isSelected || isHovering ||
+    final showPorts = isSelected ||
+        isHovering ||
         (edgeSourcePort != null && edgeSourcePort!.nodeId != n.id);
 
     for (final side in ports) {
@@ -957,8 +961,7 @@ class _GraphPainter extends CustomPainter {
       canvas.drawCircle(sp, radius + 2,
           Paint()..color = portColor.withValues(alpha: showPorts ? 0.2 : 0.0));
       // Circle
-      canvas.drawCircle(
-          sp, radius, Paint()..color = nodeBg);
+      canvas.drawCircle(sp, radius, Paint()..color = nodeBg);
       canvas.drawCircle(
         sp,
         radius,
@@ -970,14 +973,14 @@ class _GraphPainter extends CustomPainter {
 
       // Label for decision outputs
       if (side == _PortSide.outputBottomYes && showPorts) {
-        _paintText(canvas, MockUiText.y,
-            sp + Offset(-3, 6 * scale.clamp(0.6, 1.4)),
+        _paintText(
+            canvas, MockUiText.y, sp + Offset(-3, 6 * scale.clamp(0.6, 1.4)),
             fontSize: 8 * scale.clamp(0.6, 1.2),
             color: AppColors.success,
             fontWeight: FontWeight.w700);
       } else if (side == _PortSide.outputBottomNo && showPorts) {
-        _paintText(canvas, MockUiText.n3,
-            sp + Offset(-3, 6 * scale.clamp(0.6, 1.4)),
+        _paintText(
+            canvas, MockUiText.n3, sp + Offset(-3, 6 * scale.clamp(0.6, 1.4)),
             fontSize: 8 * scale.clamp(0.6, 1.2),
             color: AppColors.error,
             fontWeight: FontWeight.w700);
@@ -1018,8 +1021,8 @@ class _GraphPainter extends CustomPainter {
     tp.paint(canvas, pos);
   }
 
-  void _paintIcon(Canvas canvas, IconData icon, Offset pos, Color color,
-      double size) {
+  void _paintIcon(
+      Canvas canvas, IconData icon, Offset pos, Color color, double size) {
     final tp = TextPainter(
       text: TextSpan(
         text: String.fromCharCode(icon.codePoint),
@@ -1070,8 +1073,7 @@ class GraphMinimap extends StatelessWidget {
         const w = 160.0;
         const h = 100.0;
         double minX = double.infinity, minY = double.infinity;
-        double maxX = double.negativeInfinity,
-            maxY = double.negativeInfinity;
+        double maxX = double.negativeInfinity, maxY = double.negativeInfinity;
         for (final n in nodes) {
           minX = math.min(minX, n.x);
           minY = math.min(minY, n.y);
@@ -1154,8 +1156,8 @@ class _MinimapPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
       );
       tp.layout();
-      tp.paint(
-          canvas, Offset((size.width - tp.width) / 2, (size.height - tp.height) / 2));
+      tp.paint(canvas,
+          Offset((size.width - tp.width) / 2, (size.height - tp.height) / 2));
       return;
     }
 
@@ -1181,7 +1183,8 @@ class _MinimapPainter extends CustomPainter {
         RRect.fromRectAndRadius(
             Rect.fromLTWH(rx, ry, rw, rh), const Radius.circular(2)),
         Paint()
-          ..color = AppUtils.getNodeTypeColor(node.type.name).withValues(alpha: 0.65)
+          ..color =
+              AppUtils.getNodeTypeColor(node.type.name).withValues(alpha: 0.65)
           ..style = PaintingStyle.fill,
       );
     }

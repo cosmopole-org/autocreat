@@ -705,7 +705,7 @@ class _LogoMark extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             MockUiText.autocreat,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppColors.primary,
@@ -762,9 +762,9 @@ class _FullSidebar extends ConsumerWidget {
                     BorderSide(color: cs.outline.withValues(alpha: 0.4)),
               ),
             ),
-            child: Align(
+            child: const Align(
               alignment: AlignmentDirectional.centerStart,
-              child: const _LogoMark(),
+              child: _LogoMark(),
             ),
           ),
 
