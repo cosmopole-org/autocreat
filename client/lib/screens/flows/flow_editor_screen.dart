@@ -349,28 +349,33 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
         ),
         actions: [
           if (!isMobile) ...[
-            IconButton(
-              icon: const Icon(Icons.remove_rounded, size: 18),
+            AppBarIconButton(
+              icon: Icons.remove_rounded,
               onPressed: () => ref
                   .read(flowEditorProvider.notifier)
                   .setScale(editorState.scale - 0.1),
               tooltip: UiText.zoomOut3,
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color:
-                    isDark ? AppColors.darkSurface : AppColors.primarySurface,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                UiText.percent(editorState.scale),
-                style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkSurface
+                      : AppColors.primarySurface,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  UiText.percent(editorState.scale),
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.add_rounded, size: 18),
+            AppBarIconButton(
+              icon: Icons.add_rounded,
               onPressed: () => ref
                   .read(flowEditorProvider.notifier)
                   .setScale(editorState.scale + 0.1),
@@ -379,13 +384,13 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
             const SizedBox(width: 4),
           ],
           if (isMobile)
-            IconButton(
-              icon: const Icon(Icons.tune_rounded),
+            AppBarIconButton(
+              icon: Icons.tune_rounded,
               tooltip: UiText.canvasControls3,
               onPressed: () =>
                   _showMobileControls(context, editorState, isDark),
             ),
-          AppButton(
+          AppBarActionButton(
             label: isMobile ? UiText.save : UiText.saveFlow,
             icon: Icons.save_outlined,
             loading: _saving,

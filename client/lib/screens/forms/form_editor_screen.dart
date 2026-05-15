@@ -111,13 +111,13 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
           ],
         ),
         actions: [
-          AppButton(
+          AppBarActionButton(
             label: UiText.save,
             icon: Icons.save_outlined,
             loading: _saving,
             onPressed: _save,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
         ],
       ),
       body: Row(

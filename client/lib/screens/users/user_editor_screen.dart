@@ -140,13 +140,13 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
         leading: AppBarBackButton(onPressed: () => context.pop()),
         title: Text(_user == null ? UiText.newUser : UiText.editUser),
         actions: [
-          AppButton(
+          AppBarActionButton(
             label: UiText.save,
             loading: _saving,
             onPressed: _save,
             icon: Icons.save_outlined,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
         ],
       ),
       body: SingleChildScrollView(

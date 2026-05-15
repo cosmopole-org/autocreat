@@ -1445,28 +1445,20 @@ class _CompanySelector extends ConsumerWidget {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cs = Theme.of(context).colorScheme;
+    final glassMode = ref.read(glassModeProvider);
 
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (ctx) => Container(
-        margin: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.darkCard : AppColors.lightCard,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: cs.outline.withValues(alpha: 0.15),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
-              blurRadius: 32,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Column(
+      builder: (ctx) {
+        final bgColor = glassMode
+            ? (isDark
+                ? Colors.white.withValues(alpha: 0.10)
+                : Colors.white.withValues(alpha: 0.68))
+            : (isDark ? AppColors.darkCard : AppColors.lightCard);
+
+        final column = Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Handle
@@ -1596,8 +1588,49 @@ class _CompanySelector extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
           ],
-        ),
-      ),
+        );
+
+        final innerContent = glassMode
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                  child: column,
+                ),
+              )
+            : column;
+
+        return Container(
+          margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: bgColor,
+            gradient: glassMode
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withValues(alpha: isDark ? 0.16 : 0.84),
+                      Colors.white.withValues(alpha: isDark ? 0.05 : 0.42),
+                    ],
+                  )
+                : null,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: glassMode
+                  ? Colors.white.withValues(alpha: isDark ? 0.14 : 0.55)
+                  : cs.outline.withValues(alpha: 0.15),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
+                blurRadius: 32,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: innerContent,
+        );
+      },
     );
   }
 }
