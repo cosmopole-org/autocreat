@@ -515,7 +515,7 @@ class _ModelCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppColors.primarySurface,
+                          color: cs.primaryContainer.withValues(alpha: 0.35),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Row(
@@ -523,20 +523,19 @@ class _ModelCard extends StatelessWidget {
                           children: [
                             Text(
                               f.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 10,
-                                  color: AppColors.primary,
+                                  color: cs.primary,
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(UiText.bulletSeparator,
-                                style: const TextStyle(
-                                    fontSize: 10, color: AppColors.primary)),
+                                style: TextStyle(
+                                    fontSize: 10, color: cs.primary)),
                             Text(
                               f.type.displayName,
                               style: TextStyle(
                                   fontSize: 10,
-                                  color:
-                                      AppColors.primary.withValues(alpha: 0.7)),
+                                  color: cs.primary.withValues(alpha: 0.7)),
                             ),
                           ],
                         ),

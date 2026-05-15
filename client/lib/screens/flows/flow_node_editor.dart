@@ -60,7 +60,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final node = widget.node;
-    final nodeColor = AppUtils.getNodeTypeColor(node.type.name);
+    final nodeColor = AppUtils.getNodeTypeColor(node.type.name, isDark: isDark);
     final rolesAsync = ref.watch(rolesProvider(null));
     final formsAsync = ref.watch(formsProvider(null));
 
@@ -224,6 +224,12 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                   widget.onUpdate(
                       node.copyWith(branches: [...node.branches, branch]));
                 },
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                ),
               ),
             ],
           ),
@@ -281,25 +287,22 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                                     fontWeight: FontWeight.w700)),
                           ),
                         const SizedBox(width: 4),
-                        GestureDetector(
-                          onTap: () {
+                        IconButton(
+                          onPressed: () {
                             final newBranches =
                                 List<BranchCondition>.from(node.branches)
                                   ..removeAt(e.key);
-                            widget
-                                .onUpdate(node.copyWith(branches: newBranches));
+                            widget.onUpdate(node.copyWith(branches: newBranches));
                           },
-                          child: Container(
+                          icon: const Icon(Icons.close_rounded, size: 14),
+                          color: AppColors.error,
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.error.withValues(alpha: 0.10),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6)),
                             padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: AppColors.error.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: const Icon(
-                              Icons.close_rounded,
-                              size: 14,
-                              color: AppColors.error,
-                            ),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            minimumSize: const Size(24, 24),
                           ),
                         ),
                       ],
@@ -312,7 +315,6 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 10),
-                        fillColor: isDark ? AppColors.darkCard : Colors.white,
                       ),
                       style: const TextStyle(fontSize: 12),
                       onChanged: (v) {

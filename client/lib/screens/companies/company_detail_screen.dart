@@ -239,8 +239,8 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Text(UiText.noFlowsYet,
-                            style:
-                                const TextStyle(color: AppColors.lightTextSecondary)),
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                       );
                     }
                     return Column(

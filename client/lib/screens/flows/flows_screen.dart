@@ -460,7 +460,7 @@ class _FlowsChart extends StatelessWidget {
                 color: cs.onSurface.withValues(alpha: 0.7))),
         const SizedBox(height: 8),
         ...typeMap.entries.map((e) {
-          final color = nodeColors[e.key] ?? AppColors.lightTextSecondary;
+          final color = nodeColors[e.key] ?? cs.onSurface.withValues(alpha: 0.4);
           return Padding(
             padding: const EdgeInsets.only(bottom: 6),
             child: Row(
@@ -504,20 +504,21 @@ class _FlowCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  Color get _statusColor {
+  Color _statusColor(bool isDark) {
     switch (flow.status) {
       case 'active':
         return AppColors.success;
       case 'draft':
         return AppColors.warning;
       default:
-        return AppColors.lightTextSecondary;
+        return isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final steps = flow.nodes.where((n) => n.type == NodeType.step).length;
     final decisions =
@@ -544,7 +545,7 @@ class _FlowCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: _statusColor.withValues(alpha: 0.1),
+                  color: _statusColor(isDark).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -552,7 +553,7 @@ class _FlowCard extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w700,
-                      color: _statusColor,
+                      color: _statusColor(isDark),
                       letterSpacing: 0.5),
                 ),
               ),

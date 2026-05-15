@@ -626,7 +626,7 @@ class _TicketCard extends StatelessWidget {
     }
   }
 
-  Color _statusColor() {
+  Color _statusColor({bool isDark = false}) {
     switch (ticket.status) {
       case TicketStatus.open:
         return AppColors.warning;
@@ -635,7 +635,7 @@ class _TicketCard extends StatelessWidget {
       case TicketStatus.resolved:
         return AppColors.success;
       case TicketStatus.closed:
-        return AppColors.lightTextSecondary;
+        return isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
     }
   }
 
@@ -644,7 +644,7 @@ class _TicketCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final priorityColor = _priorityColor();
-    final statusColor = _statusColor();
+    final statusColor = _statusColor(isDark: isDark);
     final hasDescription =
         ticket.description != null && ticket.description!.trim().isNotEmpty;
 

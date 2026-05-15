@@ -201,6 +201,10 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                       icon: Icon(Icons.keyboard_arrow_down_rounded,
                           color: cs.onSurface.withValues(alpha: 0.5)),
                       onPressed: () => Navigator.of(sheetCtx).pop(),
+                      style: IconButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: const EdgeInsets.all(4),
+                      ),
                     ),
                   ],
                 ),
@@ -365,10 +369,10 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.add_box_outlined,
                                 size: 48,
-                                color: AppColors.lightTextSecondary,
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                               ),
                               const SizedBox(height: 12),
                               Text(
@@ -451,6 +455,7 @@ class _FieldCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: AppCard(
@@ -459,10 +464,10 @@ class _FieldCard extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.drag_indicator,
               size: 18,
-              color: AppColors.lightTextSecondary,
+              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -480,7 +485,7 @@ class _FieldCard extends StatelessWidget {
                     field.type.displayName +
                         (field.required ? UiText.requiredText3 : ''),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.lightTextSecondary,
+                          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                         ),
                   ),
                 ],
@@ -655,6 +660,12 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
                         ));
                       widget.onUpdate(field.copyWith(options: options));
                     },
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ],
               ),
@@ -680,14 +691,16 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      InkWell(
-                        onTap: () {
+                      IconButton(
+                        onPressed: () {
                           final opts = List<FormFieldOption>.from(field.options)
                             ..removeAt(e.key);
                           widget.onUpdate(field.copyWith(options: opts));
                         },
-                        child: const Icon(Icons.remove_circle_outline,
-                            size: 16, color: AppColors.error),
+                        icon: const Icon(Icons.remove_circle_outline, size: 16),
+                        color: AppColors.error,
+                        padding: const EdgeInsets.all(4),
+                        constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                       ),
                     ],
                   ),

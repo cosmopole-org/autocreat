@@ -1285,7 +1285,7 @@ class StatusChip extends ConsumerWidget {
 
   const StatusChip({super.key, required this.status, this.color});
 
-  Color _statusColor() {
+  Color _statusColor({bool isDark = false}) {
     switch (status.toLowerCase()) {
       case 'active':
       case 'approved':
@@ -1305,7 +1305,7 @@ class StatusChip extends ConsumerWidget {
         return AppColors.error;
       case 'draft':
       case 'inactive':
-        return AppColors.lightTextSecondary;
+        return isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
       default:
         return AppColors.info;
     }
@@ -1313,7 +1313,8 @@ class StatusChip extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final c = color ?? _statusColor();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final c = color ?? _statusColor(isDark: isDark);
     final glassMode = ref.watch(glassModeProvider);
 
     return GlassSurface(

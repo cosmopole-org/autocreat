@@ -100,7 +100,7 @@ class AppUtils {
     }
   }
 
-  static Color getNodeTypeColor(String type) {
+  static Color getNodeTypeColor(String type, {bool isDark = false}) {
     switch (type.toUpperCase()) {
       case 'START':
         return AppColors.nodeStart;
@@ -111,7 +111,7 @@ class AppUtils {
       case 'END':
         return AppColors.nodeEnd;
       default:
-        return AppColors.lightTextSecondary;
+        return isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
     }
   }
 

@@ -239,7 +239,12 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
-                                ?.copyWith(color: AppColors.lightTextSecondary),
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.54),
+                                ),
                           ),
                         ],
                       ),

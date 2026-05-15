@@ -334,14 +334,14 @@ class _RoleCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  Color _levelColor(String level) {
+  Color _levelColor(String level, {bool isDark = false}) {
     switch (level) {
       case 'admin':
         return AppColors.error;
       case 'manager':
         return AppColors.warning;
       case 'viewer':
-        return AppColors.lightTextSecondary;
+        return isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
       default:
         return AppColors.accent;
     }
@@ -350,7 +350,8 @@ class _RoleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final lvlColor = _levelColor(role.level);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final lvlColor = _levelColor(role.level, isDark: isDark);
 
     // Permission summary
     final canCreate = role.permissions.where((p) => p.canCreate).length;
@@ -491,7 +492,7 @@ class _RoleCard extends StatelessWidget {
                             size: 9,
                             color: p.canCreate
                                 ? AppColors.success
-                                : AppColors.lightTextSecondary,
+                                : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
                           ),
                           const SizedBox(width: 3),
                           Text(
@@ -510,13 +511,13 @@ class _RoleCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 7, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppColors.primarySurface,
+                          color: cs.primaryContainer.withValues(alpha: 0.35),
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
                           UiText.moreCount(role.permissions.length - 4),
-                          style: const TextStyle(
-                              fontSize: 10, color: AppColors.primary),
+                          style: TextStyle(
+                              fontSize: 10, color: cs.primary),
                         ),
                       )
                     ]
