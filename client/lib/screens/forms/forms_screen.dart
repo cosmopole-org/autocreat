@@ -7,7 +7,7 @@ import '../../models/form_definition.dart';
 import '../../providers/form_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class FormsScreen extends ConsumerStatefulWidget {
   const FormsScreen({super.key});
@@ -29,7 +29,7 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
   Future<void> _createForm(BuildContext context) async {
     final repo = ref.read(formRepositoryProvider);
     final form = await repo.createForm({
-      'name': MockUiText.newForm,
+      'name': UiText.newForm,
       'status': 'draft',
       'fields': [],
     });
@@ -75,11 +75,11 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
               children: [
                 // Header
                 AppPageHeader(
-                  title: MockUiText.formDefinitions,
-                  description: MockUiText
+                  title: UiText.formDefinitions,
+                  description: UiText
                       .buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif,
-                  actionLabel: MockUiText.newForm,
-                  compactActionLabel: MockUiText.newText,
+                  actionLabel: UiText.newForm,
+                  compactActionLabel: UiText.newText,
                   actionIcon: Icons.add,
                   onAction: () => _createForm(context),
                 ).animate().fadeIn(duration: 300.ms),
@@ -102,7 +102,7 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
                 // Search
                 SearchField(
                   controller: _searchController,
-                  hintText: MockUiText.searchForms,
+                  hintText: UiText.searchForms,
                   onChanged: (v) => setState(() => _search = v),
                 ).animate().fadeIn(delay: 250.ms),
                 const SizedBox(height: 16),
@@ -113,10 +113,10 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
         if (filtered.isEmpty)
           SliverFillRemaining(
             child: EmptyState(
-              title: MockUiText.noFormsYet,
-              subtitle: MockUiText.createYourFirstFormDefinition,
+              title: UiText.noFormsYet,
+              subtitle: UiText.createYourFirstFormDefinition,
               icon: Icons.dynamic_form_outlined,
-              actionLabel: MockUiText.createForm,
+              actionLabel: UiText.createForm,
               onAction: () => _createForm(context),
             ),
           )
@@ -138,8 +138,8 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
                     final confirmed = await showDialog<bool>(
                       context: context,
                       builder: (_) => ConfirmDialog(
-                        title: MockUiText.deleteForm,
-                        message: MockUiText.thisWillDeleteTheFormPermanently,
+                        title: UiText.deleteForm,
+                        message: UiText.thisWillDeleteTheFormPermanently,
                       ),
                     );
                     if (confirmed == true) {
@@ -179,25 +179,25 @@ class _FormsStatsRow extends StatelessWidget {
     final stats = [
       (
         Icons.dynamic_form_rounded,
-        MockUiText.totalForms,
+        UiText.totalForms,
         total.toString(),
         AppColors.accent
       ),
       (
         Icons.check_circle_rounded,
-        MockUiText.active,
+        UiText.active,
         active.toString(),
         AppColors.success
       ),
       (
         Icons.edit_note_rounded,
-        MockUiText.draft,
+        UiText.draft,
         draft.toString(),
         AppColors.warning
       ),
       (
         Icons.list_alt_rounded,
-        MockUiText.totalFields,
+        UiText.totalFields,
         totalFields.toString(),
         AppColors.primary
       ),
@@ -216,7 +216,7 @@ class _FormsStatsRow extends StatelessWidget {
               .entries
               .map((e) => Expanded(
                     child: Padding(
-                      padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+                      padding: EdgeInsetsDirectional.only(start: e.key == 0 ? 0 : 12),
                       child: e.value,
                     ),
                   ))
@@ -275,18 +275,18 @@ class _FieldTypeChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(MockUiText.fieldTypesDistribution,
+          Text(UiText.fieldTypesDistribution,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text(MockUiText.countOfEachFieldTypeAcrossAllForms,
+          Text(UiText.countOfEachFieldTypeAcrossAllForms,
               style: TextStyle(
                   fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           if (top.isEmpty)
             Center(
-              child: Text(MockUiText.noFieldsDefined,
+              child: Text(UiText.noFieldsDefined,
                   style: TextStyle(color: cs.onSurface.withValues(alpha: 0.4))),
             )
           else
@@ -426,10 +426,10 @@ class _FormCard extends StatelessWidget {
                     size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                 itemBuilder: (_) => [
                   GlassContextMenuItem(
-                      value: 'edit', child: Text(MockUiText.openEditor)),
+                      value: 'edit', child: Text(UiText.openEditor)),
                   GlassContextMenuItem(
                       value: 'delete',
-                      child: Text(MockUiText.delete,
+                      child: Text(UiText.delete,
                           style: const TextStyle(color: AppColors.error))),
                 ],
                 onSelected: (v) {
@@ -497,7 +497,7 @@ class _FormCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            MockUiText.moreCount(form.fields.length - 3),
+                            UiText.moreCount(form.fields.length - 3),
                             style: const TextStyle(
                                 fontSize: 9, color: AppColors.primary),
                           ),
@@ -514,7 +514,7 @@ class _FormCard extends StatelessWidget {
                   size: 13, color: cs.onSurface.withValues(alpha: 0.4)),
               const SizedBox(width: 4),
               Text(
-                MockUiText.fieldCount(form.fields.length),
+                UiText.fieldCount(form.fields.length),
                 style: TextStyle(
                     fontSize: 11, color: cs.onSurface.withValues(alpha: 0.55)),
               ),

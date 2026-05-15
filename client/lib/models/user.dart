@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../data/mock_ui_text.dart';
+import '../data/ui_text.dart';
 
 part 'user.freezed.dart';
 part 'user.g.dart';
@@ -26,11 +26,11 @@ class User with _$User {
 }
 
 extension UserExt on User {
-  String get fullName => MockUiText.userFullName(firstName, lastName);
+  String get fullName => UiText.userFullName(firstName, lastName);
   String get initials {
     final f = firstName.isNotEmpty ? firstName[0] : '';
     final l = lastName.isNotEmpty ? lastName[0] : '';
-    return MockUiText.initialsFromParts(f, l);
+    return UiText.initialsFromParts(f, l);
   }
 }
 

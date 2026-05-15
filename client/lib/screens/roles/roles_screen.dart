@@ -7,7 +7,7 @@ import '../../models/role.dart';
 import '../../providers/role_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class RolesScreen extends ConsumerStatefulWidget {
   const RolesScreen({super.key});
@@ -63,11 +63,11 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
               children: [
                 // Header
                 AppPageHeader(
-                  title: MockUiText.rolesPermissions,
-                  description: MockUiText
+                  title: UiText.rolesPermissions,
+                  description: UiText
                       .shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery,
-                  actionLabel: MockUiText.newRole,
-                  compactActionLabel: MockUiText.newText,
+                  actionLabel: UiText.newRole,
+                  compactActionLabel: UiText.newText,
                   actionIcon: Icons.add,
                   onAction: () => context.push('/roles/new/edit'),
                 ).animate().fadeIn(duration: 300.ms),
@@ -92,7 +92,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                 // Search
                 SearchField(
                   controller: _searchController,
-                  hintText: MockUiText.searchRoles,
+                  hintText: UiText.searchRoles,
                   onChanged: (v) => setState(() => _search = v),
                 ).animate().fadeIn(delay: 250.ms),
                 const SizedBox(height: 16),
@@ -103,10 +103,10 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
         if (filtered.isEmpty)
           SliverFillRemaining(
             child: EmptyState(
-              title: MockUiText.noRolesYet,
-              subtitle: MockUiText.createRolesToManageAccessControl,
+              title: UiText.noRolesYet,
+              subtitle: UiText.createRolesToManageAccessControl,
               icon: Icons.shield_outlined,
-              actionLabel: MockUiText.createRole,
+              actionLabel: UiText.createRole,
               onAction: () => context.push('/roles/new/edit'),
             ),
           )
@@ -124,8 +124,8 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (_) => ConfirmDialog(
-                          title: MockUiText.deleteRole,
-                          message: MockUiText.deleteThisRolePermanently,
+                          title: UiText.deleteRole,
+                          message: UiText.deleteThisRolePermanently,
                         ),
                       );
                       if (confirmed == true) {
@@ -167,25 +167,25 @@ class _RoleStatsRow extends StatelessWidget {
     final stats = [
       (
         Icons.shield_rounded,
-        MockUiText.totalRoles,
+        UiText.totalRoles,
         total.toString(),
         AppColors.success
       ),
       (
         Icons.check_circle_rounded,
-        MockUiText.active,
+        UiText.active,
         active.toString(),
         AppColors.primary
       ),
       (
         Icons.people_rounded,
-        MockUiText.totalMembers,
+        UiText.totalMembers,
         totalMembers.toString(),
         AppColors.accent
       ),
       (
         Icons.lock_rounded,
-        MockUiText.permissionSets,
+        UiText.permissionSets,
         totalPerms.toString(),
         AppColors.warning
       ),
@@ -239,12 +239,12 @@ class _MembersBarChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(MockUiText.membersPerRole,
+          Text(UiText.membersPerRole,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text(MockUiText.howManyUsersAreAssignedToEachRole,
+          Text(UiText.howManyUsersAreAssignedToEachRole,
               style: TextStyle(
                   fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
@@ -277,7 +277,7 @@ class _MembersBarChart extends StatelessWidget {
                         if (idx >= top.length) return const SizedBox();
                         final name = top[idx].name;
                         final short = name.length > 8
-                            ? MockUiText.truncatedName7(name)
+                            ? UiText.truncatedName7(name)
                             : name;
                         return Padding(
                           padding: const EdgeInsets.only(top: 4),
@@ -427,10 +427,10 @@ class _RoleCard extends StatelessWidget {
                     size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                 itemBuilder: (_) => [
                   GlassContextMenuItem(
-                      value: 'edit', child: Text(MockUiText.edit)),
+                      value: 'edit', child: Text(UiText.edit)),
                   GlassContextMenuItem(
                       value: 'delete',
-                      child: Text(MockUiText.delete,
+                      child: Text(UiText.delete,
                           style: const TextStyle(color: AppColors.error))),
                 ],
                 onSelected: (v) {
@@ -448,19 +448,19 @@ class _RoleCard extends StatelessWidget {
             children: [
               _PermBadge(
                 icon: Icons.people_rounded,
-                label: MockUiText.membersCount(role.memberCount),
+                label: UiText.membersCount(role.memberCount),
                 color: AppColors.primary,
               ),
               const SizedBox(width: 8),
               _PermBadge(
                 icon: Icons.lock_open_rounded,
-                label: MockUiText.resourcesCount(role.permissions.length),
+                label: UiText.resourcesCount(role.permissions.length),
                 color: AppColors.accent,
               ),
               const SizedBox(width: 8),
               _PermBadge(
                 icon: Icons.add_circle_outline,
-                label: MockUiText.canCreateCount(canCreate),
+                label: UiText.canCreateCount(canCreate),
                 color: AppColors.success,
               ),
             ],
@@ -514,7 +514,7 @@ class _RoleCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
-                          MockUiText.moreCount(role.permissions.length - 4),
+                          UiText.moreCount(role.permissions.length - 4),
                           style: const TextStyle(
                               fontSize: 10, color: AppColors.primary),
                         ),

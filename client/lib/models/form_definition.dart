@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../data/mock_ui_text.dart';
+import '../data/ui_text.dart';
 
 part 'form_definition.freezed.dart';
 part 'form_definition.g.dart';
@@ -26,22 +26,22 @@ enum FormFieldType {
 extension FormFieldTypeExt on FormFieldType {
   String get displayName {
     switch (this) {
-      case FormFieldType.text: return MockUiText.textField;
-      case FormFieldType.number: return MockUiText.number;
-      case FormFieldType.textarea: return MockUiText.textArea;
-      case FormFieldType.dropdown: return MockUiText.dropdown;
-      case FormFieldType.multiselect: return MockUiText.multiSelect;
-      case FormFieldType.checkbox: return MockUiText.checkbox;
-      case FormFieldType.radio: return MockUiText.radioGroup;
-      case FormFieldType.date: return MockUiText.datePicker;
-      case FormFieldType.time: return MockUiText.timePicker;
-      case FormFieldType.file: return MockUiText.fileUpload;
-      case FormFieldType.image: return MockUiText.imageUpload;
-      case FormFieldType.color: return MockUiText.colorPicker;
-      case FormFieldType.switchField: return MockUiText.switchText;
-      case FormFieldType.table: return MockUiText.table;
-      case FormFieldType.rating: return MockUiText.rating;
-      case FormFieldType.signature: return MockUiText.signature;
+      case FormFieldType.text: return UiText.textField;
+      case FormFieldType.number: return UiText.number;
+      case FormFieldType.textarea: return UiText.textArea;
+      case FormFieldType.dropdown: return UiText.dropdown;
+      case FormFieldType.multiselect: return UiText.multiSelect;
+      case FormFieldType.checkbox: return UiText.checkbox;
+      case FormFieldType.radio: return UiText.radioGroup;
+      case FormFieldType.date: return UiText.datePicker;
+      case FormFieldType.time: return UiText.timePicker;
+      case FormFieldType.file: return UiText.fileUpload;
+      case FormFieldType.image: return UiText.imageUpload;
+      case FormFieldType.color: return UiText.colorPicker;
+      case FormFieldType.switchField: return UiText.switchText;
+      case FormFieldType.table: return UiText.table;
+      case FormFieldType.rating: return UiText.rating;
+      case FormFieldType.signature: return UiText.signature;
     }
   }
 }

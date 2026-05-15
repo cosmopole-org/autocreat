@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../providers/letter_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class LetterEditorScreen extends ConsumerStatefulWidget {
   final String letterId;
@@ -69,7 +69,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
         'description':
             _descController.text.isNotEmpty ? _descController.text : null,
         'content': plainText,
-        MockUiText.deltacontent: {'ops': delta.toJson()},
+        UiText.deltacontent: {'ops': delta.toJson()},
         'status': 'draft',
       };
 
@@ -85,7 +85,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.templateSaved),
+              content: Text(UiText.templateSaved),
               backgroundColor: AppColors.success),
         );
       }
@@ -93,7 +93,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.error(e)),
+              content: Text(UiText.error(e)),
               backgroundColor: AppColors.error),
         );
       }
@@ -140,7 +140,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
         title: TextField(
           controller: _nameController,
           decoration: InputDecoration(
-            hintText: MockUiText.templateName,
+            hintText: UiText.templateName,
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
@@ -152,18 +152,18 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
           TextButton.icon(
             icon: const Icon(Icons.attach_file, size: 16),
             label: Text(_attachments.isEmpty
-                ? MockUiText.attach
-                : MockUiText.fileCount(_attachments.length)),
+                ? UiText.attach
+                : UiText.fileCount(_attachments.length)),
             onPressed: _pickAttachment,
           ),
           // Variable chip
           TextButton.icon(
             icon: const Icon(Icons.data_object, size: 16),
-            label: Text(MockUiText.variables),
+            label: Text(UiText.variables),
             onPressed: _showVariablesPanel,
           ),
           AppButton(
-            label: MockUiText.save,
+            label: UiText.save,
             loading: _saving,
             onPressed: _save,
             icon: Icons.save_outlined,
@@ -226,7 +226,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                     const SizedBox(width: 4),
                     ..._attachments.asMap().entries.map(
                           (e) => Padding(
-                            padding: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsetsDirectional.only(end: 8),
                             child: Chip(
                               label: Text(
                                 e.value.name,
@@ -243,7 +243,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                     TextButton.icon(
                       onPressed: _pickAttachment,
                       icon: const Icon(Icons.add, size: 14),
-                      label: Text(MockUiText.addMore,
+                      label: Text(UiText.addMore,
                           style: const TextStyle(fontSize: 11)),
                       style: TextButton.styleFrom(
                         minimumSize: Size.zero,
@@ -279,7 +279,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                     focusNode: _focusNode,
                     scrollController: _scrollController,
                     configurations: QuillEditorConfigurations(
-                      placeholder: MockUiText.startWritingYourLetterTemplate,
+                      placeholder: UiText.startWritingYourLetterTemplate,
                       padding: EdgeInsets.zero,
                       autoFocus: false,
                       expands: false,
@@ -299,23 +299,23 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     showDialog(
       context: context,
       builder: (_) => GlassAlertDialog(
-        title: Text(MockUiText.availableVariables),
+        title: Text(UiText.availableVariables),
         content: SizedBox(
           width: 320,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                MockUiText
+                UiText
                     .useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV,
               ),
               const SizedBox(height: 16),
               ...[
-                (r'{{user.name}}', MockUiText.userSFullName),
-                (r'{{user.email}}', MockUiText.userSEmail),
-                (r'{{company.name}}', MockUiText.companyName),
-                (r'{{date}}', MockUiText.currentDate),
-                (r'{{flow.name}}', MockUiText.flowName),
+                (r'{{user.name}}', UiText.userSFullName),
+                (r'{{user.email}}', UiText.userSEmail),
+                (r'{{company.name}}', UiText.companyName),
+                (r'{{date}}', UiText.currentDate),
+                (r'{{flow.name}}', UiText.flowName),
               ].map(
                 (v) => ListTile(
                   title: Text(v.$1,
@@ -342,7 +342,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(MockUiText.close),
+            child: Text(UiText.close),
           ),
         ],
       ),

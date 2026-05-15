@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../data/mock_ui_text.dart';
+import '../data/ui_text.dart';
 
 part 'model_definition.freezed.dart';
 part 'model_definition.g.dart';
@@ -18,14 +18,14 @@ enum ModelFieldType {
 extension ModelFieldTypeExt on ModelFieldType {
   String get displayName {
     switch (this) {
-      case ModelFieldType.string: return MockUiText.string;
-      case ModelFieldType.integer: return MockUiText.integer;
-      case ModelFieldType.float: return MockUiText.float;
-      case ModelFieldType.boolean: return MockUiText.boolean;
-      case ModelFieldType.date: return MockUiText.date;
-      case ModelFieldType.dateTime: return MockUiText.dateTime;
-      case ModelFieldType.file: return MockUiText.file;
-      case ModelFieldType.reference: return MockUiText.reference;
+      case ModelFieldType.string: return UiText.string;
+      case ModelFieldType.integer: return UiText.integer;
+      case ModelFieldType.float: return UiText.float;
+      case ModelFieldType.boolean: return UiText.boolean;
+      case ModelFieldType.date: return UiText.date;
+      case ModelFieldType.dateTime: return UiText.dateTime;
+      case ModelFieldType.file: return UiText.file;
+      case ModelFieldType.reference: return UiText.reference;
     }
   }
 }

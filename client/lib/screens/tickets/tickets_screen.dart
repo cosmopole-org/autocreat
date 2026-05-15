@@ -11,7 +11,7 @@ import '../../providers/ticket_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class TicketsScreen extends ConsumerStatefulWidget {
   const TicketsScreen({super.key});
@@ -27,11 +27,11 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
   late TabController _tabController;
 
   static List<String> get _tabs => [
-        MockUiText.all,
-        MockUiText.open,
-        MockUiText.inProgress,
-        MockUiText.resolved,
-        MockUiText.closed
+        UiText.all,
+        UiText.open,
+        UiText.inProgress,
+        UiText.resolved,
+        UiText.closed
       ];
 
   @override
@@ -122,11 +122,11 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                     children: [
                       // Header
                       AppPageHeader(
-                        title: MockUiText.supportTickets,
-                        description: MockUiText
+                        title: UiText.supportTickets,
+                        description: UiText
                             .trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut,
-                        actionLabel: MockUiText.newTicket,
-                        compactActionLabel: MockUiText.newText,
+                        actionLabel: UiText.newTicket,
+                        compactActionLabel: UiText.newText,
                         actionIcon: Icons.add,
                         onAction: () => _showCreateTicket(context),
                       ).animate().fadeIn(duration: 300.ms),
@@ -168,7 +168,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                       // Search
                       SearchField(
                         controller: _searchController,
-                        hintText: MockUiText.searchTickets,
+                        hintText: UiText.searchTickets,
                         onChanged: (v) => setState(() => _search = v),
                       ),
                       const SizedBox(height: 8),
@@ -194,8 +194,8 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
               if (filtered.isEmpty)
                 SliverFillRemaining(
                   child: EmptyState(
-                    title: MockUiText.noTicketsFound,
-                    subtitle: MockUiText.tryAdjustingYourFilters,
+                    title: UiText.noTicketsFound,
+                    subtitle: UiText.tryAdjustingYourFilters,
                     icon: Icons.support_agent_outlined,
                   ),
                 )
@@ -329,25 +329,25 @@ class _TicketStatsRow extends StatelessWidget {
           AppStatCard(
             icon: Icons.confirmation_number_rounded,
             value: '$total',
-            label: MockUiText.total,
+            label: UiText.total,
             color: AppColors.primary,
           ),
           AppStatCard(
             icon: Icons.inbox_rounded,
             value: '$open',
-            label: MockUiText.open,
+            label: UiText.open,
             color: AppColors.warning,
           ),
           AppStatCard(
             icon: Icons.sync_rounded,
             value: '$inProgress',
-            label: MockUiText.inProgress,
+            label: UiText.inProgress,
             color: AppColors.info,
           ),
           AppStatCard(
             icon: Icons.check_circle_rounded,
             value: '$resolved',
-            label: MockUiText.resolved,
+            label: UiText.resolved,
             color: AppColors.success,
           ),
         ],
@@ -387,10 +387,10 @@ class _PriorityBarChart extends StatelessWidget {
       AppColors.chartColors[5], // red
     ];
     final labels = [
-      MockUiText.low,
-      MockUiText.med,
-      MockUiText.high,
-      MockUiText.urgent
+      UiText.low,
+      UiText.med,
+      UiText.high,
+      UiText.urgent
     ];
 
     return AppCard(
@@ -398,12 +398,12 @@ class _PriorityBarChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(MockUiText.priorityBreakdown,
+          Text(UiText.priorityBreakdown,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text(MockUiText.ticketsByPriorityLevel,
+          Text(UiText.ticketsByPriorityLevel,
               style: TextStyle(
                   fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
@@ -502,10 +502,10 @@ class _StatusDonutState extends State<_StatusDonut> {
     final total = data.fold(0, (a, b) => a + b);
 
     final labels = [
-      MockUiText.open,
-      MockUiText.inProgress,
-      MockUiText.resolved,
-      MockUiText.closed
+      UiText.open,
+      UiText.inProgress,
+      UiText.resolved,
+      UiText.closed
     ];
     final colors = [
       AppColors.chartColors[3], // amber (open)
@@ -519,12 +519,12 @@ class _StatusDonutState extends State<_StatusDonut> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(MockUiText.statusDistribution,
+          Text(UiText.statusDistribution,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text(MockUiText.currentTicketStates,
+          Text(UiText.currentTicketStates,
               style: TextStyle(
                   fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
@@ -535,7 +535,7 @@ class _StatusDonutState extends State<_StatusDonut> {
                 height: 100,
                 child: total == 0
                     ? Center(
-                        child: Text(MockUiText.noData,
+                        child: Text(UiText.noData,
                             style: TextStyle(
                                 fontSize: 11,
                                 color: cs.onSurface.withValues(alpha: 0.4))))
@@ -703,7 +703,7 @@ class _TicketCard extends StatelessWidget {
                             Container(
                               width: 8,
                               height: 8,
-                              margin: const EdgeInsets.only(right: 8),
+                              margin: const EdgeInsetsDirectional.only(end: 8),
                               decoration: BoxDecoration(
                                 color: priorityColor,
                                 shape: BoxShape.circle,
@@ -897,9 +897,9 @@ class _TicketCard extends StatelessWidget {
 
   String _formatDue(DateTime due) {
     final diff = due.difference(DateTime.now());
-    if (diff.inDays > 0) return MockUiText.dueInDays(diff.inDays);
-    if (diff.inDays < 0) return MockUiText.daysOverdue(-diff.inDays);
-    return MockUiText.dueToday;
+    if (diff.inDays > 0) return UiText.dueInDays(diff.inDays);
+    if (diff.inDays < 0) return UiText.daysOverdue(-diff.inDays);
+    return UiText.dueToday;
   }
 }
 
@@ -924,7 +924,7 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
   @override
   Widget build(BuildContext context) {
     return GlassAlertDialog(
-      title: Text(MockUiText.newTicket),
+      title: Text(UiText.newTicket),
       content: SizedBox(
         width: 400,
         child: Form(
@@ -935,14 +935,14 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
               TextFormField(
                 controller: _titleController,
                 decoration:
-                    InputDecoration(labelText: MockUiText.titleRequired),
+                    InputDecoration(labelText: UiText.titleRequired),
                 validator: (v) =>
-                    v?.isEmpty ?? true ? MockUiText.titleIsRequired : null,
+                    v?.isEmpty ?? true ? UiText.titleIsRequired : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _descController,
-                decoration: InputDecoration(labelText: MockUiText.description),
+                decoration: InputDecoration(labelText: UiText.description),
                 maxLines: 3,
               ),
               const SizedBox(height: 12),
@@ -953,7 +953,7 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
                         DropdownMenuItem(value: p, child: Text(p.displayName)))
                     .toList(),
                 onChanged: (v) => setState(() => _priority = v!),
-                decoration: InputDecoration(labelText: MockUiText.priority),
+                decoration: InputDecoration(labelText: UiText.priority),
               ),
             ],
           ),
@@ -962,10 +962,10 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(MockUiText.cancel),
+          child: Text(UiText.cancel),
         ),
         AppButton(
-          label: MockUiText.create,
+          label: UiText.create,
           loading: _saving,
           onPressed: () async {
             if (!_formKey.currentState!.validate()) return;

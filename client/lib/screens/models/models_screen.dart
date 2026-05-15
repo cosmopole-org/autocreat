@@ -7,7 +7,7 @@ import '../../models/model_definition.dart';
 import '../../providers/model_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class ModelsScreen extends ConsumerStatefulWidget {
   const ModelsScreen({super.key});
@@ -29,7 +29,7 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
   Future<void> _createModel(BuildContext context) async {
     final repo = ref.read(modelRepositoryProvider);
     final model = await repo.createModel({
-      'name': MockUiText.newModel,
+      'name': UiText.newModel,
       'fields': [],
     });
     if (context.mounted) context.push('/models/${model.id}/edit');
@@ -84,11 +84,11 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
               children: [
                 // Header
                 AppPageHeader(
-                  title: MockUiText.dataModels,
-                  description: MockUiText
+                  title: UiText.dataModels,
+                  description: UiText
                       .defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation,
-                  actionLabel: MockUiText.newModel,
-                  compactActionLabel: MockUiText.newText,
+                  actionLabel: UiText.newModel,
+                  compactActionLabel: UiText.newText,
                   actionIcon: Icons.add,
                   onAction: () => _createModel(context),
                 ).animate().fadeIn(duration: 300.ms),
@@ -114,7 +114,7 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
                 // Search
                 SearchField(
                   controller: _searchController,
-                  hintText: MockUiText.searchModels,
+                  hintText: UiText.searchModels,
                   onChanged: (v) => setState(() => _search = v),
                 ).animate().fadeIn(delay: 250.ms),
                 const SizedBox(height: 16),
@@ -125,10 +125,10 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
         if (filtered.isEmpty)
           SliverFillRemaining(
             child: EmptyState(
-              title: MockUiText.noModelsYet,
-              subtitle: MockUiText.defineYourDataStructures,
+              title: UiText.noModelsYet,
+              subtitle: UiText.defineYourDataStructures,
               icon: Icons.data_object_outlined,
-              actionLabel: MockUiText.createModel,
+              actionLabel: UiText.createModel,
               onAction: () => _createModel(context),
             ),
           )
@@ -147,8 +147,8 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (_) => ConfirmDialog(
-                          title: MockUiText.deleteModel,
-                          message: MockUiText.deleteThisModelPermanently,
+                          title: UiText.deleteModel,
+                          message: UiText.deleteThisModelPermanently,
                         ),
                       );
                       if (confirmed == true) {
@@ -191,25 +191,25 @@ class _ModelStatsRow extends StatelessWidget {
     final stats = [
       (
         Icons.data_object_rounded,
-        MockUiText.totalModels,
+        UiText.totalModels,
         total.toString(),
         AppColors.info
       ),
       (
         Icons.list_alt_rounded,
-        MockUiText.totalFields,
+        UiText.totalFields,
         totalFields.toString(),
         AppColors.primary
       ),
       (
         Icons.star_rounded,
-        MockUiText.requiredText,
+        UiText.requiredText,
         required.toString(),
         AppColors.warning
       ),
       (
         Icons.fingerprint_rounded,
-        MockUiText.unique3,
+        UiText.unique3,
         unique.toString(),
         AppColors.success
       ),
@@ -228,7 +228,7 @@ class _ModelStatsRow extends StatelessWidget {
               .entries
               .map((e) => Expanded(
                     child: Padding(
-                      padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+                      padding: EdgeInsetsDirectional.only(start: e.key == 0 ? 0 : 12),
                       child: e.value,
                     ),
                   ))
@@ -285,12 +285,12 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(MockUiText.fieldTypeDistribution,
+          Text(UiText.fieldTypeDistribution,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text(MockUiText.breakdownOfFieldTypesAcrossAllModels,
+          Text(UiText.breakdownOfFieldTypesAcrossAllModels,
               style: TextStyle(
                   fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
@@ -352,7 +352,7 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
                                         overflow: TextOverflow.ellipsis),
                                   ),
                                   Text(
-                                      MockUiText.distributionLegend(
+                                      UiText.distributionLegend(
                                           e.value.value, pct),
                                       style: TextStyle(
                                           fontSize: 12,
@@ -403,7 +403,7 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                  MockUiText.distributionSlice(
+                                  UiText.distributionSlice(
                                       e.value.key, e.value.value),
                                   style: const TextStyle(fontSize: 11)),
                             ],
@@ -488,10 +488,10 @@ class _ModelCard extends StatelessWidget {
                     size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                 itemBuilder: (_) => [
                   GlassContextMenuItem(
-                      value: 'edit', child: Text(MockUiText.edit)),
+                      value: 'edit', child: Text(UiText.edit)),
                   GlassContextMenuItem(
                       value: 'delete',
-                      child: Text(MockUiText.delete,
+                      child: Text(UiText.delete,
                           style: const TextStyle(color: AppColors.error))),
                 ],
                 onSelected: (v) {
@@ -528,7 +528,7 @@ class _ModelCard extends StatelessWidget {
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.w500),
                             ),
-                            Text(MockUiText.bulletSeparator,
+                            Text(UiText.bulletSeparator,
                                 style: const TextStyle(
                                     fontSize: 10, color: AppColors.primary)),
                             Text(
@@ -552,7 +552,7 @@ class _ModelCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            MockUiText.moreCount(model.fields.length - 5),
+                            UiText.moreCount(model.fields.length - 5),
                             style: TextStyle(
                                 fontSize: 10,
                                 color: cs.onSurface.withValues(alpha: 0.5)),
@@ -569,19 +569,19 @@ class _ModelCard extends StatelessWidget {
             children: [
               _FieldBadge(
                   icon: Icons.list_alt_rounded,
-                  label: MockUiText.fieldCount(model.fields.length),
+                  label: UiText.fieldCount(model.fields.length),
                   color: AppColors.info),
               const SizedBox(width: 8),
               if (reqCount > 0)
                 _FieldBadge(
                     icon: Icons.star_rounded,
-                    label: MockUiText.requiredCount(reqCount),
+                    label: UiText.requiredCount(reqCount),
                     color: AppColors.warning),
               if (reqCount > 0) const SizedBox(width: 8),
               if (uniqueCount > 0)
                 _FieldBadge(
                     icon: Icons.fingerprint_rounded,
-                    label: MockUiText.uniqueCount(uniqueCount),
+                    label: UiText.uniqueCount(uniqueCount),
                     color: AppColors.success),
               const Spacer(),
               Icon(Icons.edit_outlined,

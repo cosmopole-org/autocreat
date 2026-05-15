@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../data/mock_ui_text.dart';
+import '../data/ui_text.dart';
 
 part 'ticket.freezed.dart';
 part 'ticket.g.dart';
@@ -57,10 +57,10 @@ class Ticket with _$Ticket {
 extension TicketStatusExt on TicketStatus {
   String get displayName {
     switch (this) {
-      case TicketStatus.open: return MockUiText.open;
-      case TicketStatus.inProgress: return MockUiText.inProgress;
-      case TicketStatus.resolved: return MockUiText.resolved;
-      case TicketStatus.closed: return MockUiText.closed;
+      case TicketStatus.open: return UiText.open;
+      case TicketStatus.inProgress: return UiText.inProgress;
+      case TicketStatus.resolved: return UiText.resolved;
+      case TicketStatus.closed: return UiText.closed;
     }
   }
 }
@@ -68,10 +68,10 @@ extension TicketStatusExt on TicketStatus {
 extension TicketPriorityExt on TicketPriority {
   String get displayName {
     switch (this) {
-      case TicketPriority.low: return MockUiText.low;
-      case TicketPriority.medium: return MockUiText.medium;
-      case TicketPriority.high: return MockUiText.high;
-      case TicketPriority.urgent: return MockUiText.urgent;
+      case TicketPriority.low: return UiText.low;
+      case TicketPriority.medium: return UiText.medium;
+      case TicketPriority.high: return UiText.high;
+      case TicketPriority.urgent: return UiText.urgent;
     }
   }
 }

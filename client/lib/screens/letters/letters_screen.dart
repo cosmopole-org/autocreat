@@ -7,7 +7,7 @@ import '../../models/letter_template.dart';
 import '../../providers/letter_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class LettersScreen extends ConsumerStatefulWidget {
   const LettersScreen({super.key});
@@ -30,10 +30,10 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
   Future<void> _createLetter(BuildContext context) async {
     final repo = ref.read(letterRepositoryProvider);
     final letter = await repo.createLetter({
-      'name': MockUiText.newLetterTemplate,
+      'name': UiText.newLetterTemplate,
       'status': 'draft',
       'content': '',
-      MockUiText.deltacontent: {},
+      UiText.deltacontent: {},
     });
     if (context.mounted) context.push('/letters/${letter.id}/edit');
   }
@@ -56,14 +56,14 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
 
   Widget _buildContent(BuildContext context, List<LetterTemplate> letters) {
     final categories = letters
-        .map((l) => l.category ?? MockUiText.uncategorized)
+        .map((l) => l.category ?? UiText.uncategorized)
         .toSet()
         .toList();
     final filtered = letters.where((l) {
       final matchesSearch = _search.isEmpty ||
           l.name.toLowerCase().contains(_search.toLowerCase());
       final matchesCat = _categoryFilter == null ||
-          (l.category ?? MockUiText.uncategorized) == _categoryFilter;
+          (l.category ?? UiText.uncategorized) == _categoryFilter;
       return matchesSearch && matchesCat;
     }).toList();
 
@@ -84,11 +84,11 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                     children: [
                       // Header
                       AppPageHeader(
-                        title: MockUiText.letterTemplates,
-                        description: MockUiText
+                        title: UiText.letterTemplates,
+                        description: UiText
                             .manageReusableLetterTemplatesWithDynamicVariablesReadyToSend,
-                        actionLabel: MockUiText.newTemplate,
-                        compactActionLabel: MockUiText.newText,
+                        actionLabel: UiText.newTemplate,
+                        compactActionLabel: UiText.newText,
                         actionIcon: Icons.add,
                         onAction: () => _createLetter(context),
                       ).animate().fadeIn(duration: 300.ms),
@@ -116,7 +116,7 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                           Expanded(
                             child: SearchField(
                               controller: _searchController,
-                              hintText: MockUiText.searchTemplates,
+                              hintText: UiText.searchTemplates,
                               onChanged: (v) => setState(() => _search = v),
                             ),
                           ),
@@ -139,10 +139,10 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
               if (filtered.isEmpty)
                 SliverFillRemaining(
                   child: EmptyState(
-                    title: MockUiText.noLetterTemplates,
-                    subtitle: MockUiText.createReusableLetterTemplates,
+                    title: UiText.noLetterTemplates,
+                    subtitle: UiText.createReusableLetterTemplates,
                     icon: Icons.mail_outline,
-                    actionLabel: MockUiText.createTemplate,
+                    actionLabel: UiText.createTemplate,
                     onAction: () => _createLetter(context),
                   ),
                 )
@@ -166,8 +166,8 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                           final confirmed = await showDialog<bool>(
                             context: context,
                             builder: (_) => ConfirmDialog(
-                              title: MockUiText.deleteTemplate,
-                              message: MockUiText
+                              title: UiText.deleteTemplate,
+                              message: UiText
                                   .deleteThisLetterTemplatePermanently,
                             ),
                           );
@@ -212,25 +212,25 @@ class _StatsRow extends StatelessWidget {
     final stats = [
       (
         Icons.mail_rounded,
-        MockUiText.totalTemplates,
+        UiText.totalTemplates,
         total.toString(),
         AppColors.primary
       ),
       (
         Icons.check_circle_rounded,
-        MockUiText.active,
+        UiText.active,
         active.toString(),
         AppColors.success
       ),
       (
         Icons.edit_note_rounded,
-        MockUiText.draft,
+        UiText.draft,
         draft.toString(),
         AppColors.warning
       ),
       (
         Icons.code_rounded,
-        MockUiText.totalVariables,
+        UiText.totalVariables,
         totalVars.toString(),
         AppColors.accent
       ),
@@ -249,7 +249,7 @@ class _StatsRow extends StatelessWidget {
               .entries
               .map((e) => Expanded(
                     child: Padding(
-                      padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+                      padding: EdgeInsetsDirectional.only(start: e.key == 0 ? 0 : 12),
                       child: e.value,
                     ),
                   ))
@@ -289,7 +289,7 @@ class _CategoryChart extends StatelessWidget {
 
     final catMap = <String, int>{};
     for (final l in letters) {
-      final cat = l.category ?? MockUiText.uncategorized;
+      final cat = l.category ?? UiText.uncategorized;
       catMap[cat] = (catMap[cat] ?? 0) + 1;
     }
     final cats = catMap.entries.toList();
@@ -306,12 +306,12 @@ class _CategoryChart extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(MockUiText.templatesByCategory,
+                  Text(UiText.templatesByCategory,
                       style: Theme.of(context)
                           .textTheme
                           .titleSmall
                           ?.copyWith(fontWeight: FontWeight.w700)),
-                  Text(MockUiText.distributionAcrossCategories,
+                  Text(UiText.distributionAcrossCategories,
                       style: TextStyle(
                           fontSize: 11,
                           color: cs.onSurface.withValues(alpha: 0.45))),
@@ -331,7 +331,7 @@ class _CategoryChart extends StatelessWidget {
                     const Icon(Icons.code, size: 12, color: AppColors.primary),
                     const SizedBox(width: 4),
                     Text(
-                      MockUiText.avgVars((letters.fold<int>(
+                      UiText.avgVars((letters.fold<int>(
                                   0, (s, l) => s + l.variables.length) /
                               (letters.isEmpty ? 1 : letters.length))
                           .toStringAsFixed(1)),
@@ -418,7 +418,7 @@ class _CategoryChart extends StatelessWidget {
                     style: const TextStyle(fontSize: 12),
                     overflow: TextOverflow.ellipsis),
               ),
-              Text(MockUiText.distributionLegend(e.value.value, pct),
+              Text(UiText.distributionLegend(e.value.value, pct),
                   style: TextStyle(
                       fontSize: 12, fontWeight: FontWeight.w700, color: color)),
             ],
@@ -456,12 +456,12 @@ class _CategoryDropdown extends StatelessWidget {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String?>(
           value: selected,
-          hint: Text(MockUiText.allCategories, style: const TextStyle(fontSize: 13)),
+          hint: Text(UiText.allCategories, style: const TextStyle(fontSize: 13)),
           style: TextStyle(fontSize: 13, color: cs.onSurface),
           items: [
             DropdownMenuItem<String?>(
               value: null,
-              child: Text(MockUiText.allCategories),
+              child: Text(UiText.allCategories),
             ),
             ...categories.map((c) => DropdownMenuItem<String?>(
                   value: c,
@@ -544,10 +544,10 @@ class _LetterCard extends StatelessWidget {
                     size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                 itemBuilder: (_) => [
                   GlassContextMenuItem(
-                      value: 'edit', child: Text(MockUiText.edit)),
+                      value: 'edit', child: Text(UiText.edit)),
                   GlassContextMenuItem(
                       value: 'delete',
-                      child: Text(MockUiText.delete,
+                      child: Text(UiText.delete,
                           style: const TextStyle(color: AppColors.error))),
                 ],
                 onSelected: (v) {
@@ -619,7 +619,7 @@ class _LetterCard extends StatelessWidget {
                         size: 10, color: cs.onSurface.withValues(alpha: 0.5)),
                     const SizedBox(width: 3),
                     Text(
-                      MockUiText.varsCount(letter.variables.length),
+                      UiText.varsCount(letter.variables.length),
                       style: TextStyle(
                           fontSize: 10,
                           color: cs.onSurface.withValues(alpha: 0.6)),

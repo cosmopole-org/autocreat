@@ -7,7 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shimmer/shimmer.dart';
 import '../providers/theme_provider.dart';
 import '../theme/app_colors.dart';
-import '../data/mock_ui_text.dart';
+import '../data/ui_text.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE LAYOUT METRICS
@@ -210,9 +210,9 @@ class AppPageHeader extends ConsumerWidget {
   Widget _cardContent(Widget content, bool isDark, Color primaryTint) {
     return Stack(
       children: [
-        Positioned(
+        PositionedDirectional(
           top: -28,
-          right: -28,
+          end: -28,
           child: Container(
             width: 110,
             height: 110,
@@ -222,9 +222,9 @@ class AppPageHeader extends ConsumerWidget {
             ),
           ),
         ),
-        Positioned(
+        PositionedDirectional(
           bottom: -18,
-          right: 60,
+          end: 60,
           child: Container(
             width: 64,
             height: 64,
@@ -531,7 +531,7 @@ Future<T?> showGlassContextMenu<T>({
         opacity: curved,
         child: ScaleTransition(
           scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
-          alignment: Alignment.topLeft,
+          alignment: AlignmentDirectional.topStart,
           child: child,
         ),
       );
@@ -794,7 +794,7 @@ class AppStatCard extends StatelessWidget {
               children: [
                 FittedBox(
                   fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
+                  alignment: AlignmentDirectional.centerStart,
                   child: Text(
                     value,
                     style: TextStyle(
@@ -1437,7 +1437,7 @@ class ConfirmDialog extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(MockUiText.cancel),
+            child: Text(UiText.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -1445,7 +1445,7 @@ class ConfirmDialog extends ConsumerWidget {
               backgroundColor: confirmColor ?? AppColors.error,
               foregroundColor: Colors.white,
             ),
-            child: Text(confirmLabel ?? MockUiText.delete),
+            child: Text(confirmLabel ?? UiText.delete),
           ),
         ],
       );
@@ -1471,11 +1471,11 @@ class ConfirmDialog extends ConsumerWidget {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text(MockUiText.cancel),
+                  child: Text(UiText.cancel),
                 ),
                 const SizedBox(width: 10),
                 AppButton(
-                  label: confirmLabel ?? MockUiText.delete,
+                  label: confirmLabel ?? UiText.delete,
                   onPressed: () => Navigator.pop(context, true),
                   color: confirmColor ?? AppColors.error,
                 ),
@@ -1621,7 +1621,7 @@ class _SearchFieldState extends State<SearchField> {
         widget.onChanged?.call(v);
       },
       decoration: InputDecoration(
-        hintText: widget.hintText ?? MockUiText.searchEllipsis,
+        hintText: widget.hintText ?? UiText.searchEllipsis,
         prefixIcon: const Icon(Icons.search_rounded, size: 20),
         suffixIcon: widget.controller.text.isNotEmpty
             ? IconButton(
@@ -1673,7 +1673,7 @@ class AppErrorWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              MockUiText.somethingWentWrong,
+              UiText.somethingWentWrong,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -1685,7 +1685,7 @@ class AppErrorWidget extends StatelessWidget {
             if (onRetry != null) ...[
               const SizedBox(height: 20),
               AppButton(
-                  label: MockUiText.retry,
+                  label: UiText.retry,
                   onPressed: onRetry,
                   icon: Icons.refresh),
             ],
