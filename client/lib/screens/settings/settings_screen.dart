@@ -733,7 +733,7 @@ class _WorkspaceSection extends ConsumerWidget {
 
           // Manage Companies button
           InkWell(
-            onTap: () => context.go(AppRoutes.companies),
+            onTap: () => context.push(AppRoutes.companies),
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

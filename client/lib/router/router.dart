@@ -115,11 +115,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const DashboardScreen(),
           ),
           GoRoute(
-            path: AppRoutes.companies,
-            name: 'companies',
-            builder: (context, state) => const CompaniesScreen(),
-          ),
-          GoRoute(
             path: AppRoutes.flows,
             name: 'flows',
             builder: (context, state) => const FlowsScreen(),
@@ -162,6 +157,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
       // SECONDARY ROUTES - outside shell, with modal/fullscreen behavior
+      GoRoute(
+        path: AppRoutes.companies,
+        name: 'companies',
+        pageBuilder: (context, state) => _buildSecondaryPage(
+          context,
+          state,
+          const CompaniesScreen(),
+        ),
+      ),
       GoRoute(
         path: '/companies/:id',
         name: 'company-detail',

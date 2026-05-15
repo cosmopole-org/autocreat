@@ -40,13 +40,6 @@ List<_NavItem> get _navItems => [
     section: UiText.overview,
   ),
   _NavItem(
-    label: UiText.companies,
-    icon: Icons.business_outlined,
-    selectedIcon: Icons.business_rounded,
-    route: AppRoutes.companies,
-    section: UiText.organization,
-  ),
-  _NavItem(
     label: UiText.users,
     icon: Icons.people_outline_rounded,
     selectedIcon: Icons.people_rounded,
@@ -340,13 +333,6 @@ class _FloatingMobileBar extends ConsumerWidget {
                   onTap: () => GoRouter.of(context).go(AppRoutes.tickets),
                   tooltip: UiText.notifications,
                 ),
-              ),
-              const SizedBox(width: 2),
-              // Settings button
-              _BarIconButton(
-                icon: Icons.settings_outlined,
-                onTap: () => GoRouter.of(context).go(AppRoutes.settings),
-                tooltip: UiText.settingsButton,
               ),
               const SizedBox(width: 4),
               // Avatar
