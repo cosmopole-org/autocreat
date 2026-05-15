@@ -453,7 +453,13 @@ enum _UiTextKey {
   emptyJsonObject,
   bulletSeparator,
   requiredAsterisk,
-  schemaSeparator
+  schemaSeparator,
+  step,
+  decision,
+  instances,
+  approved,
+  pending,
+  rejected,
 }
 
 class UiText {
@@ -932,6 +938,12 @@ class UiText {
     _UiTextKey.bulletSeparator: " · ",
     _UiTextKey.requiredAsterisk: "*",
     _UiTextKey.schemaSeparator: ",\n",
+    _UiTextKey.step: "Step",
+    _UiTextKey.decision: "Decision",
+    _UiTextKey.instances: "Instances",
+    _UiTextKey.approved: "Approved",
+    _UiTextKey.pending: "Pending",
+    _UiTextKey.rejected: "Rejected",
   };
 
   static const Map<_UiTextKey, String> _persian = {
@@ -1279,7 +1291,7 @@ class UiText {
     _UiTextKey.recentTickets: "تیکت‌های اخیر",
     _UiTextKey.latestActivity: "آخرین فعالیت",
     _UiTextKey.viewAll: "مشاهده همه",
-    _UiTextKey.resolutionRate: "resolution Rate",
+    _UiTextKey.resolutionRate: "نرخ حل‌وفصل",
     _UiTextKey.slaCompliance: "رعایت SLA",
     _UiTextKey.performanceMetrics: "معیارهای عملکرد",
     _UiTextKey.ticketKpisAtAGlance: "KPIهای تیکت در یک نگاه",
