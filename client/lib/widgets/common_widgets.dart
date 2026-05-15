@@ -1139,7 +1139,7 @@ class ConfirmDialog extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(MockUiText.cancel),
+            child: Text(MockUiText.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -1173,7 +1173,7 @@ class ConfirmDialog extends ConsumerWidget {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text(MockUiText.cancel),
+                  child: Text(MockUiText.cancel),
                 ),
                 const SizedBox(width: 10),
                 AppButton(

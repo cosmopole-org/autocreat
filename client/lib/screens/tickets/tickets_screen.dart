@@ -26,7 +26,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
   String _search = '';
   late TabController _tabController;
 
-  static const _tabs = [MockUiText.all, MockUiText.open, MockUiText.inProgress, MockUiText.resolved, MockUiText.closed];
+  static List<String> get _tabs => [MockUiText.all, MockUiText.open, MockUiText.inProgress, MockUiText.resolved, MockUiText.closed];
 
   @override
   void initState() {
@@ -388,7 +388,7 @@ class _PriorityBarChart extends StatelessWidget {
       AppColors.chartColors[3], // amber
       AppColors.chartColors[5], // red
     ];
-    const labels = [MockUiText.low, MockUiText.med, MockUiText.high, MockUiText.urgent];
+    final labels = [MockUiText.low, MockUiText.med, MockUiText.high, MockUiText.urgent];
 
     return AppCard(
       padding: const EdgeInsets.all(20),
@@ -919,7 +919,7 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(MockUiText.newTicket),
+      title: Text(MockUiText.newTicket),
       content: SizedBox(
         width: 400,
         child: Form(
@@ -929,14 +929,14 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
             children: [
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(labelText: MockUiText.titleRequired),
+                decoration: InputDecoration(labelText: MockUiText.titleRequired),
                 validator: (v) =>
                     v?.isEmpty ?? true ? MockUiText.titleIsRequired : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _descController,
-                decoration: const InputDecoration(labelText: MockUiText.description),
+                decoration: InputDecoration(labelText: MockUiText.description),
                 maxLines: 3,
               ),
               const SizedBox(height: 12),
@@ -947,7 +947,7 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
                         value: p, child: Text(p.displayName)))
                     .toList(),
                 onChanged: (v) => setState(() => _priority = v!),
-                decoration: const InputDecoration(labelText: MockUiText.priority),
+                decoration: InputDecoration(labelText: MockUiText.priority),
               ),
             ],
           ),
@@ -956,7 +956,7 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text(MockUiText.cancel),
+          child: Text(MockUiText.cancel),
         ),
         AppButton(
           label: MockUiText.create,

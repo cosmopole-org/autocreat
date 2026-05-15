@@ -500,7 +500,7 @@ class _KpiCard extends ConsumerWidget {
 class _ActivityLineChart extends StatelessWidget {
   static const _ticketData = [3.0, 7.0, 4.0, 10.0, 6.0, 8.0, 5.0];
   static const _flowData = [1.0, 4.0, 2.0, 6.0, 4.0, 5.0, 3.0];
-  static const _days = [MockUiText.mon, MockUiText.tue, MockUiText.wed, MockUiText.thu, MockUiText.fri, MockUiText.sat, MockUiText.sun];
+  static List<String> get _days => [MockUiText.mon, MockUiText.tue, MockUiText.wed, MockUiText.thu, MockUiText.fri, MockUiText.sat, MockUiText.sun];
 
   const _ActivityLineChart();
 
@@ -774,7 +774,7 @@ class _PriorityBarChart extends StatelessWidget {
       AppColors.warning,
       AppColors.error,
     ];
-    const labels = [MockUiText.low, MockUiText.med, MockUiText.high, MockUiText.urgent];
+    final labels = [MockUiText.low, MockUiText.med, MockUiText.high, MockUiText.urgent];
 
     return _ChartCard(
       title: MockUiText.priorityBreakdown,
@@ -873,7 +873,7 @@ class _RecentTicketsList extends StatelessWidget {
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-        child: const Text(MockUiText.viewAll, style: TextStyle(fontSize: 12)),
+        child: Text(MockUiText.viewAll, style: TextStyle(fontSize: 12)),
       ),
       child: tickets.isEmpty
           ? Padding(

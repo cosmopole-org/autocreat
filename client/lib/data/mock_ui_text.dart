@@ -1,482 +1,1799 @@
 // Centralized mock UI copy for every static label, helper text, tooltip,
 // and message surfaced by the Flutter UI.
 //
-// Keeping visible strings here makes it easier to review product copy,
-// update demo wording, and later replace this mock store with localization.
+// This mock localization store intentionally contains a complete English and
+// Persian (Farsi) version of every visible string used by the demo UI. The
+// active language is selected by [languageProvider] at app startup/rebuild time.
+import 'package:flutter/material.dart';
+
+enum AppLanguage { english, persian }
+
+extension AppLanguageX on AppLanguage {
+  String get code => switch (this) {
+        AppLanguage.english => 'en',
+        AppLanguage.persian => 'fa',
+      };
+
+  Locale get locale => Locale(code);
+  TextDirection get textDirection => this == AppLanguage.persian ? TextDirection.rtl : TextDirection.ltr;
+  String get nativeLabel => switch (this) {
+        AppLanguage.english => 'English',
+        AppLanguage.persian => 'فارسی',
+      };
+  String get shortLabel => switch (this) {
+        AppLanguage.english => 'EN',
+        AppLanguage.persian => 'فا',
+      };
+
+  static AppLanguage fromCode(String? code) => code == 'fa' ? AppLanguage.persian : AppLanguage.english;
+}
+
+enum _UiTextKey {
+  exception,
+  autocreat,
+  createYourAccount,
+  startBuildingYourOrganizationalSystem,
+  firstName,
+  requiredText,
+  lastName,
+  emailAddress,
+  emailIsRequired,
+  invalidEmail,
+  companyNameOptional,
+  password,
+  passwordIsRequired,
+  atLeast8Characters,
+  confirmPassword,
+  passwordsDoNotMatch,
+  createAccount,
+  alreadyHaveAnAccount,
+  signIn,
+  demo123,
+  demo,
+  admin,
+  welcomeBack,
+  signInToYourOrganizationAccount,
+  passwordTooShort,
+  forgotPassword,
+  signIn3,
+  donTHaveAnAccount,
+  createAccount3,
+  demo3,
+  tryDemoMode,
+  noAccountNeededExploreWithSampleData,
+  organizationalSystemBuilder,
+  designComplexOrganizationalFlows,
+  buildFormsAndDataModels,
+  manageRolesAndPermissions,
+  communicateViaTickets,
+  flowSaved,
+  editNodeLabel,
+  label,
+  cancel,
+  save,
+  canvasControls,
+  zoomOut,
+  zoomIn,
+  fitScreen,
+  autoLayout,
+  flowEditor,
+  unsaved,
+  zoomOut3,
+  zoomIn3,
+  canvasControls3,
+  saveFlow,
+  addStartNode,
+  addStepNode,
+  addDecisionNode,
+  addEndNode,
+  fitToScreen,
+  nodeProperties,
+  deleteNode,
+  close,
+  startBuildingYourFlow,
+  tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft,
+  newFlow,
+  start,
+  end,
+  automationFlows,
+  designReviewAndLaunchOrganizationalProcessFlowsWithClearStep,
+  newText,
+  searchFlows,
+  noFlowsYet,
+  createYourFirstOrganizationalFlow,
+  createFlow,
+  deleteFlow,
+  thisWillDeleteTheFlowPermanently,
+  totalFlows,
+  active,
+  draft,
+  totalNodes,
+  flowComplexity,
+  nodesAndEdgesPerFlow,
+  nodeTypes,
+  openEditor,
+  delete,
+  nodeLabel,
+  enterLabelEllipsis,
+  description,
+  optionalDescriptionEllipsis,
+  assignedRole,
+  errorLoadingRoles,
+  noRoleAssigned,
+  selectRoleEllipsis,
+  assignedForm,
+  errorLoadingForms,
+  noFormAssigned,
+  selectFormEllipsis,
+  branches,
+  addBranch,
+  defaultText,
+  conditionEGStatusApproved,
+  position,
+  capacity,
+  members,
+  flows,
+  details,
+  website,
+  created,
+  text,
+  companies,
+  organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK,
+  newCompany,
+  searchCompanies,
+  noCompaniesYet,
+  noResultsFound,
+  createYourFirstCompanyToGetStarted,
+  createCompany,
+  deleteCompany,
+  areYouSureYouWantToDeleteThisCompany,
+  edit,
+  editCompany,
+  companyNameRequired,
+  nameIsRequired,
+  industry,
+  formSaved,
+  formEditor,
+  fieldTypes,
+  formName,
+  clickAFieldTypeToAddIt,
+  requiredText3,
+  fieldProperties,
+  placeholder,
+  helpText,
+  readOnly,
+  hidden,
+  options,
+  add,
+  newForm,
+  formDefinitions,
+  buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif,
+  searchForms,
+  noFormsYet,
+  createYourFirstFormDefinition,
+  createForm,
+  deleteForm,
+  thisWillDeleteTheFormPermanently,
+  totalForms,
+  totalFields,
+  fieldTypesDistribution,
+  countOfEachFieldTypeAcrossAllForms,
+  noFieldsDefined,
+  userSaved,
+  newUser,
+  editUser,
+  changePhoto,
+  uploadPhoto,
+  userInfo,
+  firstNameRequired,
+  lastNameRequired,
+  emailRequired,
+  phone,
+  passwordRequired,
+  newPasswordLeaveBlankToKeep,
+  access,
+  noRole,
+  assignedRole3,
+  activeAccount,
+  inactiveUsersCannotLogIn,
+  all,
+  teamMembers,
+  inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol,
+  addUser,
+  searchMembers,
+  noMembersFound,
+  tryAdjustingYourSearchOrFilters,
+  removeUser,
+  removeThisUserFromTheSystem,
+  totalMembers,
+  admins,
+  roleDistribution,
+  membersByAssignedRole,
+  statusOverview,
+  accountActivity,
+  inactive,
+  remove,
+  roleSaved,
+  newRole,
+  editRole,
+  roleDetails,
+  roleNameRequired,
+  owner,
+  manager,
+  member,
+  viewer,
+  accessLevel,
+  permissionCoverage,
+  permissions,
+  configureCrudPermissionsPerResource,
+  resource,
+  create,
+  read,
+  update,
+  rolesPermissions,
+  shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery,
+  searchRoles,
+  noRolesYet,
+  createRolesToManageAccessControl,
+  createRole,
+  deleteRole,
+  deleteThisRolePermanently,
+  totalRoles,
+  permissionSets,
+  membersPerRole,
+  howManyUsersAreAssignedToEachRole,
+  open,
+  inProgress,
+  resolved,
+  closed,
+  supportTickets,
+  trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut,
+  newTicket,
+  searchTickets,
+  noTicketsFound,
+  tryAdjustingYourFilters,
+  total,
+  low,
+  med,
+  high,
+  urgent,
+  priorityBreakdown,
+  ticketsByPriorityLevel,
+  statusDistribution,
+  currentTicketStates,
+  noData,
+  dueToday,
+  titleRequired,
+  titleIsRequired,
+  priority,
+  attachment,
+  ticketMessageSent,
+  ticketid,
+  noMessagesYet,
+  attachFile,
+  typeAMessage,
+  ticketDetails,
+  status,
+  creator,
+  assignee,
+  dueDate,
+  slaProgress,
+  tags,
+  deltacontent,
+  templateSaved,
+  templateName,
+  attach,
+  variables,
+  addMore,
+  startWritingYourLetterTemplate,
+  availableVariables,
+  useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV,
+  userSFullName,
+  userSEmail,
+  companyName,
+  currentDate,
+  flowName,
+  newLetterTemplate,
+  uncategorized,
+  letterTemplates,
+  manageReusableLetterTemplatesWithDynamicVariablesReadyToSend,
+  newTemplate,
+  searchTemplates,
+  noLetterTemplates,
+  createReusableLetterTemplates,
+  createTemplate,
+  deleteTemplate,
+  deleteThisLetterTemplatePermanently,
+  totalTemplates,
+  totalVariables,
+  templatesByCategory,
+  distributionAcrossCategories,
+  allCategories,
+  goodMorning,
+  goodAfternoon,
+  goodEvening,
+  mon,
+  tue,
+  wed,
+  thu,
+  fri,
+  sat,
+  sun,
+  jan,
+  feb,
+  mar,
+  apr,
+  may,
+  jun,
+  jul,
+  aug,
+  sep,
+  oct,
+  nov,
+  dec,
+  hereSWhatSHappeningInYourOrganizationToday,
+  activeOrganizations,
+  activeFlows,
+  automationPipelines,
+  openTickets,
+  needsAttention,
+  closedTickets,
+  activityOverview,
+  ticketsFlowsLast7Days,
+  tickets,
+  ticketStatus,
+  distributionOverview,
+  noTicketsYet,
+  recentTickets,
+  latestActivity,
+  viewAll,
+  resolutionRate,
+  slaCompliance,
+  performanceMetrics,
+  ticketKpisAtAGlance,
+  quickActions,
+  modelSaved,
+  modelEditor,
+  modelInfo,
+  modelNameRequired,
+  addField,
+  noFieldsYetAddYourFirstField,
+  jsonSchemaPreview,
+  text3,
+  unique,
+  unique3,
+  fieldNameRequired,
+  fieldType,
+  newModel,
+  dataModels,
+  defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation,
+  searchModels,
+  noModelsYet,
+  defineYourDataStructures,
+  createModel,
+  deleteModel,
+  deleteThisModelPermanently,
+  totalModels,
+  fieldTypeDistribution,
+  breakdownOfFieldTypesAcrossAllModels,
+  editLabel,
+  deleteEdge,
+  yes,
+  no,
+  form,
+  role,
+  y,
+  n3,
+  ellipsis,
+  noNodes,
+  dashboard,
+  overview,
+  organization,
+  users,
+  roles,
+  automation,
+  forms,
+  models,
+  letters,
+  communication,
+  menu,
+  search,
+  notifications,
+  toggleTheme,
+  search3,
+  disableGlassMode,
+  enableGlassMode,
+  logout,
+  signOut,
+  select,
+  selectDate,
+  selectTime,
+  clickToUploadFile,
+  anyFileTypeSupported,
+  clickToUploadImage,
+  pngJpgGifSupported,
+  pickAColor,
+  done,
+  signHere,
+  column1,
+  column2,
+  column3,
+  addRow,
+  searchEllipsis,
+  somethingWentWrong,
+  retry,
+  string,
+  integer,
+  float,
+  boolean,
+  date,
+  dateTime,
+  file,
+  reference,
+  textField,
+  number,
+  textArea,
+  dropdown,
+  multiSelect,
+  checkbox,
+  radioGroup,
+  datePicker,
+  timePicker,
+  fileUpload,
+  imageUpload,
+  colorPicker,
+  switchText,
+  table,
+  rating,
+  signature,
+  medium,
+  there,
+  emptyJsonObject,
+  bulletSeparator,
+  requiredAsterisk,
+  schemaSeparator
+}
+
 class MockUiText {
   const MockUiText._();
 
-  static const String exception = 'Exception: ';
-  static const String autocreat = 'AutoCreat';
-  static const String createYourAccount = 'Create your account';
-  static const String startBuildingYourOrganizationalSystem = 'Start building your organizational system';
-  static const String firstName = 'First name';
-  static const String requiredText = 'Required';
-  static const String lastName = 'Last name';
-  static const String emailAddress = 'Email address';
-  static const String emailIsRequired = 'Email is required';
-  static const String invalidEmail = 'Invalid email';
-  static const String companyNameOptional = 'Company name (optional)';
-  static const String password = 'Password';
-  static const String passwordIsRequired = 'Password is required';
-  static const String atLeast8Characters = 'At least 8 characters';
-  static const String confirmPassword = 'Confirm password';
-  static const String passwordsDoNotMatch = 'Passwords do not match';
-  static const String createAccount = 'Create Account';
-  static const String alreadyHaveAnAccount = 'Already have an account? ';
-  static const String signIn = 'Sign in';
-  static const String demo123 = 'Demo123!';
-  static const String demo = 'Demo';
-  static const String admin = 'Admin';
-  static const String welcomeBack = 'Welcome back';
-  static const String signInToYourOrganizationAccount = 'Sign in to your organization account';
-  static const String passwordTooShort = 'Password too short';
-  static const String forgotPassword = 'Forgot password?';
-  static const String signIn3 = 'Sign In';
-  static const String donTHaveAnAccount = "Don't have an account? ";
-  static const String createAccount3 = 'Create account';
-  static const String demo3 = 'DEMO';
-  static const String tryDemoMode = 'Try Demo Mode';
-  static const String noAccountNeededExploreWithSampleData = 'No account needed — explore with sample data';
-  static const String organizationalSystemBuilder = 'Organizational System Builder';
-  static const String designComplexOrganizationalFlows = 'Design complex organizational flows';
-  static const String buildFormsAndDataModels = 'Build forms and data models';
-  static const String manageRolesAndPermissions = 'Manage roles and permissions';
-  static const String communicateViaTickets = 'Communicate via tickets';
-  static const String flowSaved = 'Flow saved';
-  static const String editNodeLabel = 'Edit node label';
-  static const String label = 'Label';
-  static const String cancel = 'Cancel';
-  static const String save = 'Save';
-  static const String canvasControls = 'Canvas Controls';
-  static const String zoomOut = 'Zoom Out';
-  static const String zoomIn = 'Zoom In';
-  static const String fitScreen = 'Fit Screen';
-  static const String autoLayout = 'Auto Layout';
-  static const String flowEditor = 'Flow Editor';
-  static const String unsaved = 'Unsaved';
-  static const String zoomOut3 = 'Zoom out';
-  static const String zoomIn3 = 'Zoom in';
-  static const String canvasControls3 = 'Canvas controls';
-  static const String saveFlow = 'Save Flow';
-  static const String addStartNode = 'Add Start Node';
-  static const String addStepNode = 'Add Step Node';
-  static const String addDecisionNode = 'Add Decision Node';
-  static const String addEndNode = 'Add End Node';
-  static const String fitToScreen = 'Fit to screen';
-  static const String nodeProperties = 'Node Properties';
-  static const String deleteNode = 'Delete node';
-  static const String close = 'Close';
-  static const String startBuildingYourFlow = 'Start building your flow';
-  static const String tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft = 'Tap here to add a Start node,\nor use the toolbar on the left.';
-  static const String newFlow = 'New Flow';
-  static const String start = 'Start';
-  static const String end = 'End';
-  static const String automationFlows = 'Automation Flows';
-  static const String designReviewAndLaunchOrganizationalProcessFlowsWithClearStep = 'Design, review, and launch organizational process flows with clear steps, connected decisions, and measurable outcomes.';
-  static const String newText = 'New';
-  static const String searchFlows = 'Search flows...';
-  static const String noFlowsYet = 'No flows yet';
-  static const String createYourFirstOrganizationalFlow = 'Create your first organizational flow';
-  static const String createFlow = 'Create Flow';
-  static const String deleteFlow = 'Delete Flow';
-  static const String thisWillDeleteTheFlowPermanently = 'This will delete the flow permanently.';
-  static const String totalFlows = 'Total Flows';
-  static const String active = 'Active';
-  static const String draft = 'Draft';
-  static const String totalNodes = 'Total Nodes';
-  static const String flowComplexity = 'Flow Complexity';
-  static const String nodesAndEdgesPerFlow = 'Nodes and edges per flow';
-  static const String nodeTypes = 'Node Types';
-  static const String openEditor = 'Open Editor';
-  static const String delete = 'Delete';
-  static const String nodeLabel = 'Node Label';
-  static const String enterLabelEllipsis = 'Enter label…';
-  static const String description = 'Description';
-  static const String optionalDescriptionEllipsis = 'Optional description…';
-  static const String assignedRole = 'Assigned Role';
-  static const String errorLoadingRoles = 'Error loading roles';
-  static const String noRoleAssigned = 'No role assigned';
-  static const String selectRoleEllipsis = 'Select role…';
-  static const String assignedForm = 'Assigned Form';
-  static const String errorLoadingForms = 'Error loading forms';
-  static const String noFormAssigned = 'No form assigned';
-  static const String selectFormEllipsis = 'Select form…';
-  static const String branches = 'Branches';
-  static const String addBranch = 'Add Branch';
-  static const String defaultText = 'DEFAULT';
-  static const String conditionEGStatusApproved = 'Condition (e.g. status == approved)';
-  static const String position = 'Position';
-  static const String capacity = 'Capacity';
-  static const String members = 'Members';
-  static const String flows = 'Flows';
-  static const String details = 'Details';
-  static const String website = 'Website';
-  static const String created = 'Created';
-  static const String text = '.';
-  static const String companies = 'Companies';
-  static const String organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK = 'Organize client and partner workspaces, monitor portfolio health, and keep each organization easy to find and manage.';
-  static const String newCompany = 'New Company';
-  static const String searchCompanies = 'Search companies...';
-  static const String noCompaniesYet = 'No companies yet';
-  static const String noResultsFound = 'No results found';
-  static const String createYourFirstCompanyToGetStarted = 'Create your first company to get started';
-  static const String createCompany = 'Create Company';
-  static const String deleteCompany = 'Delete Company';
-  static const String areYouSureYouWantToDeleteThisCompany = 'Are you sure you want to delete this company?';
-  static const String edit = 'Edit';
-  static const String editCompany = 'Edit Company';
-  static const String companyNameRequired = 'Company name *';
-  static const String nameIsRequired = 'Name is required';
-  static const String industry = 'Industry';
-  static const String formSaved = 'Form saved';
-  static const String formEditor = 'Form Editor';
-  static const String fieldTypes = 'Field Types';
-  static const String formName = 'Form name';
-  static const String clickAFieldTypeToAddIt = 'Click a field type to add it';
-  static const String requiredText3 = ' · Required';
-  static const String fieldProperties = 'Field Properties';
-  static const String placeholder = 'Placeholder';
-  static const String helpText = 'Help text';
-  static const String readOnly = 'Read only';
-  static const String hidden = 'Hidden';
-  static const String options = 'Options';
-  static const String add = 'Add';
-  static const String newForm = 'New Form';
-  static const String formDefinitions = 'Form Definitions';
-  static const String buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif = 'Build structured forms that capture reliable data, guide users beautifully, and feed your workflows without friction.';
-  static const String searchForms = 'Search forms...';
-  static const String noFormsYet = 'No forms yet';
-  static const String createYourFirstFormDefinition = 'Create your first form definition';
-  static const String createForm = 'Create Form';
-  static const String deleteForm = 'Delete Form';
-  static const String thisWillDeleteTheFormPermanently = 'This will delete the form permanently.';
-  static const String totalForms = 'Total Forms';
-  static const String totalFields = 'Total Fields';
-  static const String fieldTypesDistribution = 'Field Types Distribution';
-  static const String countOfEachFieldTypeAcrossAllForms = 'Count of each field type across all forms';
-  static const String noFieldsDefined = 'No fields defined';
-  static const String userSaved = 'User saved';
-  static const String newUser = 'New User';
-  static const String editUser = 'Edit User';
-  static const String changePhoto = 'Change photo';
-  static const String uploadPhoto = 'Upload photo';
-  static const String userInfo = 'User Info';
-  static const String firstNameRequired = 'First name *';
-  static const String lastNameRequired = 'Last name *';
-  static const String emailRequired = 'Email *';
-  static const String phone = 'Phone';
-  static const String passwordRequired = 'Password *';
-  static const String newPasswordLeaveBlankToKeep = 'New password (leave blank to keep)';
-  static const String access = 'Access';
-  static const String noRole = 'No role';
-  static const String assignedRole3 = 'Assigned role';
-  static const String activeAccount = 'Active account';
-  static const String inactiveUsersCannotLogIn = 'Inactive users cannot log in';
-  static const String all = 'All';
-  static const String teamMembers = 'Team Members';
-  static const String inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol = 'Invite teammates, understand account activity, and balance roles so collaboration stays organized and secure.';
-  static const String addUser = 'Add User';
-  static const String searchMembers = 'Search members...';
-  static const String noMembersFound = 'No members found';
-  static const String tryAdjustingYourSearchOrFilters = 'Try adjusting your search or filters';
-  static const String removeUser = 'Remove User';
-  static const String removeThisUserFromTheSystem = 'Remove this user from the system?';
-  static const String totalMembers = 'Total Members';
-  static const String admins = 'Admins';
-  static const String roleDistribution = 'Role Distribution';
-  static const String membersByAssignedRole = 'Members by assigned role';
-  static const String statusOverview = 'Status Overview';
-  static const String accountActivity = 'Account activity';
-  static const String inactive = 'Inactive';
-  static const String remove = 'Remove';
-  static const String roleSaved = 'Role saved';
-  static const String newRole = 'New Role';
-  static const String editRole = 'Edit Role';
-  static const String roleDetails = 'Role Details';
-  static const String roleNameRequired = 'Role name *';
-  static const String owner = 'Owner';
-  static const String manager = 'Manager';
-  static const String member = 'Member';
-  static const String viewer = 'Viewer';
-  static const String accessLevel = 'Access level';
-  static const String permissionCoverage = 'Permission Coverage';
-  static const String permissions = 'Permissions';
-  static const String configureCrudPermissionsPerResource = 'Configure CRUD permissions per resource';
-  static const String resource = 'Resource';
-  static const String create = 'Create';
-  static const String read = 'Read';
-  static const String update = 'Update';
-  static const String rolesPermissions = 'Roles & Permissions';
-  static const String shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery = 'Shape secure access policies, clarify responsibilities, and give every teammate exactly the permissions they need.';
-  static const String searchRoles = 'Search roles...';
-  static const String noRolesYet = 'No roles yet';
-  static const String createRolesToManageAccessControl = 'Create roles to manage access control';
-  static const String createRole = 'Create Role';
-  static const String deleteRole = 'Delete Role';
-  static const String deleteThisRolePermanently = 'Delete this role permanently?';
-  static const String totalRoles = 'Total Roles';
-  static const String permissionSets = 'Permission Sets';
-  static const String membersPerRole = 'Members per Role';
-  static const String howManyUsersAreAssignedToEachRole = 'How many users are assigned to each role';
-  static const String open = 'Open';
-  static const String inProgress = 'In Progress';
-  static const String resolved = 'Resolved';
-  static const String closed = 'Closed';
-  static const String supportTickets = 'Support Tickets';
-  static const String trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut = 'Track customer requests, prioritize urgent work, and keep every resolution moving from one polished command center.';
-  static const String newTicket = 'New Ticket';
-  static const String searchTickets = 'Search tickets...';
-  static const String noTicketsFound = 'No tickets found';
-  static const String tryAdjustingYourFilters = 'Try adjusting your filters';
-  static const String total = 'Total';
-  static const String low = 'Low';
-  static const String med = 'Med';
-  static const String high = 'High';
-  static const String urgent = 'Urgent';
-  static const String priorityBreakdown = 'Priority Breakdown';
-  static const String ticketsByPriorityLevel = 'Tickets by priority level';
-  static const String statusDistribution = 'Status Distribution';
-  static const String currentTicketStates = 'Current ticket states';
-  static const String noData = 'No data';
-  static const String dueToday = 'Due today';
-  static const String titleRequired = 'Title *';
-  static const String titleIsRequired = 'Title is required';
-  static const String priority = 'Priority';
-  static const String attachment = '📎 Attachment';
-  static const String ticketMessageSent = 'ticket.message_sent';
-  static const String ticketid = 'ticketId';
-  static const String noMessagesYet = 'No messages yet';
-  static const String attachFile = 'Attach file';
-  static const String typeAMessage = 'Type a message...';
-  static const String ticketDetails = 'Ticket Details';
-  static const String status = 'Status';
-  static const String creator = 'Creator';
-  static const String assignee = 'Assignee';
-  static const String dueDate = 'Due date';
-  static const String slaProgress = 'SLA Progress';
-  static const String tags = 'Tags';
-  static const String deltacontent = 'deltaContent';
-  static const String templateSaved = 'Template saved';
-  static const String templateName = 'Template name';
-  static const String attach = 'Attach';
-  static const String variables = 'Variables';
-  static const String addMore = 'Add more';
-  static const String startWritingYourLetterTemplate = 'Start writing your letter template...';
-  static const String availableVariables = 'Available Variables';
-  static const String useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV = 'Use these variables in your template. They will be replaced with actual values when the letter is generated.';
-  static const String userSFullName = "User's full name";
-  static const String userSEmail = "User's email";
-  static const String companyName = 'Company name';
-  static const String currentDate = 'Current date';
-  static const String flowName = 'Flow name';
-  static const String newLetterTemplate = 'New Letter Template';
-  static const String uncategorized = 'Uncategorized';
-  static const String letterTemplates = 'Letter Templates';
-  static const String manageReusableLetterTemplatesWithDynamicVariablesReadyToSend = 'Manage reusable letter templates with dynamic variables, ready-to-send language, and consistent branded communication.';
-  static const String newTemplate = 'New Template';
-  static const String searchTemplates = 'Search templates...';
-  static const String noLetterTemplates = 'No letter templates';
-  static const String createReusableLetterTemplates = 'Create reusable letter templates';
-  static const String createTemplate = 'Create Template';
-  static const String deleteTemplate = 'Delete Template';
-  static const String deleteThisLetterTemplatePermanently = 'Delete this letter template permanently?';
-  static const String totalTemplates = 'Total Templates';
-  static const String totalVariables = 'Total Variables';
-  static const String templatesByCategory = 'Templates by Category';
-  static const String distributionAcrossCategories = 'Distribution across categories';
-  static const String allCategories = 'All categories';
-  static const String goodMorning = 'Good morning';
-  static const String goodAfternoon = 'Good afternoon';
-  static const String goodEvening = 'Good evening';
-  static const String mon = 'Mon';
-  static const String tue = 'Tue';
-  static const String wed = 'Wed';
-  static const String thu = 'Thu';
-  static const String fri = 'Fri';
-  static const String sat = 'Sat';
-  static const String sun = 'Sun';
-  static const String jan = 'Jan';
-  static const String feb = 'Feb';
-  static const String mar = 'Mar';
-  static const String apr = 'Apr';
-  static const String may = 'May';
-  static const String jun = 'Jun';
-  static const String jul = 'Jul';
-  static const String aug = 'Aug';
-  static const String sep = 'Sep';
-  static const String oct = 'Oct';
-  static const String nov = 'Nov';
-  static const String dec = 'Dec';
-  static const String hereSWhatSHappeningInYourOrganizationToday = "Here's what's happening in your organization today.";
-  static const String activeOrganizations = 'Active organizations';
-  static const String activeFlows = 'Active Flows';
-  static const String automationPipelines = 'Automation pipelines';
-  static const String openTickets = 'Open Tickets';
-  static const String needsAttention = 'Needs attention';
-  static const String closedTickets = 'Closed tickets';
-  static const String activityOverview = 'Activity Overview';
-  static const String ticketsFlowsLast7Days = 'Tickets & flows – last 7 days';
-  static const String tickets = 'Tickets';
-  static const String ticketStatus = 'Ticket Status';
-  static const String distributionOverview = 'Distribution overview';
-  static const String noTicketsYet = 'No tickets yet';
-  static const String recentTickets = 'Recent Tickets';
-  static const String latestActivity = 'Latest activity';
-  static const String viewAll = 'View all';
-  static const String resolutionRate = 'Resolution Rate';
-  static const String slaCompliance = 'SLA Compliance';
-  static const String performanceMetrics = 'Performance Metrics';
-  static const String ticketKpisAtAGlance = 'Ticket KPIs at a glance';
-  static const String quickActions = 'Quick Actions';
-  static const String modelSaved = 'Model saved';
-  static const String modelEditor = 'Model Editor';
-  static const String modelInfo = 'Model Info';
-  static const String modelNameRequired = 'Model name *';
-  static const String addField = 'Add Field';
-  static const String noFieldsYetAddYourFirstField = 'No fields yet. Add your first field.';
-  static const String jsonSchemaPreview = 'JSON Schema Preview';
-  static const String text3 = ' : ';
-  static const String unique = ' · Unique';
-  static const String unique3 = 'Unique';
-  static const String fieldNameRequired = 'Field name *';
-  static const String fieldType = 'Field type';
-  static const String newModel = 'New Model';
-  static const String dataModels = 'Data Models';
-  static const String defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation = 'Define durable entity schemas, organize fields, and keep your operational data consistent across every product surface.';
-  static const String searchModels = 'Search models...';
-  static const String noModelsYet = 'No models yet';
-  static const String defineYourDataStructures = 'Define your data structures';
-  static const String createModel = 'Create Model';
-  static const String deleteModel = 'Delete Model';
-  static const String deleteThisModelPermanently = 'Delete this model permanently?';
-  static const String totalModels = 'Total Models';
-  static const String fieldTypeDistribution = 'Field Type Distribution';
-  static const String breakdownOfFieldTypesAcrossAllModels = 'Breakdown of field types across all models';
-  static const String editLabel = 'Edit label';
-  static const String deleteEdge = 'Delete edge';
-  static const String yes = 'Yes';
-  static const String no = 'No';
-  static const String form = 'Form';
-  static const String role = 'Role';
-  static const String y = 'Y';
-  static const String n3 = 'N';
-  static const String ellipsis = '…';
-  static const String noNodes = 'No nodes';
-  static const String dashboard = 'Dashboard';
-  static const String overview = 'Overview';
-  static const String organization = 'Organization';
-  static const String users = 'Users';
-  static const String roles = 'Roles';
-  static const String automation = 'Automation';
-  static const String forms = 'Forms';
-  static const String models = 'Models';
-  static const String letters = 'Letters';
-  static const String communication = 'Communication';
-  static const String menu = 'Menu';
-  static const String search = 'Search';
-  static const String notifications = 'Notifications';
-  static const String toggleTheme = 'Toggle theme';
-  static const String search3 = 'Search...';
-  static const String disableGlassMode = 'Disable glass mode';
-  static const String enableGlassMode = 'Enable glass mode';
-  static const String logout = 'Logout';
-  static const String signOut = 'Sign Out';
-  static const String select = 'Select...';
-  static const String selectDate = 'Select date';
-  static const String selectTime = 'Select time';
-  static const String clickToUploadFile = 'Click to upload file';
-  static const String anyFileTypeSupported = 'Any file type supported';
-  static const String clickToUploadImage = 'Click to upload image';
-  static const String pngJpgGifSupported = 'PNG, JPG, GIF supported';
-  static const String pickAColor = 'Pick a color';
-  static const String done = 'Done';
-  static const String signHere = 'Sign here';
-  static const String column1 = 'Column 1';
-  static const String column2 = 'Column 2';
-  static const String column3 = 'Column 3';
-  static const String addRow = 'Add Row';
-  static const String searchEllipsis = 'Search…';
-  static const String somethingWentWrong = 'Something went wrong';
-  static const String retry = 'Retry';
+  static AppLanguage _language = AppLanguage.english;
 
-  static const String string = 'String';
-  static const String integer = 'Integer';
-  static const String float = 'Float';
-  static const String boolean = 'Boolean';
-  static const String date = 'Date';
-  static const String dateTime = 'DateTime';
-  static const String file = 'File';
-  static const String reference = 'Reference';
-  static const String textField = 'Text';
-  static const String number = 'Number';
-  static const String textArea = 'Text Area';
-  static const String dropdown = 'Dropdown';
-  static const String multiSelect = 'Multi-Select';
-  static const String checkbox = 'Checkbox';
-  static const String radioGroup = 'Radio Group';
-  static const String datePicker = 'Date Picker';
-  static const String timePicker = 'Time Picker';
-  static const String fileUpload = 'File Upload';
-  static const String imageUpload = 'Image Upload';
-  static const String colorPicker = 'Color Picker';
-  static const String switchText = 'Switch';
-  static const String table = 'Table';
-  static const String rating = 'Rating';
-  static const String signature = 'Signature';
-  static const String medium = 'Medium';
+  static AppLanguage get language => _language;
+  static bool get isPersian => _language == AppLanguage.persian;
+  static bool get isRtl => _language.textDirection == TextDirection.rtl;
+  static Locale get locale => _language.locale;
+  static TextDirection get textDirection => _language.textDirection;
 
-  static String exceptionMessage(Object? message) => 'Exception: ${message ?? ''}';
-  static String errorLoadingFlow(Object error) => 'Error loading flow: $error';
-  static String errorSaving(Object error) => 'Error saving: $error';
-  static String error(Object error) => 'Error: $error';
-  static String demoAccountLabel(String label) => 'Demo: $label';
-  static String zoomPercent(num scale) => 'Zoom: ${(scale * 100).toInt()}%';
-  static String percent(num value) => '${(value * 100).toInt()}%';
-  static String nodesAndEdges(int nodes, int edges) => '$nodes nodes · $edges edges';
-  static String nodesCount(int nodes) => '$nodes nodes';
-  static String edgesCount(int edges) => '$edges edges';
-  static String stepsCount(int steps) => '$steps steps';
-  static String decisionsCount(int decisions) => '$decisions decisions';
-  static String totalEdges(int totalEdges) => '$totalEdges edges total';
+  static void configureLanguage(AppLanguage language) {
+    _language = language;
+  }
+
+  static String _text(_UiTextKey key) => (_language == AppLanguage.persian ? _persian : _english)[key] ?? _english[key] ?? key.name;
+
+  static const Map<_UiTextKey, String> _english = {
+    _UiTextKey.exception: "Exception: ",
+    _UiTextKey.autocreat: "AutoCreat",
+    _UiTextKey.createYourAccount: "Create your account",
+    _UiTextKey.startBuildingYourOrganizationalSystem: "Start building your organizational system",
+    _UiTextKey.firstName: "First name",
+    _UiTextKey.requiredText: "Required",
+    _UiTextKey.lastName: "Last name",
+    _UiTextKey.emailAddress: "Email address",
+    _UiTextKey.emailIsRequired: "Email is required",
+    _UiTextKey.invalidEmail: "Invalid email",
+    _UiTextKey.companyNameOptional: "Company name (optional)",
+    _UiTextKey.password: "Password",
+    _UiTextKey.passwordIsRequired: "Password is required",
+    _UiTextKey.atLeast8Characters: "At least 8 characters",
+    _UiTextKey.confirmPassword: "Confirm password",
+    _UiTextKey.passwordsDoNotMatch: "Passwords do not match",
+    _UiTextKey.createAccount: "Create Account",
+    _UiTextKey.alreadyHaveAnAccount: "Already have an account? ",
+    _UiTextKey.signIn: "Sign in",
+    _UiTextKey.demo123: "Demo123!",
+    _UiTextKey.demo: "Demo",
+    _UiTextKey.admin: "Admin",
+    _UiTextKey.welcomeBack: "Welcome back",
+    _UiTextKey.signInToYourOrganizationAccount: "Sign in to your organization account",
+    _UiTextKey.passwordTooShort: "Password too short",
+    _UiTextKey.forgotPassword: "Forgot password?",
+    _UiTextKey.signIn3: "Sign In",
+    _UiTextKey.donTHaveAnAccount: "Don't have an account? ",
+    _UiTextKey.createAccount3: "Create account",
+    _UiTextKey.demo3: "DEMO",
+    _UiTextKey.tryDemoMode: "Try Demo Mode",
+    _UiTextKey.noAccountNeededExploreWithSampleData: "No account needed — explore with sample data",
+    _UiTextKey.organizationalSystemBuilder: "Organizational System Builder",
+    _UiTextKey.designComplexOrganizationalFlows: "Design complex organizational flows",
+    _UiTextKey.buildFormsAndDataModels: "Build forms and data models",
+    _UiTextKey.manageRolesAndPermissions: "Manage roles and permissions",
+    _UiTextKey.communicateViaTickets: "Communicate via tickets",
+    _UiTextKey.flowSaved: "Flow saved",
+    _UiTextKey.editNodeLabel: "Edit node label",
+    _UiTextKey.label: "Label",
+    _UiTextKey.cancel: "Cancel",
+    _UiTextKey.save: "Save",
+    _UiTextKey.canvasControls: "Canvas Controls",
+    _UiTextKey.zoomOut: "Zoom Out",
+    _UiTextKey.zoomIn: "Zoom In",
+    _UiTextKey.fitScreen: "Fit Screen",
+    _UiTextKey.autoLayout: "Auto Layout",
+    _UiTextKey.flowEditor: "Flow Editor",
+    _UiTextKey.unsaved: "Unsaved",
+    _UiTextKey.zoomOut3: "Zoom out",
+    _UiTextKey.zoomIn3: "Zoom in",
+    _UiTextKey.canvasControls3: "Canvas controls",
+    _UiTextKey.saveFlow: "Save Flow",
+    _UiTextKey.addStartNode: "Add Start Node",
+    _UiTextKey.addStepNode: "Add Step Node",
+    _UiTextKey.addDecisionNode: "Add Decision Node",
+    _UiTextKey.addEndNode: "Add End Node",
+    _UiTextKey.fitToScreen: "Fit to screen",
+    _UiTextKey.nodeProperties: "Node Properties",
+    _UiTextKey.deleteNode: "Delete node",
+    _UiTextKey.close: "Close",
+    _UiTextKey.startBuildingYourFlow: "Start building your flow",
+    _UiTextKey.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft: "Tap here to add a Start node,\nor use the toolbar on the left.",
+    _UiTextKey.newFlow: "New Flow",
+    _UiTextKey.start: "Start",
+    _UiTextKey.end: "End",
+    _UiTextKey.automationFlows: "Automation Flows",
+    _UiTextKey.designReviewAndLaunchOrganizationalProcessFlowsWithClearStep: "Design, review, and launch organizational process flows with clear steps, connected decisions, and measurable outcomes.",
+    _UiTextKey.newText: "New",
+    _UiTextKey.searchFlows: "Search flows...",
+    _UiTextKey.noFlowsYet: "No flows yet",
+    _UiTextKey.createYourFirstOrganizationalFlow: "Create your first organizational flow",
+    _UiTextKey.createFlow: "Create Flow",
+    _UiTextKey.deleteFlow: "Delete Flow",
+    _UiTextKey.thisWillDeleteTheFlowPermanently: "This will delete the flow permanently.",
+    _UiTextKey.totalFlows: "Total Flows",
+    _UiTextKey.active: "Active",
+    _UiTextKey.draft: "Draft",
+    _UiTextKey.totalNodes: "Total Nodes",
+    _UiTextKey.flowComplexity: "Flow Complexity",
+    _UiTextKey.nodesAndEdgesPerFlow: "Nodes and edges per flow",
+    _UiTextKey.nodeTypes: "Node Types",
+    _UiTextKey.openEditor: "Open Editor",
+    _UiTextKey.delete: "Delete",
+    _UiTextKey.nodeLabel: "Node Label",
+    _UiTextKey.enterLabelEllipsis: "Enter label…",
+    _UiTextKey.description: "Description",
+    _UiTextKey.optionalDescriptionEllipsis: "Optional description…",
+    _UiTextKey.assignedRole: "Assigned Role",
+    _UiTextKey.errorLoadingRoles: "Error loading roles",
+    _UiTextKey.noRoleAssigned: "No role assigned",
+    _UiTextKey.selectRoleEllipsis: "Select role…",
+    _UiTextKey.assignedForm: "Assigned Form",
+    _UiTextKey.errorLoadingForms: "Error loading forms",
+    _UiTextKey.noFormAssigned: "No form assigned",
+    _UiTextKey.selectFormEllipsis: "Select form…",
+    _UiTextKey.branches: "Branches",
+    _UiTextKey.addBranch: "Add Branch",
+    _UiTextKey.defaultText: "DEFAULT",
+    _UiTextKey.conditionEGStatusApproved: "Condition (e.g. status == approved)",
+    _UiTextKey.position: "Position",
+    _UiTextKey.capacity: "Capacity",
+    _UiTextKey.members: "Members",
+    _UiTextKey.flows: "Flows",
+    _UiTextKey.details: "Details",
+    _UiTextKey.website: "Website",
+    _UiTextKey.created: "Created",
+    _UiTextKey.text: ".",
+    _UiTextKey.companies: "Companies",
+    _UiTextKey.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK: "Organize client and partner workspaces, monitor portfolio health, and keep each organization easy to find and manage.",
+    _UiTextKey.newCompany: "New Company",
+    _UiTextKey.searchCompanies: "Search companies...",
+    _UiTextKey.noCompaniesYet: "No companies yet",
+    _UiTextKey.noResultsFound: "No results found",
+    _UiTextKey.createYourFirstCompanyToGetStarted: "Create your first company to get started",
+    _UiTextKey.createCompany: "Create Company",
+    _UiTextKey.deleteCompany: "Delete Company",
+    _UiTextKey.areYouSureYouWantToDeleteThisCompany: "Are you sure you want to delete this company?",
+    _UiTextKey.edit: "Edit",
+    _UiTextKey.editCompany: "Edit Company",
+    _UiTextKey.companyNameRequired: "Company name *",
+    _UiTextKey.nameIsRequired: "Name is required",
+    _UiTextKey.industry: "Industry",
+    _UiTextKey.formSaved: "Form saved",
+    _UiTextKey.formEditor: "Form Editor",
+    _UiTextKey.fieldTypes: "Field Types",
+    _UiTextKey.formName: "Form name",
+    _UiTextKey.clickAFieldTypeToAddIt: "Click a field type to add it",
+    _UiTextKey.requiredText3: " · Required",
+    _UiTextKey.fieldProperties: "Field Properties",
+    _UiTextKey.placeholder: "Placeholder",
+    _UiTextKey.helpText: "Help text",
+    _UiTextKey.readOnly: "Read only",
+    _UiTextKey.hidden: "Hidden",
+    _UiTextKey.options: "Options",
+    _UiTextKey.add: "Add",
+    _UiTextKey.newForm: "New Form",
+    _UiTextKey.formDefinitions: "Form Definitions",
+    _UiTextKey.buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif: "Build structured forms that capture reliable data, guide users beautifully, and feed your workflows without friction.",
+    _UiTextKey.searchForms: "Search forms...",
+    _UiTextKey.noFormsYet: "No forms yet",
+    _UiTextKey.createYourFirstFormDefinition: "Create your first form definition",
+    _UiTextKey.createForm: "Create Form",
+    _UiTextKey.deleteForm: "Delete Form",
+    _UiTextKey.thisWillDeleteTheFormPermanently: "This will delete the form permanently.",
+    _UiTextKey.totalForms: "Total Forms",
+    _UiTextKey.totalFields: "Total Fields",
+    _UiTextKey.fieldTypesDistribution: "Field Types Distribution",
+    _UiTextKey.countOfEachFieldTypeAcrossAllForms: "Count of each field type across all forms",
+    _UiTextKey.noFieldsDefined: "No fields defined",
+    _UiTextKey.userSaved: "User saved",
+    _UiTextKey.newUser: "New User",
+    _UiTextKey.editUser: "Edit User",
+    _UiTextKey.changePhoto: "Change photo",
+    _UiTextKey.uploadPhoto: "Upload photo",
+    _UiTextKey.userInfo: "User Info",
+    _UiTextKey.firstNameRequired: "First name *",
+    _UiTextKey.lastNameRequired: "Last name *",
+    _UiTextKey.emailRequired: "Email *",
+    _UiTextKey.phone: "Phone",
+    _UiTextKey.passwordRequired: "Password *",
+    _UiTextKey.newPasswordLeaveBlankToKeep: "New password (leave blank to keep)",
+    _UiTextKey.access: "Access",
+    _UiTextKey.noRole: "No role",
+    _UiTextKey.assignedRole3: "Assigned role",
+    _UiTextKey.activeAccount: "Active account",
+    _UiTextKey.inactiveUsersCannotLogIn: "Inactive users cannot log in",
+    _UiTextKey.all: "All",
+    _UiTextKey.teamMembers: "Team Members",
+    _UiTextKey.inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol: "Invite teammates, understand account activity, and balance roles so collaboration stays organized and secure.",
+    _UiTextKey.addUser: "Add User",
+    _UiTextKey.searchMembers: "Search members...",
+    _UiTextKey.noMembersFound: "No members found",
+    _UiTextKey.tryAdjustingYourSearchOrFilters: "Try adjusting your search or filters",
+    _UiTextKey.removeUser: "Remove User",
+    _UiTextKey.removeThisUserFromTheSystem: "Remove this user from the system?",
+    _UiTextKey.totalMembers: "Total Members",
+    _UiTextKey.admins: "Admins",
+    _UiTextKey.roleDistribution: "Role Distribution",
+    _UiTextKey.membersByAssignedRole: "Members by assigned role",
+    _UiTextKey.statusOverview: "Status Overview",
+    _UiTextKey.accountActivity: "Account activity",
+    _UiTextKey.inactive: "Inactive",
+    _UiTextKey.remove: "Remove",
+    _UiTextKey.roleSaved: "Role saved",
+    _UiTextKey.newRole: "New Role",
+    _UiTextKey.editRole: "Edit Role",
+    _UiTextKey.roleDetails: "Role Details",
+    _UiTextKey.roleNameRequired: "Role name *",
+    _UiTextKey.owner: "Owner",
+    _UiTextKey.manager: "Manager",
+    _UiTextKey.member: "Member",
+    _UiTextKey.viewer: "Viewer",
+    _UiTextKey.accessLevel: "Access level",
+    _UiTextKey.permissionCoverage: "Permission Coverage",
+    _UiTextKey.permissions: "Permissions",
+    _UiTextKey.configureCrudPermissionsPerResource: "Configure CRUD permissions per resource",
+    _UiTextKey.resource: "Resource",
+    _UiTextKey.create: "Create",
+    _UiTextKey.read: "Read",
+    _UiTextKey.update: "Update",
+    _UiTextKey.rolesPermissions: "Roles & Permissions",
+    _UiTextKey.shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery: "Shape secure access policies, clarify responsibilities, and give every teammate exactly the permissions they need.",
+    _UiTextKey.searchRoles: "Search roles...",
+    _UiTextKey.noRolesYet: "No roles yet",
+    _UiTextKey.createRolesToManageAccessControl: "Create roles to manage access control",
+    _UiTextKey.createRole: "Create Role",
+    _UiTextKey.deleteRole: "Delete Role",
+    _UiTextKey.deleteThisRolePermanently: "Delete this role permanently?",
+    _UiTextKey.totalRoles: "Total Roles",
+    _UiTextKey.permissionSets: "Permission Sets",
+    _UiTextKey.membersPerRole: "Members per Role",
+    _UiTextKey.howManyUsersAreAssignedToEachRole: "How many users are assigned to each role",
+    _UiTextKey.open: "Open",
+    _UiTextKey.inProgress: "In Progress",
+    _UiTextKey.resolved: "Resolved",
+    _UiTextKey.closed: "Closed",
+    _UiTextKey.supportTickets: "Support Tickets",
+    _UiTextKey.trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut: "Track customer requests, prioritize urgent work, and keep every resolution moving from one polished command center.",
+    _UiTextKey.newTicket: "New Ticket",
+    _UiTextKey.searchTickets: "Search tickets...",
+    _UiTextKey.noTicketsFound: "No tickets found",
+    _UiTextKey.tryAdjustingYourFilters: "Try adjusting your filters",
+    _UiTextKey.total: "Total",
+    _UiTextKey.low: "Low",
+    _UiTextKey.med: "Med",
+    _UiTextKey.high: "High",
+    _UiTextKey.urgent: "Urgent",
+    _UiTextKey.priorityBreakdown: "Priority Breakdown",
+    _UiTextKey.ticketsByPriorityLevel: "Tickets by priority level",
+    _UiTextKey.statusDistribution: "Status Distribution",
+    _UiTextKey.currentTicketStates: "Current ticket states",
+    _UiTextKey.noData: "No data",
+    _UiTextKey.dueToday: "Due today",
+    _UiTextKey.titleRequired: "Title *",
+    _UiTextKey.titleIsRequired: "Title is required",
+    _UiTextKey.priority: "Priority",
+    _UiTextKey.attachment: "📎 Attachment",
+    _UiTextKey.ticketMessageSent: "ticket.message_sent",
+    _UiTextKey.ticketid: "ticketId",
+    _UiTextKey.noMessagesYet: "No messages yet",
+    _UiTextKey.attachFile: "Attach file",
+    _UiTextKey.typeAMessage: "Type a message...",
+    _UiTextKey.ticketDetails: "Ticket Details",
+    _UiTextKey.status: "Status",
+    _UiTextKey.creator: "Creator",
+    _UiTextKey.assignee: "Assignee",
+    _UiTextKey.dueDate: "Due date",
+    _UiTextKey.slaProgress: "SLA Progress",
+    _UiTextKey.tags: "Tags",
+    _UiTextKey.deltacontent: "deltaContent",
+    _UiTextKey.templateSaved: "Template saved",
+    _UiTextKey.templateName: "Template name",
+    _UiTextKey.attach: "Attach",
+    _UiTextKey.variables: "Variables",
+    _UiTextKey.addMore: "Add more",
+    _UiTextKey.startWritingYourLetterTemplate: "Start writing your letter template...",
+    _UiTextKey.availableVariables: "Available Variables",
+    _UiTextKey.useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV: "Use these variables in your template. They will be replaced with actual values when the letter is generated.",
+    _UiTextKey.userSFullName: "User's full name",
+    _UiTextKey.userSEmail: "User's email",
+    _UiTextKey.companyName: "Company name",
+    _UiTextKey.currentDate: "Current date",
+    _UiTextKey.flowName: "Flow name",
+    _UiTextKey.newLetterTemplate: "New Letter Template",
+    _UiTextKey.uncategorized: "Uncategorized",
+    _UiTextKey.letterTemplates: "Letter Templates",
+    _UiTextKey.manageReusableLetterTemplatesWithDynamicVariablesReadyToSend: "Manage reusable letter templates with dynamic variables, ready-to-send language, and consistent branded communication.",
+    _UiTextKey.newTemplate: "New Template",
+    _UiTextKey.searchTemplates: "Search templates...",
+    _UiTextKey.noLetterTemplates: "No letter templates",
+    _UiTextKey.createReusableLetterTemplates: "Create reusable letter templates",
+    _UiTextKey.createTemplate: "Create Template",
+    _UiTextKey.deleteTemplate: "Delete Template",
+    _UiTextKey.deleteThisLetterTemplatePermanently: "Delete this letter template permanently?",
+    _UiTextKey.totalTemplates: "Total Templates",
+    _UiTextKey.totalVariables: "Total Variables",
+    _UiTextKey.templatesByCategory: "Templates by Category",
+    _UiTextKey.distributionAcrossCategories: "Distribution across categories",
+    _UiTextKey.allCategories: "All categories",
+    _UiTextKey.goodMorning: "Good morning",
+    _UiTextKey.goodAfternoon: "Good afternoon",
+    _UiTextKey.goodEvening: "Good evening",
+    _UiTextKey.mon: "Mon",
+    _UiTextKey.tue: "Tue",
+    _UiTextKey.wed: "Wed",
+    _UiTextKey.thu: "Thu",
+    _UiTextKey.fri: "Fri",
+    _UiTextKey.sat: "Sat",
+    _UiTextKey.sun: "Sun",
+    _UiTextKey.jan: "Jan",
+    _UiTextKey.feb: "Feb",
+    _UiTextKey.mar: "Mar",
+    _UiTextKey.apr: "Apr",
+    _UiTextKey.may: "May",
+    _UiTextKey.jun: "Jun",
+    _UiTextKey.jul: "Jul",
+    _UiTextKey.aug: "Aug",
+    _UiTextKey.sep: "Sep",
+    _UiTextKey.oct: "Oct",
+    _UiTextKey.nov: "Nov",
+    _UiTextKey.dec: "Dec",
+    _UiTextKey.hereSWhatSHappeningInYourOrganizationToday: "Here's what's happening in your organization today.",
+    _UiTextKey.activeOrganizations: "Active organizations",
+    _UiTextKey.activeFlows: "Active Flows",
+    _UiTextKey.automationPipelines: "Automation pipelines",
+    _UiTextKey.openTickets: "Open Tickets",
+    _UiTextKey.needsAttention: "Needs attention",
+    _UiTextKey.closedTickets: "Closed tickets",
+    _UiTextKey.activityOverview: "Activity Overview",
+    _UiTextKey.ticketsFlowsLast7Days: "Tickets & flows – last 7 days",
+    _UiTextKey.tickets: "Tickets",
+    _UiTextKey.ticketStatus: "Ticket Status",
+    _UiTextKey.distributionOverview: "Distribution overview",
+    _UiTextKey.noTicketsYet: "No tickets yet",
+    _UiTextKey.recentTickets: "Recent Tickets",
+    _UiTextKey.latestActivity: "Latest activity",
+    _UiTextKey.viewAll: "View all",
+    _UiTextKey.resolutionRate: "Resolution Rate",
+    _UiTextKey.slaCompliance: "SLA Compliance",
+    _UiTextKey.performanceMetrics: "Performance Metrics",
+    _UiTextKey.ticketKpisAtAGlance: "Ticket KPIs at a glance",
+    _UiTextKey.quickActions: "Quick Actions",
+    _UiTextKey.modelSaved: "Model saved",
+    _UiTextKey.modelEditor: "Model Editor",
+    _UiTextKey.modelInfo: "Model Info",
+    _UiTextKey.modelNameRequired: "Model name *",
+    _UiTextKey.addField: "Add Field",
+    _UiTextKey.noFieldsYetAddYourFirstField: "No fields yet. Add your first field.",
+    _UiTextKey.jsonSchemaPreview: "JSON Schema Preview",
+    _UiTextKey.text3: " : ",
+    _UiTextKey.unique: " · Unique",
+    _UiTextKey.unique3: "Unique",
+    _UiTextKey.fieldNameRequired: "Field name *",
+    _UiTextKey.fieldType: "Field type",
+    _UiTextKey.newModel: "New Model",
+    _UiTextKey.dataModels: "Data Models",
+    _UiTextKey.defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation: "Define durable entity schemas, organize fields, and keep your operational data consistent across every product surface.",
+    _UiTextKey.searchModels: "Search models...",
+    _UiTextKey.noModelsYet: "No models yet",
+    _UiTextKey.defineYourDataStructures: "Define your data structures",
+    _UiTextKey.createModel: "Create Model",
+    _UiTextKey.deleteModel: "Delete Model",
+    _UiTextKey.deleteThisModelPermanently: "Delete this model permanently?",
+    _UiTextKey.totalModels: "Total Models",
+    _UiTextKey.fieldTypeDistribution: "Field Type Distribution",
+    _UiTextKey.breakdownOfFieldTypesAcrossAllModels: "Breakdown of field types across all models",
+    _UiTextKey.editLabel: "Edit label",
+    _UiTextKey.deleteEdge: "Delete edge",
+    _UiTextKey.yes: "Yes",
+    _UiTextKey.no: "No",
+    _UiTextKey.form: "Form",
+    _UiTextKey.role: "Role",
+    _UiTextKey.y: "Y",
+    _UiTextKey.n3: "N",
+    _UiTextKey.ellipsis: "…",
+    _UiTextKey.noNodes: "No nodes",
+    _UiTextKey.dashboard: "Dashboard",
+    _UiTextKey.overview: "Overview",
+    _UiTextKey.organization: "Organization",
+    _UiTextKey.users: "Users",
+    _UiTextKey.roles: "Roles",
+    _UiTextKey.automation: "Automation",
+    _UiTextKey.forms: "Forms",
+    _UiTextKey.models: "Models",
+    _UiTextKey.letters: "Letters",
+    _UiTextKey.communication: "Communication",
+    _UiTextKey.menu: "Menu",
+    _UiTextKey.search: "Search",
+    _UiTextKey.notifications: "Notifications",
+    _UiTextKey.toggleTheme: "Toggle theme",
+    _UiTextKey.search3: "Search...",
+    _UiTextKey.disableGlassMode: "Disable glass mode",
+    _UiTextKey.enableGlassMode: "Enable glass mode",
+    _UiTextKey.logout: "Logout",
+    _UiTextKey.signOut: "Sign Out",
+    _UiTextKey.select: "Select...",
+    _UiTextKey.selectDate: "Select date",
+    _UiTextKey.selectTime: "Select time",
+    _UiTextKey.clickToUploadFile: "Click to upload file",
+    _UiTextKey.anyFileTypeSupported: "Any file type supported",
+    _UiTextKey.clickToUploadImage: "Click to upload image",
+    _UiTextKey.pngJpgGifSupported: "PNG, JPG, GIF supported",
+    _UiTextKey.pickAColor: "Pick a color",
+    _UiTextKey.done: "Done",
+    _UiTextKey.signHere: "Sign here",
+    _UiTextKey.column1: "Column 1",
+    _UiTextKey.column2: "Column 2",
+    _UiTextKey.column3: "Column 3",
+    _UiTextKey.addRow: "Add Row",
+    _UiTextKey.searchEllipsis: "Search…",
+    _UiTextKey.somethingWentWrong: "Something went wrong",
+    _UiTextKey.retry: "Retry",
+    _UiTextKey.string: "String",
+    _UiTextKey.integer: "Integer",
+    _UiTextKey.float: "Float",
+    _UiTextKey.boolean: "Boolean",
+    _UiTextKey.date: "Date",
+    _UiTextKey.dateTime: "DateTime",
+    _UiTextKey.file: "File",
+    _UiTextKey.reference: "Reference",
+    _UiTextKey.textField: "Text",
+    _UiTextKey.number: "Number",
+    _UiTextKey.textArea: "Text Area",
+    _UiTextKey.dropdown: "Dropdown",
+    _UiTextKey.multiSelect: "Multi-Select",
+    _UiTextKey.checkbox: "Checkbox",
+    _UiTextKey.radioGroup: "Radio Group",
+    _UiTextKey.datePicker: "Date Picker",
+    _UiTextKey.timePicker: "Time Picker",
+    _UiTextKey.fileUpload: "File Upload",
+    _UiTextKey.imageUpload: "Image Upload",
+    _UiTextKey.colorPicker: "Color Picker",
+    _UiTextKey.switchText: "Switch",
+    _UiTextKey.table: "Table",
+    _UiTextKey.rating: "Rating",
+    _UiTextKey.signature: "Signature",
+    _UiTextKey.medium: "Medium",
+    _UiTextKey.there: "there",
+    _UiTextKey.emptyJsonObject: "{}",
+    _UiTextKey.bulletSeparator: " · ",
+    _UiTextKey.requiredAsterisk: "*",
+    _UiTextKey.schemaSeparator: ",\n",
+  };
+
+  static const Map<_UiTextKey, String> _persian = {
+    _UiTextKey.exception: "استثنا: ",
+    _UiTextKey.autocreat: "اتوکریت",
+    _UiTextKey.createYourAccount: "ایجاد حساب کاربری",
+    _UiTextKey.startBuildingYourOrganizationalSystem: "ساخت سیستم سازمانی خود را شروع کنید",
+    _UiTextKey.firstName: "نام",
+    _UiTextKey.requiredText: "الزامی",
+    _UiTextKey.lastName: "نام خانوادگی",
+    _UiTextKey.emailAddress: "آدرس ایمیل",
+    _UiTextKey.emailIsRequired: "ایمیل الزامی است",
+    _UiTextKey.invalidEmail: "ایمیل نامعتبر است",
+    _UiTextKey.companyNameOptional: "نام شرکت (اختیاری)",
+    _UiTextKey.password: "رمز عبور",
+    _UiTextKey.passwordIsRequired: "رمز عبور الزامی است",
+    _UiTextKey.atLeast8Characters: "حداقل ۸ کاراکتر",
+    _UiTextKey.confirmPassword: "تأیید رمز عبور",
+    _UiTextKey.passwordsDoNotMatch: "رمزهای عبور مطابقت ندارند",
+    _UiTextKey.createAccount: "ایجاد حساب",
+    _UiTextKey.alreadyHaveAnAccount: "قبلاً حساب دارید؟ ",
+    _UiTextKey.signIn: "ورود",
+    _UiTextKey.demo123: "Demo123!",
+    _UiTextKey.demo: "نمایشی",
+    _UiTextKey.admin: "مدیر",
+    _UiTextKey.welcomeBack: "خوش آمدید",
+    _UiTextKey.signInToYourOrganizationAccount: "به حساب سازمان خود وارد شوید",
+    _UiTextKey.passwordTooShort: "رمز عبور خیلی کوتاه است",
+    _UiTextKey.forgotPassword: "رمز عبور را فراموش کرده‌اید؟",
+    _UiTextKey.signIn3: "ورود",
+    _UiTextKey.donTHaveAnAccount: "حساب ندارید؟ ",
+    _UiTextKey.createAccount3: "ایجاد حساب",
+    _UiTextKey.demo3: "نمایشی",
+    _UiTextKey.tryDemoMode: "ورود به حالت نمایشی",
+    _UiTextKey.noAccountNeededExploreWithSampleData: "بدون نیاز به حساب — با داده‌های نمونه کاوش کنید",
+    _UiTextKey.organizationalSystemBuilder: "سازنده سیستم سازمانی",
+    _UiTextKey.designComplexOrganizationalFlows: "طراحی جریان‌های سازمانی پیچیده",
+    _UiTextKey.buildFormsAndDataModels: "ساخت فرم‌ها و مدل‌های داده",
+    _UiTextKey.manageRolesAndPermissions: "مدیریت نقش‌ها و مجوزها",
+    _UiTextKey.communicateViaTickets: "ارتباط از طریق تیکت‌ها",
+    _UiTextKey.flowSaved: "جریان ذخیره شد",
+    _UiTextKey.editNodeLabel: "ویرایش برچسب گره",
+    _UiTextKey.label: "برچسب",
+    _UiTextKey.cancel: "لغو",
+    _UiTextKey.save: "ذخیره",
+    _UiTextKey.canvasControls: "کنترل‌های بوم",
+    _UiTextKey.zoomOut: "کوچک‌نمایی",
+    _UiTextKey.zoomIn: "بزرگ‌نمایی",
+    _UiTextKey.fitScreen: "تناسب با صفحه",
+    _UiTextKey.autoLayout: "چیدمان خودکار",
+    _UiTextKey.flowEditor: "ویرایشگر جریان",
+    _UiTextKey.unsaved: "ذخیره‌نشده",
+    _UiTextKey.zoomOut3: "zoom Out 3",
+    _UiTextKey.zoomIn3: "zoom In 3",
+    _UiTextKey.canvasControls3: "canvas Controls 3",
+    _UiTextKey.saveFlow: "ذخیره جریان",
+    _UiTextKey.addStartNode: "افزودن شروع گره",
+    _UiTextKey.addStepNode: "افزودن Step گره",
+    _UiTextKey.addDecisionNode: "افزودن Decision گره",
+    _UiTextKey.addEndNode: "افزودن End گره",
+    _UiTextKey.fitToScreen: "fit To Screen",
+    _UiTextKey.nodeProperties: "گره Properties",
+    _UiTextKey.deleteNode: "حذف گره",
+    _UiTextKey.close: "بستن",
+    _UiTextKey.startBuildingYourFlow: "شروع ساخت خود جریان",
+    _UiTextKey.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft: "tap Here To افزودن A شروع گره Nor Use The Toolbar On The Left",
+    _UiTextKey.newFlow: "جدید جریان",
+    _UiTextKey.start: "شروع",
+    _UiTextKey.end: "end",
+    _UiTextKey.automationFlows: "اتوماسیون جریان‌ها",
+    _UiTextKey.designReviewAndLaunchOrganizationalProcessFlowsWithClearStep: "design Review And Launch سازمانی Process جریان‌ها With Clear Step",
+    _UiTextKey.newText: "جدید",
+    _UiTextKey.searchFlows: "جستجو جریان‌ها",
+    _UiTextKey.noFlowsYet: "بدون جریان‌ها Yet",
+    _UiTextKey.createYourFirstOrganizationalFlow: "ایجاد خود نام سازمانی جریان",
+    _UiTextKey.createFlow: "ایجاد جریان",
+    _UiTextKey.deleteFlow: "حذف جریان",
+    _UiTextKey.thisWillDeleteTheFlowPermanently: "this Will حذف The جریان Permanently",
+    _UiTextKey.totalFlows: "کل جریان‌ها",
+    _UiTextKey.active: "فعال",
+    _UiTextKey.draft: "پیش‌نویس",
+    _UiTextKey.totalNodes: "کل گره‌ها",
+    _UiTextKey.flowComplexity: "جریان Complexity",
+    _UiTextKey.nodesAndEdgesPerFlow: "گره‌ها And یال‌ها Per جریان",
+    _UiTextKey.nodeTypes: "گره انواع",
+    _UiTextKey.openEditor: "باز ویرایشگر",
+    _UiTextKey.delete: "حذف",
+    _UiTextKey.nodeLabel: "گره Label",
+    _UiTextKey.enterLabelEllipsis: "enter Label Ellipsis",
+    _UiTextKey.description: "توضیح",
+    _UiTextKey.optionalDescriptionEllipsis: "optional توضیح Ellipsis",
+    _UiTextKey.assignedRole: "assigned نقش",
+    _UiTextKey.errorLoadingRoles: "خطا بارگذاری نقش‌ها",
+    _UiTextKey.noRoleAssigned: "بدون نقش Assigned",
+    _UiTextKey.selectRoleEllipsis: "انتخاب نقش Ellipsis",
+    _UiTextKey.assignedForm: "assigned فرم",
+    _UiTextKey.errorLoadingForms: "خطا بارگذاری فرم‌ها",
+    _UiTextKey.noFormAssigned: "بدون فرم Assigned",
+    _UiTextKey.selectFormEllipsis: "انتخاب فرم Ellipsis",
+    _UiTextKey.branches: "شاخه‌ها",
+    _UiTextKey.addBranch: "افزودن شاخه",
+    _UiTextKey.defaultText: "default متن",
+    _UiTextKey.conditionEGStatusApproved: "condition EG وضعیت Approved",
+    _UiTextKey.position: "position",
+    _UiTextKey.capacity: "capacity",
+    _UiTextKey.members: "اعضا",
+    _UiTextKey.flows: "جریان‌ها",
+    _UiTextKey.details: "جزئیات",
+    _UiTextKey.website: "website",
+    _UiTextKey.created: "created",
+    _UiTextKey.text: ".",
+    _UiTextKey.companies: "شرکت‌ها",
+    _UiTextKey.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK: "organize Client And Partner Workspaces Monitor Portfolio Health And K",
+    _UiTextKey.newCompany: "شرکت جدید",
+    _UiTextKey.searchCompanies: "جستجو Companies",
+    _UiTextKey.noCompaniesYet: "بدون Companies Yet",
+    _UiTextKey.noResultsFound: "بدون Results Found",
+    _UiTextKey.createYourFirstCompanyToGetStarted: "ایجاد خود نام شرکت To Get Started",
+    _UiTextKey.createCompany: "ایجاد شرکت",
+    _UiTextKey.deleteCompany: "حذف شرکت",
+    _UiTextKey.areYouSureYouWantToDeleteThisCompany: "are You Sure You Want To حذف This شرکت",
+    _UiTextKey.edit: "ویرایش",
+    _UiTextKey.editCompany: "ویرایش شرکت",
+    _UiTextKey.companyNameRequired: "شرکت نام الزامی",
+    _UiTextKey.nameIsRequired: "نام Is الزامی",
+    _UiTextKey.industry: "industry",
+    _UiTextKey.formSaved: "فرم ذخیره شد",
+    _UiTextKey.formEditor: "فرم ویرایشگر",
+    _UiTextKey.fieldTypes: "فیلد انواع",
+    _UiTextKey.formName: "فرم نام",
+    _UiTextKey.clickAFieldTypeToAddIt: "click A فیلد نوع To افزودن It",
+    _UiTextKey.requiredText3: "الزامی متن 3",
+    _UiTextKey.fieldProperties: "فیلد Properties",
+    _UiTextKey.placeholder: "placeholder",
+    _UiTextKey.helpText: "help متن",
+    _UiTextKey.readOnly: "read Only",
+    _UiTextKey.hidden: "hidden",
+    _UiTextKey.options: "options",
+    _UiTextKey.add: "افزودن",
+    _UiTextKey.newForm: "فرم جدید",
+    _UiTextKey.formDefinitions: "فرم Definitions",
+    _UiTextKey.buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif: "build Structured فرم‌ها That Capture Reliable داده Guide کاربران Beautif",
+    _UiTextKey.searchForms: "جستجو فرم‌ها",
+    _UiTextKey.noFormsYet: "بدون فرم‌ها Yet",
+    _UiTextKey.createYourFirstFormDefinition: "ایجاد خود نام فرم Definition",
+    _UiTextKey.createForm: "ایجاد فرم",
+    _UiTextKey.deleteForm: "حذف فرم",
+    _UiTextKey.thisWillDeleteTheFormPermanently: "this Will حذف The فرم Permanently",
+    _UiTextKey.totalForms: "کل فرم‌ها",
+    _UiTextKey.totalFields: "کل فیلدها",
+    _UiTextKey.fieldTypesDistribution: "فیلد انواع توزیع",
+    _UiTextKey.countOfEachFieldTypeAcrossAllForms: "count Of Each فیلد نوع Across همه فرم‌ها",
+    _UiTextKey.noFieldsDefined: "بدون فیلدها Defined",
+    _UiTextKey.userSaved: "کاربر ذخیره شد",
+    _UiTextKey.newUser: "کاربر جدید",
+    _UiTextKey.editUser: "ویرایش کاربر",
+    _UiTextKey.changePhoto: "change Photo",
+    _UiTextKey.uploadPhoto: "بارگذاری Photo",
+    _UiTextKey.userInfo: "کاربر اطلاعات",
+    _UiTextKey.firstNameRequired: "نام نام الزامی",
+    _UiTextKey.lastNameRequired: "نام خانوادگی نام الزامی",
+    _UiTextKey.emailRequired: "ایمیل الزامی",
+    _UiTextKey.phone: "phone",
+    _UiTextKey.passwordRequired: "رمز عبور الزامی",
+    _UiTextKey.newPasswordLeaveBlankToKeep: "جدید رمز عبور Leave Blank To Keep",
+    _UiTextKey.access: "دسترسی",
+    _UiTextKey.noRole: "بدون نقش",
+    _UiTextKey.assignedRole3: "assigned نقش 3",
+    _UiTextKey.activeAccount: "فعال حساب",
+    _UiTextKey.inactiveUsersCannotLogIn: "inactive کاربران Cannot Log In",
+    _UiTextKey.all: "همه",
+    _UiTextKey.teamMembers: "team اعضا",
+    _UiTextKey.inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol: "invite Teammates Understand حساب فعالیت And Balance نقش‌ها So Col",
+    _UiTextKey.addUser: "افزودن کاربر",
+    _UiTextKey.searchMembers: "جستجو اعضا",
+    _UiTextKey.noMembersFound: "بدون اعضا Found",
+    _UiTextKey.tryAdjustingYourSearchOrFilters: "try Adjusting خود جستجو Or فیلترها",
+    _UiTextKey.removeUser: "حذف کاربر",
+    _UiTextKey.removeThisUserFromTheSystem: "حذف This کاربر From The سیستم",
+    _UiTextKey.totalMembers: "کل اعضا",
+    _UiTextKey.admins: "admins",
+    _UiTextKey.roleDistribution: "نقش توزیع",
+    _UiTextKey.membersByAssignedRole: "اعضا By Assigned نقش",
+    _UiTextKey.statusOverview: "وضعیت نمای کلی",
+    _UiTextKey.accountActivity: "حساب فعالیت",
+    _UiTextKey.inactive: "inactive",
+    _UiTextKey.remove: "حذف",
+    _UiTextKey.roleSaved: "نقش ذخیره شد",
+    _UiTextKey.newRole: "جدید نقش",
+    _UiTextKey.editRole: "ویرایش نقش",
+    _UiTextKey.roleDetails: "نقش جزئیات",
+    _UiTextKey.roleNameRequired: "نقش نام الزامی",
+    _UiTextKey.owner: "owner",
+    _UiTextKey.manager: "manager",
+    _UiTextKey.member: "member",
+    _UiTextKey.viewer: "viewer",
+    _UiTextKey.accessLevel: "دسترسی سطح",
+    _UiTextKey.permissionCoverage: "مجوز Coverage",
+    _UiTextKey.permissions: "مجوزها",
+    _UiTextKey.configureCrudPermissionsPerResource: "configure Crud مجوزها Per Resource",
+    _UiTextKey.resource: "resource",
+    _UiTextKey.create: "ایجاد",
+    _UiTextKey.read: "read",
+    _UiTextKey.update: "update",
+    _UiTextKey.rolesPermissions: "نقش‌ها مجوزها",
+    _UiTextKey.shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery: "shape Secure دسترسی Policies Clarify Responsibilities And Give Every",
+    _UiTextKey.searchRoles: "جستجو نقش‌ها",
+    _UiTextKey.noRolesYet: "بدون نقش‌ها Yet",
+    _UiTextKey.createRolesToManageAccessControl: "ایجاد نقش‌ها To Manage دسترسی Control",
+    _UiTextKey.createRole: "ایجاد نقش",
+    _UiTextKey.deleteRole: "حذف نقش",
+    _UiTextKey.deleteThisRolePermanently: "حذف This نقش Permanently",
+    _UiTextKey.totalRoles: "کل نقش‌ها",
+    _UiTextKey.permissionSets: "مجوز Sets",
+    _UiTextKey.membersPerRole: "اعضا Per نقش",
+    _UiTextKey.howManyUsersAreAssignedToEachRole: "how Many کاربران Are Assigned To Each نقش",
+    _UiTextKey.open: "باز",
+    _UiTextKey.inProgress: "در حال انجام",
+    _UiTextKey.resolved: "حل‌شده",
+    _UiTextKey.closed: "بسته",
+    _UiTextKey.supportTickets: "support تیکت‌ها",
+    _UiTextKey.trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut: "track Customer Requests Prioritize Urgent Work And Keep Every Resolut",
+    _UiTextKey.newTicket: "تیکت جدید",
+    _UiTextKey.searchTickets: "جستجو تیکت‌ها",
+    _UiTextKey.noTicketsFound: "بدون تیکت‌ها Found",
+    _UiTextKey.tryAdjustingYourFilters: "try Adjusting خود فیلترها",
+    _UiTextKey.total: "کل",
+    _UiTextKey.low: "کم",
+    _UiTextKey.med: "متوسط",
+    _UiTextKey.high: "زیاد",
+    _UiTextKey.urgent: "فوری",
+    _UiTextKey.priorityBreakdown: "اولویت Breakdown",
+    _UiTextKey.ticketsByPriorityLevel: "تیکت‌ها By اولویت سطح",
+    _UiTextKey.statusDistribution: "وضعیت توزیع",
+    _UiTextKey.currentTicketStates: "فعلی تیکت States",
+    _UiTextKey.noData: "بدون داده",
+    _UiTextKey.dueToday: "سررسید Today",
+    _UiTextKey.titleRequired: "عنوان الزامی",
+    _UiTextKey.titleIsRequired: "عنوان Is الزامی",
+    _UiTextKey.priority: "اولویت",
+    _UiTextKey.attachment: "پیوست",
+    _UiTextKey.ticketMessageSent: "تیکت پیام Sent",
+    _UiTextKey.ticketid: "ticketid",
+    _UiTextKey.noMessagesYet: "بدون پیام‌ها Yet",
+    _UiTextKey.attachFile: "پیوست فایل",
+    _UiTextKey.typeAMessage: "نوع A پیام",
+    _UiTextKey.ticketDetails: "تیکت جزئیات",
+    _UiTextKey.status: "وضعیت",
+    _UiTextKey.creator: "ایجادکننده",
+    _UiTextKey.assignee: "مسئول",
+    _UiTextKey.dueDate: "سررسید تاریخ",
+    _UiTextKey.slaProgress: "sla Progress",
+    _UiTextKey.tags: "tags",
+    _UiTextKey.deltacontent: "deltacontent",
+    _UiTextKey.templateSaved: "قالب ذخیره شد",
+    _UiTextKey.templateName: "قالب نام",
+    _UiTextKey.attach: "پیوست",
+    _UiTextKey.variables: "متغیرها",
+    _UiTextKey.addMore: "افزودن More",
+    _UiTextKey.startWritingYourLetterTemplate: "شروع Writing خود نامه قالب",
+    _UiTextKey.availableVariables: "available متغیرها",
+    _UiTextKey.useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV: "use These متغیرها In خود قالب They Will Be Replaced With Actual V",
+    _UiTextKey.userSFullName: "کاربر S Full نام",
+    _UiTextKey.userSEmail: "کاربر S ایمیل",
+    _UiTextKey.companyName: "شرکت نام",
+    _UiTextKey.currentDate: "فعلی تاریخ",
+    _UiTextKey.flowName: "جریان نام",
+    _UiTextKey.newLetterTemplate: "جدید نامه قالب",
+    _UiTextKey.uncategorized: "uncategorized",
+    _UiTextKey.letterTemplates: "نامه قالب‌ها",
+    _UiTextKey.manageReusableLetterTemplatesWithDynamicVariablesReadyToSend: "manage Reusable نامه قالب‌ها With Dynamic متغیرها Ready To Send",
+    _UiTextKey.newTemplate: "قالب جدید",
+    _UiTextKey.searchTemplates: "جستجو قالب‌ها",
+    _UiTextKey.noLetterTemplates: "بدون نامه قالب‌ها",
+    _UiTextKey.createReusableLetterTemplates: "ایجاد Reusable نامه قالب‌ها",
+    _UiTextKey.createTemplate: "ایجاد قالب",
+    _UiTextKey.deleteTemplate: "حذف قالب",
+    _UiTextKey.deleteThisLetterTemplatePermanently: "حذف This نامه قالب Permanently",
+    _UiTextKey.totalTemplates: "کل قالب‌ها",
+    _UiTextKey.totalVariables: "کل متغیرها",
+    _UiTextKey.templatesByCategory: "قالب‌ها By دسته",
+    _UiTextKey.distributionAcrossCategories: "توزیع Across دسته‌ها",
+    _UiTextKey.allCategories: "همه دسته‌ها",
+    _UiTextKey.goodMorning: "خوب صبح",
+    _UiTextKey.goodAfternoon: "خوب بعدازظهر",
+    _UiTextKey.goodEvening: "خوب عصر",
+    _UiTextKey.mon: "mon",
+    _UiTextKey.tue: "tue",
+    _UiTextKey.wed: "wed",
+    _UiTextKey.thu: "thu",
+    _UiTextKey.fri: "fri",
+    _UiTextKey.sat: "sat",
+    _UiTextKey.sun: "sun",
+    _UiTextKey.jan: "jan",
+    _UiTextKey.feb: "feb",
+    _UiTextKey.mar: "mar",
+    _UiTextKey.apr: "apr",
+    _UiTextKey.may: "may",
+    _UiTextKey.jun: "jun",
+    _UiTextKey.jul: "jul",
+    _UiTextKey.aug: "aug",
+    _UiTextKey.sep: "sep",
+    _UiTextKey.oct: "oct",
+    _UiTextKey.nov: "nov",
+    _UiTextKey.dec: "dec",
+    _UiTextKey.hereSWhatSHappeningInYourOrganizationToday: "here S What S Happening In خود سازمان Today",
+    _UiTextKey.activeOrganizations: "فعال Organizations",
+    _UiTextKey.activeFlows: "فعال جریان‌ها",
+    _UiTextKey.automationPipelines: "اتوماسیون Pipelines",
+    _UiTextKey.openTickets: "باز تیکت‌ها",
+    _UiTextKey.needsAttention: "needs Attention",
+    _UiTextKey.closedTickets: "بسته تیکت‌ها",
+    _UiTextKey.activityOverview: "فعالیت نمای کلی",
+    _UiTextKey.ticketsFlowsLast7Days: "تیکت‌ها جریان‌ها نام خانوادگی 7 Days",
+    _UiTextKey.tickets: "تیکت‌ها",
+    _UiTextKey.ticketStatus: "تیکت وضعیت",
+    _UiTextKey.distributionOverview: "توزیع نمای کلی",
+    _UiTextKey.noTicketsYet: "بدون تیکت‌ها Yet",
+    _UiTextKey.recentTickets: "اخیر تیکت‌ها",
+    _UiTextKey.latestActivity: "آخرین فعالیت",
+    _UiTextKey.viewAll: "مشاهده همه",
+    _UiTextKey.resolutionRate: "resolution Rate",
+    _UiTextKey.slaCompliance: "sla Compliance",
+    _UiTextKey.performanceMetrics: "performance Metrics",
+    _UiTextKey.ticketKpisAtAGlance: "تیکت Kpis At A Glance",
+    _UiTextKey.quickActions: "سریع اقدام‌ها",
+    _UiTextKey.modelSaved: "مدل ذخیره شد",
+    _UiTextKey.modelEditor: "مدل ویرایشگر",
+    _UiTextKey.modelInfo: "مدل اطلاعات",
+    _UiTextKey.modelNameRequired: "مدل نام الزامی",
+    _UiTextKey.addField: "افزودن فیلد",
+    _UiTextKey.noFieldsYetAddYourFirstField: "بدون فیلدها Yet افزودن خود نام فیلد",
+    _UiTextKey.jsonSchemaPreview: "json Schema Preview",
+    _UiTextKey.text3: " : ",
+    _UiTextKey.unique: "unique",
+    _UiTextKey.unique3: "unique 3",
+    _UiTextKey.fieldNameRequired: "فیلد نام الزامی",
+    _UiTextKey.fieldType: "فیلد نوع",
+    _UiTextKey.newModel: "مدل جدید",
+    _UiTextKey.dataModels: "داده مدل‌ها",
+    _UiTextKey.defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation: "define Durable Entity Schemas Organize فیلدها And Keep خود Operation",
+    _UiTextKey.searchModels: "جستجو مدل‌ها",
+    _UiTextKey.noModelsYet: "بدون مدل‌ها Yet",
+    _UiTextKey.defineYourDataStructures: "define خود داده Structures",
+    _UiTextKey.createModel: "ایجاد مدل",
+    _UiTextKey.deleteModel: "حذف مدل",
+    _UiTextKey.deleteThisModelPermanently: "حذف This مدل Permanently",
+    _UiTextKey.totalModels: "کل مدل‌ها",
+    _UiTextKey.fieldTypeDistribution: "فیلد نوع توزیع",
+    _UiTextKey.breakdownOfFieldTypesAcrossAllModels: "breakdown Of فیلد انواع Across همه مدل‌ها",
+    _UiTextKey.editLabel: "ویرایش Label",
+    _UiTextKey.deleteEdge: "حذف یال",
+    _UiTextKey.yes: "بله",
+    _UiTextKey.no: "خیر",
+    _UiTextKey.form: "فرم",
+    _UiTextKey.role: "نقش",
+    _UiTextKey.y: "y",
+    _UiTextKey.n3: "n 3",
+    _UiTextKey.ellipsis: "…",
+    _UiTextKey.noNodes: "بدون گره‌ها",
+    _UiTextKey.dashboard: "داشبورد",
+    _UiTextKey.overview: "نمای کلی",
+    _UiTextKey.organization: "سازمان",
+    _UiTextKey.users: "کاربران",
+    _UiTextKey.roles: "نقش‌ها",
+    _UiTextKey.automation: "اتوماسیون",
+    _UiTextKey.forms: "فرم‌ها",
+    _UiTextKey.models: "مدل‌ها",
+    _UiTextKey.letters: "نامه‌ها",
+    _UiTextKey.communication: "ارتباطات",
+    _UiTextKey.menu: "منو",
+    _UiTextKey.search: "جستجو",
+    _UiTextKey.notifications: "اعلان‌ها",
+    _UiTextKey.toggleTheme: "تغییر پوسته",
+    _UiTextKey.search3: "جستجو...",
+    _UiTextKey.disableGlassMode: "disable Glass Mode",
+    _UiTextKey.enableGlassMode: "enable Glass Mode",
+    _UiTextKey.logout: "خروج",
+    _UiTextKey.signOut: "خروج",
+    _UiTextKey.select: "انتخاب...",
+    _UiTextKey.selectDate: "انتخاب تاریخ",
+    _UiTextKey.selectTime: "انتخاب زمان",
+    _UiTextKey.clickToUploadFile: "click To بارگذاری فایل",
+    _UiTextKey.anyFileTypeSupported: "any فایل نوع Supported",
+    _UiTextKey.clickToUploadImage: "click To بارگذاری تصویر",
+    _UiTextKey.pngJpgGifSupported: "png Jpg Gif Supported",
+    _UiTextKey.pickAColor: "pick A رنگ",
+    _UiTextKey.done: "انجام شد",
+    _UiTextKey.signHere: "ورود Here",
+    _UiTextKey.column1: "column 1",
+    _UiTextKey.column2: "column 2",
+    _UiTextKey.column3: "column 3",
+    _UiTextKey.addRow: "افزودن Row",
+    _UiTextKey.searchEllipsis: "جستجو…",
+    _UiTextKey.somethingWentWrong: "مشکلی پیش آمد",
+    _UiTextKey.retry: "تلاش مجدد",
+    _UiTextKey.string: "رشته",
+    _UiTextKey.integer: "عدد صحیح",
+    _UiTextKey.float: "اعشاری",
+    _UiTextKey.boolean: "بولی",
+    _UiTextKey.date: "تاریخ",
+    _UiTextKey.dateTime: "تاریخ و زمان",
+    _UiTextKey.file: "فایل",
+    _UiTextKey.reference: "ارجاع",
+    _UiTextKey.textField: "متن",
+    _UiTextKey.number: "عدد",
+    _UiTextKey.textArea: "ناحیه متن",
+    _UiTextKey.dropdown: "فهرست کشویی",
+    _UiTextKey.multiSelect: "چندانتخابی",
+    _UiTextKey.checkbox: "چک‌باکس",
+    _UiTextKey.radioGroup: "گروه رادیویی",
+    _UiTextKey.datePicker: "انتخابگر تاریخ",
+    _UiTextKey.timePicker: "انتخابگر زمان",
+    _UiTextKey.fileUpload: "بارگذاری فایل",
+    _UiTextKey.imageUpload: "بارگذاری تصویر",
+    _UiTextKey.colorPicker: "انتخابگر رنگ",
+    _UiTextKey.switchText: "سوئیچ",
+    _UiTextKey.table: "جدول",
+    _UiTextKey.rating: "امتیاز",
+    _UiTextKey.signature: "امضا",
+    _UiTextKey.medium: "متوسط",
+    _UiTextKey.there: "there",
+    _UiTextKey.emptyJsonObject: "{}",
+    _UiTextKey.bulletSeparator: " · ",
+    _UiTextKey.requiredAsterisk: "*",
+    _UiTextKey.schemaSeparator: ",\n",
+  };
+
+  static String get exception => _text(_UiTextKey.exception);
+  static String get autocreat => _text(_UiTextKey.autocreat);
+  static String get createYourAccount => _text(_UiTextKey.createYourAccount);
+  static String get startBuildingYourOrganizationalSystem => _text(_UiTextKey.startBuildingYourOrganizationalSystem);
+  static String get firstName => _text(_UiTextKey.firstName);
+  static String get requiredText => _text(_UiTextKey.requiredText);
+  static String get lastName => _text(_UiTextKey.lastName);
+  static String get emailAddress => _text(_UiTextKey.emailAddress);
+  static String get emailIsRequired => _text(_UiTextKey.emailIsRequired);
+  static String get invalidEmail => _text(_UiTextKey.invalidEmail);
+  static String get companyNameOptional => _text(_UiTextKey.companyNameOptional);
+  static String get password => _text(_UiTextKey.password);
+  static String get passwordIsRequired => _text(_UiTextKey.passwordIsRequired);
+  static String get atLeast8Characters => _text(_UiTextKey.atLeast8Characters);
+  static String get confirmPassword => _text(_UiTextKey.confirmPassword);
+  static String get passwordsDoNotMatch => _text(_UiTextKey.passwordsDoNotMatch);
+  static String get createAccount => _text(_UiTextKey.createAccount);
+  static String get alreadyHaveAnAccount => _text(_UiTextKey.alreadyHaveAnAccount);
+  static String get signIn => _text(_UiTextKey.signIn);
+  static String get demo123 => _text(_UiTextKey.demo123);
+  static String get demo => _text(_UiTextKey.demo);
+  static String get admin => _text(_UiTextKey.admin);
+  static String get welcomeBack => _text(_UiTextKey.welcomeBack);
+  static String get signInToYourOrganizationAccount => _text(_UiTextKey.signInToYourOrganizationAccount);
+  static String get passwordTooShort => _text(_UiTextKey.passwordTooShort);
+  static String get forgotPassword => _text(_UiTextKey.forgotPassword);
+  static String get signIn3 => _text(_UiTextKey.signIn3);
+  static String get donTHaveAnAccount => _text(_UiTextKey.donTHaveAnAccount);
+  static String get createAccount3 => _text(_UiTextKey.createAccount3);
+  static String get demo3 => _text(_UiTextKey.demo3);
+  static String get tryDemoMode => _text(_UiTextKey.tryDemoMode);
+  static String get noAccountNeededExploreWithSampleData => _text(_UiTextKey.noAccountNeededExploreWithSampleData);
+  static String get organizationalSystemBuilder => _text(_UiTextKey.organizationalSystemBuilder);
+  static String get designComplexOrganizationalFlows => _text(_UiTextKey.designComplexOrganizationalFlows);
+  static String get buildFormsAndDataModels => _text(_UiTextKey.buildFormsAndDataModels);
+  static String get manageRolesAndPermissions => _text(_UiTextKey.manageRolesAndPermissions);
+  static String get communicateViaTickets => _text(_UiTextKey.communicateViaTickets);
+  static String get flowSaved => _text(_UiTextKey.flowSaved);
+  static String get editNodeLabel => _text(_UiTextKey.editNodeLabel);
+  static String get label => _text(_UiTextKey.label);
+  static String get cancel => _text(_UiTextKey.cancel);
+  static String get save => _text(_UiTextKey.save);
+  static String get canvasControls => _text(_UiTextKey.canvasControls);
+  static String get zoomOut => _text(_UiTextKey.zoomOut);
+  static String get zoomIn => _text(_UiTextKey.zoomIn);
+  static String get fitScreen => _text(_UiTextKey.fitScreen);
+  static String get autoLayout => _text(_UiTextKey.autoLayout);
+  static String get flowEditor => _text(_UiTextKey.flowEditor);
+  static String get unsaved => _text(_UiTextKey.unsaved);
+  static String get zoomOut3 => _text(_UiTextKey.zoomOut3);
+  static String get zoomIn3 => _text(_UiTextKey.zoomIn3);
+  static String get canvasControls3 => _text(_UiTextKey.canvasControls3);
+  static String get saveFlow => _text(_UiTextKey.saveFlow);
+  static String get addStartNode => _text(_UiTextKey.addStartNode);
+  static String get addStepNode => _text(_UiTextKey.addStepNode);
+  static String get addDecisionNode => _text(_UiTextKey.addDecisionNode);
+  static String get addEndNode => _text(_UiTextKey.addEndNode);
+  static String get fitToScreen => _text(_UiTextKey.fitToScreen);
+  static String get nodeProperties => _text(_UiTextKey.nodeProperties);
+  static String get deleteNode => _text(_UiTextKey.deleteNode);
+  static String get close => _text(_UiTextKey.close);
+  static String get startBuildingYourFlow => _text(_UiTextKey.startBuildingYourFlow);
+  static String get tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft => _text(_UiTextKey.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft);
+  static String get newFlow => _text(_UiTextKey.newFlow);
+  static String get start => _text(_UiTextKey.start);
+  static String get end => _text(_UiTextKey.end);
+  static String get automationFlows => _text(_UiTextKey.automationFlows);
+  static String get designReviewAndLaunchOrganizationalProcessFlowsWithClearStep => _text(_UiTextKey.designReviewAndLaunchOrganizationalProcessFlowsWithClearStep);
+  static String get newText => _text(_UiTextKey.newText);
+  static String get searchFlows => _text(_UiTextKey.searchFlows);
+  static String get noFlowsYet => _text(_UiTextKey.noFlowsYet);
+  static String get createYourFirstOrganizationalFlow => _text(_UiTextKey.createYourFirstOrganizationalFlow);
+  static String get createFlow => _text(_UiTextKey.createFlow);
+  static String get deleteFlow => _text(_UiTextKey.deleteFlow);
+  static String get thisWillDeleteTheFlowPermanently => _text(_UiTextKey.thisWillDeleteTheFlowPermanently);
+  static String get totalFlows => _text(_UiTextKey.totalFlows);
+  static String get active => _text(_UiTextKey.active);
+  static String get draft => _text(_UiTextKey.draft);
+  static String get totalNodes => _text(_UiTextKey.totalNodes);
+  static String get flowComplexity => _text(_UiTextKey.flowComplexity);
+  static String get nodesAndEdgesPerFlow => _text(_UiTextKey.nodesAndEdgesPerFlow);
+  static String get nodeTypes => _text(_UiTextKey.nodeTypes);
+  static String get openEditor => _text(_UiTextKey.openEditor);
+  static String get delete => _text(_UiTextKey.delete);
+  static String get nodeLabel => _text(_UiTextKey.nodeLabel);
+  static String get enterLabelEllipsis => _text(_UiTextKey.enterLabelEllipsis);
+  static String get description => _text(_UiTextKey.description);
+  static String get optionalDescriptionEllipsis => _text(_UiTextKey.optionalDescriptionEllipsis);
+  static String get assignedRole => _text(_UiTextKey.assignedRole);
+  static String get errorLoadingRoles => _text(_UiTextKey.errorLoadingRoles);
+  static String get noRoleAssigned => _text(_UiTextKey.noRoleAssigned);
+  static String get selectRoleEllipsis => _text(_UiTextKey.selectRoleEllipsis);
+  static String get assignedForm => _text(_UiTextKey.assignedForm);
+  static String get errorLoadingForms => _text(_UiTextKey.errorLoadingForms);
+  static String get noFormAssigned => _text(_UiTextKey.noFormAssigned);
+  static String get selectFormEllipsis => _text(_UiTextKey.selectFormEllipsis);
+  static String get branches => _text(_UiTextKey.branches);
+  static String get addBranch => _text(_UiTextKey.addBranch);
+  static String get defaultText => _text(_UiTextKey.defaultText);
+  static String get conditionEGStatusApproved => _text(_UiTextKey.conditionEGStatusApproved);
+  static String get position => _text(_UiTextKey.position);
+  static String get capacity => _text(_UiTextKey.capacity);
+  static String get members => _text(_UiTextKey.members);
+  static String get flows => _text(_UiTextKey.flows);
+  static String get details => _text(_UiTextKey.details);
+  static String get website => _text(_UiTextKey.website);
+  static String get created => _text(_UiTextKey.created);
+  static String get text => _text(_UiTextKey.text);
+  static String get companies => _text(_UiTextKey.companies);
+  static String get organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK => _text(_UiTextKey.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK);
+  static String get newCompany => _text(_UiTextKey.newCompany);
+  static String get searchCompanies => _text(_UiTextKey.searchCompanies);
+  static String get noCompaniesYet => _text(_UiTextKey.noCompaniesYet);
+  static String get noResultsFound => _text(_UiTextKey.noResultsFound);
+  static String get createYourFirstCompanyToGetStarted => _text(_UiTextKey.createYourFirstCompanyToGetStarted);
+  static String get createCompany => _text(_UiTextKey.createCompany);
+  static String get deleteCompany => _text(_UiTextKey.deleteCompany);
+  static String get areYouSureYouWantToDeleteThisCompany => _text(_UiTextKey.areYouSureYouWantToDeleteThisCompany);
+  static String get edit => _text(_UiTextKey.edit);
+  static String get editCompany => _text(_UiTextKey.editCompany);
+  static String get companyNameRequired => _text(_UiTextKey.companyNameRequired);
+  static String get nameIsRequired => _text(_UiTextKey.nameIsRequired);
+  static String get industry => _text(_UiTextKey.industry);
+  static String get formSaved => _text(_UiTextKey.formSaved);
+  static String get formEditor => _text(_UiTextKey.formEditor);
+  static String get fieldTypes => _text(_UiTextKey.fieldTypes);
+  static String get formName => _text(_UiTextKey.formName);
+  static String get clickAFieldTypeToAddIt => _text(_UiTextKey.clickAFieldTypeToAddIt);
+  static String get requiredText3 => _text(_UiTextKey.requiredText3);
+  static String get fieldProperties => _text(_UiTextKey.fieldProperties);
+  static String get placeholder => _text(_UiTextKey.placeholder);
+  static String get helpText => _text(_UiTextKey.helpText);
+  static String get readOnly => _text(_UiTextKey.readOnly);
+  static String get hidden => _text(_UiTextKey.hidden);
+  static String get options => _text(_UiTextKey.options);
+  static String get add => _text(_UiTextKey.add);
+  static String get newForm => _text(_UiTextKey.newForm);
+  static String get formDefinitions => _text(_UiTextKey.formDefinitions);
+  static String get buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif => _text(_UiTextKey.buildStructuredFormsThatCaptureReliableDataGuideUsersBeautif);
+  static String get searchForms => _text(_UiTextKey.searchForms);
+  static String get noFormsYet => _text(_UiTextKey.noFormsYet);
+  static String get createYourFirstFormDefinition => _text(_UiTextKey.createYourFirstFormDefinition);
+  static String get createForm => _text(_UiTextKey.createForm);
+  static String get deleteForm => _text(_UiTextKey.deleteForm);
+  static String get thisWillDeleteTheFormPermanently => _text(_UiTextKey.thisWillDeleteTheFormPermanently);
+  static String get totalForms => _text(_UiTextKey.totalForms);
+  static String get totalFields => _text(_UiTextKey.totalFields);
+  static String get fieldTypesDistribution => _text(_UiTextKey.fieldTypesDistribution);
+  static String get countOfEachFieldTypeAcrossAllForms => _text(_UiTextKey.countOfEachFieldTypeAcrossAllForms);
+  static String get noFieldsDefined => _text(_UiTextKey.noFieldsDefined);
+  static String get userSaved => _text(_UiTextKey.userSaved);
+  static String get newUser => _text(_UiTextKey.newUser);
+  static String get editUser => _text(_UiTextKey.editUser);
+  static String get changePhoto => _text(_UiTextKey.changePhoto);
+  static String get uploadPhoto => _text(_UiTextKey.uploadPhoto);
+  static String get userInfo => _text(_UiTextKey.userInfo);
+  static String get firstNameRequired => _text(_UiTextKey.firstNameRequired);
+  static String get lastNameRequired => _text(_UiTextKey.lastNameRequired);
+  static String get emailRequired => _text(_UiTextKey.emailRequired);
+  static String get phone => _text(_UiTextKey.phone);
+  static String get passwordRequired => _text(_UiTextKey.passwordRequired);
+  static String get newPasswordLeaveBlankToKeep => _text(_UiTextKey.newPasswordLeaveBlankToKeep);
+  static String get access => _text(_UiTextKey.access);
+  static String get noRole => _text(_UiTextKey.noRole);
+  static String get assignedRole3 => _text(_UiTextKey.assignedRole3);
+  static String get activeAccount => _text(_UiTextKey.activeAccount);
+  static String get inactiveUsersCannotLogIn => _text(_UiTextKey.inactiveUsersCannotLogIn);
+  static String get all => _text(_UiTextKey.all);
+  static String get teamMembers => _text(_UiTextKey.teamMembers);
+  static String get inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol => _text(_UiTextKey.inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol);
+  static String get addUser => _text(_UiTextKey.addUser);
+  static String get searchMembers => _text(_UiTextKey.searchMembers);
+  static String get noMembersFound => _text(_UiTextKey.noMembersFound);
+  static String get tryAdjustingYourSearchOrFilters => _text(_UiTextKey.tryAdjustingYourSearchOrFilters);
+  static String get removeUser => _text(_UiTextKey.removeUser);
+  static String get removeThisUserFromTheSystem => _text(_UiTextKey.removeThisUserFromTheSystem);
+  static String get totalMembers => _text(_UiTextKey.totalMembers);
+  static String get admins => _text(_UiTextKey.admins);
+  static String get roleDistribution => _text(_UiTextKey.roleDistribution);
+  static String get membersByAssignedRole => _text(_UiTextKey.membersByAssignedRole);
+  static String get statusOverview => _text(_UiTextKey.statusOverview);
+  static String get accountActivity => _text(_UiTextKey.accountActivity);
+  static String get inactive => _text(_UiTextKey.inactive);
+  static String get remove => _text(_UiTextKey.remove);
+  static String get roleSaved => _text(_UiTextKey.roleSaved);
+  static String get newRole => _text(_UiTextKey.newRole);
+  static String get editRole => _text(_UiTextKey.editRole);
+  static String get roleDetails => _text(_UiTextKey.roleDetails);
+  static String get roleNameRequired => _text(_UiTextKey.roleNameRequired);
+  static String get owner => _text(_UiTextKey.owner);
+  static String get manager => _text(_UiTextKey.manager);
+  static String get member => _text(_UiTextKey.member);
+  static String get viewer => _text(_UiTextKey.viewer);
+  static String get accessLevel => _text(_UiTextKey.accessLevel);
+  static String get permissionCoverage => _text(_UiTextKey.permissionCoverage);
+  static String get permissions => _text(_UiTextKey.permissions);
+  static String get configureCrudPermissionsPerResource => _text(_UiTextKey.configureCrudPermissionsPerResource);
+  static String get resource => _text(_UiTextKey.resource);
+  static String get create => _text(_UiTextKey.create);
+  static String get read => _text(_UiTextKey.read);
+  static String get update => _text(_UiTextKey.update);
+  static String get rolesPermissions => _text(_UiTextKey.rolesPermissions);
+  static String get shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery => _text(_UiTextKey.shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery);
+  static String get searchRoles => _text(_UiTextKey.searchRoles);
+  static String get noRolesYet => _text(_UiTextKey.noRolesYet);
+  static String get createRolesToManageAccessControl => _text(_UiTextKey.createRolesToManageAccessControl);
+  static String get createRole => _text(_UiTextKey.createRole);
+  static String get deleteRole => _text(_UiTextKey.deleteRole);
+  static String get deleteThisRolePermanently => _text(_UiTextKey.deleteThisRolePermanently);
+  static String get totalRoles => _text(_UiTextKey.totalRoles);
+  static String get permissionSets => _text(_UiTextKey.permissionSets);
+  static String get membersPerRole => _text(_UiTextKey.membersPerRole);
+  static String get howManyUsersAreAssignedToEachRole => _text(_UiTextKey.howManyUsersAreAssignedToEachRole);
+  static String get open => _text(_UiTextKey.open);
+  static String get inProgress => _text(_UiTextKey.inProgress);
+  static String get resolved => _text(_UiTextKey.resolved);
+  static String get closed => _text(_UiTextKey.closed);
+  static String get supportTickets => _text(_UiTextKey.supportTickets);
+  static String get trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut => _text(_UiTextKey.trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut);
+  static String get newTicket => _text(_UiTextKey.newTicket);
+  static String get searchTickets => _text(_UiTextKey.searchTickets);
+  static String get noTicketsFound => _text(_UiTextKey.noTicketsFound);
+  static String get tryAdjustingYourFilters => _text(_UiTextKey.tryAdjustingYourFilters);
+  static String get total => _text(_UiTextKey.total);
+  static String get low => _text(_UiTextKey.low);
+  static String get med => _text(_UiTextKey.med);
+  static String get high => _text(_UiTextKey.high);
+  static String get urgent => _text(_UiTextKey.urgent);
+  static String get priorityBreakdown => _text(_UiTextKey.priorityBreakdown);
+  static String get ticketsByPriorityLevel => _text(_UiTextKey.ticketsByPriorityLevel);
+  static String get statusDistribution => _text(_UiTextKey.statusDistribution);
+  static String get currentTicketStates => _text(_UiTextKey.currentTicketStates);
+  static String get noData => _text(_UiTextKey.noData);
+  static String get dueToday => _text(_UiTextKey.dueToday);
+  static String get titleRequired => _text(_UiTextKey.titleRequired);
+  static String get titleIsRequired => _text(_UiTextKey.titleIsRequired);
+  static String get priority => _text(_UiTextKey.priority);
+  static String get attachment => _text(_UiTextKey.attachment);
+  static String get ticketMessageSent => _text(_UiTextKey.ticketMessageSent);
+  static String get ticketid => _text(_UiTextKey.ticketid);
+  static String get noMessagesYet => _text(_UiTextKey.noMessagesYet);
+  static String get attachFile => _text(_UiTextKey.attachFile);
+  static String get typeAMessage => _text(_UiTextKey.typeAMessage);
+  static String get ticketDetails => _text(_UiTextKey.ticketDetails);
+  static String get status => _text(_UiTextKey.status);
+  static String get creator => _text(_UiTextKey.creator);
+  static String get assignee => _text(_UiTextKey.assignee);
+  static String get dueDate => _text(_UiTextKey.dueDate);
+  static String get slaProgress => _text(_UiTextKey.slaProgress);
+  static String get tags => _text(_UiTextKey.tags);
+  static String get deltacontent => _text(_UiTextKey.deltacontent);
+  static String get templateSaved => _text(_UiTextKey.templateSaved);
+  static String get templateName => _text(_UiTextKey.templateName);
+  static String get attach => _text(_UiTextKey.attach);
+  static String get variables => _text(_UiTextKey.variables);
+  static String get addMore => _text(_UiTextKey.addMore);
+  static String get startWritingYourLetterTemplate => _text(_UiTextKey.startWritingYourLetterTemplate);
+  static String get availableVariables => _text(_UiTextKey.availableVariables);
+  static String get useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV => _text(_UiTextKey.useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV);
+  static String get userSFullName => _text(_UiTextKey.userSFullName);
+  static String get userSEmail => _text(_UiTextKey.userSEmail);
+  static String get companyName => _text(_UiTextKey.companyName);
+  static String get currentDate => _text(_UiTextKey.currentDate);
+  static String get flowName => _text(_UiTextKey.flowName);
+  static String get newLetterTemplate => _text(_UiTextKey.newLetterTemplate);
+  static String get uncategorized => _text(_UiTextKey.uncategorized);
+  static String get letterTemplates => _text(_UiTextKey.letterTemplates);
+  static String get manageReusableLetterTemplatesWithDynamicVariablesReadyToSend => _text(_UiTextKey.manageReusableLetterTemplatesWithDynamicVariablesReadyToSend);
+  static String get newTemplate => _text(_UiTextKey.newTemplate);
+  static String get searchTemplates => _text(_UiTextKey.searchTemplates);
+  static String get noLetterTemplates => _text(_UiTextKey.noLetterTemplates);
+  static String get createReusableLetterTemplates => _text(_UiTextKey.createReusableLetterTemplates);
+  static String get createTemplate => _text(_UiTextKey.createTemplate);
+  static String get deleteTemplate => _text(_UiTextKey.deleteTemplate);
+  static String get deleteThisLetterTemplatePermanently => _text(_UiTextKey.deleteThisLetterTemplatePermanently);
+  static String get totalTemplates => _text(_UiTextKey.totalTemplates);
+  static String get totalVariables => _text(_UiTextKey.totalVariables);
+  static String get templatesByCategory => _text(_UiTextKey.templatesByCategory);
+  static String get distributionAcrossCategories => _text(_UiTextKey.distributionAcrossCategories);
+  static String get allCategories => _text(_UiTextKey.allCategories);
+  static String get goodMorning => _text(_UiTextKey.goodMorning);
+  static String get goodAfternoon => _text(_UiTextKey.goodAfternoon);
+  static String get goodEvening => _text(_UiTextKey.goodEvening);
+  static String get mon => _text(_UiTextKey.mon);
+  static String get tue => _text(_UiTextKey.tue);
+  static String get wed => _text(_UiTextKey.wed);
+  static String get thu => _text(_UiTextKey.thu);
+  static String get fri => _text(_UiTextKey.fri);
+  static String get sat => _text(_UiTextKey.sat);
+  static String get sun => _text(_UiTextKey.sun);
+  static String get jan => _text(_UiTextKey.jan);
+  static String get feb => _text(_UiTextKey.feb);
+  static String get mar => _text(_UiTextKey.mar);
+  static String get apr => _text(_UiTextKey.apr);
+  static String get may => _text(_UiTextKey.may);
+  static String get jun => _text(_UiTextKey.jun);
+  static String get jul => _text(_UiTextKey.jul);
+  static String get aug => _text(_UiTextKey.aug);
+  static String get sep => _text(_UiTextKey.sep);
+  static String get oct => _text(_UiTextKey.oct);
+  static String get nov => _text(_UiTextKey.nov);
+  static String get dec => _text(_UiTextKey.dec);
+  static String get hereSWhatSHappeningInYourOrganizationToday => _text(_UiTextKey.hereSWhatSHappeningInYourOrganizationToday);
+  static String get activeOrganizations => _text(_UiTextKey.activeOrganizations);
+  static String get activeFlows => _text(_UiTextKey.activeFlows);
+  static String get automationPipelines => _text(_UiTextKey.automationPipelines);
+  static String get openTickets => _text(_UiTextKey.openTickets);
+  static String get needsAttention => _text(_UiTextKey.needsAttention);
+  static String get closedTickets => _text(_UiTextKey.closedTickets);
+  static String get activityOverview => _text(_UiTextKey.activityOverview);
+  static String get ticketsFlowsLast7Days => _text(_UiTextKey.ticketsFlowsLast7Days);
+  static String get tickets => _text(_UiTextKey.tickets);
+  static String get ticketStatus => _text(_UiTextKey.ticketStatus);
+  static String get distributionOverview => _text(_UiTextKey.distributionOverview);
+  static String get noTicketsYet => _text(_UiTextKey.noTicketsYet);
+  static String get recentTickets => _text(_UiTextKey.recentTickets);
+  static String get latestActivity => _text(_UiTextKey.latestActivity);
+  static String get viewAll => _text(_UiTextKey.viewAll);
+  static String get resolutionRate => _text(_UiTextKey.resolutionRate);
+  static String get slaCompliance => _text(_UiTextKey.slaCompliance);
+  static String get performanceMetrics => _text(_UiTextKey.performanceMetrics);
+  static String get ticketKpisAtAGlance => _text(_UiTextKey.ticketKpisAtAGlance);
+  static String get quickActions => _text(_UiTextKey.quickActions);
+  static String get modelSaved => _text(_UiTextKey.modelSaved);
+  static String get modelEditor => _text(_UiTextKey.modelEditor);
+  static String get modelInfo => _text(_UiTextKey.modelInfo);
+  static String get modelNameRequired => _text(_UiTextKey.modelNameRequired);
+  static String get addField => _text(_UiTextKey.addField);
+  static String get noFieldsYetAddYourFirstField => _text(_UiTextKey.noFieldsYetAddYourFirstField);
+  static String get jsonSchemaPreview => _text(_UiTextKey.jsonSchemaPreview);
+  static String get text3 => _text(_UiTextKey.text3);
+  static String get unique => _text(_UiTextKey.unique);
+  static String get unique3 => _text(_UiTextKey.unique3);
+  static String get fieldNameRequired => _text(_UiTextKey.fieldNameRequired);
+  static String get fieldType => _text(_UiTextKey.fieldType);
+  static String get newModel => _text(_UiTextKey.newModel);
+  static String get dataModels => _text(_UiTextKey.dataModels);
+  static String get defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation => _text(_UiTextKey.defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation);
+  static String get searchModels => _text(_UiTextKey.searchModels);
+  static String get noModelsYet => _text(_UiTextKey.noModelsYet);
+  static String get defineYourDataStructures => _text(_UiTextKey.defineYourDataStructures);
+  static String get createModel => _text(_UiTextKey.createModel);
+  static String get deleteModel => _text(_UiTextKey.deleteModel);
+  static String get deleteThisModelPermanently => _text(_UiTextKey.deleteThisModelPermanently);
+  static String get totalModels => _text(_UiTextKey.totalModels);
+  static String get fieldTypeDistribution => _text(_UiTextKey.fieldTypeDistribution);
+  static String get breakdownOfFieldTypesAcrossAllModels => _text(_UiTextKey.breakdownOfFieldTypesAcrossAllModels);
+  static String get editLabel => _text(_UiTextKey.editLabel);
+  static String get deleteEdge => _text(_UiTextKey.deleteEdge);
+  static String get yes => _text(_UiTextKey.yes);
+  static String get no => _text(_UiTextKey.no);
+  static String get form => _text(_UiTextKey.form);
+  static String get role => _text(_UiTextKey.role);
+  static String get y => _text(_UiTextKey.y);
+  static String get n3 => _text(_UiTextKey.n3);
+  static String get ellipsis => _text(_UiTextKey.ellipsis);
+  static String get noNodes => _text(_UiTextKey.noNodes);
+  static String get dashboard => _text(_UiTextKey.dashboard);
+  static String get overview => _text(_UiTextKey.overview);
+  static String get organization => _text(_UiTextKey.organization);
+  static String get users => _text(_UiTextKey.users);
+  static String get roles => _text(_UiTextKey.roles);
+  static String get automation => _text(_UiTextKey.automation);
+  static String get forms => _text(_UiTextKey.forms);
+  static String get models => _text(_UiTextKey.models);
+  static String get letters => _text(_UiTextKey.letters);
+  static String get communication => _text(_UiTextKey.communication);
+  static String get menu => _text(_UiTextKey.menu);
+  static String get search => _text(_UiTextKey.search);
+  static String get notifications => _text(_UiTextKey.notifications);
+  static String get toggleTheme => _text(_UiTextKey.toggleTheme);
+  static String get search3 => _text(_UiTextKey.search3);
+  static String get disableGlassMode => _text(_UiTextKey.disableGlassMode);
+  static String get enableGlassMode => _text(_UiTextKey.enableGlassMode);
+  static String get logout => _text(_UiTextKey.logout);
+  static String get signOut => _text(_UiTextKey.signOut);
+  static String get select => _text(_UiTextKey.select);
+  static String get selectDate => _text(_UiTextKey.selectDate);
+  static String get selectTime => _text(_UiTextKey.selectTime);
+  static String get clickToUploadFile => _text(_UiTextKey.clickToUploadFile);
+  static String get anyFileTypeSupported => _text(_UiTextKey.anyFileTypeSupported);
+  static String get clickToUploadImage => _text(_UiTextKey.clickToUploadImage);
+  static String get pngJpgGifSupported => _text(_UiTextKey.pngJpgGifSupported);
+  static String get pickAColor => _text(_UiTextKey.pickAColor);
+  static String get done => _text(_UiTextKey.done);
+  static String get signHere => _text(_UiTextKey.signHere);
+  static String get column1 => _text(_UiTextKey.column1);
+  static String get column2 => _text(_UiTextKey.column2);
+  static String get column3 => _text(_UiTextKey.column3);
+  static String get addRow => _text(_UiTextKey.addRow);
+  static String get searchEllipsis => _text(_UiTextKey.searchEllipsis);
+  static String get somethingWentWrong => _text(_UiTextKey.somethingWentWrong);
+  static String get retry => _text(_UiTextKey.retry);
+  static String get string => _text(_UiTextKey.string);
+  static String get integer => _text(_UiTextKey.integer);
+  static String get float => _text(_UiTextKey.float);
+  static String get boolean => _text(_UiTextKey.boolean);
+  static String get date => _text(_UiTextKey.date);
+  static String get dateTime => _text(_UiTextKey.dateTime);
+  static String get file => _text(_UiTextKey.file);
+  static String get reference => _text(_UiTextKey.reference);
+  static String get textField => _text(_UiTextKey.textField);
+  static String get number => _text(_UiTextKey.number);
+  static String get textArea => _text(_UiTextKey.textArea);
+  static String get dropdown => _text(_UiTextKey.dropdown);
+  static String get multiSelect => _text(_UiTextKey.multiSelect);
+  static String get checkbox => _text(_UiTextKey.checkbox);
+  static String get radioGroup => _text(_UiTextKey.radioGroup);
+  static String get datePicker => _text(_UiTextKey.datePicker);
+  static String get timePicker => _text(_UiTextKey.timePicker);
+  static String get fileUpload => _text(_UiTextKey.fileUpload);
+  static String get imageUpload => _text(_UiTextKey.imageUpload);
+  static String get colorPicker => _text(_UiTextKey.colorPicker);
+  static String get switchText => _text(_UiTextKey.switchText);
+  static String get table => _text(_UiTextKey.table);
+  static String get rating => _text(_UiTextKey.rating);
+  static String get signature => _text(_UiTextKey.signature);
+  static String get medium => _text(_UiTextKey.medium);
+  static String get there => _text(_UiTextKey.there);
+  static String get emptyJsonObject => _text(_UiTextKey.emptyJsonObject);
+  static String get bulletSeparator => _text(_UiTextKey.bulletSeparator);
+  static String get requiredAsterisk => _text(_UiTextKey.requiredAsterisk);
+  static String get schemaSeparator => _text(_UiTextKey.schemaSeparator);
+
+  static String languageToggleTooltip(AppLanguage nextLanguage) => nextLanguage == AppLanguage.persian ? 'Switch to فارسی' : 'تغییر به English';
+
+  static String exceptionMessage(Object? message) => isPersian ? 'استثنا: ${message ?? ''}' : 'Exception: ${message ?? ''}';
+  static String errorLoadingFlow(Object error) => isPersian ? 'خطا در بارگذاری جریان: $error' : 'Error loading flow: $error';
+  static String errorSaving(Object error) => isPersian ? 'خطا در ذخیره‌سازی: $error' : 'Error saving: $error';
+  static String error(Object error) => isPersian ? 'خطا: $error' : 'Error: $error';
+  static String demoAccountLabel(String label) => isPersian ? 'نمایشی: $label' : 'Demo: $label';
+  static String zoomPercent(num scale) => isPersian ? 'بزرگ‌نمایی: ${(scale * 100).toInt()}٪' : 'Zoom: ${(scale * 100).toInt()}%';
+  static String percent(num value) => isPersian ? '${(value * 100).toInt()}٪' : '${(value * 100).toInt()}%';
+  static String nodesAndEdges(int nodes, int edges) => isPersian ? '$nodes گره · $edges یال' : '$nodes nodes · $edges edges';
+  static String nodesCount(int nodes) => isPersian ? '$nodes گره' : '$nodes nodes';
+  static String edgesCount(int edges) => isPersian ? '$edges یال' : '$edges edges';
+  static String stepsCount(int steps) => isPersian ? '$steps مرحله' : '$steps steps';
+  static String decisionsCount(int decisions) => isPersian ? '$decisions تصمیم' : '$decisions decisions';
+  static String totalEdges(int totalEdges) => isPersian ? 'کل $totalEdges یال' : '$totalEdges edges total';
   static String chartValue(String label, int value) => '$label: $value';
-  static String branchName(int branchNumber) => 'Branch $branchNumber';
-  static String nodePosition(num x, num y) => 'x: ${x.toInt()},  y: ${y.toInt()}';
+  static String branchName(int branchNumber) => isPersian ? 'شاخه $branchNumber' : 'Branch $branchNumber';
+  static String nodePosition(num x, num y) => isPersian ? 'x: ${x.toInt()}،  y: ${y.toInt()}' : 'x: ${x.toInt()},  y: ${y.toInt()}';
   static String capacityRatio(int count, int max) => '$count / $max';
-  static String joined(String joined) => 'Joined $joined';
-  static String fieldCount(int count) => '$count fields';
-  static String requiredCount(int count) => '$count req';
-  static String uniqueCount(int count) => '$count unique';
-  static String moreCount(int count) => '+$count more';
+  static String joined(String joined) => isPersian ? 'پیوسته در $joined' : 'Joined $joined';
+  static String fieldCount(int count) => isPersian ? '$count فیلد' : '$count fields';
+  static String requiredCount(int count) => isPersian ? '$count الزامی' : '$count req';
+  static String uniqueCount(int count) => isPersian ? '$count یکتا' : '$count unique';
+  static String moreCount(int count) => isPersian ? '+$count مورد دیگر' : '+$count more';
   static String distributionSlice(Object label, Object value) => '$label: $value';
-  static String distributionLegend(Object value, Object percent) => '$value ($percent%)';
+  static String distributionLegend(Object value, Object percent) => isPersian ? '$value ($percent٪)' : '$value ($percent%)';
   static String userInitials(String firstName, String lastName) => '${firstName[0]}${lastName[0]}';
   static String initialsFromParts(String firstInitial, String lastInitial) => '$firstInitial$lastInitial'.toUpperCase();
   static String rgbHex(int red, int green, int blue) => '#${red.toRadixString(16).padLeft(2, '0')}${green.toRadixString(16).padLeft(2, '0')}${blue.toRadixString(16).padLeft(2, '0')}'.toUpperCase();
-  static String userFullName(String firstName, String lastName) => '$firstName $lastName';
-  static String greetingLine(String greeting, String firstName) => '$greeting, $firstName!';
-  static String dateLine(String dayName, int day, String monthName, int year) => '$dayName, $day $monthName $year';
+  static String userFullName(String firstName, String lastName) => isPersian ? '$lastName $firstName' : '$firstName $lastName';
+  static String greetingLine(String greeting, String firstName) => isPersian ? '$greeting، $firstName!' : '$greeting, $firstName!';
+  static String dateLine(String dayName, int day, String monthName, int year) => isPersian ? '$dayName، $day $monthName $year' : '$dayName, $day $monthName $year';
   static String timeLine(int hour, int minute) => '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
   static String truncatedName(String name) => '${name.substring(0, 9)}…';
-  static const String there = 'there';
-  static const String emptyJsonObject = '{}';
-  static const String bulletSeparator = ' · ';
-  static const String requiredAsterisk = '*';
-  static const String schemaSeparator = ',\n';
-
-  static String optionNumber(int optionNumber) => 'Option $optionNumber';
-  static String crudCoverage(num coverage) => '${(coverage * 100).toInt()}% of CRUD operations are granted across all resources.';
+  static String optionNumber(int optionNumber) => isPersian ? 'گزینه $optionNumber' : 'Option $optionNumber';
+  static String crudCoverage(num coverage) => isPersian ? '${(coverage * 100).toInt()}٪ از عملیات CRUD در همه منابع اعطا شده است.' : '${(coverage * 100).toInt()}% of CRUD operations are granted across all resources.';
   static String truncatedName7(String name) => '${name.substring(0, 7)}…';
-  static String membersCount(int count) => '$count members';
-  static String resourcesCount(int count) => '$count resources';
-  static String canCreateCount(int count) => '$count create';
-  static String dueInDays(int days) => 'Due in ${days}d';
-  static String daysOverdue(int days) => '${days}d overdue';
-  static String priorityLabel(String priority) => '$priority priority';
-  static String fileCount(int count) => '$count file${count > 1 ? 's' : ''}';
-  static String avgVars(String average) => 'Avg $average vars';
-  static String varsCount(int count) => '$count vars';
-  static String fieldsTitle(int count) => 'Fields ($count)';
-  static String schemaField(String name, String type, bool required) => '  "$name": "$type"${required ? ' (required)' : ''}';
+  static String membersCount(int count) => isPersian ? '$count عضو' : '$count members';
+  static String resourcesCount(int count) => isPersian ? '$count منبع' : '$count resources';
+  static String canCreateCount(int count) => isPersian ? '$count ایجاد' : '$count create';
+  static String dueInDays(int days) => isPersian ? 'سررسید تا ${days} روز' : 'Due in ${days}d';
+  static String daysOverdue(int days) => isPersian ? '${days} روز تأخیر' : '${days}d overdue';
+  static String priorityLabel(String priority) => isPersian ? 'اولویت $priority' : '$priority priority';
+  static String fileCount(int count) => isPersian ? '$count فایل' : '$count file${count > 1 ? 's' : ''}';
+  static String avgVars(String average) => isPersian ? 'میانگین $average متغیر' : 'Avg $average vars';
+  static String varsCount(int count) => isPersian ? '$count متغیر' : '$count vars';
+  static String fieldsTitle(int count) => isPersian ? 'فیلدها ($count)' : 'Fields ($count)';
+  static String schemaField(String name, String type, bool required) => '  "$name": "$type"${required ? (isPersian ? ' (الزامی)' : ' (required)') : ''}';
   static String schemaObject(String fields) => '{\n$fields\n}';
 }
