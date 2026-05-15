@@ -924,9 +924,7 @@ class AppBarBackButton extends ConsumerWidget {
                         )
                       : null,
                   child: Icon(
-                    Directionality.of(context) == TextDirection.rtl
-                        ? Icons.arrow_forward
-                        : Icons.arrow_back,
+                    Icons.arrow_back,
                     size: 16,
                     color: cs.onSurface.withValues(alpha: 0.75),
                   ),
