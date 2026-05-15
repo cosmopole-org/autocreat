@@ -8,7 +8,6 @@ import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../widgets/ios_tab_bar.dart';
 import '../../data/ui_text.dart';
 
 class TicketsScreen extends ConsumerStatefulWidget {
@@ -145,7 +144,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen> {
                 .toList();
           }
 
-          final tabBar = IosTabBar(
+          final tabBar = AppTabBar(
             tabs: _tabs,
             selectedIndex: _selectedTabIndex,
             onTabSelected: _selectTab,
@@ -269,7 +268,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen> {
                   top: stickyTop,
                   left: 0,
                   right: 0,
-                  child: IosTabBar(
+                  child: AppTabBar(
                     tabs: _tabs,
                     selectedIndex: _selectedTabIndex,
                     onTabSelected: _selectTab,
@@ -671,15 +670,16 @@ class _TicketCard extends StatelessWidget {
         child: IntrinsicHeight(
           child: Row(
             children: [
-              // Priority accent bar
+              // Priority accent bar — DirectionalBorderRadius ensures correct
+              // rounding on the leading edge in both LTR and RTL layouts.
               Container(
                 width: 5,
                 decoration: BoxDecoration(
                   color: priorityColor,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    bottomLeft: Radius.circular(16),
-                  ),
+                  borderRadius: BorderRadiusDirectional.only(
+                    topStart: const Radius.circular(16),
+                    bottomStart: const Radius.circular(16),
+                  ).resolve(Directionality.of(context)),
                 ),
               ),
 

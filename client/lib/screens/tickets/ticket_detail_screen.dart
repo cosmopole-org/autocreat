@@ -129,25 +129,29 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
           title:
               Text(ticket.title, maxLines: 1, overflow: TextOverflow.ellipsis),
           actions: [
-            DropdownButton<TicketStatus>(
-              value: ticket.status,
-              underline: const SizedBox.shrink(),
-              onChanged: (status) {
-                if (status != null) {
-                  ref
-                      .read(ticketNotifierProvider.notifier)
-                      .updateStatus(ticket.id, status);
-                  ref.invalidate(ticketDetailProvider(ticket.id));
-                }
-              },
-              items: TicketStatus.values
-                  .map((s) => DropdownMenuItem(
-                        value: s,
-                        child: StatusChip(status: s.displayName),
-                      ))
-                  .toList(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 11),
+              child: DropdownButton<TicketStatus>(
+                value: ticket.status,
+                underline: const SizedBox.shrink(),
+                isDense: true,
+                onChanged: (status) {
+                  if (status != null) {
+                    ref
+                        .read(ticketNotifierProvider.notifier)
+                        .updateStatus(ticket.id, status);
+                    ref.invalidate(ticketDetailProvider(ticket.id));
+                  }
+                },
+                items: TicketStatus.values
+                    .map((s) => DropdownMenuItem(
+                          value: s,
+                          child: StatusChip(status: s.displayName),
+                        ))
+                    .toList(),
+              ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
           ],
         ),
         body: Row(

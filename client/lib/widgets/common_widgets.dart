@@ -1698,6 +1698,423 @@ class _SearchFieldState extends State<SearchField> {
 // ERROR WIDGET
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// APP TAB BAR  –  modern pill-style segment control for use anywhere tabs appear
+// ─────────────────────────────────────────────────────────────────────────────
+
+class AppTabBar extends ConsumerStatefulWidget {
+  final List<String> tabs;
+  final int selectedIndex;
+  final ValueChanged<int> onTabSelected;
+
+  /// When true, wraps the bar in a frosted-glass sticky overlay suitable for
+  /// floating above scroll content (no background padding, full-width blur).
+  final bool isOverlay;
+
+  const AppTabBar({
+    super.key,
+    required this.tabs,
+    required this.selectedIndex,
+    required this.onTabSelected,
+    this.isOverlay = false,
+  });
+
+  static const double barHeight = 52.0;
+
+  @override
+  ConsumerState<AppTabBar> createState() => _AppTabBarState();
+}
+
+class _AppTabBarState extends ConsumerState<AppTabBar> {
+  final ScrollController _scrollController = ScrollController();
+  static const double _tabApproxWidth = 110.0;
+
+  @override
+  void didUpdateWidget(AppTabBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedIndex != widget.selectedIndex) {
+      _scrollToSelected();
+    }
+  }
+
+  void _scrollToSelected() {
+    if (!_scrollController.hasClients) return;
+    final target = (widget.selectedIndex * _tabApproxWidth - 40.0)
+        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassMode = ref.watch(glassModeProvider);
+    final cs = Theme.of(context).colorScheme;
+
+    final pillBg = isDark
+        ? Colors.white.withValues(alpha: 0.09)
+        : Colors.black.withValues(alpha: 0.055);
+
+    final segments = Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: pillBg,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(widget.tabs.length, (i) {
+          final isSelected = i == widget.selectedIndex;
+          final selectedBg = isDark
+              ? cs.primary.withValues(alpha: 0.88)
+              : cs.primary;
+          return GestureDetector(
+            onTap: () => widget.onTabSelected(i),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+              decoration: BoxDecoration(
+                color: isSelected ? selectedBg : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: cs.primary.withValues(alpha: 0.28),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 13,
+                  fontWeight:
+                      isSelected ? FontWeight.w600 : FontWeight.w400,
+                  color: isSelected
+                      ? Colors.white
+                      : cs.onSurface.withValues(
+                          alpha: isDark ? 0.52 : 0.48),
+                ),
+                child: Text(widget.tabs[i]),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+
+    final bar = SizedBox(
+      height: AppTabBar.barHeight,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        child: segments,
+      ),
+    );
+
+    if (!widget.isOverlay) return bar;
+
+    // Overlay mode: frosted-glass sticky container.
+    final bgColor = glassMode
+        ? (isDark
+            ? Colors.white.withValues(alpha: 0.07)
+            : Colors.white.withValues(alpha: 0.72))
+        : cs.surface;
+
+    final decorated = DecoratedBox(
+      decoration: BoxDecoration(
+        color: bgColor,
+        gradient: glassMode
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: isDark ? 0.13 : 0.82),
+                  Colors.white.withValues(alpha: isDark ? 0.04 : 0.46),
+                ],
+              )
+            : null,
+        border: Border(
+          bottom: BorderSide(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.07)
+                : Colors.black.withValues(alpha: 0.06),
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.05),
+            blurRadius: glassMode ? 20 : 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: bar,
+    );
+
+    if (!glassMode) return decorated;
+
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        child: decorated,
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// APP BAR ICON BUTTON  –  compact icon button for use in AppBar actions
+// ─────────────────────────────────────────────────────────────────────────────
+
+class AppBarIconButton extends ConsumerWidget {
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final String? tooltip;
+
+  const AppBarIconButton({
+    super.key,
+    required this.icon,
+    this.onPressed,
+    this.tooltip,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassMode = ref.watch(glassModeProvider);
+
+    Widget button = ClipRRect(
+      borderRadius: BorderRadius.circular(glassMode ? 10 : 8),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: glassMode ? 10 : 0,
+          sigmaY: glassMode ? 10 : 0,
+        ),
+        child: Material(
+          color: glassMode
+              ? Colors.white.withValues(alpha: isDark ? 0.07 : 0.26)
+              : cs.onSurface.withValues(alpha: isDark ? 0.06 : 0.05),
+          borderRadius: BorderRadius.circular(glassMode ? 10 : 8),
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: BorderRadius.circular(glassMode ? 10 : 8),
+            child: Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(glassMode ? 10 : 8),
+                border: glassMode
+                    ? Border.all(
+                        color: Colors.white
+                            .withValues(alpha: isDark ? 0.12 : 0.40),
+                        width: 1,
+                      )
+                    : Border.all(
+                        color: cs.outline.withValues(alpha: 0.28),
+                        width: 1,
+                      ),
+              ),
+              child: Icon(
+                icon,
+                size: 17,
+                color: cs.onSurface.withValues(alpha: 0.72),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (tooltip != null) {
+      button = Tooltip(message: tooltip!, child: button);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: button,
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// APP BAR ACTION BUTTON  –  compact labelled button for use in AppBar actions
+// ─────────────────────────────────────────────────────────────────────────────
+
+class AppBarActionButton extends ConsumerWidget {
+  final String label;
+  final IconData? icon;
+  final VoidCallback? onPressed;
+  final bool loading;
+  final bool outlined;
+
+  const AppBarActionButton({
+    super.key,
+    required this.label,
+    this.icon,
+    this.onPressed,
+    this.loading = false,
+    this.outlined = false,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassMode = ref.watch(glassModeProvider);
+    final cs = Theme.of(context).colorScheme;
+    final enabled = (onPressed != null) && !loading;
+    final accent = isDark ? AppColors.primaryLight : AppColors.primary;
+    final foreground = outlined ? accent : Colors.white;
+    final radius = glassMode ? 12.0 : 10.0;
+
+    final BoxDecoration decoration;
+    if (glassMode) {
+      decoration = BoxDecoration(
+        color: outlined
+            ? Colors.white.withValues(alpha: isDark ? 0.075 : 0.34)
+            : accent.withValues(alpha: isDark ? 0.55 : 0.72),
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(
+          color: outlined
+              ? Colors.white.withValues(alpha: isDark ? 0.20 : 0.62)
+              : Colors.white.withValues(alpha: isDark ? 0.20 : 0.40),
+          width: 1,
+        ),
+        gradient: outlined
+            ? null
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  accent.withValues(alpha: isDark ? 0.72 : 0.88),
+                  AppColors.accent.withValues(alpha: isDark ? 0.46 : 0.65),
+                ],
+              ),
+        boxShadow: [
+          BoxShadow(
+            color: (outlined ? Colors.black : accent)
+                .withValues(alpha: isDark ? 0.22 : 0.18),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      );
+    } else {
+      decoration = BoxDecoration(
+        borderRadius: BorderRadius.circular(radius),
+        gradient: outlined
+            ? null
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  accent,
+                  AppColors.accent.withValues(alpha: isDark ? 0.82 : 0.88),
+                ],
+              ),
+        color: outlined
+            ? (isDark
+                ? AppColors.darkSurface.withValues(alpha: 0.5)
+                : Colors.transparent)
+            : null,
+        border: Border.all(
+          color: outlined
+              ? accent.withValues(alpha: 0.80)
+              : Colors.white.withValues(alpha: isDark ? 0.14 : 0.28),
+          width: outlined ? 1.5 : 1,
+        ),
+        boxShadow: outlined
+            ? null
+            : [
+                BoxShadow(
+                  color: accent.withValues(alpha: isDark ? 0.34 : 0.24),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+      );
+    }
+
+    final content = ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: glassMode
+          ? BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+              child: DecoratedBox(
+                decoration: decoration,
+                child: _buildInner(foreground, radius),
+              ),
+            )
+          : DecoratedBox(
+              decoration: decoration,
+              child: _buildInner(foreground, radius),
+            ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 160),
+        opacity: enabled ? 1.0 : 0.56,
+        child: content,
+      ),
+    );
+  }
+
+  Widget _buildInner(Color foreground, double radius) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: loading ? null : onPressed,
+        borderRadius: BorderRadius.circular(radius),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (loading)
+                SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: foreground),
+                )
+              else if (icon != null)
+                Icon(icon, size: 15, color: foreground),
+              if (loading || icon != null) const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: foreground,
+                  letterSpacing: -0.1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class AppErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;

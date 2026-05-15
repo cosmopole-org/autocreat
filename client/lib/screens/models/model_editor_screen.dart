@@ -95,13 +95,13 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
         leading: AppBarBackButton(onPressed: () => context.pop()),
         title: Text(editorState.model?.name ?? UiText.modelEditor),
         actions: [
-          AppButton(
+          AppBarActionButton(
             label: UiText.save,
             icon: Icons.save_outlined,
             loading: _saving,
             onPressed: _save,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
         ],
       ),
       body: Row(

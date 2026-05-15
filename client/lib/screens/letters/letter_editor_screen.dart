@@ -167,118 +167,53 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
             ),
       ),
       actions: [
-        if (isMobile) ...[
-          // Attach — badge shows count
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.attach_file),
-                tooltip: UiText.attach,
-                onPressed: _pickAttachment,
-              ),
-              if (_attachments.isNotEmpty)
-                Positioned(
-                  top: 8,
-                  right: 6,
-                  child: Container(
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: accent,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${_attachments.length}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                        ),
+        // Attach — badge shows count when attachments present
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            AppBarIconButton(
+              icon: Icons.attach_file,
+              tooltip: UiText.attach,
+              onPressed: _pickAttachment,
+            ),
+            if (_attachments.isNotEmpty)
+              Positioned(
+                top: 9,
+                right: 3,
+                child: Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: accent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${_attachments.length}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-            ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.data_object),
-            tooltip: UiText.variables,
-            onPressed: _showVariablesPanel,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8, left: 2),
-            child: _saving
-                ? SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: Center(
-                      child: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: accent,
-                        ),
-                      ),
-                    ),
-                  )
-                : Material(
-                    color: accent,
-                    borderRadius: BorderRadius.circular(12),
-                    child: InkWell(
-                      onTap: _save,
-                      borderRadius: BorderRadius.circular(12),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.save_outlined,
-                                size: 16, color: Colors.white),
-                            const SizedBox(width: 4),
-                            Text(
-                              UiText.save,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-          ),
-        ] else ...[
-          // Tablet / desktop — text+icon buttons
-          _OutlinedActionButton(
-            icon: Icons.attach_file,
-            label: _attachments.isEmpty
-                ? UiText.attach
-                : UiText.fileCount(_attachments.length),
-            isDark: isDark,
-            onPressed: _pickAttachment,
-          ),
-          const SizedBox(width: 6),
-          _OutlinedActionButton(
-            icon: Icons.data_object,
-            label: UiText.variables,
-            isDark: isDark,
-            onPressed: _showVariablesPanel,
-          ),
-          const SizedBox(width: 10),
-          AppButton(
-            label: UiText.save,
-            loading: _saving,
-            onPressed: _save,
-            icon: Icons.save_outlined,
-          ),
-          const SizedBox(width: 16),
-        ],
+              ),
+          ],
+        ),
+        AppBarIconButton(
+          icon: Icons.data_object,
+          tooltip: UiText.variables,
+          onPressed: _showVariablesPanel,
+        ),
+        const SizedBox(width: 2),
+        AppBarActionButton(
+          label: UiText.save,
+          loading: _saving,
+          onPressed: _save,
+          icon: Icons.save_outlined,
+        ),
+        const SizedBox(width: 12),
       ],
     );
   }
