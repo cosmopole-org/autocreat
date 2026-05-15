@@ -320,7 +320,7 @@ class _FieldTypeChart extends StatelessWidget {
                           return Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
-                              top[idx].key,
+                              FormFieldType.values.where((t) => t.name == top[idx].key).isEmpty ? top[idx].key : FormFieldType.values.firstWhere((t) => t.name == top[idx].key).displayName,
                               style: TextStyle(
                                   fontSize: 10,
                                   color: cs.onSurface.withValues(alpha: 0.5)),
@@ -412,7 +412,7 @@ class _FormCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  form.status.toUpperCase(),
+                  UiText.statusLabel(form.status).toUpperCase(),
                   style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w700,
@@ -480,7 +480,7 @@ class _FormCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          f.type.name,
+                          f.type.displayName,
                           style: TextStyle(
                               fontSize: 9,
                               color: cs.onSurface.withValues(alpha: 0.6)),

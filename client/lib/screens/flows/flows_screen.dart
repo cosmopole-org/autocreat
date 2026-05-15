@@ -548,7 +548,7 @@ class _FlowCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  flow.status.toUpperCase(),
+                  UiText.statusLabel(flow.status).toUpperCase(),
                   style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w700,

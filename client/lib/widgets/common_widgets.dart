@@ -1277,7 +1277,7 @@ class StatusChip extends ConsumerWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         child: Text(
-          status,
+          UiText.statusLabel(status),
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,

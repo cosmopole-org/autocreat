@@ -301,6 +301,8 @@ class _CompanyCard extends StatelessWidget {
                       Text(
                         company.industry!,
                         style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                   ],
                 ),

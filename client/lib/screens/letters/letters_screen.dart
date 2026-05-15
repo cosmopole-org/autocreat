@@ -530,7 +530,7 @@ class _LetterCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  letter.status.toUpperCase(),
+                  UiText.statusLabel(letter.status).toUpperCase(),
                   style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w700,

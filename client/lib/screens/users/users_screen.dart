@@ -599,7 +599,7 @@ class _UserCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        user.role,
+                        UiText.roleLevelLabel(user.role),
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,

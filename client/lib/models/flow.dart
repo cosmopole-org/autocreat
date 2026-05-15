@@ -1,9 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../data/ui_text.dart';
 
 part 'flow.freezed.dart';
 part 'flow.g.dart';
 
 enum NodeType { start, step, decision, end }
+
+extension NodeTypeExt on NodeType {
+  String get displayName => UiText.nodeTypeLabel(name);
+}
 
 @freezed
 class FlowNode with _$FlowNode {

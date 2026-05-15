@@ -1399,6 +1399,12 @@ class UiText {
     _UiTextKey.bulletSeparator: " · ",
     _UiTextKey.requiredAsterisk: "*",
     _UiTextKey.schemaSeparator: ",\n",
+    _UiTextKey.step: "مرحله",
+    _UiTextKey.decision: "تصمیم",
+    _UiTextKey.instances: "نمونه‌ها",
+    _UiTextKey.approved: "تأییدشده",
+    _UiTextKey.pending: "در انتظار",
+    _UiTextKey.rejected: "ردشده",
   };
 
   static String get exception => _text(_UiTextKey.exception);
@@ -1906,6 +1912,12 @@ class UiText {
   static String get bulletSeparator => _text(_UiTextKey.bulletSeparator);
   static String get requiredAsterisk => _text(_UiTextKey.requiredAsterisk);
   static String get schemaSeparator => _text(_UiTextKey.schemaSeparator);
+  static String get step => _text(_UiTextKey.step);
+  static String get decision => _text(_UiTextKey.decision);
+  static String get instances => _text(_UiTextKey.instances);
+  static String get approved => _text(_UiTextKey.approved);
+  static String get pending => _text(_UiTextKey.pending);
+  static String get rejected => _text(_UiTextKey.rejected);
 
   static String languageToggleTooltip(AppLanguage nextLanguage) =>
       nextLanguage == AppLanguage.persian
@@ -2008,4 +2020,57 @@ class UiText {
   static String schemaField(String name, String type, bool required) =>
       '  "$name": "$type"${required ? (isPersian ? ' (الزامی)' : ' (required)') : ''}';
   static String schemaObject(String fields) => '{\n$fields\n}';
+
+  static String statusLabel(String status) {
+    switch (status.toLowerCase()) {
+      case 'active': return active;
+      case 'inactive': return inactive;
+      case 'draft': return draft;
+      case 'open': return open;
+      case 'closed': return closed;
+      case 'resolved': return resolved;
+      case 'in_progress':
+      case 'inprogress': return inProgress;
+      case 'approved': return approved;
+      case 'pending': return pending;
+      case 'rejected': return rejected;
+      default: return status;
+    }
+  }
+
+  static String roleLevelLabel(String level) {
+    switch (level.toLowerCase()) {
+      case 'admin': return admin;
+      case 'owner': return owner;
+      case 'manager': return manager;
+      case 'member': return member;
+      case 'viewer': return viewer;
+      default: return level;
+    }
+  }
+
+  static String resourceLabel(String resource) {
+    switch (resource.toLowerCase()) {
+      case 'tickets': return tickets;
+      case 'forms': return forms;
+      case 'flows': return flows;
+      case 'companies': return companies;
+      case 'users': return users;
+      case 'roles': return roles;
+      case 'models': return models;
+      case 'letters': return letters;
+      case 'instances': return instances;
+      default: return resource;
+    }
+  }
+
+  static String nodeTypeLabel(String type) {
+    switch (type.toLowerCase()) {
+      case 'start': return start;
+      case 'step': return step;
+      case 'decision': return decision;
+      case 'end': return end;
+      default: return type;
+    }
+  }
 }
