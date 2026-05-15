@@ -1032,83 +1032,85 @@ class _StyledButton extends StatelessWidget {
       );
     }
 
-    final innerContent = ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: DecoratedBox(
-        decoration: decoration,
-        child: Stack(
-          children: [
-            if (glassEffect)
-              Positioned(
-                top: -24,
-                left: -36,
-                child: Transform.rotate(
-                  angle: -0.55,
-                  child: Container(
-                    width: 92,
-                    height: 18,
-                    color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.26),
-                  ),
-                ),
-              ),
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: enabled ? onPressed : null,
-                borderRadius: BorderRadius.circular(radius),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 46),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (loading)
-                          SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: foreground,
-                            ),
-                          )
-                        else if (icon != null)
-                          Icon(icon, size: 18, color: foreground),
-                        if (hasLeading) const SizedBox(width: 8),
-                        Text(
-                          label,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: foreground,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.05,
-                          ),
-                        ),
-                      ],
+    final stackChildren = [
+      if (glassEffect)
+        Positioned(
+          top: -24,
+          left: -36,
+          child: Transform.rotate(
+            angle: -0.55,
+            child: Container(
+              width: 92,
+              height: 18,
+              color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.26),
+            ),
+          ),
+        ),
+      Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: enabled ? onPressed : null,
+          borderRadius: BorderRadius.circular(radius),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 46),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (loading)
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: foreground,
+                      ),
+                    )
+                  else if (icon != null)
+                    Icon(icon, size: 18, color: foreground),
+                  if (hasLeading) const SizedBox(width: 8),
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: foreground,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.05,
                     ),
                   ),
-                ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
-    );
+    ];
 
-    final button = AnimatedOpacity(
-      duration: const Duration(milliseconds: 160),
-      opacity: enabled ? 1 : 0.58,
+    // ClipRRect must wrap BackdropFilter so the blur is bounded to the button shape.
+    final innerContent = ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
       child: glassEffect
           ? BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-              child: innerContent,
+              child: DecoratedBox(
+                decoration: decoration,
+                child: Stack(children: stackChildren),
+              ),
             )
-          : innerContent,
+          : DecoratedBox(
+              decoration: decoration,
+              child: Stack(children: stackChildren),
+            ),
     );
 
-    return SizedBox(width: width, child: button);
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 160),
+      opacity: enabled ? 1 : 0.58,
+      child: SizedBox(width: width, child: innerContent),
+    );
   }
 }
 
