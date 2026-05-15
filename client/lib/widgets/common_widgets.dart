@@ -749,7 +749,7 @@ class AppCard extends ConsumerWidget {
 // APP STAT CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
-class AppStatCard extends StatelessWidget {
+class AppStatCard extends ConsumerWidget {
   final IconData icon;
   final String label;
   final String value;
@@ -763,65 +763,114 @@ class AppStatCard extends StatelessWidget {
     required this.color,
   });
 
+  static const _padding = EdgeInsets.symmetric(horizontal: 14, vertical: 14);
+
+  Widget _iconBox(bool isDark, bool glassMode) {
+    final bgAlpha = isDark && !glassMode ? 0.22 : (isDark ? 0.18 : 0.14);
+    final borderAlpha = isDark && !glassMode ? 0.40 : (isDark ? 0.24 : 0.18);
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: bgAlpha),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withValues(alpha: borderAlpha)),
+        boxShadow: isDark && !glassMode
+            ? [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.22),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ]
+            : null,
+      ),
+      child: Icon(icon, color: color, size: 22),
+    );
+  }
+
+  Widget _textContent(BuildContext context, ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: AlignmentDirectional.centerStart,
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: color,
+              height: 1,
+            ),
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
+            fontWeight: FontWeight.w600,
+            height: 1.1,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final tintedSurface = color.withValues(alpha: isDark ? 0.13 : 0.10);
+    final glassMode = ref.watch(glassModeProvider);
 
+    final rowContent = Row(
+      children: [
+        _iconBox(isDark, glassMode),
+        const SizedBox(width: 12),
+        Expanded(child: _textContent(context, theme)),
+      ],
+    );
+
+    if (glassMode) {
+      return AppCard(
+        color: color,
+        padding: _padding,
+        child: rowContent,
+      );
+    }
+
+    if (isDark) {
+      // Rich dark mode: diagonal gradient wash + prominent colored border
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: _padding,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: AlignmentDirectional.topStart,
+            end: AlignmentDirectional.bottomEnd,
+            colors: [
+              Color.alphaBlend(color.withValues(alpha: 0.22), AppColors.darkCard),
+              AppColors.darkCard,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.32)),
+        ),
+        child: rowContent,
+      );
+    }
+
+    // Light mode: subtle tint via AppCard (unchanged)
     return AppCard(
-      color: tintedSurface,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: isDark ? 0.18 : 0.14),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: color.withValues(alpha: isDark ? 0.24 : 0.18),
-              ),
-            ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      color: color,
-                      height: 1,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  label,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
-                    fontWeight: FontWeight.w600,
-                    height: 1.1,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      color: color.withValues(alpha: 0.10),
+      padding: _padding,
+      child: rowContent,
     );
   }
 }
