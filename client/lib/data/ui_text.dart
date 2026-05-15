@@ -460,6 +460,52 @@ enum _UiTextKey {
   approved,
   pending,
   rejected,
+  settings,
+  settingsSubtitle,
+  workspace,
+  activeCompany,
+  noCompanySelected,
+  manageCompanies,
+  switchCompany,
+  appearance,
+  themeMode,
+  lightMode,
+  darkMode,
+  systemDefault,
+  glassEffect,
+  glassEffectDesc,
+  languageAndRegion,
+  rtlNote,
+  notificationPrefs,
+  emailNotifs,
+  emailNotifsDesc,
+  pushNotifs,
+  pushNotifsDesc,
+  soundEffects,
+  soundEffectsDesc,
+  systemSection,
+  usageAnalytics,
+  usageAnalyticsDesc,
+  autoSave,
+  autoSaveDesc,
+  clearCache,
+  clearCacheDesc,
+  exportData,
+  exportDataDesc,
+  cacheCleared,
+  exportStarted,
+  aboutSection,
+  appVersionLabel,
+  buildLabel,
+  licenseLabel,
+  sendFeedback,
+  reportBug,
+  privacyPolicy,
+  openingFeedback,
+  openingBugTracker,
+  openingPrivacy,
+  settingsButton,
+  selectCompanyTitle,
 }
 
 class UiText {
@@ -944,6 +990,52 @@ class UiText {
     _UiTextKey.approved: "Approved",
     _UiTextKey.pending: "Pending",
     _UiTextKey.rejected: "Rejected",
+    _UiTextKey.settings: "Settings",
+    _UiTextKey.settingsSubtitle: "Customize your workspace",
+    _UiTextKey.workspace: "Workspace",
+    _UiTextKey.activeCompany: "Active Company",
+    _UiTextKey.noCompanySelected: "No company selected",
+    _UiTextKey.manageCompanies: "Manage Companies",
+    _UiTextKey.switchCompany: "Switch Company",
+    _UiTextKey.appearance: "Appearance",
+    _UiTextKey.themeMode: "Theme",
+    _UiTextKey.lightMode: "Light",
+    _UiTextKey.darkMode: "Dark",
+    _UiTextKey.systemDefault: "System",
+    _UiTextKey.glassEffect: "Glass Effect",
+    _UiTextKey.glassEffectDesc: "Translucent surfaces with blur",
+    _UiTextKey.languageAndRegion: "Language & Region",
+    _UiTextKey.rtlNote: "RTL layout applied automatically for Persian",
+    _UiTextKey.notificationPrefs: "Notifications",
+    _UiTextKey.emailNotifs: "Email Notifications",
+    _UiTextKey.emailNotifsDesc: "Receive updates via email",
+    _UiTextKey.pushNotifs: "Push Notifications",
+    _UiTextKey.pushNotifsDesc: "Browser & mobile alerts",
+    _UiTextKey.soundEffects: "Sound Effects",
+    _UiTextKey.soundEffectsDesc: "Play sounds for events",
+    _UiTextKey.systemSection: "System",
+    _UiTextKey.usageAnalytics: "Usage Analytics",
+    _UiTextKey.usageAnalyticsDesc: "Help improve AutoCreat",
+    _UiTextKey.autoSave: "Auto Save",
+    _UiTextKey.autoSaveDesc: "Automatically save changes",
+    _UiTextKey.clearCache: "Clear Cache",
+    _UiTextKey.clearCacheDesc: "Free up storage space",
+    _UiTextKey.exportData: "Export Data",
+    _UiTextKey.exportDataDesc: "Download all your data",
+    _UiTextKey.cacheCleared: "Cache cleared successfully",
+    _UiTextKey.exportStarted: "Export started — check your email",
+    _UiTextKey.aboutSection: "About",
+    _UiTextKey.appVersionLabel: "Version",
+    _UiTextKey.buildLabel: "Build",
+    _UiTextKey.licenseLabel: "License",
+    _UiTextKey.sendFeedback: "Send Feedback",
+    _UiTextKey.reportBug: "Report a Bug",
+    _UiTextKey.privacyPolicy: "Privacy Policy",
+    _UiTextKey.openingFeedback: "Opening feedback form...",
+    _UiTextKey.openingBugTracker: "Opening issue tracker...",
+    _UiTextKey.openingPrivacy: "Opening privacy policy...",
+    _UiTextKey.settingsButton: "Settings",
+    _UiTextKey.selectCompanyTitle: "Select Company",
   };
 
   static const Map<_UiTextKey, String> _persian = {
@@ -1405,6 +1497,52 @@ class UiText {
     _UiTextKey.approved: "تأییدشده",
     _UiTextKey.pending: "در انتظار",
     _UiTextKey.rejected: "ردشده",
+    _UiTextKey.settings: "تنظیمات",
+    _UiTextKey.settingsSubtitle: "فضای کاری خود را سفارشی کنید",
+    _UiTextKey.workspace: "فضای کاری",
+    _UiTextKey.activeCompany: "شرکت فعال",
+    _UiTextKey.noCompanySelected: "شرکتی انتخاب نشده",
+    _UiTextKey.manageCompanies: "مدیریت شرکت‌ها",
+    _UiTextKey.switchCompany: "تغییر شرکت",
+    _UiTextKey.appearance: "ظاهر",
+    _UiTextKey.themeMode: "پوسته",
+    _UiTextKey.lightMode: "روشن",
+    _UiTextKey.darkMode: "تاریک",
+    _UiTextKey.systemDefault: "سیستم",
+    _UiTextKey.glassEffect: "افکت شیشه‌ای",
+    _UiTextKey.glassEffectDesc: "سطوح شفاف با تاری",
+    _UiTextKey.languageAndRegion: "زبان و منطقه",
+    _UiTextKey.rtlNote: "چیدمان RTL برای فارسی به‌طور خودکار اعمال می‌شود",
+    _UiTextKey.notificationPrefs: "اعلان‌ها",
+    _UiTextKey.emailNotifs: "اعلان‌های ایمیلی",
+    _UiTextKey.emailNotifsDesc: "دریافت به‌روزرسانی‌ها از طریق ایمیل",
+    _UiTextKey.pushNotifs: "اعلان‌های فوری",
+    _UiTextKey.pushNotifsDesc: "هشدارهای مرورگر و موبایل",
+    _UiTextKey.soundEffects: "افکت‌های صوتی",
+    _UiTextKey.soundEffectsDesc: "پخش صدا برای رویدادها",
+    _UiTextKey.systemSection: "سیستم",
+    _UiTextKey.usageAnalytics: "آمار استفاده",
+    _UiTextKey.usageAnalyticsDesc: "به بهبود اتوکریت کمک کنید",
+    _UiTextKey.autoSave: "ذخیره خودکار",
+    _UiTextKey.autoSaveDesc: "ذخیره خودکار تغییرات",
+    _UiTextKey.clearCache: "پاکسازی حافظه",
+    _UiTextKey.clearCacheDesc: "آزادسازی فضای ذخیره‌سازی",
+    _UiTextKey.exportData: "صدور داده‌ها",
+    _UiTextKey.exportDataDesc: "دانلود همه داده‌های شما",
+    _UiTextKey.cacheCleared: "حافظه با موفقیت پاکسازی شد",
+    _UiTextKey.exportStarted: "صدور شروع شد — ایمیل خود را بررسی کنید",
+    _UiTextKey.aboutSection: "درباره",
+    _UiTextKey.appVersionLabel: "نسخه",
+    _UiTextKey.buildLabel: "بیلد",
+    _UiTextKey.licenseLabel: "مجوز",
+    _UiTextKey.sendFeedback: "ارسال بازخورد",
+    _UiTextKey.reportBug: "گزارش باگ",
+    _UiTextKey.privacyPolicy: "سیاست حریم خصوصی",
+    _UiTextKey.openingFeedback: "در حال باز کردن فرم بازخورد...",
+    _UiTextKey.openingBugTracker: "در حال باز کردن ردیاب مشکلات...",
+    _UiTextKey.openingPrivacy: "در حال باز کردن سیاست حریم خصوصی...",
+    _UiTextKey.settingsButton: "تنظیمات",
+    _UiTextKey.selectCompanyTitle: "انتخاب شرکت",
   };
 
   static String get exception => _text(_UiTextKey.exception);
@@ -1918,6 +2056,52 @@ class UiText {
   static String get approved => _text(_UiTextKey.approved);
   static String get pending => _text(_UiTextKey.pending);
   static String get rejected => _text(_UiTextKey.rejected);
+  static String get settings => _text(_UiTextKey.settings);
+  static String get settingsSubtitle => _text(_UiTextKey.settingsSubtitle);
+  static String get workspace => _text(_UiTextKey.workspace);
+  static String get activeCompany => _text(_UiTextKey.activeCompany);
+  static String get noCompanySelected => _text(_UiTextKey.noCompanySelected);
+  static String get manageCompanies => _text(_UiTextKey.manageCompanies);
+  static String get switchCompany => _text(_UiTextKey.switchCompany);
+  static String get appearance => _text(_UiTextKey.appearance);
+  static String get themeMode => _text(_UiTextKey.themeMode);
+  static String get lightMode => _text(_UiTextKey.lightMode);
+  static String get darkMode => _text(_UiTextKey.darkMode);
+  static String get systemDefault => _text(_UiTextKey.systemDefault);
+  static String get glassEffect => _text(_UiTextKey.glassEffect);
+  static String get glassEffectDesc => _text(_UiTextKey.glassEffectDesc);
+  static String get languageAndRegion => _text(_UiTextKey.languageAndRegion);
+  static String get rtlNote => _text(_UiTextKey.rtlNote);
+  static String get notificationPrefs => _text(_UiTextKey.notificationPrefs);
+  static String get emailNotifs => _text(_UiTextKey.emailNotifs);
+  static String get emailNotifsDesc => _text(_UiTextKey.emailNotifsDesc);
+  static String get pushNotifs => _text(_UiTextKey.pushNotifs);
+  static String get pushNotifsDesc => _text(_UiTextKey.pushNotifsDesc);
+  static String get soundEffects => _text(_UiTextKey.soundEffects);
+  static String get soundEffectsDesc => _text(_UiTextKey.soundEffectsDesc);
+  static String get systemSection => _text(_UiTextKey.systemSection);
+  static String get usageAnalytics => _text(_UiTextKey.usageAnalytics);
+  static String get usageAnalyticsDesc => _text(_UiTextKey.usageAnalyticsDesc);
+  static String get autoSave => _text(_UiTextKey.autoSave);
+  static String get autoSaveDesc => _text(_UiTextKey.autoSaveDesc);
+  static String get clearCache => _text(_UiTextKey.clearCache);
+  static String get clearCacheDesc => _text(_UiTextKey.clearCacheDesc);
+  static String get exportData => _text(_UiTextKey.exportData);
+  static String get exportDataDesc => _text(_UiTextKey.exportDataDesc);
+  static String get cacheCleared => _text(_UiTextKey.cacheCleared);
+  static String get exportStarted => _text(_UiTextKey.exportStarted);
+  static String get aboutSection => _text(_UiTextKey.aboutSection);
+  static String get appVersionLabel => _text(_UiTextKey.appVersionLabel);
+  static String get buildLabel => _text(_UiTextKey.buildLabel);
+  static String get licenseLabel => _text(_UiTextKey.licenseLabel);
+  static String get sendFeedback => _text(_UiTextKey.sendFeedback);
+  static String get reportBug => _text(_UiTextKey.reportBug);
+  static String get privacyPolicy => _text(_UiTextKey.privacyPolicy);
+  static String get openingFeedback => _text(_UiTextKey.openingFeedback);
+  static String get openingBugTracker => _text(_UiTextKey.openingBugTracker);
+  static String get openingPrivacy => _text(_UiTextKey.openingPrivacy);
+  static String get settingsButton => _text(_UiTextKey.settingsButton);
+  static String get selectCompanyTitle => _text(_UiTextKey.selectCompanyTitle);
 
   static String languageToggleTooltip(AppLanguage nextLanguage) =>
       nextLanguage == AppLanguage.persian

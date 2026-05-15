@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/constants.dart';
 import '../providers/auth_provider.dart';
+import '../providers/company_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/ticket_provider.dart';
 import '../theme/app_colors.dart';
@@ -341,18 +342,12 @@ class _FloatingMobileBar extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 2),
-              // Theme toggle
+              // Settings button
               _BarIconButton(
-                icon: isDark
-                    ? Icons.light_mode_outlined
-                    : Icons.dark_mode_outlined,
-                onTap: () => ref.read(themeProvider.notifier).toggleTheme(),
-                tooltip: UiText.toggleTheme,
+                icon: Icons.settings_outlined,
+                onTap: () => GoRouter.of(context).go(AppRoutes.settings),
+                tooltip: UiText.settingsButton,
               ),
-              const SizedBox(width: 2),
-              const _LanguageToggleButton(compact: true),
-              const SizedBox(width: 2),
-              const _GlassModeButton(compact: true),
               const SizedBox(width: 4),
               // Avatar
               if (user != null)
@@ -538,26 +533,16 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
                 ),
               ),
             ),
-            // Theme toggle
+            // Settings button
             IconButton(
-              icon: Icon(
-                isDark
-                    ? Icons.light_mode_outlined
-                    : Icons.dark_mode_outlined,
-                size: 20,
-              ),
-              onPressed: () =>
-                  ref.read(themeProvider.notifier).toggleTheme(),
-              tooltip: UiText.toggleTheme,
+              icon: const Icon(Icons.settings_outlined, size: 20),
+              onPressed: () => GoRouter.of(context).go(AppRoutes.settings),
+              tooltip: UiText.settingsButton,
               style: IconButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
               ),
             ),
-            const SizedBox(width: 2),
-            const _LanguageToggleButton(),
-            const SizedBox(width: 2),
-            const _GlassModeButton(),
             const SizedBox(width: 4),
             if (user != null)
               AvatarWidget(
@@ -771,6 +756,9 @@ class _FullSidebar extends ConsumerWidget {
           // User card
           _SidebarUserCard(user: user),
 
+          // Company selector
+          const _CompanySelector(),
+
           // Nav items grouped by section
           Expanded(
             child: _SidebarNavList(
@@ -780,6 +768,9 @@ class _FullSidebar extends ConsumerWidget {
               expanded: true,
             ),
           ),
+
+          // Settings
+          _SettingsTile(),
 
           // Logout
           _LogoutTile(
@@ -853,7 +844,7 @@ class _CollapsedSidebar extends ConsumerWidget {
           ),
           const Divider(height: 1),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: user != null
                 ? AvatarWidget(
                     imageUrl: user.avatar,
@@ -862,6 +853,13 @@ class _CollapsedSidebar extends ConsumerWidget {
                     size: 34,
                   )
                 : const SizedBox.shrink(),
+          ),
+          Tooltip(
+            message: UiText.settingsButton,
+            child: IconButton(
+              icon: const Icon(Icons.settings_outlined, size: 20),
+              onPressed: () => GoRouter.of(context).go(AppRoutes.settings),
+            ),
           ),
           Tooltip(
             message: UiText.logout,
@@ -966,6 +964,7 @@ class _SidebarDrawer extends ConsumerWidget {
             ),
           ),
           _SidebarUserCard(user: user),
+          const _CompanySelector(),
           Expanded(
             child: _SidebarNavList(
               selectedIndex: selectedIndex,
@@ -974,6 +973,7 @@ class _SidebarDrawer extends ConsumerWidget {
               expanded: true,
             ),
           ),
+          _SettingsTile(),
           _LogoutTile(
             onLogout: () => ref.read(authProvider.notifier).logout(),
           ),
@@ -1372,6 +1372,405 @@ class _NavIcon extends ConsumerWidget {
                       : cs.onSurface.withValues(alpha: 0.5),
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ────────────────────────────────────────────────────────────────
+// COMPANY SELECTOR (sidebar dropdown)
+// ────────────────────────────────────────────────────────────────
+
+class _CompanySelector extends ConsumerWidget {
+  const _CompanySelector();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final glassMode = ref.watch(glassModeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
+    final selectedId = ref.watch(selectedCompanyIdProvider);
+    final companiesAsync = ref.watch(companiesProvider);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+      child: companiesAsync.when(
+        loading: () => _buildSelectorShell(
+          context,
+          glassMode: glassMode,
+          isDark: isDark,
+          cs: cs,
+          child: Row(children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Container(
+                height: 12,
+                decoration: BoxDecoration(
+                  color: cs.onSurface.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+            ),
+          ]),
+          onTap: null,
+        ),
+        error: (_, __) => const SizedBox.shrink(),
+        data: (companies) {
+          final selected = companies.where((c) => c.id == selectedId).firstOrNull;
+          return _buildSelectorShell(
+            context,
+            glassMode: glassMode,
+            isDark: isDark,
+            cs: cs,
+            child: Row(children: [
+              // Company avatar
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primary, AppColors.accent],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  selected != null ? selected.name[0].toUpperCase() : '?',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      selected?.name ?? UiText.noCompanySelected,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        color: selected != null
+                            ? cs.onSurface
+                            : cs.onSurface.withValues(alpha: 0.5),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (selected?.industry != null)
+                      Text(
+                        selected!.industry!,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: cs.onSurface.withValues(alpha: 0.45),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    else
+                      Text(
+                        UiText.workspace,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: AppColors.primary.withValues(alpha: 0.7),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.unfold_more_rounded,
+                size: 18,
+                color: cs.onSurface.withValues(alpha: 0.4),
+              ),
+            ]),
+            onTap: companies.isEmpty
+                ? null
+                : () => _showCompanyPicker(context, ref, companies, selectedId),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSelectorShell(
+    BuildContext context, {
+    required bool glassMode,
+    required bool isDark,
+    required ColorScheme cs,
+    required Widget child,
+    required VoidCallback? onTap,
+  }) {
+    final decoration = BoxDecoration(
+      color: glassMode
+          ? Colors.white.withValues(alpha: isDark ? 0.07 : 0.38)
+          : AppColors.primary.withValues(alpha: 0.06),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(
+        color: glassMode
+            ? Colors.white.withValues(alpha: isDark ? 0.12 : 0.45)
+            : AppColors.primary.withValues(alpha: 0.18),
+      ),
+    );
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: decoration,
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  void _showCompanyPicker(
+    BuildContext context,
+    WidgetRef ref,
+    List<dynamic> companies,
+    String? selectedId,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassMode = ref.read(glassModeProvider);
+    final cs = Theme.of(context).colorScheme;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        margin: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkCard : AppColors.lightCard,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: cs.outline.withValues(alpha: 0.15),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
+              blurRadius: 32,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: cs.onSurface.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            // Title
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: Row(children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.accent],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.business_rounded,
+                      size: 18, color: Colors.white),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  UiText.selectCompanyTitle,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: cs.onSurface,
+                  ),
+                ),
+              ]),
+            ),
+            const Divider(height: 1),
+            // Company list
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 320),
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shrinkWrap: true,
+                itemCount: companies.length,
+                itemBuilder: (ctx, i) {
+                  final c = companies[i];
+                  final isSelected = c.id == selectedId;
+                  return ListTile(
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primary.withValues(
+                                alpha: isSelected ? 1.0 : 0.7),
+                            AppColors.accent.withValues(
+                                alpha: isSelected ? 1.0 : 0.7),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        c.name[0].toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      c.name,
+                      style: TextStyle(
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: isSelected
+                            ? AppColors.primary
+                            : cs.onSurface,
+                      ),
+                    ),
+                    subtitle: c.industry != null
+                        ? Text(
+                            c.industry!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: cs.onSurface.withValues(alpha: 0.5),
+                            ),
+                          )
+                        : null,
+                    trailing: isSelected
+                        ? Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Icon(Icons.check_rounded,
+                                size: 14, color: Colors.white),
+                          )
+                        : null,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onTap: () {
+                      ref.read(selectedCompanyIdProvider.notifier).state = c.id;
+                      ref
+                          .read(sharedPreferencesProvider)
+                          .setString(AppConstants.lastCompanyKey, c.id);
+                      Navigator.of(ctx).pop();
+                    },
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ────────────────────────────────────────────────────────────────
+// SETTINGS TILE (sidebar)
+// ────────────────────────────────────────────────────────────────
+
+class _SettingsTile extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final glassMode = ref.watch(glassModeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
+    final currentLocation = GoRouterState.of(context).matchedLocation;
+    final isSelected = currentLocation == AppRoutes.settings;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+      child: Material(
+        color: glassMode
+            ? AppColors.primary.withValues(alpha: isDark ? 0.08 : 0.06)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(glassMode ? 14 : 10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(glassMode ? 14 : 10),
+          onTap: () => GoRouter.of(context).go(AppRoutes.settings),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColors.primary.withValues(alpha: glassMode ? 0.16 : 0.1)
+                  : null,
+              borderRadius: BorderRadius.circular(glassMode ? 14 : 10),
+              border: glassMode
+                  ? Border.all(
+                      color: Colors.white.withValues(
+                          alpha: isDark ? 0.10 : 0.34),
+                    )
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isSelected
+                      ? Icons.settings_rounded
+                      : Icons.settings_outlined,
+                  size: 19,
+                  color: isSelected
+                      ? AppColors.primary
+                      : cs.onSurface.withValues(alpha: 0.6),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  UiText.settingsButton,
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.w400,
+                    color: isSelected
+                        ? AppColors.primary
+                        : cs.onSurface.withValues(alpha: 0.8),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

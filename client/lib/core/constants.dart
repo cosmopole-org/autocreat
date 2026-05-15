@@ -58,4 +58,5 @@ class AppRoutes {
   static const String letterEditor = '/letters/:id/edit';
   static const String tickets = '/tickets';
   static const String ticketDetail = '/tickets/:id';
+  static const String settings = '/settings';
 }

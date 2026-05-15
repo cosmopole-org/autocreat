@@ -21,6 +21,7 @@ import '../screens/roles/role_editor_screen.dart';
 import '../screens/roles/roles_screen.dart';
 import '../screens/tickets/ticket_detail_screen.dart';
 import '../screens/tickets/tickets_screen.dart';
+import '../screens/settings/settings_screen.dart';
 import '../screens/users/user_editor_screen.dart';
 import '../screens/users/users_screen.dart';
 import '../widgets/responsive_shell.dart';
@@ -152,6 +153,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: AppRoutes.tickets,
             name: 'tickets',
             builder: (context, state) => const TicketsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.settings,
+            name: 'settings',
+            builder: (context, state) => const SettingsScreen(),
           ),
         ],
       ),
