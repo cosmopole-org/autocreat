@@ -92,10 +92,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        leading: AppBarBackButton(onPressed: () => context.pop()),
         title: Text(editorState.model?.name ?? UiText.modelEditor),
         actions: [
           AppButton(

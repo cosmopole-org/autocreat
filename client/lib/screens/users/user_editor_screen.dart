@@ -137,10 +137,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        leading: AppBarBackButton(onPressed: () => context.pop()),
         title: Text(_user == null ? UiText.newUser : UiText.editUser),
         actions: [
           AppButton(

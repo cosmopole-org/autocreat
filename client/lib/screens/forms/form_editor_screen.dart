@@ -92,10 +92,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        leading: AppBarBackButton(onPressed: () => context.pop()),
         title: Row(
           children: [
             Text(editorState.form?.name ?? UiText.formEditor),

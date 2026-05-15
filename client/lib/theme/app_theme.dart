@@ -396,12 +396,21 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.06) : null,
+          backgroundColor: glassMode
+              ? Colors.white.withValues(alpha: 0.06)
+              : AppColors.primaryLight.withValues(alpha: 0.08),
           foregroundColor: AppColors.primaryLight,
           minimumSize: const Size(0, 40),
           alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 14 : 8)),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(glassMode ? 14 : 10),
+            side: glassMode
+                ? BorderSide.none
+                : BorderSide(
+                    color: AppColors.primaryLight.withValues(alpha: 0.20),
+                    width: 1),
+          ),
           textStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
@@ -430,9 +439,12 @@ class AppTheme {
       ),
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
-          backgroundColor: glassMode ? Colors.white.withValues(alpha: 0.06) : null,
+          backgroundColor: glassMode
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.white.withValues(alpha: 0.04),
           foregroundColor: AppColors.darkText,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(glassMode ? 14 : 8)),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(glassMode ? 14 : 10)),
           side: glassMode
               ? BorderSide(color: Colors.white.withValues(alpha: 0.12), width: 1)
               : BorderSide.none,

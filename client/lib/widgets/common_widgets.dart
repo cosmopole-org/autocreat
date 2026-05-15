@@ -827,7 +827,65 @@ class AppStatCard extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// APP BUTTON  –  icon + label always centred, consistent sizing
+// APP BAR BACK BUTTON  –  consistent bordered nav button for all AppBars
+// ─────────────────────────────────────────────────────────────────────────────
+
+class AppBarBackButton extends ConsumerWidget {
+  final VoidCallback? onPressed;
+
+  const AppBarBackButton({super.key, this.onPressed});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final glassMode = ref.watch(glassModeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final onTap = onPressed ?? () => Navigator.of(context).maybePop();
+
+    final Color bgColor;
+    final Color borderColor;
+    if (glassMode) {
+      bgColor = isDark
+          ? Colors.white.withValues(alpha: 0.08)
+          : Colors.white.withValues(alpha: 0.42);
+      borderColor = isDark
+          ? Colors.white.withValues(alpha: 0.18)
+          : Colors.white.withValues(alpha: 0.65);
+    } else {
+      bgColor = isDark
+          ? AppColors.darkSurface.withValues(alpha: 0.90)
+          : AppColors.lightSurface;
+      borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderColor, width: 1),
+            ),
+            child: Icon(
+              Icons.arrow_back,
+              color: isDark ? AppColors.darkText : AppColors.lightText,
+              size: 20,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// APP BUTTON  –  icon + label always centred, gradient in all modes
 // ─────────────────────────────────────────────────────────────────────────────
 
 class AppButton extends ConsumerWidget {
@@ -850,72 +908,24 @@ class AppButton extends ConsumerWidget {
     this.width,
   });
 
-  Widget _buildChild(Color spinnerColor) {
-    final hasLeading = loading || icon != null;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (loading)
-          SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: spinnerColor,
-            ),
-          )
-        else if (icon != null)
-          Icon(icon, size: 18),
-        if (hasLeading) const SizedBox(width: 8),
-        Text(label, textAlign: TextAlign.center),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final glassMode = ref.watch(glassModeProvider);
 
-    if (glassMode) {
-      return _GlassButton(
-        label: label,
-        onPressed: loading ? null : onPressed,
-        icon: icon,
-        loading: loading,
-        outlined: outlined,
-        color: color,
-        width: width,
-      );
-    }
-
-    if (outlined) {
-      return SizedBox(
-        width: width,
-        child: OutlinedButton(
-          onPressed: loading ? null : onPressed,
-          child: _buildChild(AppColors.primary),
-        ),
-      );
-    }
-
-    ButtonStyle? extraStyle;
-    if (color != null) {
-      extraStyle = ElevatedButton.styleFrom(backgroundColor: color);
-    }
-
-    return SizedBox(
+    return _StyledButton(
+      label: label,
+      onPressed: loading ? null : onPressed,
+      icon: icon,
+      loading: loading,
+      outlined: outlined,
+      color: color,
       width: width,
-      child: ElevatedButton(
-        onPressed: loading ? null : onPressed,
-        style: extraStyle,
-        child: _buildChild(Colors.white),
-      ),
+      glassEffect: glassMode,
     );
   }
 }
 
-class _GlassButton extends StatelessWidget {
+class _StyledButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
@@ -923,8 +933,9 @@ class _GlassButton extends StatelessWidget {
   final bool outlined;
   final Color? color;
   final double? width;
+  final bool glassEffect;
 
-  const _GlassButton({
+  const _StyledButton({
     required this.label,
     required this.onPressed,
     required this.icon,
@@ -932,132 +943,172 @@ class _GlassButton extends StatelessWidget {
     required this.outlined,
     required this.color,
     required this.width,
+    required this.glassEffect,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final enabled = onPressed != null;
-    final accent =
-        color ?? (isDark ? AppColors.primaryLight : AppColors.primary);
+    final accent = color ?? (isDark ? AppColors.primaryLight : AppColors.primary);
     final foreground = outlined ? accent : Colors.white;
     final hasLeading = loading || icon != null;
+    final radius = glassEffect ? 16.0 : 12.0;
 
-    final button = AnimatedOpacity(
-      duration: const Duration(milliseconds: 160),
-      opacity: enabled ? 1 : 0.58,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: outlined
-                  ? Colors.white.withValues(alpha: isDark ? 0.075 : 0.38)
-                  : accent.withValues(alpha: isDark ? 0.55 : 0.72),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: outlined
-                    ? Colors.white.withValues(alpha: isDark ? 0.18 : 0.70)
-                    : Colors.white.withValues(alpha: isDark ? 0.22 : 0.45),
-                width: 1.2,
-              ),
-              gradient: LinearGradient(
+    BoxDecoration decoration;
+    if (glassEffect) {
+      decoration = BoxDecoration(
+        color: outlined
+            ? Colors.white.withValues(alpha: isDark ? 0.075 : 0.38)
+            : accent.withValues(alpha: isDark ? 0.55 : 0.72),
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(
+          color: outlined
+              ? Colors.white.withValues(alpha: isDark ? 0.18 : 0.70)
+              : Colors.white.withValues(alpha: isDark ? 0.22 : 0.45),
+          width: 1.2,
+        ),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: outlined
+              ? [
+                  Colors.white.withValues(alpha: isDark ? 0.15 : 0.62),
+                  Colors.white.withValues(alpha: isDark ? 0.04 : 0.22),
+                ]
+              : [
+                  accent.withValues(alpha: isDark ? 0.70 : 0.86),
+                  AppColors.accent.withValues(alpha: isDark ? 0.45 : 0.62),
+                ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: (outlined ? Colors.black : accent)
+                .withValues(alpha: isDark ? 0.28 : 0.20),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.white.withValues(alpha: isDark ? 0.025 : 0.45),
+            blurRadius: 1,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      );
+    } else {
+      // Non-glass: solid gradient for filled, clean bordered for outlined
+      decoration = BoxDecoration(
+        borderRadius: BorderRadius.circular(radius),
+        gradient: outlined
+            ? null
+            : LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: outlined
-                    ? [
-                        Colors.white.withValues(alpha: isDark ? 0.15 : 0.62),
-                        Colors.white.withValues(alpha: isDark ? 0.04 : 0.22),
-                      ]
-                    : [
-                        accent.withValues(alpha: isDark ? 0.70 : 0.86),
-                        AppColors.accent
-                            .withValues(alpha: isDark ? 0.45 : 0.62),
-                      ],
+                colors: [
+                  accent,
+                  AppColors.accent.withValues(alpha: isDark ? 0.82 : 0.88),
+                ],
               ),
-              boxShadow: [
+        color: outlined
+            ? (isDark
+                ? AppColors.darkSurface.withValues(alpha: 0.5)
+                : Colors.transparent)
+            : null,
+        border: Border.all(
+          color: outlined
+              ? accent.withValues(alpha: 0.90)
+              : Colors.white.withValues(alpha: isDark ? 0.16 : 0.30),
+          width: outlined ? 1.5 : 1,
+        ),
+        boxShadow: outlined
+            ? null
+            : [
                 BoxShadow(
-                  color: (outlined ? Colors.black : accent)
-                      .withValues(alpha: isDark ? 0.28 : 0.20),
-                  blurRadius: 22,
-                  offset: const Offset(0, 10),
-                ),
-                BoxShadow(
-                  color: Colors.white.withValues(alpha: isDark ? 0.025 : 0.45),
-                  blurRadius: 1,
-                  offset: const Offset(0, 1),
+                  color: accent.withValues(alpha: isDark ? 0.38 : 0.28),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
                 ),
               ],
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  top: -24,
-                  left: -36,
-                  child: Transform.rotate(
-                    angle: -0.55,
-                    child: Container(
-                      width: 92,
-                      height: 18,
-                      color:
-                          Colors.white.withValues(alpha: isDark ? 0.10 : 0.26),
-                    ),
+      );
+    }
+
+    final innerContent = ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: DecoratedBox(
+        decoration: decoration,
+        child: Stack(
+          children: [
+            if (glassEffect)
+              Positioned(
+                top: -24,
+                left: -36,
+                child: Transform.rotate(
+                  angle: -0.55,
+                  child: Container(
+                    width: 92,
+                    height: 18,
+                    color: Colors.white.withValues(alpha: isDark ? 0.10 : 0.26),
                   ),
                 ),
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: enabled ? onPressed : null,
-                    borderRadius: BorderRadius.circular(16),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(minHeight: 46),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 13),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (loading)
-                              SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: foreground,
-                                ),
-                              )
-                            else if (icon != null)
-                              Icon(icon, size: 18, color: foreground),
-                            if (hasLeading) const SizedBox(width: 8),
-                            Text(
-                              label,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: foreground,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.05,
-                              ),
+              ),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: enabled ? onPressed : null,
+                borderRadius: BorderRadius.circular(radius),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 46),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (loading)
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: foreground,
                             ),
-                          ],
+                          )
+                        else if (icon != null)
+                          Icon(icon, size: 18, color: foreground),
+                        if (hasLeading) const SizedBox(width: 8),
+                        Text(
+                          label,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: foreground,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.05,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
 
-    return SizedBox(
-      width: width,
-      child: button,
+    final button = AnimatedOpacity(
+      duration: const Duration(milliseconds: 160),
+      opacity: enabled ? 1 : 0.58,
+      child: glassEffect
+          ? BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: innerContent,
+            )
+          : innerContent,
     );
+
+    return SizedBox(width: width, child: button);
   }
 }
 
