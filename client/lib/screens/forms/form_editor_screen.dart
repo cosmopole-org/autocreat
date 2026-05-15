@@ -107,7 +107,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                   color: AppColors.warning.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(MockUiText.unsaved,
+                child: Text(MockUiText.unsaved,
                     style: TextStyle(fontSize: 11, color: AppColors.warning)),
               ),
             ],
@@ -415,7 +415,7 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
 
             TextFormField(
               controller: _labelController,
-              decoration: const InputDecoration(labelText: MockUiText.label),
+              decoration: InputDecoration(labelText: MockUiText.label),
               onChanged: (v) =>
                   widget.onUpdate(field.copyWith(label: v)),
             ),
@@ -423,7 +423,7 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
 
             TextFormField(
               controller: _placeholderController,
-              decoration: const InputDecoration(labelText: MockUiText.placeholder),
+              decoration: InputDecoration(labelText: MockUiText.placeholder),
               onChanged: (v) =>
                   widget.onUpdate(field.copyWith(placeholder: v)),
             ),
@@ -431,14 +431,14 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
 
             TextFormField(
               controller: _helpTextController,
-              decoration: const InputDecoration(labelText: MockUiText.helpText),
+              decoration: InputDecoration(labelText: MockUiText.helpText),
               onChanged: (v) =>
                   widget.onUpdate(field.copyWith(helpText: v)),
             ),
             const SizedBox(height: 16),
 
             SwitchListTile(
-              title: const Text(MockUiText.requiredText, style: TextStyle(fontSize: 14)),
+              title: Text(MockUiText.requiredText, style: TextStyle(fontSize: 14)),
               value: field.required,
               onChanged: (v) =>
                   widget.onUpdate(field.copyWith(required: v)),
@@ -447,7 +447,7 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
             ),
 
             SwitchListTile(
-              title: const Text(MockUiText.readOnly, style: TextStyle(fontSize: 14)),
+              title: Text(MockUiText.readOnly, style: TextStyle(fontSize: 14)),
               value: field.readOnly,
               onChanged: (v) =>
                   widget.onUpdate(field.copyWith(readOnly: v)),
@@ -456,7 +456,7 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
             ),
 
             SwitchListTile(
-              title: const Text(MockUiText.hidden, style: TextStyle(fontSize: 14)),
+              title: Text(MockUiText.hidden, style: TextStyle(fontSize: 14)),
               value: field.hidden,
               onChanged: (v) =>
                   widget.onUpdate(field.copyWith(hidden: v)),
@@ -476,7 +476,7 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
                       style: Theme.of(context).textTheme.labelLarge),
                   TextButton.icon(
                     icon: const Icon(Icons.add, size: 14),
-                    label: const Text(MockUiText.add),
+                    label: Text(MockUiText.add),
                     onPressed: () {
                       const uuid = Uuid();
                       final options = List<FormFieldOption>.from(field.options)

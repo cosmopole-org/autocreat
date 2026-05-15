@@ -126,7 +126,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                         TextFormField(
                           controller: _nameController,
                           decoration:
-                              const InputDecoration(labelText: MockUiText.modelNameRequired),
+                              InputDecoration(labelText: MockUiText.modelNameRequired),
                           onChanged: (_) => ref
                               .read(modelEditorProvider.notifier)
                               .updateModelMeta(
@@ -138,7 +138,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                         TextFormField(
                           controller: _descController,
                           decoration:
-                              const InputDecoration(labelText: MockUiText.description),
+                              InputDecoration(labelText: MockUiText.description),
                           maxLines: 2,
                           onChanged: (_) => ref
                               .read(modelEditorProvider.notifier)
@@ -376,7 +376,7 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(MockUiText.addField),
+      title: Text(MockUiText.addField),
       content: SizedBox(
         width: 360,
         child: Column(
@@ -384,7 +384,7 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: MockUiText.fieldNameRequired),
+              decoration: InputDecoration(labelText: MockUiText.fieldNameRequired),
               autofocus: true,
             ),
             const SizedBox(height: 12),
@@ -395,18 +395,18 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
                       value: t, child: Text(t.displayName)))
                   .toList(),
               onChanged: (v) => setState(() => _type = v!),
-              decoration: const InputDecoration(labelText: MockUiText.fieldType),
+              decoration: InputDecoration(labelText: MockUiText.fieldType),
             ),
             const SizedBox(height: 12),
             CheckboxListTile(
-              title: const Text(MockUiText.requiredText),
+              title: Text(MockUiText.requiredText),
               value: _required,
               onChanged: (v) => setState(() => _required = v!),
               contentPadding: EdgeInsets.zero,
               dense: true,
             ),
             CheckboxListTile(
-              title: const Text(MockUiText.unique3),
+              title: Text(MockUiText.unique3),
               value: _unique,
               onChanged: (v) => setState(() => _unique = v!),
               contentPadding: EdgeInsets.zero,
@@ -418,7 +418,7 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text(MockUiText.cancel),
+          child: Text(MockUiText.cancel),
         ),
         ElevatedButton(
           onPressed: () {
@@ -433,7 +433,7 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
             ));
             Navigator.pop(context);
           },
-          child: const Text(MockUiText.add),
+          child: Text(MockUiText.add),
         ),
       ],
     );

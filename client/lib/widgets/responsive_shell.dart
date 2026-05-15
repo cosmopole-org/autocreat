@@ -20,7 +20,7 @@ class _NavItem {
   final bool hasBadge;
   final String section;
 
-  const _NavItem({
+  _NavItem({
     required this.label,
     required this.icon,
     required this.selectedIcon,
@@ -30,64 +30,64 @@ class _NavItem {
   });
 }
 
-final _navItems = [
-  const _NavItem(
+List<_NavItem> get _navItems => [
+  _NavItem(
     label: MockUiText.dashboard,
     icon: Icons.dashboard_outlined,
     selectedIcon: Icons.dashboard_rounded,
     route: AppRoutes.dashboard,
     section: MockUiText.overview,
   ),
-  const _NavItem(
+  _NavItem(
     label: MockUiText.companies,
     icon: Icons.business_outlined,
     selectedIcon: Icons.business_rounded,
     route: AppRoutes.companies,
     section: MockUiText.organization,
   ),
-  const _NavItem(
+  _NavItem(
     label: MockUiText.users,
     icon: Icons.people_outline_rounded,
     selectedIcon: Icons.people_rounded,
     route: AppRoutes.users,
     section: MockUiText.organization,
   ),
-  const _NavItem(
+  _NavItem(
     label: MockUiText.roles,
     icon: Icons.shield_outlined,
     selectedIcon: Icons.shield_rounded,
     route: AppRoutes.roles,
     section: MockUiText.organization,
   ),
-  const _NavItem(
+  _NavItem(
     label: MockUiText.flows,
     icon: Icons.account_tree_outlined,
     selectedIcon: Icons.account_tree_rounded,
     route: AppRoutes.flows,
     section: MockUiText.automation,
   ),
-  const _NavItem(
+  _NavItem(
     label: MockUiText.forms,
     icon: Icons.dynamic_form_outlined,
     selectedIcon: Icons.dynamic_form_rounded,
     route: AppRoutes.forms,
     section: MockUiText.automation,
   ),
-  const _NavItem(
+  _NavItem(
     label: MockUiText.models,
     icon: Icons.data_object_rounded,
     selectedIcon: Icons.data_object_rounded,
     route: AppRoutes.models,
     section: MockUiText.automation,
   ),
-  const _NavItem(
+  _NavItem(
     label: MockUiText.letters,
     icon: Icons.mail_outline_rounded,
     selectedIcon: Icons.mail_rounded,
     route: AppRoutes.letters,
     section: MockUiText.communication,
   ),
-  const _NavItem(
+  _NavItem(
     label: MockUiText.tickets,
     icon: Icons.support_agent_outlined,
     selectedIcon: Icons.support_agent_rounded,
@@ -350,6 +350,8 @@ class _FloatingMobileBar extends ConsumerWidget {
                 tooltip: MockUiText.toggleTheme,
               ),
               const SizedBox(width: 2),
+              const _LanguageToggleButton(compact: true),
+              const SizedBox(width: 2),
               const _GlassModeButton(compact: true),
               const SizedBox(width: 4),
               // Avatar
@@ -553,6 +555,8 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
               ),
             ),
             const SizedBox(width: 2),
+            const _LanguageToggleButton(),
+            const SizedBox(width: 2),
             const _GlassModeButton(),
             const SizedBox(width: 4),
             if (user != null)
@@ -570,6 +574,61 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
   }
 }
 
+
+
+class _LanguageToggleButton extends ConsumerWidget {
+  final bool compact;
+
+  const _LanguageToggleButton({this.compact = false});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final language = ref.watch(languageProvider);
+    final nextLanguage = language == AppLanguage.english ? AppLanguage.persian : AppLanguage.english;
+    final tooltip = MockUiText.languageToggleTooltip(nextLanguage);
+
+    if (compact) {
+      return Tooltip(
+        message: tooltip,
+        child: InkWell(
+          onTap: () => ref.read(languageProvider.notifier).toggleLanguage(),
+          borderRadius: BorderRadius.circular(9),
+          child: Container(
+            height: 30,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(9),
+              color: AppColors.primary.withValues(alpha: 0.10),
+            ),
+            child: Text(
+              nextLanguage.shortLabel,
+              style: const TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w800,
+                fontSize: 11,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Tooltip(
+      message: tooltip,
+      child: TextButton.icon(
+        onPressed: () => ref.read(languageProvider.notifier).toggleLanguage(),
+        icon: const Icon(Icons.translate_rounded, size: 18),
+        label: Text(nextLanguage.shortLabel),
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      ),
+    );
+  }
+}
 
 class _GlassModeButton extends ConsumerWidget {
   final bool compact;
@@ -644,7 +703,7 @@ class _LogoMark extends StatelessWidget {
         ),
         if (!compact) ...[
           const SizedBox(width: 10),
-          const Text(
+          Text(
             MockUiText.autocreat,
             style: TextStyle(
               fontSize: 16,
@@ -687,8 +746,8 @@ class _FullSidebar extends ConsumerWidget {
       width: 248,
       decoration: BoxDecoration(
         color: sidebarBg,
-        border: Border(
-          right: BorderSide(color: cs.outline.withValues(alpha: 0.4)),
+        border: BorderDirectional(
+          end: BorderSide(color: cs.outline.withValues(alpha: 0.4)),
         ),
       ),
       child: Column(
@@ -703,9 +762,9 @@ class _FullSidebar extends ConsumerWidget {
                     BorderSide(color: cs.outline.withValues(alpha: 0.4)),
               ),
             ),
-            child: const Align(
-              alignment: Alignment.centerLeft,
-              child: _LogoMark(),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: const _LogoMark(),
             ),
           ),
 
@@ -760,8 +819,8 @@ class _CollapsedSidebar extends ConsumerWidget {
       width: 68,
       decoration: BoxDecoration(
         color: sidebarBg,
-        border: Border(
-          right: BorderSide(color: cs.outline.withValues(alpha: 0.4)),
+        border: BorderDirectional(
+          end: BorderSide(color: cs.outline.withValues(alpha: 0.4)),
         ),
       ),
       child: Column(

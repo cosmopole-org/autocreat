@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants.dart';
+import '../data/mock_ui_text.dart';
 
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError('SharedPreferences not initialized');
@@ -57,6 +58,28 @@ class GlassModeNotifier extends Notifier<bool> {
   }
 }
 
+
+class LanguageNotifier extends Notifier<AppLanguage> {
+  @override
+  AppLanguage build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return AppLanguageX.fromCode(prefs.getString(AppConstants.languageKey));
+  }
+
+  Future<void> setLanguage(AppLanguage language) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    await prefs.setString(AppConstants.languageKey, language.code);
+    MockUiText.configureLanguage(language);
+    state = language;
+  }
+
+  Future<void> toggleLanguage() async {
+    await setLanguage(state == AppLanguage.english ? AppLanguage.persian : AppLanguage.english);
+  }
+}
+
 final themeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(ThemeNotifier.new);
+
+final languageProvider = NotifierProvider<LanguageNotifier, AppLanguage>(LanguageNotifier.new);
 
 final glassModeProvider = NotifierProvider<GlassModeNotifier, bool>(GlassModeNotifier.new);

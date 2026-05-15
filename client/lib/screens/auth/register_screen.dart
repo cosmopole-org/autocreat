@@ -169,7 +169,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               Expanded(
                 child: TextFormField(
                   controller: _firstNameController,
-                  decoration: const InputDecoration(labelText: MockUiText.firstName),
+                  decoration: InputDecoration(labelText: MockUiText.firstName),
                   validator: (v) =>
                       v?.isEmpty ?? true ? MockUiText.requiredText : null,
                 ),
@@ -178,7 +178,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               Expanded(
                 child: TextFormField(
                   controller: _lastNameController,
-                  decoration: const InputDecoration(labelText: MockUiText.lastName),
+                  decoration: InputDecoration(labelText: MockUiText.lastName),
                   validator: (v) =>
                       v?.isEmpty ?? true ? MockUiText.requiredText : null,
                 ),
@@ -282,7 +282,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
               TextButton(
                 onPressed: () => context.go(AppRoutes.login),
-                child: const Text(MockUiText.signIn),
+                child: Text(MockUiText.signIn),
               ),
             ],
           ).animate().fadeIn(delay: 700.ms),

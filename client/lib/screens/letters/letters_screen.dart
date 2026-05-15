@@ -420,7 +420,7 @@ class _CategoryDropdown extends StatelessWidget {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String?>(
           value: selected,
-          hint: const Text(MockUiText.allCategories, style: TextStyle(fontSize: 13)),
+          hint: Text(MockUiText.allCategories, style: TextStyle(fontSize: 13)),
           style: TextStyle(fontSize: 13, color: cs.onSurface),
           items: [
             const DropdownMenuItem<String?>(
@@ -508,8 +508,8 @@ class _LetterCard extends StatelessWidget {
                   icon: Icon(Icons.more_vert,
                       size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                   itemBuilder: (_) => [
-                    const PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
-                    const PopupMenuItem(
+                    PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
+                    PopupMenuItem(
                         value: 'delete',
                         child: Text(MockUiText.delete,
                             style: TextStyle(color: AppColors.error))),

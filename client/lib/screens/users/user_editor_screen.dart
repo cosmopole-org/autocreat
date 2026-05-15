@@ -294,7 +294,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                     const SizedBox(height: 16),
                     rolesAsync.when(
                       loading: () => const LinearProgressIndicator(),
-                      error: (_, __) => const Text(MockUiText.errorLoadingRoles),
+                      error: (_, __) => Text(MockUiText.errorLoadingRoles),
                       data: (roles) => DropdownButtonFormField<String?>(
                         value: _selectedRoleId,
                         items: [
@@ -313,9 +313,9 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                     ),
                     const SizedBox(height: 12),
                     SwitchListTile(
-                      title: const Text(MockUiText.activeAccount),
+                      title: Text(MockUiText.activeAccount),
                       subtitle:
-                          const Text(MockUiText.inactiveUsersCannotLogIn),
+                          Text(MockUiText.inactiveUsersCannotLogIn),
                       value: _isActive,
                       onChanged: (v) => setState(() => _isActive = v),
                       contentPadding: EdgeInsets.zero,

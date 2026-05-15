@@ -95,20 +95,20 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     showDialog(
       context: ctx,
       builder: (_) => AlertDialog(
-        title: const Text(MockUiText.editNodeLabel),
+        title: Text(MockUiText.editNodeLabel),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          decoration: const InputDecoration(labelText: MockUiText.label),
+          decoration: InputDecoration(labelText: MockUiText.label),
           onSubmitted: (_) => Navigator.pop(ctx, ctrl.text),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text(MockUiText.cancel)),
+              child: Text(MockUiText.cancel)),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, ctrl.text),
-            child: const Text(MockUiText.save),
+            child: Text(MockUiText.save),
           ),
         ],
       ),

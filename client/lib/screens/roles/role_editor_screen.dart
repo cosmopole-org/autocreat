@@ -159,7 +159,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                     TextFormField(
                       controller: _nameController,
                       decoration:
-                          const InputDecoration(labelText: MockUiText.roleNameRequired),
+                          InputDecoration(labelText: MockUiText.roleNameRequired),
                       validator: (v) =>
                           v?.isEmpty ?? true ? MockUiText.nameIsRequired : null,
                     ),
@@ -167,7 +167,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                     TextFormField(
                       controller: _descController,
                       decoration:
-                          const InputDecoration(labelText: MockUiText.description),
+                          InputDecoration(labelText: MockUiText.description),
                       maxLines: 2,
                     ),
                     const SizedBox(height: 12),
@@ -191,7 +191,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                     ),
                     const SizedBox(height: 12),
                     SwitchListTile(
-                      title: const Text(MockUiText.active),
+                      title: Text(MockUiText.active),
                       value: _isActive,
                       onChanged: (v) => setState(() => _isActive = v),
                       contentPadding: EdgeInsets.zero,

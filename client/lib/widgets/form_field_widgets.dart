@@ -58,7 +58,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                 ),
                 if (widget.field.required) ...[
                   const SizedBox(width: 4),
-                  const Text(MockUiText.requiredAsterisk,
+                  Text(MockUiText.requiredAsterisk,
                       style: TextStyle(color: AppColors.error, fontSize: 14)),
                 ],
               ],
@@ -293,7 +293,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                     TextButton.icon(
                       onPressed: () => widget.onChanged?.call(null),
                       icon: const Icon(Icons.close, size: 14),
-                      label: const Text(MockUiText.remove),
+                      label: Text(MockUiText.remove),
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.error,
                         padding: const EdgeInsets.symmetric(
@@ -408,7 +408,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                   showDialog(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      title: const Text(MockUiText.pickAColor),
+                      title: Text(MockUiText.pickAColor),
                       content: SingleChildScrollView(
                         child: ColorPicker(
                           pickerColor: color,
@@ -421,7 +421,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(ctx),
-                          child: const Text(MockUiText.done),
+                          child: Text(MockUiText.done),
                         ),
                       ],
                     ),
@@ -596,7 +596,7 @@ class _TableFieldState extends State<_TableField> {
                   });
                 },
                 icon: const Icon(Icons.add, size: 16),
-                label: const Text(MockUiText.addRow),
+                label: Text(MockUiText.addRow),
               ),
             ),
         ],
