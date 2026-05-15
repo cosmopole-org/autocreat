@@ -6,6 +6,7 @@ import '../../models/flow.dart';
 import '../../providers/form_provider.dart';
 import '../../providers/role_provider.dart';
 import '../../theme/app_colors.dart';
+import '../../data/mock_ui_text.dart';
 
 class FlowNodeEditor extends ConsumerStatefulWidget {
   final FlowNode node;
@@ -90,7 +91,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Node Properties',
+                    Text(MockUiText.nodeProperties,
                         style: Theme.of(context).textTheme.titleSmall),
                     Container(
                       margin: const EdgeInsets.only(top: 2),
@@ -116,7 +117,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                 icon: const Icon(Icons.delete_outline_rounded,
                     color: AppColors.error, size: 18),
                 onPressed: widget.onDelete,
-                tooltip: 'Delete node',
+                tooltip: MockUiText.deleteNode,
                 style: IconButton.styleFrom(
                   backgroundColor:
                       AppColors.error.withValues(alpha: 0.07),
@@ -130,12 +131,12 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         ],
 
         // ── Label ─────────────────────────────────────────────────
-        const _FieldLabel('Node Label'),
+        const _FieldLabel(MockUiText.nodeLabel),
         const SizedBox(height: 6),
         TextFormField(
           controller: _labelController,
           decoration: const InputDecoration(
-            hintText: 'Enter label…',
+            hintText: MockUiText.enterLabelEllipsis,
             prefixIcon: Icon(Icons.label_outline_rounded, size: 18),
           ),
           onChanged: (v) => widget.onUpdate(node.copyWith(label: v)),
@@ -143,12 +144,12 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 14),
 
         // ── Description ───────────────────────────────────────────
-        const _FieldLabel('Description'),
+        const _FieldLabel(MockUiText.description),
         const SizedBox(height: 6),
         TextFormField(
           controller: _descController,
           decoration: const InputDecoration(
-            hintText: 'Optional description…',
+            hintText: MockUiText.optionalDescriptionEllipsis,
             prefixIcon: Icon(Icons.notes_rounded, size: 18),
           ),
           maxLines: 2,
@@ -158,26 +159,26 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 16),
 
         // ── Role assignment ────────────────────────────────────────
-        const _FieldLabel('Assigned Role'),
+        const _FieldLabel(MockUiText.assignedRole),
         const SizedBox(height: 6),
         rolesAsync.when(
           loading: () =>
               const LinearProgressIndicator(minHeight: 2),
           error: (_, __) =>
-              const _ErrorTile('Error loading roles'),
+              const _ErrorTile(MockUiText.errorLoadingRoles),
           data: (roles) => DropdownButtonFormField<String?>(
             value: node.assignedRoleId,
             items: [
               const DropdownMenuItem(
                   value: null,
-                  child: Text('No role assigned')),
+                  child: Text(MockUiText.noRoleAssigned)),
               ...roles.map((r) => DropdownMenuItem(
                   value: r.id, child: Text(r.name))),
             ],
             onChanged: (v) =>
                 widget.onUpdate(node.copyWith(assignedRoleId: v)),
             decoration: const InputDecoration(
-              hintText: 'Select role…',
+              hintText: MockUiText.selectRoleEllipsis,
               prefixIcon:
                   Icon(Icons.shield_outlined, size: 18),
             ),
@@ -186,26 +187,26 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 16),
 
         // ── Form assignment ───────────────────────────────────────
-        const _FieldLabel('Assigned Form'),
+        const _FieldLabel(MockUiText.assignedForm),
         const SizedBox(height: 6),
         formsAsync.when(
           loading: () =>
               const LinearProgressIndicator(minHeight: 2),
           error: (_, __) =>
-              const _ErrorTile('Error loading forms'),
+              const _ErrorTile(MockUiText.errorLoadingForms),
           data: (forms) => DropdownButtonFormField<String?>(
             value: node.assignedFormId,
             items: [
               const DropdownMenuItem(
                   value: null,
-                  child: Text('No form assigned')),
+                  child: Text(MockUiText.noFormAssigned)),
               ...forms.map((f) => DropdownMenuItem(
                   value: f.id, child: Text(f.name))),
             ],
             onChanged: (v) =>
                 widget.onUpdate(node.copyWith(assignedFormId: v)),
             decoration: const InputDecoration(
-              hintText: 'Select form…',
+              hintText: MockUiText.selectFormEllipsis,
               prefixIcon:
                   Icon(Icons.dynamic_form_outlined, size: 18),
             ),
@@ -217,7 +218,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
           const SizedBox(height: 20),
           Row(
             children: [
-              Text('Branches',
+              Text(MockUiText.branches,
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
@@ -225,12 +226,12 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
               const Spacer(),
               TextButton.icon(
                 icon: const Icon(Icons.add_rounded, size: 16),
-                label: const Text('Add Branch'),
+                label: const Text(MockUiText.addBranch),
                 onPressed: () {
                   const uuid = Uuid();
                   final branch = BranchCondition(
                     id: uuid.v4(),
-                    label: 'Branch ${node.branches.length + 1}',
+                    label: MockUiText.branchName(node.branches.length + 1),
                   );
                   widget.onUpdate(
                       node.copyWith(branches: [...node.branches, branch]));
@@ -288,7 +289,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                                   .withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text('DEFAULT',
+                            child: const Text(MockUiText.defaultText,
                                 style: TextStyle(
                                     fontSize: 9,
                                     color: AppColors.success,
@@ -324,7 +325,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                     TextFormField(
                       initialValue: branch.condition ?? '',
                       decoration: InputDecoration(
-                        hintText: 'Condition (e.g. status == approved)',
+                        hintText: MockUiText.conditionEGStatusApproved,
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 10),
@@ -364,11 +365,11 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                     ? AppColors.darkTextHint
                     : AppColors.lightTextHint),
             const SizedBox(width: 5),
-            Text('Position',
+            Text(MockUiText.position,
                 style: Theme.of(context).textTheme.labelSmall),
             const Spacer(),
             Text(
-              'x: ${node.x.toInt()},  y: ${node.y.toInt()}',
+              MockUiText.nodePosition(node.x, node.y),
               style: Theme.of(context)
                   .textTheme
                   .labelSmall

@@ -8,6 +8,7 @@ import '../../providers/realtime_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
+import '../../data/mock_ui_text.dart';
 
 class UsersScreen extends ConsumerStatefulWidget {
   const UsersScreen({super.key});
@@ -19,7 +20,7 @@ class UsersScreen extends ConsumerStatefulWidget {
 class _UsersScreenState extends ConsumerState<UsersScreen> {
   final _searchController = TextEditingController();
   String _search = '';
-  String _roleFilter = 'All';
+  String _roleFilter = MockUiText.all;
   int _touchedIndex = -1;
 
   @override
@@ -51,7 +52,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
           onRetry: () => ref.read(userNotifierProvider.notifier).refresh(),
         ),
         data: (users) {
-          final roles = <String>{'All', ...users.map((u) => u.role)};
+          final roles = <String>{MockUiText.all, ...users.map((u) => u.role)};
           final filtered = users.where((u) {
             final matchesSearch = _search.isEmpty ||
                 u.fullName
@@ -59,7 +60,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                     .contains(_search.toLowerCase()) ||
                 u.email.toLowerCase().contains(_search.toLowerCase());
             final matchesRole =
-                _roleFilter == 'All' || u.role == _roleFilter;
+                _roleFilter == MockUiText.all || u.role == _roleFilter;
             return matchesSearch && matchesRole;
           }).toList();
 
@@ -76,11 +77,11 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                     children: [
                       // Header
                       AppPageHeader(
-                        title: 'Team Members',
+                        title: MockUiText.teamMembers,
                         description:
-                            'Invite teammates, understand account activity, and balance roles so collaboration stays organized and secure.',
-                        actionLabel: 'Add User',
-                        compactActionLabel: 'Add',
+                            MockUiText.inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol,
+                        actionLabel: MockUiText.addUser,
+                        compactActionLabel: MockUiText.add,
                         actionIcon: Icons.person_add_outlined,
                         onAction: () => context.push('/users/new/edit'),
                       ).animate().fadeIn(duration: 300.ms),
@@ -138,7 +139,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                           Expanded(
                             child: SearchField(
                               controller: _searchController,
-                              hintText: 'Search members...',
+                              hintText: MockUiText.searchMembers,
                               onChanged: (v) =>
                                   setState(() => _search = v),
                             ),
@@ -160,10 +161,10 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
               if (filtered.isEmpty)
                 SliverFillRemaining(
                   child: EmptyState(
-                    title: 'No members found',
-                    subtitle: 'Try adjusting your search or filters',
+                    title: MockUiText.noMembersFound,
+                    subtitle: MockUiText.tryAdjustingYourSearchOrFilters,
                     icon: Icons.people_outline,
-                    actionLabel: 'Add User',
+                    actionLabel: MockUiText.addUser,
                     onAction: () => context.push('/users/new/edit'),
                   ),
                 )
@@ -196,8 +197,8 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => const ConfirmDialog(
-        title: 'Remove User',
-        message: 'Remove this user from the system?',
+        title: MockUiText.removeUser,
+        message: MockUiText.removeThisUserFromTheSystem,
       ),
     );
     if (confirmed == true) {
@@ -235,25 +236,25 @@ class _UserStatsRow extends StatelessWidget {
           AppStatCard(
             icon: Icons.people_rounded,
             value: '$total',
-            label: 'Total Members',
+            label: MockUiText.totalMembers,
             color: AppColors.primary,
           ),
           AppStatCard(
             icon: Icons.check_circle_rounded,
             value: '$active',
-            label: 'Active',
+            label: MockUiText.active,
             color: AppColors.success,
           ),
           AppStatCard(
             icon: Icons.admin_panel_settings_rounded,
             value: '$admins',
-            label: 'Admins',
+            label: MockUiText.admins,
             color: AppColors.warning,
           ),
           AppStatCard(
             icon: Icons.person_rounded,
             value: '$members',
-            label: 'Members',
+            label: MockUiText.members,
             color: AppColors.info,
           ),
         ],
@@ -294,12 +295,12 @@ class _RoleDonut extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Role Distribution',
+          Text(MockUiText.roleDistribution,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text('Members by assigned role',
+          Text(MockUiText.membersByAssignedRole,
               style: TextStyle(
                   fontSize: 11,
                   color: cs.onSurface.withValues(alpha: 0.45))),
@@ -366,7 +367,7 @@ class _RoleDonut extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${e.value.value} ($pct%)',
+                            MockUiText.distributionLegend(e.value.value, pct),
                             style: TextStyle(
                                 fontSize: 11,
                                 color: cs.onSurface.withValues(alpha: 0.55)),
@@ -403,25 +404,25 @@ class _ActivityCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Status Overview',
+          Text(MockUiText.statusOverview,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text('Account activity',
+          Text(MockUiText.accountActivity,
               style: TextStyle(
                   fontSize: 11,
                   color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           _StatusBar(
-            label: 'Active',
+            label: MockUiText.active,
             count: active,
             total: users.length,
             color: AppColors.success,
           ),
           const SizedBox(height: 10),
           _StatusBar(
-            label: 'Inactive',
+            label: MockUiText.inactive,
             count: inactive,
             total: users.length,
             color: AppColors.lightTextSecondary,
@@ -456,7 +457,7 @@ class _StatusBar extends StatelessWidget {
           children: [
             Text(label, style: const TextStyle(fontSize: 12)),
             Text(
-              '$count',
+              count.toString(),
               style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -655,7 +656,7 @@ class _UserCard extends StatelessWidget {
                         if (joined != null)
                           _InfoChip(
                             icon: Icons.calendar_today_outlined,
-                            label: 'Joined $joined',
+                            label: MockUiText.joined(joined),
                           ),
                         const Spacer(),
                         StatusChip(
@@ -673,10 +674,10 @@ class _UserCard extends StatelessWidget {
                     size: 18,
                     color: cs.onSurface.withValues(alpha: 0.45)),
                 itemBuilder: (_) => const [
-                  PopupMenuItem(value: 'edit', child: Text('Edit')),
+                  PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
                   PopupMenuItem(
                     value: 'delete',
-                    child: Text('Remove',
+                    child: Text(MockUiText.remove,
                         style: TextStyle(color: AppColors.error)),
                   ),
                 ],

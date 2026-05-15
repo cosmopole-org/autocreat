@@ -6,6 +6,7 @@ import 'providers/realtime_provider.dart';
 import 'router/router.dart';
 import 'theme/app_colors.dart';
 import 'theme/app_theme.dart';
+import 'data/mock_ui_text.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +35,7 @@ class AutoCreatApp extends ConsumerWidget {
     final glassMode = ref.watch(glassModeProvider);
 
     return MaterialApp.router(
-      title: 'AutoCreat',
+      title: MockUiText.autocreat,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(glassMode: glassMode),
       darkTheme: AppTheme.dark(glassMode: glassMode),

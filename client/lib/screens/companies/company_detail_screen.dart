@@ -13,6 +13,7 @@ import '../../providers/flow_provider.dart';
 import '../../data/demo_overrides.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
+import '../../data/mock_ui_text.dart';
 
 class CompanyDetailScreen extends ConsumerStatefulWidget {
   final String id;
@@ -156,14 +157,14 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Capacity',
+                      Text(MockUiText.capacity,
                           style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 16),
                       Row(
                         children: [
                           Expanded(
                             child: _CapacityIndicator(
-                              label: 'Members',
+                              label: MockUiText.members,
                               value: memberUsage,
                               count: company.memberCount,
                               max: 50,
@@ -173,7 +174,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                           const SizedBox(width: 24),
                           Expanded(
                             child: _CapacityIndicator(
-                              label: 'Flows',
+                              label: MockUiText.flows,
                               value: flowUsage,
                               count: company.flowCount,
                               max: 20,
@@ -192,33 +193,33 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Details',
+                      Text(MockUiText.details,
                           style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 12),
                       if (company.description != null)
                         InfoRow(
-                            label: 'Description',
+                            label: MockUiText.description,
                             value: company.description!),
                       if (company.website != null)
                         InfoRow(
-                            label: 'Website',
+                            label: MockUiText.website,
                             value: company.website!,
                             icon: Icons.link),
                       InfoRow(
-                          label: 'Members',
+                          label: MockUiText.members,
                           value: '${company.memberCount}',
                           icon: Icons.people),
                       InfoRow(
-                          label: 'Flows',
+                          label: MockUiText.flows,
                           value: '${company.flowCount}',
                           icon: Icons.account_tree),
                       if (company.createdAt != null)
                         InfoRow(
-                          label: 'Created',
+                          label: MockUiText.created,
                           value: company.createdAt!
                               .toLocal()
                               .toString()
-                              .split('.')[0],
+                              .split(MockUiText.text)[0],
                           icon: Icons.calendar_today,
                         ),
                     ],
@@ -230,11 +231,11 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Flows',
+                    Text(MockUiText.flows,
                         style: Theme.of(context).textTheme.titleMedium),
                     TextButton.icon(
                       icon: const Icon(Icons.add, size: 16),
-                      label: const Text('New Flow'),
+                      label: const Text(MockUiText.newFlow),
                       onPressed: () => context.go(AppRoutes.flows),
                     ),
                   ],
@@ -247,7 +248,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                     if (flows.isEmpty) {
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Text('No flows yet',
+                        child: Text(MockUiText.noFlowsYet,
                             style: TextStyle(
                                 color: AppColors.lightTextSecondary)),
                       );
@@ -367,7 +368,7 @@ class _CapacityIndicator extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label, style: Theme.of(context).textTheme.labelMedium),
-            Text('$count / $max',
+            Text(MockUiText.capacityRatio(count, max),
                 style: Theme.of(context)
                     .textTheme
                     .labelMedium

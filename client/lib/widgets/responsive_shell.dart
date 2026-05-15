@@ -10,6 +10,7 @@ import '../providers/theme_provider.dart';
 import '../providers/ticket_provider.dart';
 import '../theme/app_colors.dart';
 import 'common_widgets.dart';
+import '../data/mock_ui_text.dart';
 
 class _NavItem {
   final String label;
@@ -31,68 +32,68 @@ class _NavItem {
 
 final _navItems = [
   const _NavItem(
-    label: 'Dashboard',
+    label: MockUiText.dashboard,
     icon: Icons.dashboard_outlined,
     selectedIcon: Icons.dashboard_rounded,
     route: AppRoutes.dashboard,
-    section: 'Overview',
+    section: MockUiText.overview,
   ),
   const _NavItem(
-    label: 'Companies',
+    label: MockUiText.companies,
     icon: Icons.business_outlined,
     selectedIcon: Icons.business_rounded,
     route: AppRoutes.companies,
-    section: 'Organization',
+    section: MockUiText.organization,
   ),
   const _NavItem(
-    label: 'Users',
+    label: MockUiText.users,
     icon: Icons.people_outline_rounded,
     selectedIcon: Icons.people_rounded,
     route: AppRoutes.users,
-    section: 'Organization',
+    section: MockUiText.organization,
   ),
   const _NavItem(
-    label: 'Roles',
+    label: MockUiText.roles,
     icon: Icons.shield_outlined,
     selectedIcon: Icons.shield_rounded,
     route: AppRoutes.roles,
-    section: 'Organization',
+    section: MockUiText.organization,
   ),
   const _NavItem(
-    label: 'Flows',
+    label: MockUiText.flows,
     icon: Icons.account_tree_outlined,
     selectedIcon: Icons.account_tree_rounded,
     route: AppRoutes.flows,
-    section: 'Automation',
+    section: MockUiText.automation,
   ),
   const _NavItem(
-    label: 'Forms',
+    label: MockUiText.forms,
     icon: Icons.dynamic_form_outlined,
     selectedIcon: Icons.dynamic_form_rounded,
     route: AppRoutes.forms,
-    section: 'Automation',
+    section: MockUiText.automation,
   ),
   const _NavItem(
-    label: 'Models',
+    label: MockUiText.models,
     icon: Icons.data_object_rounded,
     selectedIcon: Icons.data_object_rounded,
     route: AppRoutes.models,
-    section: 'Automation',
+    section: MockUiText.automation,
   ),
   const _NavItem(
-    label: 'Letters',
+    label: MockUiText.letters,
     icon: Icons.mail_outline_rounded,
     selectedIcon: Icons.mail_rounded,
     route: AppRoutes.letters,
-    section: 'Communication',
+    section: MockUiText.communication,
   ),
   const _NavItem(
-    label: 'Tickets',
+    label: MockUiText.tickets,
     icon: Icons.support_agent_outlined,
     selectedIcon: Icons.support_agent_rounded,
     route: AppRoutes.tickets,
     hasBadge: true,
-    section: 'Communication',
+    section: MockUiText.communication,
   ),
 ];
 
@@ -309,7 +310,7 @@ class _FloatingMobileBar extends ConsumerWidget {
               _BarIconButton(
                 icon: Icons.menu_rounded,
                 onTap: onMenuTap,
-                tooltip: 'Menu',
+                tooltip: MockUiText.menu,
               ),
               const SizedBox(width: 6),
               // Logo
@@ -319,7 +320,7 @@ class _FloatingMobileBar extends ConsumerWidget {
               _BarIconButton(
                 icon: Icons.search_rounded,
                 onTap: () {},
-                tooltip: 'Search',
+                tooltip: MockUiText.search,
               ),
               const SizedBox(width: 2),
               // Notification bell with badge
@@ -336,7 +337,7 @@ class _FloatingMobileBar extends ConsumerWidget {
                 child: _BarIconButton(
                   icon: Icons.notifications_outlined,
                   onTap: () => GoRouter.of(context).go(AppRoutes.tickets),
-                  tooltip: 'Notifications',
+                  tooltip: MockUiText.notifications,
                 ),
               ),
               const SizedBox(width: 2),
@@ -346,7 +347,7 @@ class _FloatingMobileBar extends ConsumerWidget {
                     ? Icons.light_mode_outlined
                     : Icons.dark_mode_outlined,
                 onTap: () => ref.read(themeProvider.notifier).toggleTheme(),
-                tooltip: 'Toggle theme',
+                tooltip: MockUiText.toggleTheme,
               ),
               const SizedBox(width: 2),
               const _GlassModeButton(compact: true),
@@ -355,7 +356,7 @@ class _FloatingMobileBar extends ConsumerWidget {
               if (user != null)
                 AvatarWidget(
                   imageUrl: user.avatar,
-                  initials: '${user.firstName[0]}${user.lastName[0]}',
+                  initials: MockUiText.userInitials(user.firstName, user.lastName),
                   size: 28,
                 ),
             ],
@@ -506,7 +507,7 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
                         color: cs.onSurface.withValues(alpha: 0.4)),
                     const SizedBox(width: 6),
                     Text(
-                      'Search...',
+                      MockUiText.search3,
                       style: TextStyle(
                           fontSize: 13,
                           color: cs.onSurface.withValues(alpha: 0.4)),
@@ -528,7 +529,7 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
               child: IconButton(
                 icon: const Icon(Icons.notifications_outlined, size: 20),
                 onPressed: () => GoRouter.of(context).go(AppRoutes.tickets),
-                tooltip: 'Tickets',
+                tooltip: MockUiText.tickets,
                 style: IconButton.styleFrom(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -545,7 +546,7 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
               ),
               onPressed: () =>
                   ref.read(themeProvider.notifier).toggleTheme(),
-              tooltip: 'Toggle theme',
+              tooltip: MockUiText.toggleTheme,
               style: IconButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -557,7 +558,7 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
             if (user != null)
               AvatarWidget(
                 imageUrl: user.avatar,
-                initials: '${user.firstName[0]}${user.lastName[0]}',
+                initials: MockUiText.userInitials(user.firstName, user.lastName),
                 size: 34,
               ),
           ],
@@ -585,12 +586,12 @@ class _GlassModeButton extends ConsumerWidget {
       return _BarIconButton(
         icon: icon,
         onTap: () => ref.read(glassModeProvider.notifier).toggleGlassMode(),
-        tooltip: glassMode ? 'Disable glass mode' : 'Enable glass mode',
+        tooltip: glassMode ? MockUiText.disableGlassMode : MockUiText.enableGlassMode,
       );
     }
 
     return Tooltip(
-      message: glassMode ? 'Disable glass mode' : 'Enable glass mode',
+      message: glassMode ? MockUiText.disableGlassMode : MockUiText.enableGlassMode,
       child: IconButton(
         icon: Icon(
           icon,
@@ -644,7 +645,7 @@ class _LogoMark extends StatelessWidget {
         if (!compact) ...[
           const SizedBox(width: 10),
           const Text(
-            'AutoCreat',
+            MockUiText.autocreat,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -798,13 +799,13 @@ class _CollapsedSidebar extends ConsumerWidget {
                 ? AvatarWidget(
                     imageUrl: user.avatar,
                     initials:
-                        '${user.firstName[0]}${user.lastName[0]}',
+                        MockUiText.userInitials(user.firstName, user.lastName),
                     size: 34,
                   )
                 : const SizedBox.shrink(),
           ),
           Tooltip(
-            message: 'Logout',
+            message: MockUiText.logout,
             child: IconButton(
               icon: const Icon(Icons.logout_rounded,
                   size: 20, color: AppColors.error),
@@ -1042,7 +1043,7 @@ class _SidebarUserCard extends ConsumerWidget {
       children: [
         AvatarWidget(
           imageUrl: user.avatar,
-          initials: '${user.firstName[0]}${user.lastName[0]}',
+          initials: MockUiText.userInitials(user.firstName, user.lastName),
           size: 36,
         ),
         const SizedBox(width: 10),
@@ -1051,7 +1052,7 @@ class _SidebarUserCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${user.firstName} ${user.lastName}',
+                MockUiText.userFullName(user.firstName, user.lastName),
                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1351,7 +1352,7 @@ class _LogoutTile extends ConsumerWidget {
                     size: 19, color: AppColors.error.withValues(alpha: 0.8)),
                 const SizedBox(width: 12),
                 Text(
-                  'Sign Out',
+                  MockUiText.signOut,
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,

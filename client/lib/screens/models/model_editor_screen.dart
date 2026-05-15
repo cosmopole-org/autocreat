@@ -7,6 +7,7 @@ import '../../models/model_definition.dart';
 import '../../providers/model_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
+import '../../data/mock_ui_text.dart';
 
 class ModelEditorScreen extends ConsumerStatefulWidget {
   final String modelId;
@@ -55,7 +56,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Model saved'),
+              content: Text(MockUiText.modelSaved),
               backgroundColor: AppColors.success),
         );
       }
@@ -63,7 +64,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Error: $e'), backgroundColor: AppColors.error),
+              content: Text(MockUiText.error(e)), backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -94,10 +95,10 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        title: Text(editorState.model?.name ?? 'Model Editor'),
+        title: Text(editorState.model?.name ?? MockUiText.modelEditor),
         actions: [
           AppButton(
-            label: 'Save',
+            label: MockUiText.save,
             icon: Icons.save_outlined,
             loading: _saving,
             onPressed: _save,
@@ -119,13 +120,13 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Model Info',
+                        Text(MockUiText.modelInfo,
                             style: Theme.of(context).textTheme.titleMedium),
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _nameController,
                           decoration:
-                              const InputDecoration(labelText: 'Model name *'),
+                              const InputDecoration(labelText: MockUiText.modelNameRequired),
                           onChanged: (_) => ref
                               .read(modelEditorProvider.notifier)
                               .updateModelMeta(
@@ -137,7 +138,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                         TextFormField(
                           controller: _descController,
                           decoration:
-                              const InputDecoration(labelText: 'Description'),
+                              const InputDecoration(labelText: MockUiText.description),
                           maxLines: 2,
                           onChanged: (_) => ref
                               .read(modelEditorProvider.notifier)
@@ -155,10 +156,10 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Fields (${editorState.fields.length})',
+                      Text(MockUiText.fieldsTitle(editorState.fields.length),
                           style: Theme.of(context).textTheme.titleMedium),
                       AppButton(
-                        label: 'Add Field',
+                        label: MockUiText.addField,
                         icon: Icons.add,
                         onPressed: () => _showAddFieldDialog(context),
                       ),
@@ -176,7 +177,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                               Icon(Icons.add_box_outlined,
                                   size: 36, color: AppColors.lightTextSecondary),
                               SizedBox(height: 8),
-                              Text('No fields yet. Add your first field.',
+                              Text(MockUiText.noFieldsYetAddYourFirstField,
                                   style: TextStyle(
                                       color: AppColors.lightTextSecondary)),
                             ],
@@ -222,7 +223,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('JSON Schema Preview',
+                  Text(MockUiText.jsonSchemaPreview,
                       style: Theme.of(context).textTheme.titleSmall),
                   const SizedBox(height: 12),
                   Container(
@@ -252,11 +253,11 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
   }
 
   String _buildSchemaPreview(ModelEditorState state) {
-    if (state.model == null) return '{}';
+    if (state.model == null) return MockUiText.emptyJsonObject;
     final fields = state.fields.map((f) {
-      return '  "${f.name}": "${f.type.displayName}"${f.required ? ' (required)' : ''}';
-    }).join(',\n');
-    return '{\n$fields\n}';
+      return MockUiText.schemaField(f.name, f.type.displayName, f.required);
+    }).join(MockUiText.schemaSeparator);
+    return MockUiText.schemaObject(fields);
   }
 
   void _showAddFieldDialog(BuildContext context) {
@@ -307,8 +308,8 @@ class _ModelFieldRow extends StatelessWidget {
                         fontWeight: FontWeight.w600, fontSize: 14)),
                 Text(
                   field.type.displayName +
-                      (field.required ? ' · Required' : '') +
-                      (field.unique ? ' · Unique' : ''),
+                      (field.required ? MockUiText.requiredText3 : '') +
+                      (field.unique ? MockUiText.unique : ''),
                   style: const TextStyle(
                       fontSize: 11, color: AppColors.lightTextSecondary),
                 ),
@@ -320,12 +321,12 @@ class _ModelFieldRow extends StatelessWidget {
             children: [
               if (field.required)
                 const Tooltip(
-                  message: 'Required',
+                  message: MockUiText.requiredText,
                   child: Icon(Icons.star, size: 12, color: AppColors.error),
                 ),
               if (field.unique)
                 const Tooltip(
-                  message: 'Unique',
+                  message: MockUiText.unique3,
                   child: Icon(Icons.key, size: 12, color: AppColors.warning),
                 ),
             ],
@@ -375,7 +376,7 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add Field'),
+      title: const Text(MockUiText.addField),
       content: SizedBox(
         width: 360,
         child: Column(
@@ -383,7 +384,7 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Field name *'),
+              decoration: const InputDecoration(labelText: MockUiText.fieldNameRequired),
               autofocus: true,
             ),
             const SizedBox(height: 12),
@@ -394,18 +395,18 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
                       value: t, child: Text(t.displayName)))
                   .toList(),
               onChanged: (v) => setState(() => _type = v!),
-              decoration: const InputDecoration(labelText: 'Field type'),
+              decoration: const InputDecoration(labelText: MockUiText.fieldType),
             ),
             const SizedBox(height: 12),
             CheckboxListTile(
-              title: const Text('Required'),
+              title: const Text(MockUiText.requiredText),
               value: _required,
               onChanged: (v) => setState(() => _required = v!),
               contentPadding: EdgeInsets.zero,
               dense: true,
             ),
             CheckboxListTile(
-              title: const Text('Unique'),
+              title: const Text(MockUiText.unique3),
               value: _unique,
               onChanged: (v) => setState(() => _unique = v!),
               contentPadding: EdgeInsets.zero,
@@ -417,7 +418,7 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text(MockUiText.cancel),
         ),
         ElevatedButton(
           onPressed: () {
@@ -432,7 +433,7 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
             ));
             Navigator.pop(context);
           },
-          child: const Text('Add'),
+          child: const Text(MockUiText.add),
         ),
       ],
     );

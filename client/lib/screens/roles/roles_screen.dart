@@ -7,6 +7,7 @@ import '../../models/role.dart';
 import '../../providers/role_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
+import '../../data/mock_ui_text.dart';
 
 class RolesScreen extends ConsumerStatefulWidget {
   const RolesScreen({super.key});
@@ -65,11 +66,11 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
               children: [
                 // Header
                 AppPageHeader(
-                  title: 'Roles & Permissions',
+                  title: MockUiText.rolesPermissions,
                   description:
-                      'Shape secure access policies, clarify responsibilities, and give every teammate exactly the permissions they need.',
-                  actionLabel: 'New Role',
-                  compactActionLabel: 'New',
+                      MockUiText.shapeSecureAccessPoliciesClarifyResponsibilitiesAndGiveEvery,
+                  actionLabel: MockUiText.newRole,
+                  compactActionLabel: MockUiText.newText,
                   actionIcon: Icons.add,
                   onAction: () => context.push('/roles/new/edit'),
                 ).animate().fadeIn(duration: 300.ms),
@@ -92,7 +93,7 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                 // Search
                 SearchField(
                   controller: _searchController,
-                  hintText: 'Search roles...',
+                  hintText: MockUiText.searchRoles,
                   onChanged: (v) => setState(() => _search = v),
                 ).animate().fadeIn(delay: 250.ms),
                 const SizedBox(height: 16),
@@ -104,10 +105,10 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
         if (filtered.isEmpty)
           SliverFillRemaining(
             child: EmptyState(
-              title: 'No roles yet',
-              subtitle: 'Create roles to manage access control',
+              title: MockUiText.noRolesYet,
+              subtitle: MockUiText.createRolesToManageAccessControl,
               icon: Icons.shield_outlined,
-              actionLabel: 'Create Role',
+              actionLabel: MockUiText.createRole,
               onAction: () => context.push('/roles/new/edit'),
             ),
           )
@@ -125,8 +126,8 @@ class _RolesScreenState extends ConsumerState<RolesScreen> {
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (_) => const ConfirmDialog(
-                          title: 'Delete Role',
-                          message: 'Delete this role permanently?',
+                          title: MockUiText.deleteRole,
+                          message: MockUiText.deleteThisRolePermanently,
                         ),
                       );
                       if (confirmed == true) {
@@ -164,10 +165,10 @@ class _RoleStatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      (Icons.shield_rounded, 'Total Roles', total.toString(), AppColors.success),
-      (Icons.check_circle_rounded, 'Active', active.toString(), AppColors.primary),
-      (Icons.people_rounded, 'Total Members', totalMembers.toString(), AppColors.accent),
-      (Icons.lock_rounded, 'Permission Sets', totalPerms.toString(), AppColors.warning),
+      (Icons.shield_rounded, MockUiText.totalRoles, total.toString(), AppColors.success),
+      (Icons.check_circle_rounded, MockUiText.active, active.toString(), AppColors.primary),
+      (Icons.people_rounded, MockUiText.totalMembers, totalMembers.toString(), AppColors.accent),
+      (Icons.lock_rounded, MockUiText.permissionSets, totalPerms.toString(), AppColors.warning),
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
@@ -217,12 +218,12 @@ class _MembersBarChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Members per Role',
+          Text(MockUiText.membersPerRole,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text('How many users are assigned to each role',
+          Text(MockUiText.howManyUsersAreAssignedToEachRole,
               style: TextStyle(
                   fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
@@ -255,7 +256,7 @@ class _MembersBarChart extends StatelessWidget {
                         if (idx >= top.length) return const SizedBox();
                         final name = top[idx].name;
                         final short = name.length > 8
-                            ? '${name.substring(0, 7)}…'
+                            ? MockUiText.truncatedName7(name)
                             : name;
                         return Padding(
                           padding: const EdgeInsets.only(top: 4),
@@ -408,10 +409,10 @@ class _RoleCard extends StatelessWidget {
                   icon: Icon(Icons.more_vert,
                       size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                   itemBuilder: (_) => [
-                    const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                    const PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
                     const PopupMenuItem(
                         value: 'delete',
-                        child: Text('Delete',
+                        child: Text(MockUiText.delete,
                             style: TextStyle(color: AppColors.error))),
                   ],
                   onSelected: (v) {
@@ -429,19 +430,19 @@ class _RoleCard extends StatelessWidget {
               children: [
                 _PermBadge(
                   icon: Icons.people_rounded,
-                  label: '${role.memberCount} members',
+                  label: MockUiText.membersCount(role.memberCount),
                   color: AppColors.primary,
                 ),
                 const SizedBox(width: 8),
                 _PermBadge(
                   icon: Icons.lock_open_rounded,
-                  label: '${role.permissions.length} resources',
+                  label: MockUiText.resourcesCount(role.permissions.length),
                   color: AppColors.accent,
                 ),
                 const SizedBox(width: 8),
                 _PermBadge(
                   icon: Icons.add_circle_outline,
-                  label: '$canCreate create',
+                  label: MockUiText.canCreateCount(canCreate),
                   color: AppColors.success,
                 ),
               ],
@@ -495,7 +496,7 @@ class _RoleCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: Text(
-                            '+${role.permissions.length - 4} more',
+                            MockUiText.moreCount(role.permissions.length - 4),
                             style: const TextStyle(
                                 fontSize: 10, color: AppColors.primary),
                           ),

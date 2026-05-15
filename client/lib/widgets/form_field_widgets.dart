@@ -5,6 +5,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/form_definition.dart';
 import '../theme/app_colors.dart';
+import '../data/mock_ui_text.dart';
 
 class FormFieldRenderer extends StatefulWidget {
   final AppFormField field;
@@ -57,7 +58,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                 ),
                 if (widget.field.required) ...[
                   const SizedBox(width: 4),
-                  const Text('*',
+                  const Text(MockUiText.requiredAsterisk,
                       style: TextStyle(color: AppColors.error, fontSize: 14)),
                 ],
               ],
@@ -119,7 +120,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
               .toList(),
           onChanged: widget.readOnly ? null : (v) => widget.onChanged?.call(v),
           decoration: InputDecoration(
-            hintText: widget.field.placeholder ?? 'Select...',
+            hintText: widget.field.placeholder ?? MockUiText.select,
           ),
         );
 
@@ -188,13 +189,13 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                 },
           child: InputDecorator(
             decoration: InputDecoration(
-              hintText: widget.field.placeholder ?? 'Select date',
+              hintText: widget.field.placeholder ?? MockUiText.selectDate,
               suffixIcon: const Icon(Icons.calendar_today, size: 18),
             ),
             child: Text(
               widget.value?.toString() ??
                   widget.field.placeholder ??
-                  'Select date',
+                  MockUiText.selectDate,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
@@ -220,13 +221,13 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                 },
           child: InputDecorator(
             decoration: InputDecoration(
-              hintText: widget.field.placeholder ?? 'Select time',
+              hintText: widget.field.placeholder ?? MockUiText.selectTime,
               suffixIcon: const Icon(Icons.access_time, size: 18),
             ),
             child: Text(
               widget.value?.toString() ??
                   widget.field.placeholder ??
-                  'Select time',
+                  MockUiText.selectTime,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
@@ -268,7 +269,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    fileName ?? 'Click to upload file',
+                    fileName ?? MockUiText.clickToUploadFile,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: fileName != null
                               ? AppColors.primary
@@ -280,7 +281,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                   if (fileName == null) ...[
                     const SizedBox(height: 4),
                     Text(
-                      'Any file type supported',
+                      MockUiText.anyFileTypeSupported,
                       style: Theme.of(context)
                           .textTheme
                           .labelSmall
@@ -292,7 +293,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                     TextButton.icon(
                       onPressed: () => widget.onChanged?.call(null),
                       icon: const Icon(Icons.close, size: 14),
-                      label: const Text('Remove'),
+                      label: const Text(MockUiText.remove),
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.error,
                         padding: const EdgeInsets.symmetric(
@@ -376,7 +377,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Click to upload image',
+                          MockUiText.clickToUploadImage,
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: AppColors.lightTextSecondary,
@@ -384,7 +385,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'PNG, JPG, GIF supported',
+                          MockUiText.pngJpgGifSupported,
                           style: Theme.of(context)
                               .textTheme
                               .labelSmall
@@ -407,7 +408,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                   showDialog(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      title: const Text('Pick a color'),
+                      title: const Text(MockUiText.pickAColor),
                       content: SingleChildScrollView(
                         child: ColorPicker(
                           pickerColor: color,
@@ -420,7 +421,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(ctx),
-                          child: const Text('Done'),
+                          child: const Text(MockUiText.done),
                         ),
                       ],
                     ),
@@ -435,7 +436,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
             ),
             child: Center(
               child: Text(
-                '#${(color.r * 255).round().toRadixString(16).padLeft(2, '0')}${(color.g * 255).round().toRadixString(16).padLeft(2, '0')}${(color.b * 255).round().toRadixString(16).padLeft(2, '0')}'.toUpperCase(),
+                MockUiText.rgbHex((color.r * 255).round(), (color.g * 255).round(), (color.b * 255).round()),
                 style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -500,7 +501,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                 Icon(Icons.draw_outlined,
                     size: 32, color: AppColors.lightTextSecondary),
                 SizedBox(height: 8),
-                Text('Sign here',
+                Text(MockUiText.signHere,
                     style: TextStyle(color: AppColors.lightTextSecondary)),
               ],
             ),
@@ -537,7 +538,7 @@ class _TableField extends StatefulWidget {
 
 class _TableFieldState extends State<_TableField> {
   final List<List<String>> _rows = [];
-  final List<String> _headers = ['Column 1', 'Column 2', 'Column 3'];
+  final List<String> _headers = [MockUiText.column1, MockUiText.column2, MockUiText.column3];
 
   @override
   Widget build(BuildContext context) {
@@ -595,7 +596,7 @@ class _TableFieldState extends State<_TableField> {
                   });
                 },
                 icon: const Icon(Icons.add, size: 16),
-                label: const Text('Add Row'),
+                label: const Text(MockUiText.addRow),
               ),
             ),
         ],

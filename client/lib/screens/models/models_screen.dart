@@ -7,6 +7,7 @@ import '../../models/model_definition.dart';
 import '../../providers/model_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
+import '../../data/mock_ui_text.dart';
 
 class ModelsScreen extends ConsumerStatefulWidget {
   const ModelsScreen({super.key});
@@ -28,7 +29,7 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
   Future<void> _createModel(BuildContext context) async {
     final repo = ref.read(modelRepositoryProvider);
     final model = await repo.createModel({
-      'name': 'New Model',
+      'name': MockUiText.newModel,
       'fields': [],
     });
     if (context.mounted) context.push('/models/${model.id}/edit');
@@ -84,11 +85,11 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
               children: [
                 // Header
                 AppPageHeader(
-                  title: 'Data Models',
+                  title: MockUiText.dataModels,
                   description:
-                      'Define durable entity schemas, organize fields, and keep your operational data consistent across every product surface.',
-                  actionLabel: 'New Model',
-                  compactActionLabel: 'New',
+                      MockUiText.defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation,
+                  actionLabel: MockUiText.newModel,
+                  compactActionLabel: MockUiText.newText,
                   actionIcon: Icons.add,
                   onAction: () => _createModel(context),
                 ).animate().fadeIn(duration: 300.ms),
@@ -114,7 +115,7 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
                 // Search
                 SearchField(
                   controller: _searchController,
-                  hintText: 'Search models...',
+                  hintText: MockUiText.searchModels,
                   onChanged: (v) => setState(() => _search = v),
                 ).animate().fadeIn(delay: 250.ms),
                 const SizedBox(height: 16),
@@ -126,10 +127,10 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
         if (filtered.isEmpty)
           SliverFillRemaining(
             child: EmptyState(
-              title: 'No models yet',
-              subtitle: 'Define your data structures',
+              title: MockUiText.noModelsYet,
+              subtitle: MockUiText.defineYourDataStructures,
               icon: Icons.data_object_outlined,
-              actionLabel: 'Create Model',
+              actionLabel: MockUiText.createModel,
               onAction: () => _createModel(context),
             ),
           )
@@ -148,8 +149,8 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
                       final confirmed = await showDialog<bool>(
                         context: context,
                         builder: (_) => const ConfirmDialog(
-                          title: 'Delete Model',
-                          message: 'Delete this model permanently?',
+                          title: MockUiText.deleteModel,
+                          message: MockUiText.deleteThisModelPermanently,
                         ),
                       );
                       if (confirmed == true) {
@@ -188,10 +189,10 @@ class _ModelStatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      (Icons.data_object_rounded, 'Total Models', total.toString(), AppColors.info),
-      (Icons.list_alt_rounded, 'Total Fields', totalFields.toString(), AppColors.primary),
-      (Icons.star_rounded, 'Required', required.toString(), AppColors.warning),
-      (Icons.fingerprint_rounded, 'Unique', unique.toString(), AppColors.success),
+      (Icons.data_object_rounded, MockUiText.totalModels, total.toString(), AppColors.info),
+      (Icons.list_alt_rounded, MockUiText.totalFields, totalFields.toString(), AppColors.primary),
+      (Icons.star_rounded, MockUiText.requiredText, required.toString(), AppColors.warning),
+      (Icons.fingerprint_rounded, MockUiText.unique3, unique.toString(), AppColors.success),
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
@@ -259,12 +260,12 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Field Type Distribution',
+          Text(MockUiText.fieldTypeDistribution,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text('Breakdown of field types across all models',
+          Text(MockUiText.breakdownOfFieldTypesAcrossAllModels,
               style: TextStyle(
                   fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
@@ -326,7 +327,7 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
                                         style: const TextStyle(fontSize: 12),
                                         overflow: TextOverflow.ellipsis),
                                   ),
-                                  Text('${e.value.value} ($pct%)',
+                                  Text(MockUiText.distributionLegend(e.value.value, pct),
                                       style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w700,
@@ -375,7 +376,7 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
                                     color: color, shape: BoxShape.circle),
                               ),
                               const SizedBox(width: 4),
-                              Text('${e.value.key}: ${e.value.value}',
+                              Text(MockUiText.distributionSlice(e.value.key, e.value.value),
                                   style: const TextStyle(fontSize: 11)),
                             ],
                           );
@@ -458,10 +459,10 @@ class _ModelCard extends StatelessWidget {
                   icon: Icon(Icons.more_vert,
                       size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                   itemBuilder: (_) => [
-                    const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                    const PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
                     const PopupMenuItem(
                         value: 'delete',
-                        child: Text('Delete',
+                        child: Text(MockUiText.delete,
                             style: TextStyle(color: AppColors.error))),
                   ],
                   onSelected: (v) {
@@ -498,7 +499,7 @@ class _ModelCard extends StatelessWidget {
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.w500),
                               ),
-                              const Text(' · ',
+                              const Text(MockUiText.bulletSeparator,
                                   style: TextStyle(
                                       fontSize: 10,
                                       color: AppColors.primary)),
@@ -523,7 +524,7 @@ class _ModelCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              '+${model.fields.length - 5} more',
+                              MockUiText.moreCount(model.fields.length - 5),
                               style: TextStyle(
                                   fontSize: 10,
                                   color: cs.onSurface.withValues(alpha: 0.5)),
@@ -540,19 +541,19 @@ class _ModelCard extends StatelessWidget {
               children: [
                 _FieldBadge(
                     icon: Icons.list_alt_rounded,
-                    label: '${model.fields.length} fields',
+                    label: MockUiText.fieldCount(model.fields.length),
                     color: AppColors.info),
                 const SizedBox(width: 8),
                 if (reqCount > 0)
                   _FieldBadge(
                       icon: Icons.star_rounded,
-                      label: '$reqCount req',
+                      label: MockUiText.requiredCount(reqCount),
                       color: AppColors.warning),
                 if (reqCount > 0) const SizedBox(width: 8),
                 if (uniqueCount > 0)
                   _FieldBadge(
                       icon: Icons.fingerprint_rounded,
-                      label: '$uniqueCount unique',
+                      label: MockUiText.uniqueCount(uniqueCount),
                       color: AppColors.success),
                 const Spacer(),
                 Icon(Icons.edit_outlined,

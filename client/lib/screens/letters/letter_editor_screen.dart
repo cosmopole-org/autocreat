@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../providers/letter_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
+import '../../data/mock_ui_text.dart';
 
 class LetterEditorScreen extends ConsumerStatefulWidget {
   final String letterId;
@@ -70,7 +71,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
             ? _descController.text
             : null,
         'content': plainText,
-        'deltaContent': {'ops': delta.toJson()},
+        MockUiText.deltacontent: {'ops': delta.toJson()},
         'status': 'draft',
       };
 
@@ -86,7 +87,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Template saved'),
+              content: Text(MockUiText.templateSaved),
               backgroundColor: AppColors.success),
         );
       }
@@ -94,7 +95,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Error: $e'), backgroundColor: AppColors.error),
+              content: Text(MockUiText.error(e)), backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -140,7 +141,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
         title: TextField(
           controller: _nameController,
           decoration: const InputDecoration(
-            hintText: 'Template name',
+            hintText: MockUiText.templateName,
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
@@ -152,18 +153,18 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
           TextButton.icon(
             icon: const Icon(Icons.attach_file, size: 16),
             label: Text(_attachments.isEmpty
-                ? 'Attach'
-                : '${_attachments.length} file${_attachments.length > 1 ? 's' : ''}'),
+                ? MockUiText.attach
+                : MockUiText.fileCount(_attachments.length)),
             onPressed: _pickAttachment,
           ),
           // Variable chip
           TextButton.icon(
             icon: const Icon(Icons.data_object, size: 16),
-            label: const Text('Variables'),
+            label: const Text(MockUiText.variables),
             onPressed: _showVariablesPanel,
           ),
           AppButton(
-            label: 'Save',
+            label: MockUiText.save,
             loading: _saving,
             onPressed: _save,
             icon: Icons.save_outlined,
@@ -246,7 +247,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                     TextButton.icon(
                       onPressed: _pickAttachment,
                       icon: const Icon(Icons.add, size: 14),
-                      label: const Text('Add more',
+                      label: const Text(MockUiText.addMore,
                           style: TextStyle(fontSize: 11)),
                       style: TextButton.styleFrom(
                         minimumSize: Size.zero,
@@ -281,7 +282,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                     focusNode: _focusNode,
                     scrollController: _scrollController,
                     configurations: const QuillEditorConfigurations(
-                      placeholder: 'Start writing your letter template...',
+                      placeholder: MockUiText.startWritingYourLetterTemplate,
                       padding: EdgeInsets.zero,
                       autoFocus: false,
                       expands: false,
@@ -301,22 +302,22 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Available Variables'),
+        title: const Text(MockUiText.availableVariables),
         content: SizedBox(
           width: 320,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Use these variables in your template. They will be replaced with actual values when the letter is generated.',
+                MockUiText.useTheseVariablesInYourTemplateTheyWillBeReplacedWithActualV,
               ),
               const SizedBox(height: 16),
               ...[
-                (r'{{user.name}}', 'User\'s full name'),
-                (r'{{user.email}}', 'User\'s email'),
-                (r'{{company.name}}', 'Company name'),
-                (r'{{date}}', 'Current date'),
-                (r'{{flow.name}}', 'Flow name'),
+                (r'{{user.name}}', MockUiText.userSFullName),
+                (r'{{user.email}}', MockUiText.userSEmail),
+                (r'{{company.name}}', MockUiText.companyName),
+                (r'{{date}}', MockUiText.currentDate),
+                (r'{{flow.name}}', MockUiText.flowName),
               ].map(
                 (v) => ListTile(
                   title: Text(v.$1,
@@ -343,7 +344,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: const Text(MockUiText.close),
           ),
         ],
       ),
