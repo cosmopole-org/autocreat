@@ -169,7 +169,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Text(
           UiText.signInToYourOrganizationAccount,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.lightTextSecondary,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.56),
               ),
         ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
       ],
@@ -344,14 +344,14 @@ class _DemoModeButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF6C63FF), Color(0xFF48CAE4)],
+            colors: [AppColors.primary, AppColors.accent],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF6C63FF).withValues(alpha: 0.35),
+              color: AppColors.primary.withValues(alpha: 0.35),
               blurRadius: 14,
               offset: const Offset(0, 6),
             ),

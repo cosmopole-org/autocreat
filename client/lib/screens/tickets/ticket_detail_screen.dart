@@ -69,7 +69,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
     }
   }
 
-  Color _priorityColor(TicketPriority p) {
+  Color _priorityColor(TicketPriority p, {bool isDark = false}) {
     switch (p) {
       case TicketPriority.urgent:
         return AppColors.error;
@@ -78,7 +78,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
       case TicketPriority.medium:
         return AppColors.info;
       case TicketPriority.low:
-        return AppColors.lightTextSecondary;
+        return isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
     }
   }
 
@@ -133,25 +133,35 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
               Text(ticket.title, maxLines: 1, overflow: TextOverflow.ellipsis),
           actions: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
-              child: DropdownButton<TicketStatus>(
-                value: ticket.status,
-                underline: const SizedBox.shrink(),
-                isDense: true,
-                onChanged: (status) {
-                  if (status != null) {
-                    ref
-                        .read(ticketNotifierProvider.notifier)
-                        .updateStatus(ticket.id, status);
-                    ref.invalidate(ticketDetailProvider(ticket.id));
-                  }
-                },
-                items: TicketStatus.values
-                    .map((s) => DropdownMenuItem(
-                          value: s,
-                          child: StatusChip(status: s.displayName),
-                        ))
-                    .toList(),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: DropdownButton<TicketStatus>(
+                  value: ticket.status,
+                  underline: const SizedBox.shrink(),
+                  isDense: true,
+                  borderRadius: BorderRadius.circular(12),
+                  onChanged: (status) {
+                    if (status != null) {
+                      ref
+                          .read(ticketNotifierProvider.notifier)
+                          .updateStatus(ticket.id, status);
+                      ref.invalidate(ticketDetailProvider(ticket.id));
+                    }
+                  },
+                  items: TicketStatus.values
+                      .map((s) => DropdownMenuItem(
+                            value: s,
+                            child: StatusChip(status: s.displayName),
+                          ))
+                      .toList(),
+                ),
               ),
             ),
             if (isMobile)
@@ -177,13 +187,13 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.chat_bubble_outline,
+                                Icon(Icons.chat_bubble_outline,
                                     size: 48,
-                                    color: AppColors.lightTextSecondary),
+                                    color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
                                 const SizedBox(height: 12),
                                 Text(UiText.noMessagesYet,
-                                    style: const TextStyle(
-                                        color: AppColors.lightTextSecondary)),
+                                    style: TextStyle(
+                                        color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary)),
                               ],
                             ),
                           )
@@ -206,23 +216,23 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
-                      color: AppColors.primarySurface,
+                      color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.38),
                       child: Row(
                         children: [
-                          const Icon(Icons.attach_file,
-                              size: 16, color: AppColors.primary),
+                          Icon(Icons.attach_file,
+                              size: 16, color: Theme.of(context).colorScheme.primary),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               _attachmentName!,
-                              style: const TextStyle(
-                                  fontSize: 12, color: AppColors.primary),
+                              style: TextStyle(
+                                  fontSize: 12, color: Theme.of(context).colorScheme.primary),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.close,
-                                size: 16, color: AppColors.primary),
+                            icon: Icon(Icons.close,
+                                size: 16, color: Theme.of(context).colorScheme.primary),
                             onPressed: () =>
                                 setState(() => _attachmentName = null),
                             constraints: const BoxConstraints(),
@@ -269,19 +279,20 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        SizedBox(
-                          height: 48,
-                          child: ElevatedButton(
-                            onPressed:
-                                _sending ? null : () => _sendMessage(ticket),
-                            child: _sending
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2, color: Colors.white),
-                                  )
-                                : const Icon(Icons.send),
+                        IconButton.filled(
+                          onPressed: _sending ? null : () => _sendMessage(ticket),
+                          icon: _sending
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white),
+                                )
+                              : const Icon(Icons.send_rounded, size: 20),
+                          style: IconButton.styleFrom(
+                            minimumSize: const Size(48, 48),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
                       ],
@@ -307,7 +318,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                 child: _TicketInfoPanel(
                   ticket: ticket,
                   slaProgress: _slaProgress(ticket),
-                  priorityColor: _priorityColor(ticket.priority),
+                  priorityColor: _priorityColor(ticket.priority, isDark: isDark),
                 ),
               ),
           ],
@@ -375,7 +386,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                   child: _TicketInfoPanel(
                     ticket: ticket,
                     slaProgress: _slaProgress(ticket),
-                    priorityColor: _priorityColor(ticket.priority),
+                    priorityColor: _priorityColor(ticket.priority, isDark: isDark),
                   ),
                 ),
               ),

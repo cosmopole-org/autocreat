@@ -172,13 +172,13 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                         child: Center(
                           child: Column(
                             children: [
-                              const Icon(Icons.add_box_outlined,
+                              Icon(Icons.add_box_outlined,
                                   size: 36,
-                                  color: AppColors.lightTextSecondary),
+                                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
                               const SizedBox(height: 8),
                               Text(UiText.noFieldsYetAddYourFirstField,
-                                  style: const TextStyle(
-                                      color: AppColors.lightTextSecondary)),
+                                  style: TextStyle(
+                                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary)),
                             ],
                           ),
                         ),
@@ -290,6 +290,7 @@ class _ModelFieldRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return AppCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
@@ -315,8 +316,8 @@ class _ModelFieldRow extends StatelessWidget {
                   field.type.displayName +
                       (field.required ? UiText.requiredText3 : '') +
                       (field.unique ? UiText.unique : ''),
-                  style: const TextStyle(
-                      fontSize: 11, color: AppColors.lightTextSecondary),
+                  style: TextStyle(
+                      fontSize: 11, color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
                 ),
               ],
             ),
@@ -341,8 +342,12 @@ class _ModelFieldRow extends StatelessWidget {
             icon: const Icon(Icons.delete_outline,
                 size: 16, color: AppColors.error),
             onPressed: onDelete,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
+            style: IconButton.styleFrom(
+              foregroundColor: AppColors.error,
+              padding: const EdgeInsets.all(6),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              minimumSize: const Size(28, 28),
+            ),
           ),
         ],
       ),
@@ -434,7 +439,8 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(UiText.cancel),
         ),
-        ElevatedButton(
+        AppButton(
+          label: UiText.add,
           onPressed: () {
             if (_nameController.text.isEmpty) return;
             const uuid = Uuid();
@@ -447,7 +453,6 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
             ));
             Navigator.pop(context);
           },
-          child: Text(UiText.add),
         ),
       ],
     );

@@ -930,7 +930,7 @@ class _RecentTicketsList extends StatelessWidget {
           : Column(
               children: tickets.take(5).map((t) {
                 final priorityColor = _priorityColor(t.priority);
-                final statusColor = _statusColor(t.status);
+                final statusColor = _statusColor(t.status, isDark: isDark);
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   padding: const EdgeInsets.all(12),
@@ -1015,7 +1015,7 @@ class _RecentTicketsList extends StatelessWidget {
     }
   }
 
-  Color _statusColor(TicketStatus s) {
+  Color _statusColor(TicketStatus s, {bool isDark = false}) {
     switch (s) {
       case TicketStatus.open:
         return AppColors.warning;
@@ -1024,7 +1024,7 @@ class _RecentTicketsList extends StatelessWidget {
       case TicketStatus.resolved:
         return AppColors.success;
       case TicketStatus.closed:
-        return AppColors.lightTextSecondary;
+        return isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
     }
   }
 }

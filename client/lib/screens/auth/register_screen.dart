@@ -126,7 +126,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         Text(
           UiText.startBuildingYourOrganizationalSystem,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.lightTextSecondary,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.56),
               ),
         ).animate().fadeIn(delay: 200.ms),
       ],

@@ -45,6 +45,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -71,10 +72,11 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
           const SizedBox(height: 4),
           Text(
             widget.field.helpText!,
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: AppColors.lightTextSecondary),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
+                ),
           ),
         ],
       ],
@@ -280,7 +282,10 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: fileName != null
                               ? AppColors.primary
-                              : AppColors.lightTextSecondary,
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.54),
                           fontWeight: fileName != null ? FontWeight.w500 : null,
                         ),
                     textAlign: TextAlign.center,
@@ -289,10 +294,12 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                     const SizedBox(height: 4),
                     Text(
                       UiText.anyFileTypeSupported,
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelSmall
-                          ?.copyWith(color: AppColors.lightTextHint),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.38),
+                          ),
                     ),
                   ],
                   if (fileName != null && !widget.readOnly) ...[
@@ -350,9 +357,13 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                         Image.network(
                           imagePath,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Center(
+                          errorBuilder: (_, __, ___) => Center(
                             child: Icon(Icons.broken_image_outlined,
-                                size: 40, color: AppColors.lightTextSecondary),
+                                size: 40,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.38)),
                           ),
                         ),
                         if (!widget.readOnly)
@@ -385,18 +396,22 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
                         const SizedBox(height: 8),
                         Text(
                           UiText.clickToUploadImage,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.lightTextSecondary,
-                                  ),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.54),
+                              ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           UiText.pngJpgGifSupported,
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelSmall
-                              ?.copyWith(color: AppColors.lightTextHint),
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.38),
+                              ),
                         ),
                       ],
                     ),
@@ -441,7 +456,9 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
             decoration: BoxDecoration(
               color: color,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.lightBorder),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4),
+              ),
             ),
             child: Center(
               child: Text(
@@ -502,18 +519,29 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
         return Container(
           height: 120,
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.lightBorder),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4),
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.draw_outlined,
-                    size: 32, color: AppColors.lightTextSecondary),
+                Icon(Icons.draw_outlined,
+                    size: 32,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.45)),
                 const SizedBox(height: 8),
                 Text(UiText.signHere,
-                    style: const TextStyle(color: AppColors.lightTextSecondary)),
+                    style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.45),
+                    )),
               ],
             ),
           ),
@@ -557,18 +585,23 @@ class _TableFieldState extends State<_TableField> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.lightBorder),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: const BoxDecoration(
-              color: AppColors.primarySurface,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.darkCard
+                  : AppColors.primarySurface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             ),
             child: Row(
               children: _headers
@@ -655,8 +688,11 @@ class FieldPaletteItem extends StatelessWidget {
                       ?.copyWith(fontWeight: FontWeight.w500),
                 ),
               ),
-              const Icon(Icons.drag_indicator,
-                  size: 14, color: AppColors.lightTextHint),
+              Icon(Icons.drag_indicator,
+                  size: 14,
+                  color: isDark
+                      ? AppColors.darkTextHint
+                      : AppColors.lightTextHint),
             ],
           ),
         ),

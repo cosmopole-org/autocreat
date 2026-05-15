@@ -385,6 +385,7 @@ class _ActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final active = users.where((u) => u.isActive).length;
     final inactive = users.length - active;
 
@@ -413,7 +414,7 @@ class _ActivityCard extends StatelessWidget {
             label: UiText.inactive,
             count: inactive,
             total: users.length,
-            color: AppColors.lightTextSecondary,
+            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
           ),
         ],
       ),

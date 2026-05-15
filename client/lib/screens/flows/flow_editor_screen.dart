@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../../core/utils.dart';
 import '../../models/flow.dart';
 import '../../providers/flow_provider.dart';
+import '../../providers/theme_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/graph_editor.dart';
@@ -106,10 +107,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
           TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: Text(UiText.cancel)),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, ctrl.text),
-            child: Text(UiText.save),
-          ),
+          AppButton(label: UiText.save, onPressed: () => Navigator.pop(ctx, ctrl.text)),
         ],
       ),
     ).then((result) {
@@ -292,6 +290,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
   Widget build(BuildContext context) {
     final editorState = ref.watch(flowEditorProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassMode = ref.watch(glassModeProvider);
     final width = MediaQuery.of(context).size.width;
     final isDesktop = width >= 1100;
     final isTablet = width >= 700 && width < 1100;
@@ -360,15 +359,21 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 2),
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkSurface
-                    : AppColors.primarySurface,
+                color: glassMode
+                    ? Colors.white.withValues(alpha: isDark ? 0.10 : 0.38)
+                    : (isDark ? AppColors.darkSurface : AppColors.primarySurface),
                 borderRadius: BorderRadius.circular(9),
+                border: glassMode
+                    ? Border.all(
+                        color: Colors.white.withValues(alpha: isDark ? 0.14 : 0.52))
+                    : null,
               ),
               child: Text(
                 UiText.percent(editorState.scale),
-                style: const TextStyle(
-                    fontSize: 12, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
             AppBarIconButton(
@@ -622,7 +627,7 @@ class _NodePropertiesSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cs = Theme.of(context).colorScheme;
-    final nodeColor = AppUtils.getNodeTypeColor(node.type.name);
+    final nodeColor = AppUtils.getNodeTypeColor(node.type.name, isDark: isDark);
     final sheetBg = isDark ? AppColors.darkCard : AppColors.lightCard;
     final handleColor = cs.onSurface.withValues(alpha: 0.18);
 
@@ -713,14 +718,16 @@ class _NodePropertiesSheet extends StatelessWidget {
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline_rounded,
-                          color: AppColors.error, size: 22),
+                          color: AppColors.error, size: 20),
                       onPressed: onDelete,
                       tooltip: UiText.deleteNode,
                       style: IconButton.styleFrom(
-                        backgroundColor:
-                            AppColors.error.withValues(alpha: 0.08),
+                        backgroundColor: AppColors.error.withValues(alpha: 0.09),
+                        foregroundColor: AppColors.error,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.all(8),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -729,6 +736,10 @@ class _NodePropertiesSheet extends StatelessWidget {
                           color: cs.onSurface.withValues(alpha: 0.5), size: 26),
                       onPressed: () => Navigator.of(context).pop(),
                       tooltip: UiText.close,
+                      style: IconButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: const EdgeInsets.all(4),
+                      ),
                     ),
                   ],
                 ),

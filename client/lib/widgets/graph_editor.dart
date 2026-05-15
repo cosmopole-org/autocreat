@@ -525,7 +525,8 @@ class _GraphPainter extends CustomPainter {
   Color get nodeBorder =>
       isDark ? const Color(0xFF2D3555) : const Color(0xFFDDE2F5);
   Color get textPrimary => isDark ? AppColors.darkText : AppColors.lightText;
-  Color get textSecondary => AppColors.lightTextSecondary;
+  Color get textSecondary =>
+      isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
   Offset canvasToScreen(Offset c) =>
       Offset(c.dx * scale + offsetX, c.dy * scale + offsetY);
@@ -635,7 +636,7 @@ class _GraphPainter extends CustomPainter {
 
   void _drawNodeShadow(Canvas canvas, FlowNode n) {
     final rect = nodeScreenRect(n);
-    final color = AppUtils.getNodeTypeColor(n.type.name);
+    final color = AppUtils.getNodeTypeColor(n.type.name, isDark: isDark);
     canvas.drawRRect(
       RRect.fromRectAndRadius(rect.inflate(6), const Radius.circular(18)),
       Paint()
@@ -809,7 +810,7 @@ class _GraphPainter extends CustomPainter {
   void _drawNode(Canvas canvas, FlowNode n) {
     final rect = nodeScreenRect(n);
     final isSelected = n.id == selectedNodeId;
-    final color = AppUtils.getNodeTypeColor(n.type.name);
+    final color = AppUtils.getNodeTypeColor(n.type.name, isDark: isDark);
     final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(14));
 
     // Node background
@@ -915,7 +916,7 @@ class _GraphPainter extends CustomPainter {
     }
 
     final isSelected = n.id == selectedNodeId;
-    final color = AppUtils.getNodeTypeColor(n.type.name);
+    final color = AppUtils.getNodeTypeColor(n.type.name, isDark: isDark);
     final showPorts = isSelected ||
         isHovering ||
         (edgeSourcePort != null && edgeSourcePort!.nodeId != n.id);
@@ -1120,7 +1121,8 @@ class _MinimapPainter extends CustomPainter {
           text: UiText.noNodes,
           style: TextStyle(
               fontSize: 9,
-              color: AppColors.lightTextSecondary.withValues(alpha: 0.6)),
+              color: (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary)
+                  .withValues(alpha: 0.6)),
         ),
         textDirection: TextDirection.ltr,
       );
@@ -1153,7 +1155,7 @@ class _MinimapPainter extends CustomPainter {
             Rect.fromLTWH(rx, ry, rw, rh), const Radius.circular(2)),
         Paint()
           ..color =
-              AppUtils.getNodeTypeColor(node.type.name).withValues(alpha: 0.65)
+              AppUtils.getNodeTypeColor(node.type.name, isDark: isDark).withValues(alpha: 0.65)
           ..style = PaintingStyle.fill,
       );
     }

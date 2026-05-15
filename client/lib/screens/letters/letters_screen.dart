@@ -489,20 +489,21 @@ class _LetterCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  Color get _statusColor {
+  Color _statusColor(bool isDark) {
     switch (letter.status) {
       case 'active':
         return AppColors.success;
       case 'draft':
         return AppColors.warning;
       default:
-        return AppColors.lightTextSecondary;
+        return isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return AppCard(
       onTap: onEdit,
@@ -526,7 +527,7 @@ class _LetterCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: _statusColor.withValues(alpha: 0.1),
+                  color: _statusColor(isDark).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -534,7 +535,7 @@ class _LetterCard extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w700,
-                      color: _statusColor,
+                      color: _statusColor(isDark),
                       letterSpacing: 0.5),
                 ),
               ),
@@ -593,14 +594,14 @@ class _LetterCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.primarySurface,
+                    color: cs.primaryContainer.withValues(alpha: 0.35),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     letter.category!,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 10,
-                        color: AppColors.primary,
+                        color: cs.primary,
                         fontWeight: FontWeight.w500),
                   ),
                 ),
