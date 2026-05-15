@@ -539,12 +539,13 @@ class _LetterCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              PopupMenuButton<String>(
+              GlassContextMenuButton<String>(
                 icon: Icon(Icons.more_vert,
                     size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                 itemBuilder: (_) => [
-                  PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
-                  PopupMenuItem(
+                  GlassContextMenuItem(
+                      value: 'edit', child: Text(MockUiText.edit)),
+                  GlassContextMenuItem(
                       value: 'delete',
                       child: Text(MockUiText.delete,
                           style: const TextStyle(color: AppColors.error))),

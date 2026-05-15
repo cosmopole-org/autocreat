@@ -94,7 +94,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     final ctrl = TextEditingController(text: node.label);
     showDialog(
       context: ctx,
-      builder: (_) => AlertDialog(
+      builder: (_) => GlassAlertDialog(
         title: Text(MockUiText.editNodeLabel),
         content: TextField(
           controller: ctrl,

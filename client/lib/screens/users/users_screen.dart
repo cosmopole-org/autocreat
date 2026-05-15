@@ -652,12 +652,13 @@ class _UserCard extends StatelessWidget {
           ),
 
           // Actions
-          PopupMenuButton<String>(
+          GlassContextMenuButton<String>(
             icon: Icon(Icons.more_vert,
                 size: 18, color: cs.onSurface.withValues(alpha: 0.45)),
             itemBuilder: (_) => [
-              PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
-              PopupMenuItem(
+              GlassContextMenuItem(
+                  value: 'edit', child: Text(MockUiText.edit)),
+              GlassContextMenuItem(
                 value: 'delete',
                 child: Text(MockUiText.remove,
                     style: const TextStyle(color: AppColors.error)),

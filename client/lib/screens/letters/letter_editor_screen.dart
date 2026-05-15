@@ -298,7 +298,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
   void _showVariablesPanel() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (_) => GlassAlertDialog(
         title: Text(MockUiText.availableVariables),
         content: SizedBox(
           width: 320,

@@ -391,7 +391,7 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return GlassAlertDialog(
       title: Text(MockUiText.addField),
       content: SizedBox(
         width: 360,
