@@ -26,7 +26,13 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
   String _search = '';
   late TabController _tabController;
 
-  static List<String> get _tabs => [MockUiText.all, MockUiText.open, MockUiText.inProgress, MockUiText.resolved, MockUiText.closed];
+  static List<String> get _tabs => [
+        MockUiText.all,
+        MockUiText.open,
+        MockUiText.inProgress,
+        MockUiText.resolved,
+        MockUiText.closed
+      ];
 
   @override
   void initState() {
@@ -91,15 +97,12 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
           var filtered = tickets;
           final status = _selectedStatus;
           if (status != null) {
-            filtered =
-                filtered.where((t) => t.status == status).toList();
+            filtered = filtered.where((t) => t.status == status).toList();
           }
           if (_search.isNotEmpty) {
             filtered = filtered
                 .where((t) =>
-                    t.title
-                        .toLowerCase()
-                        .contains(_search.toLowerCase()) ||
+                    t.title.toLowerCase().contains(_search.toLowerCase()) ||
                     (t.description ?? '')
                         .toLowerCase()
                         .contains(_search.toLowerCase()))
@@ -120,8 +123,8 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                       // Header
                       AppPageHeader(
                         title: MockUiText.supportTickets,
-                        description:
-                            MockUiText.trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut,
+                        description: MockUiText
+                            .trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut,
                         actionLabel: MockUiText.newTicket,
                         compactActionLabel: MockUiText.newText,
                         actionIcon: Icons.add,
@@ -189,7 +192,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
               ),
 
               if (filtered.isEmpty)
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   child: EmptyState(
                     title: MockUiText.noTicketsFound,
                     subtitle: MockUiText.tryAdjustingYourFilters,
@@ -204,8 +207,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                       child: _TicketCard(
                         ticket: filtered[i],
                         index: i,
-                        onTap: () =>
-                            context.push('/tickets/${filtered[i].id}'),
+                        onTap: () => context.push('/tickets/${filtered[i].id}'),
                         onUpdateStatus: (s) async {
                           await ref
                               .read(ticketNotifierProvider.notifier)
@@ -371,24 +373,25 @@ class _PriorityBarChart extends StatelessWidget {
           .where((t) => t.priority == TicketPriority.medium)
           .length
           .toDouble(),
-      tickets
-          .where((t) => t.priority == TicketPriority.high)
-          .length
-          .toDouble(),
+      tickets.where((t) => t.priority == TicketPriority.high).length.toDouble(),
       tickets
           .where((t) => t.priority == TicketPriority.urgent)
           .length
           .toDouble(),
     ];
-    final maxY =
-        (data.reduce((a, b) => a > b ? a : b) + 2).clamp(4.0, 20.0);
+    final maxY = (data.reduce((a, b) => a > b ? a : b) + 2).clamp(4.0, 20.0);
     final colors = [
       AppColors.chartColors[2], // green
       AppColors.chartColors[4], // blue
       AppColors.chartColors[3], // amber
       AppColors.chartColors[5], // red
     ];
-    final labels = [MockUiText.low, MockUiText.med, MockUiText.high, MockUiText.urgent];
+    final labels = [
+      MockUiText.low,
+      MockUiText.med,
+      MockUiText.high,
+      MockUiText.urgent
+    ];
 
     return AppCard(
       padding: const EdgeInsets.all(20),
@@ -402,8 +405,7 @@ class _PriorityBarChart extends StatelessWidget {
                   ?.copyWith(fontWeight: FontWeight.w700)),
           Text(MockUiText.ticketsByPriorityLevel,
               style: TextStyle(
-                  fontSize: 11,
-                  color: cs.onSurface.withValues(alpha: 0.45))),
+                  fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           SizedBox(
             height: 140,
@@ -490,9 +492,8 @@ class _StatusDonutState extends State<_StatusDonut> {
 
     final open =
         widget.tickets.where((t) => t.status == TicketStatus.open).length;
-    final inProgress = widget.tickets
-        .where((t) => t.status == TicketStatus.inProgress)
-        .length;
+    final inProgress =
+        widget.tickets.where((t) => t.status == TicketStatus.inProgress).length;
     final resolved =
         widget.tickets.where((t) => t.status == TicketStatus.resolved).length;
     final closed =
@@ -500,7 +501,12 @@ class _StatusDonutState extends State<_StatusDonut> {
     final data = [open, inProgress, resolved, closed];
     final total = data.fold(0, (a, b) => a + b);
 
-    final labels = [MockUiText.open, MockUiText.inProgress, MockUiText.resolved, MockUiText.closed];
+    final labels = [
+      MockUiText.open,
+      MockUiText.inProgress,
+      MockUiText.resolved,
+      MockUiText.closed
+    ];
     final colors = [
       AppColors.chartColors[3], // amber (open)
       AppColors.chartColors[4], // blue (in progress)
@@ -520,8 +526,7 @@ class _StatusDonutState extends State<_StatusDonut> {
                   ?.copyWith(fontWeight: FontWeight.w700)),
           Text(MockUiText.currentTicketStates,
               style: TextStyle(
-                  fontSize: 11,
-                  color: cs.onSurface.withValues(alpha: 0.45))),
+                  fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -542,8 +547,7 @@ class _StatusDonutState extends State<_StatusDonut> {
                             touchCallback: (event, response) {
                               setState(() {
                                 _touchedIndex = response
-                                        ?.touchedSection
-                                        ?.touchedSectionIndex ??
+                                        ?.touchedSection?.touchedSectionIndex ??
                                     -1;
                               });
                             },
@@ -564,33 +568,34 @@ class _StatusDonutState extends State<_StatusDonut> {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: List.generate(4, (i) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 3),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 9,
-                              height: 9,
-                              decoration: BoxDecoration(
-                                color: colors[i],
-                                shape: BoxShape.circle,
-                              ),
+                  children: List.generate(
+                      4,
+                      (i) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 3),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 9,
+                                  height: 9,
+                                  decoration: BoxDecoration(
+                                    color: colors[i],
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                    child: Text(labels[i],
+                                        style: const TextStyle(fontSize: 11))),
+                                Text(
+                                  data[i].toString(),
+                                  style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: colors[i]),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                                child: Text(labels[i],
-                                    style:
-                                        const TextStyle(fontSize: 11))),
-                            Text(
-                              data[i].toString(),
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: colors[i]),
-                            ),
-                          ],
-                        ),
-                      )),
+                          )),
                 ),
               ),
             ],
@@ -648,8 +653,8 @@ class _TicketCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final priorityColor = _priorityColor();
     final statusColor = _statusColor();
-    final hasDescription = ticket.description != null &&
-        ticket.description!.trim().isNotEmpty;
+    final hasDescription =
+        ticket.description != null && ticket.description!.trim().isNotEmpty;
 
     return GestureDetector(
       onTap: onTap,
@@ -929,7 +934,8 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
             children: [
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: MockUiText.titleRequired),
+                decoration:
+                    InputDecoration(labelText: MockUiText.titleRequired),
                 validator: (v) =>
                     v?.isEmpty ?? true ? MockUiText.titleIsRequired : null,
               ),
@@ -943,8 +949,8 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
               DropdownButtonFormField<TicketPriority>(
                 value: _priority,
                 items: TicketPriority.values
-                    .map((p) => DropdownMenuItem(
-                        value: p, child: Text(p.displayName)))
+                    .map((p) =>
+                        DropdownMenuItem(value: p, child: Text(p.displayName)))
                     .toList(),
                 onChanged: (v) => setState(() => _priority = v!),
                 decoration: InputDecoration(labelText: MockUiText.priority),

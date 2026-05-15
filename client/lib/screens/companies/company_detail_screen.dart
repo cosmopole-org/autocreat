@@ -85,7 +85,8 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
               icon: const Icon(Icons.arrow_back_rounded),
               onPressed: () => context.pop(),
             ),
-            title: Text(company.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+            title: Text(company.name,
+                maxLines: 1, overflow: TextOverflow.ellipsis),
             titleSpacing: 0,
           ),
           body: SingleChildScrollView(
@@ -133,14 +134,12 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                           children: [
                             Text(
                               company.name,
-                              style:
-                                  Theme.of(context).textTheme.headlineSmall,
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
                             if (company.industry != null)
                               Text(
                                 company.industry!,
-                                style:
-                                    Theme.of(context).textTheme.bodyMedium,
+                                style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             const SizedBox(height: 8),
                             StatusChip(status: company.status),
@@ -246,18 +245,17 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   error: (e, _) => const SizedBox.shrink(),
                   data: (flows) {
                     if (flows.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Text(MockUiText.noFlowsYet,
-                            style: TextStyle(
-                                color: AppColors.lightTextSecondary)),
+                            style:
+                                const TextStyle(color: AppColors.lightTextSecondary)),
                       );
                     }
                     return Column(
                       children: flows
                           .map((f) => ListTile(
-                                leading: const Icon(
-                                    Icons.account_tree_outlined,
+                                leading: const Icon(Icons.account_tree_outlined,
                                     color: AppColors.primary),
                                 title: Text(f.name),
                                 subtitle: Text(f.status),
@@ -300,8 +298,7 @@ class _CompanyLogo extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            image:
-                DecorationImage(image: imageProvider, fit: BoxFit.cover),
+            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
           ),
         ),
         placeholder: (context, url) => _LogoFallback(name: name, size: size),

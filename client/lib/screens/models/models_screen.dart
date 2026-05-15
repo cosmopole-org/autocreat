@@ -55,8 +55,7 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
     final filtered = _search.isEmpty
         ? models
         : models
-            .where(
-                (m) => m.name.toLowerCase().contains(_search.toLowerCase()))
+            .where((m) => m.name.toLowerCase().contains(_search.toLowerCase()))
             .toList();
 
     final totalFields = models.fold<int>(0, (s, m) => s + m.fields.length);
@@ -86,8 +85,8 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
                 // Header
                 AppPageHeader(
                   title: MockUiText.dataModels,
-                  description:
-                      MockUiText.defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation,
+                  description: MockUiText
+                      .defineDurableEntitySchemasOrganizeFieldsAndKeepYourOperation,
                   actionLabel: MockUiText.newModel,
                   compactActionLabel: MockUiText.newText,
                   actionIcon: Icons.add,
@@ -123,7 +122,6 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
             ),
           ),
         ),
-
         if (filtered.isEmpty)
           SliverFillRemaining(
             child: EmptyState(
@@ -148,7 +146,7 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
                     onDelete: () async {
                       final confirmed = await showDialog<bool>(
                         context: context,
-                        builder: (_) => const ConfirmDialog(
+                        builder: (_) => ConfirmDialog(
                           title: MockUiText.deleteModel,
                           message: MockUiText.deleteThisModelPermanently,
                         ),
@@ -160,7 +158,9 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
                         ref.invalidate(modelsProvider);
                       }
                     },
-                  ).animate().fadeIn(delay: Duration(milliseconds: 60 + i * 50)),
+                  )
+                      .animate()
+                      .fadeIn(delay: Duration(milliseconds: 60 + i * 50)),
                 ),
                 childCount: filtered.length,
               ),
@@ -189,25 +189,50 @@ class _ModelStatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      (Icons.data_object_rounded, MockUiText.totalModels, total.toString(), AppColors.info),
-      (Icons.list_alt_rounded, MockUiText.totalFields, totalFields.toString(), AppColors.primary),
-      (Icons.star_rounded, MockUiText.requiredText, required.toString(), AppColors.warning),
-      (Icons.fingerprint_rounded, MockUiText.unique3, unique.toString(), AppColors.success),
+      (
+        Icons.data_object_rounded,
+        MockUiText.totalModels,
+        total.toString(),
+        AppColors.info
+      ),
+      (
+        Icons.list_alt_rounded,
+        MockUiText.totalFields,
+        totalFields.toString(),
+        AppColors.primary
+      ),
+      (
+        Icons.star_rounded,
+        MockUiText.requiredText,
+        required.toString(),
+        AppColors.warning
+      ),
+      (
+        Icons.fingerprint_rounded,
+        MockUiText.unique3,
+        unique.toString(),
+        AppColors.success
+      ),
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
       final isWide = constraints.maxWidth > 700;
       final cards = stats
-          .map((s) => AppStatCard(icon: s.$1, label: s.$2, value: s.$3, color: s.$4))
+          .map((s) =>
+              AppStatCard(icon: s.$1, label: s.$2, value: s.$3, color: s.$4))
           .toList();
       if (isWide) {
         return Row(
-          children: cards.asMap().entries.map((e) => Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
-              child: e.value,
-            ),
-          )).toList(),
+          children: cards
+              .asMap()
+              .entries
+              .map((e) => Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+                      child: e.value,
+                    ),
+                  ))
+              .toList(),
         );
       }
       return Column(
@@ -284,8 +309,7 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
                             pieTouchData: PieTouchData(
                               touchCallback: (event, response) {
                                 setState(() {
-                                  _touchedIndex = response
-                                          ?.touchedSection
+                                  _touchedIndex = response?.touchedSection
                                           ?.touchedSectionIndex ??
                                       -1;
                                 });
@@ -309,8 +333,8 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
                         child: Column(
                           children: entries.asMap().entries.map((e) {
                             final color = colors[e.key % colors.length];
-                            final pct =
-                                (e.value.value / total * 100).toStringAsFixed(0);
+                            final pct = (e.value.value / total * 100)
+                                .toStringAsFixed(0);
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Row(
@@ -327,7 +351,9 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
                                         style: const TextStyle(fontSize: 12),
                                         overflow: TextOverflow.ellipsis),
                                   ),
-                                  Text(MockUiText.distributionLegend(e.value.value, pct),
+                                  Text(
+                                      MockUiText.distributionLegend(
+                                          e.value.value, pct),
                                       style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w700,
@@ -376,7 +402,9 @@ class _FieldTypeDonutState extends State<_FieldTypeDonut> {
                                     color: color, shape: BoxShape.circle),
                               ),
                               const SizedBox(width: 4),
-                              Text(MockUiText.distributionSlice(e.value.key, e.value.value),
+                              Text(
+                                  MockUiText.distributionSlice(
+                                      e.value.key, e.value.value),
                                   style: const TextStyle(fontSize: 11)),
                             ],
                           );
@@ -415,153 +443,152 @@ class _ModelCard extends StatelessWidget {
       onTap: onEdit,
       padding: const EdgeInsets.all(18),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header row
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.info.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(Icons.data_object_rounded,
-                      color: AppColors.info, size: 22),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.info.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                child: const Icon(Icons.data_object_rounded,
+                    color: AppColors.info, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      model.name,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (model.description != null)
                       Text(
-                        model.name,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700),
+                        model.description!,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: cs.onSurface.withValues(alpha: 0.55),
+                            ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (model.description != null)
-                        Text(
-                          model.description!,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: cs.onSurface.withValues(alpha: 0.55),
-                              ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    ],
-                  ),
-                ),
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert,
-                      size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
-                  itemBuilder: (_) => [
-                    PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
-                    PopupMenuItem(
-                        value: 'delete',
-                        child: Text(MockUiText.delete,
-                            style: TextStyle(color: AppColors.error))),
                   ],
-                  onSelected: (v) {
-                    if (v == 'edit') onEdit();
-                    if (v == 'delete') onDelete();
-                  },
                 ),
-              ],
-            ),
+              ),
+              PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert,
+                    size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
+                itemBuilder: (_) => [
+                  PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
+                  PopupMenuItem(
+                      value: 'delete',
+                      child: Text(MockUiText.delete,
+                          style: const TextStyle(color: AppColors.error))),
+                ],
+                onSelected: (v) {
+                  if (v == 'edit') onEdit();
+                  if (v == 'delete') onDelete();
+                },
+              ),
+            ],
+          ),
 
-            const SizedBox(height: 14),
+          const SizedBox(height: 14),
 
-            // Field chips
-            if (model.fields.isNotEmpty) ...[
-              Wrap(
-                spacing: 5,
-                runSpacing: 5,
-                children: model.fields
-                    .take(5)
-                    .map((f) => Container(
+          // Field chips
+          if (model.fields.isNotEmpty) ...[
+            Wrap(
+              spacing: 5,
+              runSpacing: 5,
+              children: model.fields
+                  .take(5)
+                  .map((f) => Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.primarySurface,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              f.name,
+                              style: const TextStyle(
+                                  fontSize: 10,
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            Text(MockUiText.bulletSeparator,
+                                style: const TextStyle(
+                                    fontSize: 10, color: AppColors.primary)),
+                            Text(
+                              f.type.displayName,
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.7)),
+                            ),
+                          ],
+                        ),
+                      ))
+                  .toList()
+                ..addAll(model.fields.length > 5
+                    ? [
+                        Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppColors.primarySurface,
+                            color: cs.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                f.name,
-                                style: const TextStyle(
-                                    fontSize: 10,
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                              Text(MockUiText.bulletSeparator,
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      color: AppColors.primary)),
-                              Text(
-                                f.type.displayName,
-                                style: TextStyle(
-                                    fontSize: 10,
-                                    color: AppColors.primary
-                                        .withValues(alpha: 0.7)),
-                              ),
-                            ],
+                          child: Text(
+                            MockUiText.moreCount(model.fields.length - 5),
+                            style: TextStyle(
+                                fontSize: 10,
+                                color: cs.onSurface.withValues(alpha: 0.5)),
                           ),
-                        ))
-                    .toList()
-                  ..addAll(model.fields.length > 5
-                      ? [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              MockUiText.moreCount(model.fields.length - 5),
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  color: cs.onSurface.withValues(alpha: 0.5)),
-                            ),
-                          )
-                        ]
-                      : []),
-              ),
-              const SizedBox(height: 12),
-            ],
-
-            // Footer stats
-            Row(
-              children: [
-                _FieldBadge(
-                    icon: Icons.list_alt_rounded,
-                    label: MockUiText.fieldCount(model.fields.length),
-                    color: AppColors.info),
-                const SizedBox(width: 8),
-                if (reqCount > 0)
-                  _FieldBadge(
-                      icon: Icons.star_rounded,
-                      label: MockUiText.requiredCount(reqCount),
-                      color: AppColors.warning),
-                if (reqCount > 0) const SizedBox(width: 8),
-                if (uniqueCount > 0)
-                  _FieldBadge(
-                      icon: Icons.fingerprint_rounded,
-                      label: MockUiText.uniqueCount(uniqueCount),
-                      color: AppColors.success),
-                const Spacer(),
-                Icon(Icons.edit_outlined,
-                    size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
-              ],
+                        )
+                      ]
+                    : []),
             ),
+            const SizedBox(height: 12),
           ],
-        ),
+
+          // Footer stats
+          Row(
+            children: [
+              _FieldBadge(
+                  icon: Icons.list_alt_rounded,
+                  label: MockUiText.fieldCount(model.fields.length),
+                  color: AppColors.info),
+              const SizedBox(width: 8),
+              if (reqCount > 0)
+                _FieldBadge(
+                    icon: Icons.star_rounded,
+                    label: MockUiText.requiredCount(reqCount),
+                    color: AppColors.warning),
+              if (reqCount > 0) const SizedBox(width: 8),
+              if (uniqueCount > 0)
+                _FieldBadge(
+                    icon: Icons.fingerprint_rounded,
+                    label: MockUiText.uniqueCount(uniqueCount),
+                    color: AppColors.success),
+              const Spacer(),
+              Icon(Icons.edit_outlined,
+                  size: 14, color: cs.onSurface.withValues(alpha: 0.3)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -55,9 +55,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
           final roles = <String>{MockUiText.all, ...users.map((u) => u.role)};
           final filtered = users.where((u) {
             final matchesSearch = _search.isEmpty ||
-                u.fullName
-                    .toLowerCase()
-                    .contains(_search.toLowerCase()) ||
+                u.fullName.toLowerCase().contains(_search.toLowerCase()) ||
                 u.email.toLowerCase().contains(_search.toLowerCase());
             final matchesRole =
                 _roleFilter == MockUiText.all || u.role == _roleFilter;
@@ -78,8 +76,8 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                       // Header
                       AppPageHeader(
                         title: MockUiText.teamMembers,
-                        description:
-                            MockUiText.inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol,
+                        description: MockUiText
+                            .inviteTeammatesUnderstandAccountActivityAndBalanceRolesSoCol,
                         actionLabel: MockUiText.addUser,
                         compactActionLabel: MockUiText.add,
                         actionIcon: Icons.person_add_outlined,
@@ -123,8 +121,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                             _RoleDonut(
                               users: users,
                               touchedIndex: _touchedIndex,
-                              onTouch: (i) =>
-                                  setState(() => _touchedIndex = i),
+                              onTouch: (i) => setState(() => _touchedIndex = i),
                             ),
                             const SizedBox(height: 12),
                             _ActivityCard(users: users),
@@ -140,16 +137,14 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                             child: SearchField(
                               controller: _searchController,
                               hintText: MockUiText.searchMembers,
-                              onChanged: (v) =>
-                                  setState(() => _search = v),
+                              onChanged: (v) => setState(() => _search = v),
                             ),
                           ),
                           const SizedBox(width: 8),
                           _RoleDropdown(
                             roles: roles.toList(),
                             selected: _roleFilter,
-                            onChanged: (v) =>
-                                setState(() => _roleFilter = v!),
+                            onChanged: (v) => setState(() => _roleFilter = v!),
                           ),
                         ],
                       ),
@@ -178,8 +173,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                         index: i,
                         onEdit: () =>
                             context.push('/users/${filtered[i].id}/edit'),
-                        onDelete: () =>
-                            _confirmDelete(context, filtered[i]),
+                        onDelete: () => _confirmDelete(context, filtered[i]),
                       ),
                     ),
                     childCount: filtered.length,
@@ -196,7 +190,7 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
   void _confirmDelete(BuildContext context, User user) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => const ConfirmDialog(
+      builder: (_) => ConfirmDialog(
         title: MockUiText.removeUser,
         message: MockUiText.removeThisUserFromTheSystem,
       ),
@@ -302,8 +296,7 @@ class _RoleDonut extends StatelessWidget {
                   ?.copyWith(fontWeight: FontWeight.w700)),
           Text(MockUiText.membersByAssignedRole,
               style: TextStyle(
-                  fontSize: 11,
-                  color: cs.onSurface.withValues(alpha: 0.45))),
+                  fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -317,9 +310,7 @@ class _RoleDonut extends StatelessWidget {
                     pieTouchData: PieTouchData(
                       touchCallback: (event, response) {
                         onTouch(
-                          response?.touchedSection
-                                  ?.touchedSectionIndex ??
-                              -1,
+                          response?.touchedSection?.touchedSectionIndex ?? -1,
                         );
                       },
                     ),
@@ -342,8 +333,7 @@ class _RoleDonut extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: entries.asMap().entries.map((e) {
                     final color = palette[e.key % palette.length];
-                    final pct =
-                        (e.value.value / users.length * 100).round();
+                    final pct = (e.value.value / users.length * 100).round();
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
@@ -361,8 +351,7 @@ class _RoleDonut extends StatelessWidget {
                             child: Text(
                               e.value.key,
                               style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500),
+                                  fontSize: 12, fontWeight: FontWeight.w500),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -411,8 +400,7 @@ class _ActivityCard extends StatelessWidget {
                   ?.copyWith(fontWeight: FontWeight.w700)),
           Text(MockUiText.accountActivity,
               style: TextStyle(
-                  fontSize: 11,
-                  color: cs.onSurface.withValues(alpha: 0.45))),
+                  fontSize: 11, color: cs.onSurface.withValues(alpha: 0.45))),
           const SizedBox(height: 16),
           _StatusBar(
             label: MockUiText.active,
@@ -459,9 +447,7 @@ class _StatusBar extends StatelessWidget {
             Text(
               count.toString(),
               style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: color),
+                  fontSize: 12, fontWeight: FontWeight.w700, color: color),
             ),
           ],
         ),
@@ -508,7 +494,9 @@ class _RoleDropdown extends StatelessWidget {
           value: selected,
           isDense: true,
           items: roles
-              .map((r) => DropdownMenuItem(value: r, child: Text(r, style: const TextStyle(fontSize: 13))))
+              .map((r) => DropdownMenuItem(
+                  value: r,
+                  child: Text(r, style: const TextStyle(fontSize: 13))))
               .toList(),
           onChanged: onChanged,
         ),
@@ -558,136 +546,130 @@ class _UserCard extends StatelessWidget {
       onTap: onEdit,
       padding: const EdgeInsets.all(16),
       child: Row(
+        children: [
+          // Avatar
+          Stack(
             children: [
-              // Avatar
-              Stack(
-                children: [
-                  AvatarWidget(
-                    imageUrl: user.avatar,
-                    initials: user.initials,
-                    size: 48,
+              AvatarWidget(
+                imageUrl: user.avatar,
+                initials: user.initials,
+                size: 48,
+              ),
+              if (user.isActive)
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    width: 13,
+                    height: 13,
+                    decoration: BoxDecoration(
+                      color: AppColors.success,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: cs.surface, width: 2),
+                    ),
                   ),
-                  if (user.isActive)
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 13,
-                        height: 13,
-                        decoration: BoxDecoration(
-                          color: AppColors.success,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                              color: cs.surface, width: 2),
+                ),
+            ],
+          ),
+          const SizedBox(width: 14),
+
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        user.fullName,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    // Role badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: roleColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        user.role,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: roleColor,
+                          letterSpacing: 0.3,
                         ),
                       ),
                     ),
-                ],
-              ),
-              const SizedBox(width: 14),
-
-              // Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            user.fullName,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                    Icon(Icons.email_outlined,
+                        size: 12, color: cs.onSurface.withValues(alpha: 0.45)),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        user.email,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: cs.onSurface.withValues(alpha: 0.55),
                         ),
-                        // Role badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: roleColor.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            user.role,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: roleColor,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: [
-                        Icon(Icons.email_outlined,
-                            size: 12,
-                            color:
-                                cs.onSurface.withValues(alpha: 0.45)),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            user.email,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: cs.onSurface.withValues(alpha: 0.55),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        if (user.phone != null && user.phone!.isNotEmpty) ...[
-                          _InfoChip(
-                            icon: Icons.phone_outlined,
-                            label: user.phone!,
-                          ),
-                          const SizedBox(width: 6),
-                        ],
-                        if (joined != null)
-                          _InfoChip(
-                            icon: Icons.calendar_today_outlined,
-                            label: MockUiText.joined(joined),
-                          ),
-                        const Spacer(),
-                        StatusChip(
-                            status:
-                                user.isActive ? 'active' : 'inactive'),
-                      ],
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    if (user.phone != null && user.phone!.isNotEmpty) ...[
+                      _InfoChip(
+                        icon: Icons.phone_outlined,
+                        label: user.phone!,
+                      ),
+                      const SizedBox(width: 6),
+                    ],
+                    if (joined != null)
+                      _InfoChip(
+                        icon: Icons.calendar_today_outlined,
+                        label: MockUiText.joined(joined),
+                      ),
+                    const Spacer(),
+                    StatusChip(status: user.isActive ? 'active' : 'inactive'),
+                  ],
+                ),
+              ],
+            ),
+          ),
 
-              // Actions
-              PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert,
-                    size: 18,
-                    color: cs.onSurface.withValues(alpha: 0.45)),
-                itemBuilder: (_) => const [
-                  PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Text(MockUiText.remove,
-                        style: TextStyle(color: AppColors.error)),
-                  ),
-                ],
-                onSelected: (v) {
-                  if (v == 'edit') onEdit();
-                  if (v == 'delete') onDelete();
-                },
+          // Actions
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert,
+                size: 18, color: cs.onSurface.withValues(alpha: 0.45)),
+            itemBuilder: (_) => [
+              PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
+              PopupMenuItem(
+                value: 'delete',
+                child: Text(MockUiText.remove,
+                    style: const TextStyle(color: AppColors.error)),
               ),
             ],
+            onSelected: (v) {
+              if (v == 'edit') onEdit();
+              if (v == 'delete') onDelete();
+            },
           ),
+        ],
+      ),
     )
         .animate()
         .fadeIn(delay: Duration(milliseconds: index * 50))

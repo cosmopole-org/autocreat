@@ -92,7 +92,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
       if (mounted) {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
               content: Text(MockUiText.userSaved),
               backgroundColor: AppColors.success),
         );
@@ -101,7 +101,8 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.error(e)), backgroundColor: AppColors.error),
+              content: Text(MockUiText.error(e)),
+              backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -163,9 +164,8 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                   children: [
                     AvatarWidget(
                       imageUrl: _avatarPath ?? _user?.avatar,
-                      initials: initials.isNotEmpty
-                          ? initials.toUpperCase()
-                          : '?',
+                      initials:
+                          initials.isNotEmpty ? initials.toUpperCase() : '?',
                       size: 88,
                     ),
                     Positioned(
@@ -179,8 +179,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                           decoration: BoxDecoration(
                             color: AppColors.primary,
                             shape: BoxShape.circle,
-                            border:
-                                Border.all(color: Colors.white, width: 2),
+                            border: Border.all(color: Colors.white, width: 2),
                           ),
                           child: const Icon(Icons.camera_alt,
                               size: 14, color: Colors.white),
@@ -212,22 +211,24 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _firstNameController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                                 labelText: MockUiText.firstNameRequired),
                             onChanged: (_) => setState(() {}),
-                            validator: (v) =>
-                                v?.isEmpty ?? true ? MockUiText.requiredText : null,
+                            validator: (v) => v?.isEmpty ?? true
+                                ? MockUiText.requiredText
+                                : null,
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: TextFormField(
                             controller: _lastNameController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                                 labelText: MockUiText.lastNameRequired),
                             onChanged: (_) => setState(() {}),
-                            validator: (v) =>
-                                v?.isEmpty ?? true ? MockUiText.requiredText : null,
+                            validator: (v) => v?.isEmpty ?? true
+                                ? MockUiText.requiredText
+                                : null,
                           ),
                         ),
                       ],
@@ -236,9 +237,9 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: MockUiText.emailRequired,
-                        prefixIcon: Icon(Icons.email_outlined, size: 18),
+                        prefixIcon: const Icon(Icons.email_outlined, size: 18),
                       ),
                       validator: (v) {
                         if (v?.isEmpty ?? true) return MockUiText.requiredText;
@@ -253,9 +254,9 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                     TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: MockUiText.phone,
-                        prefixIcon: Icon(Icons.phone_outlined, size: 18),
+                        prefixIcon: const Icon(Icons.phone_outlined, size: 18),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -298,24 +299,22 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                       data: (roles) => DropdownButtonFormField<String?>(
                         value: _selectedRoleId,
                         items: [
-                          const DropdownMenuItem(
+                          DropdownMenuItem(
                               value: null, child: Text(MockUiText.noRole)),
                           ...roles.map((r) => DropdownMenuItem(
                               value: r.id, child: Text(r.name))),
                         ],
-                        onChanged: (v) =>
-                            setState(() => _selectedRoleId = v),
-                        decoration: const InputDecoration(
+                        onChanged: (v) => setState(() => _selectedRoleId = v),
+                        decoration: InputDecoration(
                           labelText: MockUiText.assignedRole3,
-                          prefixIcon: Icon(Icons.shield_outlined, size: 18),
+                          prefixIcon: const Icon(Icons.shield_outlined, size: 18),
                         ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     SwitchListTile(
                       title: Text(MockUiText.activeAccount),
-                      subtitle:
-                          Text(MockUiText.inactiveUsersCannotLogIn),
+                      subtitle: Text(MockUiText.inactiveUsersCannotLogIn),
                       value: _isActive,
                       onChanged: (v) => setState(() => _isActive = v),
                       contentPadding: EdgeInsets.zero,

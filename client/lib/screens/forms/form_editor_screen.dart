@@ -50,7 +50,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
       await ref.read(formEditorProvider.notifier).save(repo);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
               content: Text(MockUiText.formSaved),
               backgroundColor: AppColors.success),
         );
@@ -108,7 +108,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(MockUiText.unsaved,
-                    style: TextStyle(fontSize: 11, color: AppColors.warning)),
+                    style: const TextStyle(fontSize: 11, color: AppColors.warning)),
               ),
             ],
           ],
@@ -174,13 +174,15 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.lightBorder,
                       ),
                     ),
                   ),
                   child: TextFormField(
                     initialValue: editorState.form?.name ?? '',
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: MockUiText.formName,
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
@@ -216,10 +218,9 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                       : ReorderableListView(
                           padding: const EdgeInsets.all(16),
                           onReorder: (oldIndex, newIndex) {
-                            ref
-                                .read(formEditorProvider.notifier)
-                                .reorderFields(oldIndex,
-                                    newIndex > oldIndex ? newIndex - 1 : newIndex);
+                            ref.read(formEditorProvider.notifier).reorderFields(
+                                oldIndex,
+                                newIndex > oldIndex ? newIndex - 1 : newIndex);
                           },
                           children: editorState.fields
                               .asMap()
@@ -252,9 +253,8 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
               width: isDesktop ? 280 : 240,
               child: _FieldPropertiesPanel(
                 field: editorState.selectedField!,
-                onUpdate: (field) => ref
-                    .read(formEditorProvider.notifier)
-                    .updateField(field),
+                onUpdate: (field) =>
+                    ref.read(formEditorProvider.notifier).updateField(field),
               ),
             ).animate().fadeIn(duration: 200.ms).slideX(begin: 0.1),
         ],
@@ -396,7 +396,8 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
                     style: Theme.of(context).textTheme.titleSmall),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: AppColors.accent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
@@ -416,50 +417,45 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
             TextFormField(
               controller: _labelController,
               decoration: InputDecoration(labelText: MockUiText.label),
-              onChanged: (v) =>
-                  widget.onUpdate(field.copyWith(label: v)),
+              onChanged: (v) => widget.onUpdate(field.copyWith(label: v)),
             ),
             const SizedBox(height: 12),
 
             TextFormField(
               controller: _placeholderController,
               decoration: InputDecoration(labelText: MockUiText.placeholder),
-              onChanged: (v) =>
-                  widget.onUpdate(field.copyWith(placeholder: v)),
+              onChanged: (v) => widget.onUpdate(field.copyWith(placeholder: v)),
             ),
             const SizedBox(height: 12),
 
             TextFormField(
               controller: _helpTextController,
               decoration: InputDecoration(labelText: MockUiText.helpText),
-              onChanged: (v) =>
-                  widget.onUpdate(field.copyWith(helpText: v)),
+              onChanged: (v) => widget.onUpdate(field.copyWith(helpText: v)),
             ),
             const SizedBox(height: 16),
 
             SwitchListTile(
-              title: Text(MockUiText.requiredText, style: TextStyle(fontSize: 14)),
+              title:
+                  Text(MockUiText.requiredText, style: const TextStyle(fontSize: 14)),
               value: field.required,
-              onChanged: (v) =>
-                  widget.onUpdate(field.copyWith(required: v)),
+              onChanged: (v) => widget.onUpdate(field.copyWith(required: v)),
               contentPadding: EdgeInsets.zero,
               dense: true,
             ),
 
             SwitchListTile(
-              title: Text(MockUiText.readOnly, style: TextStyle(fontSize: 14)),
+              title: Text(MockUiText.readOnly, style: const TextStyle(fontSize: 14)),
               value: field.readOnly,
-              onChanged: (v) =>
-                  widget.onUpdate(field.copyWith(readOnly: v)),
+              onChanged: (v) => widget.onUpdate(field.copyWith(readOnly: v)),
               contentPadding: EdgeInsets.zero,
               dense: true,
             ),
 
             SwitchListTile(
-              title: Text(MockUiText.hidden, style: TextStyle(fontSize: 14)),
+              title: Text(MockUiText.hidden, style: const TextStyle(fontSize: 14)),
               value: field.hidden,
-              onChanged: (v) =>
-                  widget.onUpdate(field.copyWith(hidden: v)),
+              onChanged: (v) => widget.onUpdate(field.copyWith(hidden: v)),
               contentPadding: EdgeInsets.zero,
               dense: true,
             ),
@@ -482,7 +478,8 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
                       final options = List<FormFieldOption>.from(field.options)
                         ..add(FormFieldOption(
                           value: uuid.v4().substring(0, 8),
-                          label: MockUiText.optionNumber(field.options.length + 1),
+                          label:
+                              MockUiText.optionNumber(field.options.length + 1),
                         ));
                       widget.onUpdate(field.copyWith(options: options));
                     },
@@ -502,9 +499,10 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
                             isDense: true,
                           ),
                           onChanged: (v) {
-                            final opts = List<FormFieldOption>.from(field.options);
-                            opts[e.key] = FormFieldOption(
-                                value: e.value.value, label: v);
+                            final opts =
+                                List<FormFieldOption>.from(field.options);
+                            opts[e.key] =
+                                FormFieldOption(value: e.value.value, label: v);
                             widget.onUpdate(field.copyWith(options: opts));
                           },
                         ),

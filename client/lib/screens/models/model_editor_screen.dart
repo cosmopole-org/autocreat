@@ -55,7 +55,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
       await ref.read(modelEditorProvider.notifier).save(repo);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
               content: Text(MockUiText.modelSaved),
               backgroundColor: AppColors.success),
         );
@@ -64,7 +64,8 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.error(e)), backgroundColor: AppColors.error),
+              content: Text(MockUiText.error(e)),
+              backgroundColor: AppColors.error),
         );
       }
     } finally {
@@ -125,8 +126,8 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _nameController,
-                          decoration:
-                              InputDecoration(labelText: MockUiText.modelNameRequired),
+                          decoration: InputDecoration(
+                              labelText: MockUiText.modelNameRequired),
                           onChanged: (_) => ref
                               .read(modelEditorProvider.notifier)
                               .updateModelMeta(
@@ -137,8 +138,8 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: _descController,
-                          decoration:
-                              InputDecoration(labelText: MockUiText.description),
+                          decoration: InputDecoration(
+                              labelText: MockUiText.description),
                           maxLines: 2,
                           onChanged: (_) => ref
                               .read(modelEditorProvider.notifier)
@@ -168,17 +169,18 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                   const SizedBox(height: 12),
 
                   if (editorState.fields.isEmpty)
-                    const AppCard(
+                    AppCard(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 24),
+                        padding: const EdgeInsets.symmetric(vertical: 24),
                         child: Center(
                           child: Column(
                             children: [
-                              Icon(Icons.add_box_outlined,
-                                  size: 36, color: AppColors.lightTextSecondary),
-                              SizedBox(height: 8),
+                              const Icon(Icons.add_box_outlined,
+                                  size: 36,
+                                  color: AppColors.lightTextSecondary),
+                              const SizedBox(height: 8),
                               Text(MockUiText.noFieldsYetAddYourFirstField,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       color: AppColors.lightTextSecondary)),
                             ],
                           ),
@@ -215,7 +217,8 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                 color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                 border: Border(
                   left: BorderSide(
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                   ),
                 ),
               ),
@@ -229,10 +232,13 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.darkBg : const Color(0xFFF8F9FA),
+                      color:
+                          isDark ? AppColors.darkBg : const Color(0xFFF8F9FA),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.lightBorder,
                       ),
                     ),
                     child: Text(
@@ -240,7 +246,8 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                       style: TextStyle(
                         fontFamily: 'monospace',
                         fontSize: 11,
-                        color: isDark ? AppColors.darkText : AppColors.lightText,
+                        color:
+                            isDark ? AppColors.darkText : AppColors.lightText,
                       ),
                     ),
                   ),
@@ -264,7 +271,8 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
     showDialog(
       context: context,
       builder: (_) => _AddFieldDialog(
-        onAdd: (field) => ref.read(modelEditorProvider.notifier).addField(field),
+        onAdd: (field) =>
+            ref.read(modelEditorProvider.notifier).addField(field),
       ),
     );
   }
@@ -295,8 +303,8 @@ class _ModelFieldRow extends StatelessWidget {
               color: AppColors.info.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Icon(_getTypeIcon(field.type),
-                size: 16, color: AppColors.info),
+            child:
+                Icon(_getTypeIcon(field.type), size: 16, color: AppColors.info),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -320,14 +328,14 @@ class _ModelFieldRow extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (field.required)
-                const Tooltip(
+                Tooltip(
                   message: MockUiText.requiredText,
-                  child: Icon(Icons.star, size: 12, color: AppColors.error),
+                  child: const Icon(Icons.star, size: 12, color: AppColors.error),
                 ),
               if (field.unique)
-                const Tooltip(
+                Tooltip(
                   message: MockUiText.unique3,
-                  child: Icon(Icons.key, size: 12, color: AppColors.warning),
+                  child: const Icon(Icons.key, size: 12, color: AppColors.warning),
                 ),
             ],
           ),
@@ -346,14 +354,22 @@ class _ModelFieldRow extends StatelessWidget {
 
   IconData _getTypeIcon(ModelFieldType type) {
     switch (type) {
-      case ModelFieldType.string: return Icons.text_fields;
-      case ModelFieldType.integer: return Icons.pin;
-      case ModelFieldType.float: return Icons.numbers;
-      case ModelFieldType.boolean: return Icons.toggle_on_outlined;
-      case ModelFieldType.date: return Icons.calendar_today;
-      case ModelFieldType.dateTime: return Icons.access_time;
-      case ModelFieldType.file: return Icons.attach_file;
-      case ModelFieldType.reference: return Icons.link;
+      case ModelFieldType.string:
+        return Icons.text_fields;
+      case ModelFieldType.integer:
+        return Icons.pin;
+      case ModelFieldType.float:
+        return Icons.numbers;
+      case ModelFieldType.boolean:
+        return Icons.toggle_on_outlined;
+      case ModelFieldType.date:
+        return Icons.calendar_today;
+      case ModelFieldType.dateTime:
+        return Icons.access_time;
+      case ModelFieldType.file:
+        return Icons.attach_file;
+      case ModelFieldType.reference:
+        return Icons.link;
     }
   }
 }
@@ -384,15 +400,16 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: MockUiText.fieldNameRequired),
+              decoration:
+                  InputDecoration(labelText: MockUiText.fieldNameRequired),
               autofocus: true,
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<ModelFieldType>(
               value: _type,
               items: ModelFieldType.values
-                  .map((t) => DropdownMenuItem(
-                      value: t, child: Text(t.displayName)))
+                  .map((t) =>
+                      DropdownMenuItem(value: t, child: Text(t.displayName)))
                   .toList(),
               onChanged: (v) => setState(() => _type = v!),
               decoration: InputDecoration(labelText: MockUiText.fieldType),

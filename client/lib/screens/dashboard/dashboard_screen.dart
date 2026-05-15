@@ -74,8 +74,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               flowCount: flowCount,
               openTickets:
                   tickets.where((t) => t.status == TicketStatus.open).length,
-              resolvedTickets:
-                  tickets.where((t) => t.status == TicketStatus.resolved).length,
+              resolvedTickets: tickets
+                  .where((t) => t.status == TicketStatus.resolved)
+                  .length,
               isLoading: companiesAsync.isLoading ||
                   ticketsAsync.isLoading ||
                   flowsAsync.isLoading,
@@ -111,12 +112,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                        flex: 3,
-                        child: _PriorityBarChart(tickets: tickets)),
+                        flex: 3, child: _PriorityBarChart(tickets: tickets)),
                     const SizedBox(width: 16),
                     Expanded(
-                        flex: 4,
-                        child: _RecentTicketsList(tickets: tickets)),
+                        flex: 4, child: _RecentTicketsList(tickets: tickets)),
                   ],
                 );
               }
@@ -154,13 +153,33 @@ class _WelcomeBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final hour = now.hour;
-    final greeting =
-        hour < 12 ? MockUiText.goodMorning : hour < 17 ? MockUiText.goodAfternoon : MockUiText.goodEvening;
-    final dayName =
-        [MockUiText.mon, MockUiText.tue, MockUiText.wed, MockUiText.thu, MockUiText.fri, MockUiText.sat, MockUiText.sun][now.weekday - 1];
+    final greeting = hour < 12
+        ? MockUiText.goodMorning
+        : hour < 17
+            ? MockUiText.goodAfternoon
+            : MockUiText.goodEvening;
+    final dayName = [
+      MockUiText.mon,
+      MockUiText.tue,
+      MockUiText.wed,
+      MockUiText.thu,
+      MockUiText.fri,
+      MockUiText.sat,
+      MockUiText.sun
+    ][now.weekday - 1];
     final monthName = [
-      MockUiText.jan, MockUiText.feb, MockUiText.mar, MockUiText.apr, MockUiText.may, MockUiText.jun,
-      MockUiText.jul, MockUiText.aug, MockUiText.sep, MockUiText.oct, MockUiText.nov, MockUiText.dec,
+      MockUiText.jan,
+      MockUiText.feb,
+      MockUiText.mar,
+      MockUiText.apr,
+      MockUiText.may,
+      MockUiText.jun,
+      MockUiText.jul,
+      MockUiText.aug,
+      MockUiText.sep,
+      MockUiText.oct,
+      MockUiText.nov,
+      MockUiText.dec,
     ][now.month - 1];
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -191,7 +210,8 @@ class _WelcomeBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  MockUiText.greetingLine(greeting, user?.firstName ?? MockUiText.there),
+                  MockUiText.greetingLine(
+                      greeting, user?.firstName ?? MockUiText.there),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: narrow ? 18 : 22,
@@ -214,12 +234,12 @@ class _WelcomeBanner extends StatelessWidget {
                   children: [
                     _BannerPill(
                       icon: Icons.calendar_today_rounded,
-                      label: MockUiText.dateLine(dayName, now.day, monthName, now.year),
+                      label: MockUiText.dateLine(
+                          dayName, now.day, monthName, now.year),
                     ),
                     _BannerPill(
                       icon: Icons.access_time_rounded,
-                      label:
-                          MockUiText.timeLine(now.hour, now.minute),
+                      label: MockUiText.timeLine(now.hour, now.minute),
                     ),
                   ],
                 ),
@@ -500,7 +520,15 @@ class _KpiCard extends ConsumerWidget {
 class _ActivityLineChart extends StatelessWidget {
   static const _ticketData = [3.0, 7.0, 4.0, 10.0, 6.0, 8.0, 5.0];
   static const _flowData = [1.0, 4.0, 2.0, 6.0, 4.0, 5.0, 3.0];
-  static List<String> get _days => [MockUiText.mon, MockUiText.tue, MockUiText.wed, MockUiText.thu, MockUiText.fri, MockUiText.sat, MockUiText.sun];
+  static List<String> get _days => [
+        MockUiText.mon,
+        MockUiText.tue,
+        MockUiText.wed,
+        MockUiText.thu,
+        MockUiText.fri,
+        MockUiText.sat,
+        MockUiText.sun
+      ];
 
   const _ActivityLineChart();
 
@@ -512,11 +540,11 @@ class _ActivityLineChart extends StatelessWidget {
     return _ChartCard(
       title: MockUiText.activityOverview,
       subtitle: MockUiText.ticketsFlowsLast7Days,
-      trailing: const Row(
+      trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           _ChartLegend(color: AppColors.primary, label: MockUiText.tickets),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           _ChartLegend(color: AppColors.accent, label: MockUiText.flows),
         ],
       ),
@@ -567,7 +595,8 @@ class _ActivityLineChart extends StatelessWidget {
                     isDark ? AppColors.darkCard : Colors.white,
                 tooltipRoundedRadius: 10,
                 getTooltipItems: (spots) => spots.map((s) {
-                  final label = s.barIndex == 0 ? MockUiText.tickets : MockUiText.flows;
+                  final label =
+                      s.barIndex == 0 ? MockUiText.tickets : MockUiText.flows;
                   final color =
                       s.barIndex == 0 ? AppColors.primary : AppColors.accent;
                   return LineTooltipItem(
@@ -603,8 +632,8 @@ class _ActivityLineChart extends StatelessWidget {
                 ),
               ),
               LineChartBarData(
-                spots: List.generate(
-                    7, (i) => FlSpot(i.toDouble(), _flowData[i])),
+                spots:
+                    List.generate(7, (i) => FlSpot(i.toDouble(), _flowData[i])),
                 isCurved: true,
                 curveSmoothness: 0.3,
                 color: AppColors.accent,
@@ -656,7 +685,12 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
       widget.tickets.where((t) => t.status == TicketStatus.resolved).length,
       widget.tickets.where((t) => t.status == TicketStatus.closed).length,
     ];
-    final labels = [MockUiText.open, MockUiText.inProgress, MockUiText.resolved, MockUiText.closed];
+    final labels = [
+      MockUiText.open,
+      MockUiText.inProgress,
+      MockUiText.resolved,
+      MockUiText.closed
+    ];
     final colors = [
       AppColors.chartColors[3], // amber (open)
       AppColors.chartColors[4], // blue (in progress)
@@ -676,8 +710,8 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
                 ? Center(
                     child: Text(
                       MockUiText.noTicketsYet,
-                      style: TextStyle(
-                          color: cs.onSurface.withValues(alpha: 0.4)),
+                      style:
+                          TextStyle(color: cs.onSurface.withValues(alpha: 0.4)),
                     ),
                   )
                 : PieChart(
@@ -774,7 +808,12 @@ class _PriorityBarChart extends StatelessWidget {
       AppColors.warning,
       AppColors.error,
     ];
-    final labels = [MockUiText.low, MockUiText.med, MockUiText.high, MockUiText.urgent];
+    final labels = [
+      MockUiText.low,
+      MockUiText.med,
+      MockUiText.high,
+      MockUiText.urgent
+    ];
 
     return _ChartCard(
       title: MockUiText.priorityBreakdown,
@@ -873,7 +912,7 @@ class _RecentTicketsList extends StatelessWidget {
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-        child: Text(MockUiText.viewAll, style: TextStyle(fontSize: 12)),
+        child: Text(MockUiText.viewAll, style: const TextStyle(fontSize: 12)),
       ),
       child: tickets.isEmpty
           ? Padding(
@@ -900,9 +939,8 @@ class _RecentTicketsList extends StatelessWidget {
                         isDark ? AppColors.darkSurface : AppColors.lightSurface,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: isDark
-                          ? AppColors.darkBorder
-                          : AppColors.lightBorder,
+                      color:
+                          isDark ? AppColors.darkBorder : AppColors.lightBorder,
                     ),
                   ),
                   child: Row(
@@ -1004,7 +1042,7 @@ class _PerformanceSection extends StatelessWidget {
 
     final List<_MetricData> metrics;
     if (total == 0) {
-      metrics = const [
+      metrics = [
         _MetricData(MockUiText.resolutionRate, 0.0, AppColors.success),
         _MetricData(MockUiText.inProgress, 0.0, AppColors.info),
         _MetricData(MockUiText.slaCompliance, 0.0, AppColors.primary),
@@ -1017,9 +1055,11 @@ class _PerformanceSection extends StatelessWidget {
       final nonUrgent =
           tickets.where((t) => t.priority != TicketPriority.urgent).length;
       metrics = [
-        _MetricData(MockUiText.resolutionRate, resolved / total, AppColors.success),
+        _MetricData(
+            MockUiText.resolutionRate, resolved / total, AppColors.success),
         _MetricData(MockUiText.inProgress, inProgress / total, AppColors.info),
-        _MetricData(MockUiText.slaCompliance, nonUrgent / total, AppColors.primary),
+        _MetricData(
+            MockUiText.slaCompliance, nonUrgent / total, AppColors.primary),
       ];
     }
 
@@ -1086,7 +1126,7 @@ class _MetricData {
 class _QuickActionsSection extends StatelessWidget {
   const _QuickActionsSection();
 
-  static const _actions = [
+  static final _actions = [
     (
       label: MockUiText.newFlow,
       icon: Icons.account_tree_rounded,
@@ -1152,8 +1192,7 @@ class _QuickActionsSection extends StatelessWidget {
                           color: action.color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child:
-                            Icon(action.icon, color: action.color, size: 18),
+                        child: Icon(action.icon, color: action.color, size: 18),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -1174,10 +1213,7 @@ class _QuickActionsSection extends StatelessWidget {
                     ],
                   ),
                 ),
-              )
-                  .animate(delay: (idx * 70).ms)
-                  .fadeIn()
-                  .slideX(begin: 0.05);
+              ).animate(delay: (idx * 70).ms).fadeIn().slideX(begin: 0.05);
             }).toList(),
           );
         }),
@@ -1260,15 +1296,16 @@ class _ChartLegend extends StatelessWidget {
         Container(
           width: 10,
           height: 3,
-          decoration:
-              BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+          decoration: BoxDecoration(
+              color: color, borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 5),
         Text(
           label,
           style: TextStyle(
             fontSize: 11,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],
