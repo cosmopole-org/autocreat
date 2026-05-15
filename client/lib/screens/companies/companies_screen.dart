@@ -41,6 +41,11 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
     final companiesAsync = ref.watch(companyNotifierProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        leading: AppBarBackButton(onPressed: () => context.pop()),
+        title: Text(UiText.companies),
+        titleSpacing: 0,
+      ),
       body: companiesAsync.when(
         loading: () => CustomScrollView(
           slivers: [
