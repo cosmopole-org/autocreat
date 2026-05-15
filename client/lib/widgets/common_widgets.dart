@@ -839,43 +839,44 @@ class AppBarBackButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final glassMode = ref.watch(glassModeProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
     final onTap = onPressed ?? () => Navigator.of(context).maybePop();
-
-    final Color bgColor;
-    final Color borderColor;
-    if (glassMode) {
-      bgColor = isDark
-          ? Colors.white.withValues(alpha: 0.08)
-          : Colors.white.withValues(alpha: 0.42);
-      borderColor = isDark
-          ? Colors.white.withValues(alpha: 0.18)
-          : Colors.white.withValues(alpha: 0.65);
-    } else {
-      bgColor = isDark
-          ? AppColors.darkSurface.withValues(alpha: 0.90)
-          : AppColors.lightSurface;
-      borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
-    }
+    final radius = glassMode ? 11.0 : 9.0;
 
     return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: borderColor, width: 1),
-            ),
-            child: Icon(
-              Icons.arrow_back,
-              color: isDark ? AppColors.darkText : AppColors.lightText,
-              size: 20,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: glassMode ? 10 : 0,
+            sigmaY: glassMode ? 10 : 0,
+          ),
+          child: Material(
+            color: glassMode
+                ? Colors.white.withValues(alpha: isDark ? 0.06 : 0.28)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(radius),
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(radius),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: glassMode
+                    ? BoxDecoration(
+                        borderRadius: BorderRadius.circular(radius),
+                        border: Border.all(
+                          color: Colors.white
+                              .withValues(alpha: isDark ? 0.10 : 0.42),
+                        ),
+                      )
+                    : null,
+                child: Icon(
+                  Icons.arrow_back,
+                  size: 18,
+                  color: cs.onSurface.withValues(alpha: 0.75),
+                ),
+              ),
             ),
           ),
         ),
