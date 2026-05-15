@@ -82,7 +82,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     final state = ref.read(flowEditorProvider);
     final node = FlowNode(
       id: uuid.v4(),
-      label: type.name.toUpperCase(),
+      label: type.displayName,
       type: type,
       x: 200 - state.offsetX / state.scale,
       y: 200 - state.offsetY / state.scale,
@@ -701,7 +701,7 @@ class _NodePropertiesSheet extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              node.type.name.toUpperCase(),
+                              node.type.displayName.toUpperCase(),
                               style: TextStyle(
                                   fontSize: 10,
                                   color: nodeColor,

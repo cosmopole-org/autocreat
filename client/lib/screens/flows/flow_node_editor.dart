@@ -102,7 +102,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: Text(
-                        node.type.name.toUpperCase(),
+                        node.type.displayName.toUpperCase(),
                         style: TextStyle(
                             fontSize: 9,
                             color: nodeColor,

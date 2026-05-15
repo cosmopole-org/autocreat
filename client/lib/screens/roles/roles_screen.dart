@@ -400,7 +400,7 @@ class _RoleCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            role.level.toUpperCase(),
+                            UiText.roleLevelLabel(role.level).toUpperCase(),
                             style: TextStyle(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w700,
@@ -495,7 +495,7 @@ class _RoleCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 3),
                           Text(
-                            p.resource,
+                            UiText.resourceLabel(p.resource),
                             style: TextStyle(
                                 fontSize: 10,
                                 color: cs.onSurface.withValues(alpha: 0.65)),
