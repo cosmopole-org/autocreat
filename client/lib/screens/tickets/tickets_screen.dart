@@ -11,6 +11,7 @@ import '../../providers/ticket_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
+import '../../data/mock_ui_text.dart';
 
 class TicketsScreen extends ConsumerStatefulWidget {
   const TicketsScreen({super.key});
@@ -25,7 +26,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
   String _search = '';
   late TabController _tabController;
 
-  static const _tabs = ['All', 'Open', 'In Progress', 'Resolved', 'Closed'];
+  static const _tabs = [MockUiText.all, MockUiText.open, MockUiText.inProgress, MockUiText.resolved, MockUiText.closed];
 
   @override
   void initState() {
@@ -118,11 +119,11 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                     children: [
                       // Header
                       AppPageHeader(
-                        title: 'Support Tickets',
+                        title: MockUiText.supportTickets,
                         description:
-                            'Track customer requests, prioritize urgent work, and keep every resolution moving from one polished command center.',
-                        actionLabel: 'New Ticket',
-                        compactActionLabel: 'New',
+                            MockUiText.trackCustomerRequestsPrioritizeUrgentWorkAndKeepEveryResolut,
+                        actionLabel: MockUiText.newTicket,
+                        compactActionLabel: MockUiText.newText,
                         actionIcon: Icons.add,
                         onAction: () => _showCreateTicket(context),
                       ).animate().fadeIn(duration: 300.ms),
@@ -164,7 +165,7 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
                       // Search
                       SearchField(
                         controller: _searchController,
-                        hintText: 'Search tickets...',
+                        hintText: MockUiText.searchTickets,
                         onChanged: (v) => setState(() => _search = v),
                       ),
                       const SizedBox(height: 8),
@@ -190,8 +191,8 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen>
               if (filtered.isEmpty)
                 const SliverFillRemaining(
                   child: EmptyState(
-                    title: 'No tickets found',
-                    subtitle: 'Try adjusting your filters',
+                    title: MockUiText.noTicketsFound,
+                    subtitle: MockUiText.tryAdjustingYourFilters,
                     icon: Icons.support_agent_outlined,
                   ),
                 )
@@ -326,25 +327,25 @@ class _TicketStatsRow extends StatelessWidget {
           AppStatCard(
             icon: Icons.confirmation_number_rounded,
             value: '$total',
-            label: 'Total',
+            label: MockUiText.total,
             color: AppColors.primary,
           ),
           AppStatCard(
             icon: Icons.inbox_rounded,
             value: '$open',
-            label: 'Open',
+            label: MockUiText.open,
             color: AppColors.warning,
           ),
           AppStatCard(
             icon: Icons.sync_rounded,
             value: '$inProgress',
-            label: 'In Progress',
+            label: MockUiText.inProgress,
             color: AppColors.info,
           ),
           AppStatCard(
             icon: Icons.check_circle_rounded,
             value: '$resolved',
-            label: 'Resolved',
+            label: MockUiText.resolved,
             color: AppColors.success,
           ),
         ],
@@ -387,19 +388,19 @@ class _PriorityBarChart extends StatelessWidget {
       AppColors.chartColors[3], // amber
       AppColors.chartColors[5], // red
     ];
-    const labels = ['Low', 'Med', 'High', 'Urgent'];
+    const labels = [MockUiText.low, MockUiText.med, MockUiText.high, MockUiText.urgent];
 
     return AppCard(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Priority Breakdown',
+          Text(MockUiText.priorityBreakdown,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text('Tickets by priority level',
+          Text(MockUiText.ticketsByPriorityLevel,
               style: TextStyle(
                   fontSize: 11,
                   color: cs.onSurface.withValues(alpha: 0.45))),
@@ -499,7 +500,7 @@ class _StatusDonutState extends State<_StatusDonut> {
     final data = [open, inProgress, resolved, closed];
     final total = data.fold(0, (a, b) => a + b);
 
-    final labels = ['Open', 'In Progress', 'Resolved', 'Closed'];
+    final labels = [MockUiText.open, MockUiText.inProgress, MockUiText.resolved, MockUiText.closed];
     final colors = [
       AppColors.chartColors[3], // amber (open)
       AppColors.chartColors[4], // blue (in progress)
@@ -512,12 +513,12 @@ class _StatusDonutState extends State<_StatusDonut> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Status Distribution',
+          Text(MockUiText.statusDistribution,
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
-          Text('Current ticket states',
+          Text(MockUiText.currentTicketStates,
               style: TextStyle(
                   fontSize: 11,
                   color: cs.onSurface.withValues(alpha: 0.45))),
@@ -529,7 +530,7 @@ class _StatusDonutState extends State<_StatusDonut> {
                 height: 100,
                 child: total == 0
                     ? Center(
-                        child: Text('No data',
+                        child: Text(MockUiText.noData,
                             style: TextStyle(
                                 fontSize: 11,
                                 color: cs.onSurface.withValues(alpha: 0.4))))
@@ -581,7 +582,7 @@ class _StatusDonutState extends State<_StatusDonut> {
                                     style:
                                         const TextStyle(fontSize: 11))),
                             Text(
-                              '${data[i]}',
+                              data[i].toString(),
                               style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
@@ -838,7 +839,7 @@ class _TicketCard extends StatelessWidget {
                                 color: cs.onSurface.withValues(alpha: 0.4)),
                             const SizedBox(width: 3),
                             Text(
-                              '${ticket.messageCount}',
+                              ticket.messageCount.toString(),
                               style: TextStyle(
                                 fontSize: 11,
                                 color: cs.onSurface.withValues(alpha: 0.5),
@@ -891,9 +892,9 @@ class _TicketCard extends StatelessWidget {
 
   String _formatDue(DateTime due) {
     final diff = due.difference(DateTime.now());
-    if (diff.inDays > 0) return 'Due in ${diff.inDays}d';
-    if (diff.inDays < 0) return '${-diff.inDays}d overdue';
-    return 'Due today';
+    if (diff.inDays > 0) return MockUiText.dueInDays(diff.inDays);
+    if (diff.inDays < 0) return MockUiText.daysOverdue(-diff.inDays);
+    return MockUiText.dueToday;
   }
 }
 
@@ -918,7 +919,7 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('New Ticket'),
+      title: const Text(MockUiText.newTicket),
       content: SizedBox(
         width: 400,
         child: Form(
@@ -928,14 +929,14 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
             children: [
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title *'),
+                decoration: const InputDecoration(labelText: MockUiText.titleRequired),
                 validator: (v) =>
-                    v?.isEmpty ?? true ? 'Title is required' : null,
+                    v?.isEmpty ?? true ? MockUiText.titleIsRequired : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _descController,
-                decoration: const InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: MockUiText.description),
                 maxLines: 3,
               ),
               const SizedBox(height: 12),
@@ -946,7 +947,7 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
                         value: p, child: Text(p.displayName)))
                     .toList(),
                 onChanged: (v) => setState(() => _priority = v!),
-                decoration: const InputDecoration(labelText: 'Priority'),
+                decoration: const InputDecoration(labelText: MockUiText.priority),
               ),
             ],
           ),
@@ -955,10 +956,10 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text(MockUiText.cancel),
         ),
         AppButton(
-          label: 'Create',
+          label: MockUiText.create,
           loading: _saving,
           onPressed: () async {
             if (!_formKey.currentState!.validate()) return;

@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../data/mock_ui_text.dart';
 
 part 'form_definition.freezed.dart';
 part 'form_definition.g.dart';
@@ -25,22 +26,22 @@ enum FormFieldType {
 extension FormFieldTypeExt on FormFieldType {
   String get displayName {
     switch (this) {
-      case FormFieldType.text: return 'Text';
-      case FormFieldType.number: return 'Number';
-      case FormFieldType.textarea: return 'Text Area';
-      case FormFieldType.dropdown: return 'Dropdown';
-      case FormFieldType.multiselect: return 'Multi-Select';
-      case FormFieldType.checkbox: return 'Checkbox';
-      case FormFieldType.radio: return 'Radio Group';
-      case FormFieldType.date: return 'Date Picker';
-      case FormFieldType.time: return 'Time Picker';
-      case FormFieldType.file: return 'File Upload';
-      case FormFieldType.image: return 'Image Upload';
-      case FormFieldType.color: return 'Color Picker';
-      case FormFieldType.switchField: return 'Switch';
-      case FormFieldType.table: return 'Table';
-      case FormFieldType.rating: return 'Rating';
-      case FormFieldType.signature: return 'Signature';
+      case FormFieldType.text: return MockUiText.textField;
+      case FormFieldType.number: return MockUiText.number;
+      case FormFieldType.textarea: return MockUiText.textArea;
+      case FormFieldType.dropdown: return MockUiText.dropdown;
+      case FormFieldType.multiselect: return MockUiText.multiSelect;
+      case FormFieldType.checkbox: return MockUiText.checkbox;
+      case FormFieldType.radio: return MockUiText.radioGroup;
+      case FormFieldType.date: return MockUiText.datePicker;
+      case FormFieldType.time: return MockUiText.timePicker;
+      case FormFieldType.file: return MockUiText.fileUpload;
+      case FormFieldType.image: return MockUiText.imageUpload;
+      case FormFieldType.color: return MockUiText.colorPicker;
+      case FormFieldType.switchField: return MockUiText.switchText;
+      case FormFieldType.table: return MockUiText.table;
+      case FormFieldType.rating: return MockUiText.rating;
+      case FormFieldType.signature: return MockUiText.signature;
     }
   }
 }

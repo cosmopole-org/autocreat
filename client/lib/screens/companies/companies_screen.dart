@@ -6,6 +6,7 @@ import '../../models/company.dart';
 import '../../providers/company_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
+import '../../data/mock_ui_text.dart';
 
 class CompaniesScreen extends ConsumerStatefulWidget {
   const CompaniesScreen({super.key});
@@ -47,11 +48,11 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
               child: Padding(
                 padding: AppPageLayout.contentPadding(context, horizontal: 20),
                 child: AppPageHeader(
-                  title: 'Companies',
+                  title: MockUiText.companies,
                   description:
-                      'Organize client and partner workspaces, monitor portfolio health, and keep each organization easy to find and manage.',
-                  actionLabel: 'New Company',
-                  compactActionLabel: 'New',
+                      MockUiText.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK,
+                  actionLabel: MockUiText.newCompany,
+                  compactActionLabel: MockUiText.newText,
                   actionIcon: Icons.add,
                   onAction: () => _showCreateDialog(context),
                 ).animate().fadeIn(duration: 300.ms),
@@ -81,11 +82,11 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppPageHeader(
-                        title: 'Companies',
+                        title: MockUiText.companies,
                         description:
-                            'Organize client and partner workspaces, monitor portfolio health, and keep each organization easy to find and manage.',
-                        actionLabel: 'New Company',
-                        compactActionLabel: 'New',
+                            MockUiText.organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK,
+                        actionLabel: MockUiText.newCompany,
+                        compactActionLabel: MockUiText.newText,
                         actionIcon: Icons.add,
                         onAction: () => _showCreateDialog(context),
                       ).animate().fadeIn(duration: 300.ms),
@@ -96,7 +97,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                       const SizedBox(height: 24),
                       SearchField(
                         controller: _searchController,
-                        hintText: 'Search companies...',
+                        hintText: MockUiText.searchCompanies,
                         onChanged: (v) => setState(() => _search = v),
                       ),
                       const SizedBox(height: 20),
@@ -107,12 +108,12 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
               if (filtered.isEmpty)
                 SliverFillRemaining(
                   child: EmptyState(
-                    title: _search.isEmpty ? 'No companies yet' : 'No results found',
+                    title: _search.isEmpty ? MockUiText.noCompaniesYet : MockUiText.noResultsFound,
                     subtitle: _search.isEmpty
-                        ? 'Create your first company to get started'
+                        ? MockUiText.createYourFirstCompanyToGetStarted
                         : null,
                     icon: Icons.business_outlined,
-                    actionLabel: _search.isEmpty ? 'Create Company' : null,
+                    actionLabel: _search.isEmpty ? MockUiText.createCompany : null,
                     onAction:
                         _search.isEmpty ? () => _showCreateDialog(context) : null,
                   ),
@@ -141,9 +142,9 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                           final confirmed = await showDialog<bool>(
                             context: context,
                             builder: (_) => const ConfirmDialog(
-                              title: 'Delete Company',
+                              title: MockUiText.deleteCompany,
                               message:
-                                  'Are you sure you want to delete this company?',
+                                  MockUiText.areYouSureYouWantToDeleteThisCompany,
                             ),
                           );
                           if (confirmed == true) {
@@ -206,25 +207,25 @@ class _CompanyStatsRow extends StatelessWidget {
           AppStatCard(
             icon: Icons.business_rounded,
             value: '$total',
-            label: 'Companies',
+            label: MockUiText.companies,
             color: AppColors.primary,
           ),
           AppStatCard(
             icon: Icons.check_circle_rounded,
             value: '$active',
-            label: 'Active',
+            label: MockUiText.active,
             color: AppColors.success,
           ),
           AppStatCard(
             icon: Icons.people_rounded,
             value: '$members',
-            label: 'Members',
+            label: MockUiText.members,
             color: AppColors.accent,
           ),
           AppStatCard(
             icon: Icons.account_tree_rounded,
             value: '$flows',
-            label: 'Flows',
+            label: MockUiText.flows,
             color: AppColors.warning,
           ),
         ],
@@ -302,10 +303,10 @@ class _CompanyCard extends StatelessWidget {
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, size: 18),
                 itemBuilder: (_) => [
-                  const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                  const PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
                   const PopupMenuItem(
                       value: 'delete',
-                      child: Text('Delete',
+                      child: Text(MockUiText.delete,
                           style: TextStyle(color: AppColors.error))),
                 ],
                 onSelected: (v) {
@@ -397,7 +398,7 @@ class _CompanyDialogState extends State<_CompanyDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title:
-          Text(widget.company == null ? 'New Company' : 'Edit Company'),
+          Text(widget.company == null ? MockUiText.newCompany : MockUiText.editCompany),
       content: SizedBox(
         width: 400,
         child: Form(
@@ -407,24 +408,24 @@ class _CompanyDialogState extends State<_CompanyDialog> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Company name *'),
+                decoration: const InputDecoration(labelText: MockUiText.companyNameRequired),
                 validator: (v) =>
-                    v?.isEmpty ?? true ? 'Name is required' : null,
+                    v?.isEmpty ?? true ? MockUiText.nameIsRequired : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _industryController,
-                decoration: const InputDecoration(labelText: 'Industry'),
+                decoration: const InputDecoration(labelText: MockUiText.industry),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _websiteController,
-                decoration: const InputDecoration(labelText: 'Website'),
+                decoration: const InputDecoration(labelText: MockUiText.website),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _descController,
-                decoration: const InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: MockUiText.description),
                 maxLines: 3,
               ),
             ],
@@ -434,10 +435,10 @@ class _CompanyDialogState extends State<_CompanyDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: const Text(MockUiText.cancel),
         ),
         AppButton(
-          label: 'Save',
+          label: MockUiText.save,
           loading: _saving,
           onPressed: () async {
             if (!_formKey.currentState!.validate()) return;

@@ -7,6 +7,7 @@ import '../core/utils.dart';
 import '../models/flow.dart';
 import '../providers/theme_provider.dart';
 import '../theme/app_colors.dart';
+import '../data/mock_ui_text.dart';
 
 typedef NodeCallback = void Function(FlowNode node);
 typedef EdgeCallback = void Function(FlowEdge edge);
@@ -279,7 +280,7 @@ class _GraphEditorState extends State<GraphEditor>
           child: const Row(children: [
             Icon(Icons.edit_outlined, size: 16),
             SizedBox(width: 8),
-            Text('Edit label'),
+            Text(MockUiText.editLabel),
           ]),
           onTap: () =>
               Future.microtask(() => widget.onNodeDoubleTap?.call(node)),
@@ -289,7 +290,7 @@ class _GraphEditorState extends State<GraphEditor>
           child: const Row(children: [
             Icon(Icons.delete_outline, size: 16, color: AppColors.error),
             SizedBox(width: 8),
-            Text('Delete node',
+            Text(MockUiText.deleteNode,
                 style: TextStyle(color: AppColors.error)),
           ]),
           onTap: () => widget.onNodeDelete?.call(node.id),
@@ -318,7 +319,7 @@ class _GraphEditorState extends State<GraphEditor>
           child: const Row(children: [
             Icon(Icons.delete_outline, size: 16, color: AppColors.error),
             SizedBox(width: 8),
-            Text('Delete edge',
+            Text(MockUiText.deleteEdge,
                 style: TextStyle(color: AppColors.error)),
           ]),
           onTap: () => widget.onEdgeDelete?.call(edge.id),
@@ -383,9 +384,9 @@ class _GraphEditorState extends State<GraphEditor>
       final destId = destPort?.nodeId ?? target?.id;
       if (destId != null && destId != _edgeSourcePort!.nodeId) {
         final conditionLabel = _edgeSourcePort!.side == _PortSide.outputBottomYes
-            ? 'Yes'
+            ? MockUiText.yes
             : _edgeSourcePort!.side == _PortSide.outputBottomNo
-                ? 'No'
+                ? MockUiText.no
                 : null;
         widget.onEdgeCreate?.call(_edgeSourcePort!.nodeId, destId,
             conditionLabel: conditionLabel);
@@ -687,8 +688,8 @@ class _GraphPainter extends CustomPainter {
     // Determine ports: default right→left, but if there's a label matching
     // a branch condition use the appropriate output port
     _PortSide srcSide = _PortSide.outputRight;
-    if (e.label == 'Yes') srcSide = _PortSide.outputBottomYes;
-    if (e.label == 'No') srcSide = _PortSide.outputBottomNo;
+    if (e.label == MockUiText.yes) srcSide = _PortSide.outputBottomYes;
+    if (e.label == MockUiText.no) srcSide = _PortSide.outputBottomNo;
 
     final p0 = portScreen(src, srcSide);
     final p3 = portScreen(tgt, _PortSide.inputLeft);
@@ -912,7 +913,7 @@ class _GraphPainter extends CustomPainter {
 
     // Role/Form badge if assigned
     if (n.assignedRoleId != null || n.assignedFormId != null) {
-      final badgeText = n.assignedFormId != null ? 'Form' : 'Role';
+      final badgeText = n.assignedFormId != null ? MockUiText.form : MockUiText.role;
       final bp = Offset(rect.right - 36, rect.bottom - 16);
       canvas.drawRRect(
         RRect.fromRectAndRadius(
@@ -969,13 +970,13 @@ class _GraphPainter extends CustomPainter {
 
       // Label for decision outputs
       if (side == _PortSide.outputBottomYes && showPorts) {
-        _paintText(canvas, 'Y',
+        _paintText(canvas, MockUiText.y,
             sp + Offset(-3, 6 * scale.clamp(0.6, 1.4)),
             fontSize: 8 * scale.clamp(0.6, 1.2),
             color: AppColors.success,
             fontWeight: FontWeight.w700);
       } else if (side == _PortSide.outputBottomNo && showPorts) {
-        _paintText(canvas, 'N',
+        _paintText(canvas, MockUiText.n3,
             sp + Offset(-3, 6 * scale.clamp(0.6, 1.4)),
             fontSize: 8 * scale.clamp(0.6, 1.2),
             color: AppColors.error,
@@ -1011,7 +1012,7 @@ class _GraphPainter extends CustomPainter {
               fontSize: fontSize, color: color, fontWeight: fontWeight)),
       textDirection: TextDirection.ltr,
       maxLines: 1,
-      ellipsis: '…',
+      ellipsis: MockUiText.ellipsis,
     );
     tp.layout(maxWidth: maxWidth);
     tp.paint(canvas, pos);
@@ -1145,7 +1146,7 @@ class _MinimapPainter extends CustomPainter {
     if (nodes.isEmpty) {
       final tp = TextPainter(
         text: TextSpan(
-          text: 'No nodes',
+          text: MockUiText.noNodes,
           style: TextStyle(
               fontSize: 9,
               color: AppColors.lightTextSecondary.withValues(alpha: 0.6)),

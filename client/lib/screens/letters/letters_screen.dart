@@ -7,6 +7,7 @@ import '../../models/letter_template.dart';
 import '../../providers/letter_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
+import '../../data/mock_ui_text.dart';
 
 class LettersScreen extends ConsumerStatefulWidget {
   const LettersScreen({super.key});
@@ -29,10 +30,10 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
   Future<void> _createLetter(BuildContext context) async {
     final repo = ref.read(letterRepositoryProvider);
     final letter = await repo.createLetter({
-      'name': 'New Letter Template',
+      'name': MockUiText.newLetterTemplate,
       'status': 'draft',
       'content': '',
-      'deltaContent': {},
+      MockUiText.deltacontent: {},
     });
     if (context.mounted) context.push('/letters/${letter.id}/edit');
   }
@@ -54,12 +55,12 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
   }
 
   Widget _buildContent(BuildContext context, List<LetterTemplate> letters) {
-    final categories = letters.map((l) => l.category ?? 'Uncategorized').toSet().toList();
+    final categories = letters.map((l) => l.category ?? MockUiText.uncategorized).toSet().toList();
     final filtered = letters.where((l) {
       final matchesSearch = _search.isEmpty ||
           l.name.toLowerCase().contains(_search.toLowerCase());
       final matchesCat = _categoryFilter == null ||
-          (l.category ?? 'Uncategorized') == _categoryFilter;
+          (l.category ?? MockUiText.uncategorized) == _categoryFilter;
       return matchesSearch && matchesCat;
     }).toList();
 
@@ -80,11 +81,11 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                     children: [
                       // Header
                       AppPageHeader(
-                        title: 'Letter Templates',
+                        title: MockUiText.letterTemplates,
                         description:
-                            'Manage reusable letter templates with dynamic variables, ready-to-send language, and consistent branded communication.',
-                        actionLabel: 'New Template',
-                        compactActionLabel: 'New',
+                            MockUiText.manageReusableLetterTemplatesWithDynamicVariablesReadyToSend,
+                        actionLabel: MockUiText.newTemplate,
+                        compactActionLabel: MockUiText.newText,
                         actionIcon: Icons.add,
                         onAction: () => _createLetter(context),
                       ).animate().fadeIn(duration: 300.ms),
@@ -112,7 +113,7 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                           Expanded(
                             child: SearchField(
                               controller: _searchController,
-                              hintText: 'Search templates...',
+                              hintText: MockUiText.searchTemplates,
                               onChanged: (v) => setState(() => _search = v),
                             ),
                           ),
@@ -135,10 +136,10 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
               if (filtered.isEmpty)
                 SliverFillRemaining(
                   child: EmptyState(
-                    title: 'No letter templates',
-                    subtitle: 'Create reusable letter templates',
+                    title: MockUiText.noLetterTemplates,
+                    subtitle: MockUiText.createReusableLetterTemplates,
                     icon: Icons.mail_outline,
-                    actionLabel: 'Create Template',
+                    actionLabel: MockUiText.createTemplate,
                     onAction: () => _createLetter(context),
                   ),
                 )
@@ -160,8 +161,8 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                           final confirmed = await showDialog<bool>(
                             context: context,
                             builder: (_) => const ConfirmDialog(
-                              title: 'Delete Template',
-                              message: 'Delete this letter template permanently?',
+                              title: MockUiText.deleteTemplate,
+                              message: MockUiText.deleteThisLetterTemplatePermanently,
                             ),
                           );
                           if (confirmed == true) {
@@ -201,10 +202,10 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      (Icons.mail_rounded, 'Total Templates', total.toString(), AppColors.primary),
-      (Icons.check_circle_rounded, 'Active', active.toString(), AppColors.success),
-      (Icons.edit_note_rounded, 'Draft', draft.toString(), AppColors.warning),
-      (Icons.code_rounded, 'Total Variables', totalVars.toString(), AppColors.accent),
+      (Icons.mail_rounded, MockUiText.totalTemplates, total.toString(), AppColors.primary),
+      (Icons.check_circle_rounded, MockUiText.active, active.toString(), AppColors.success),
+      (Icons.edit_note_rounded, MockUiText.draft, draft.toString(), AppColors.warning),
+      (Icons.code_rounded, MockUiText.totalVariables, totalVars.toString(), AppColors.accent),
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
@@ -255,7 +256,7 @@ class _CategoryChart extends StatelessWidget {
 
     final catMap = <String, int>{};
     for (final l in letters) {
-      final cat = l.category ?? 'Uncategorized';
+      final cat = l.category ?? MockUiText.uncategorized;
       catMap[cat] = (catMap[cat] ?? 0) + 1;
     }
     final cats = catMap.entries.toList();
@@ -272,12 +273,12 @@ class _CategoryChart extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Templates by Category',
+                  Text(MockUiText.templatesByCategory,
                       style: Theme.of(context)
                           .textTheme
                           .titleSmall
                           ?.copyWith(fontWeight: FontWeight.w700)),
-                  Text('Distribution across categories',
+                  Text(MockUiText.distributionAcrossCategories,
                       style: TextStyle(
                           fontSize: 11,
                           color: cs.onSurface.withValues(alpha: 0.45))),
@@ -296,7 +297,7 @@ class _CategoryChart extends StatelessWidget {
                     const Icon(Icons.code, size: 12, color: AppColors.primary),
                     const SizedBox(width: 4),
                     Text(
-                      'Avg ${(letters.fold<int>(0, (s, l) => s + l.variables.length) / (letters.isEmpty ? 1 : letters.length)).toStringAsFixed(1)} vars',
+                      MockUiText.avgVars((letters.fold<int>(0, (s, l) => s + l.variables.length) / (letters.isEmpty ? 1 : letters.length)).toStringAsFixed(1)),
                       style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.primary,
@@ -379,7 +380,7 @@ class _CategoryChart extends StatelessWidget {
                     style: const TextStyle(fontSize: 12),
                     overflow: TextOverflow.ellipsis),
               ),
-              Text('${e.value.value} ($pct%)',
+              Text(MockUiText.distributionLegend(e.value.value, pct),
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -419,12 +420,12 @@ class _CategoryDropdown extends StatelessWidget {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String?>(
           value: selected,
-          hint: const Text('All categories', style: TextStyle(fontSize: 13)),
+          hint: const Text(MockUiText.allCategories, style: TextStyle(fontSize: 13)),
           style: TextStyle(fontSize: 13, color: cs.onSurface),
           items: [
             const DropdownMenuItem<String?>(
               value: null,
-              child: Text('All categories'),
+              child: Text(MockUiText.allCategories),
             ),
             ...categories.map((c) => DropdownMenuItem<String?>(
                   value: c,
@@ -507,10 +508,10 @@ class _LetterCard extends StatelessWidget {
                   icon: Icon(Icons.more_vert,
                       size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                   itemBuilder: (_) => [
-                    const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                    const PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
                     const PopupMenuItem(
                         value: 'delete',
-                        child: Text('Delete',
+                        child: Text(MockUiText.delete,
                             style: TextStyle(color: AppColors.error))),
                   ],
                   onSelected: (v) {
@@ -581,7 +582,7 @@ class _LetterCard extends StatelessWidget {
                           color: cs.onSurface.withValues(alpha: 0.5)),
                       const SizedBox(width: 3),
                       Text(
-                        '${letter.variables.length} vars',
+                        MockUiText.varsCount(letter.variables.length),
                         style: TextStyle(
                             fontSize: 10,
                             color: cs.onSurface.withValues(alpha: 0.6)),

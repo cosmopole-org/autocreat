@@ -7,6 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shimmer/shimmer.dart';
 import '../providers/theme_provider.dart';
 import '../theme/app_colors.dart';
+import '../data/mock_ui_text.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE LAYOUT METRICS
@@ -1123,7 +1124,7 @@ class ConfirmDialog extends ConsumerWidget {
     super.key,
     required this.title,
     required this.message,
-    this.confirmLabel = 'Delete',
+    this.confirmLabel = MockUiText.delete,
     this.confirmColor,
   });
 
@@ -1138,7 +1139,7 @@ class ConfirmDialog extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text(MockUiText.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -1172,7 +1173,7 @@ class ConfirmDialog extends ConsumerWidget {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel'),
+                  child: const Text(MockUiText.cancel),
                 ),
                 const SizedBox(width: 10),
                 AppButton(
@@ -1305,7 +1306,7 @@ class SearchField extends StatefulWidget {
   const SearchField({
     super.key,
     required this.controller,
-    this.hintText = 'Search…',
+    this.hintText = MockUiText.searchEllipsis,
     this.onChanged,
   });
 
@@ -1376,7 +1377,7 @@ class AppErrorWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Something went wrong',
+              MockUiText.somethingWentWrong,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
@@ -1388,7 +1389,7 @@ class AppErrorWidget extends StatelessWidget {
             if (onRetry != null) ...[
               const SizedBox(height: 20),
               AppButton(
-                  label: 'Retry', onPressed: onRetry, icon: Icons.refresh),
+                  label: MockUiText.retry, onPressed: onRetry, icon: Icons.refresh),
             ],
           ],
         ),
