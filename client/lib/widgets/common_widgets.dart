@@ -342,6 +342,296 @@ class GlassSurface extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// GLASS DIALOG
+// ─────────────────────────────────────────────────────────────────────────────
+
+class GlassAlertDialog extends ConsumerWidget {
+  final Widget? title;
+  final Widget? content;
+  final List<Widget>? actions;
+  final EdgeInsetsGeometry titlePadding;
+  final EdgeInsetsGeometry contentPadding;
+  final EdgeInsetsGeometry actionsPadding;
+
+  const GlassAlertDialog({
+    super.key,
+    this.title,
+    this.content,
+    this.actions,
+    this.titlePadding = const EdgeInsets.fromLTRB(24, 22, 24, 0),
+    this.contentPadding = const EdgeInsets.fromLTRB(24, 18, 24, 0),
+    this.actionsPadding = const EdgeInsets.fromLTRB(24, 16, 24, 18),
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final glassMode = ref.watch(glassModeProvider);
+
+    if (!glassMode) {
+      return AlertDialog(
+        title: title,
+        content: content,
+        actions: actions,
+        titlePadding: titlePadding,
+        contentPadding: contentPadding,
+        actionsPadding: actionsPadding,
+      );
+    }
+
+    final theme = Theme.of(context);
+    final titleWidget = title == null
+        ? null
+        : Padding(
+            padding: titlePadding,
+            child: DefaultTextStyle(
+              style: theme.dialogTheme.titleTextStyle ??
+                  theme.textTheme.titleLarge ??
+                  const TextStyle(),
+              child: title!,
+            ),
+          );
+    final contentWidget = content == null
+        ? null
+        : Flexible(
+            child: Padding(
+              padding: contentPadding,
+              child: DefaultTextStyle(
+                style: theme.textTheme.bodyMedium ?? const TextStyle(),
+                child: content!,
+              ),
+            ),
+          );
+    final actionsWidget = actions == null || actions!.isEmpty
+        ? null
+        : Padding(
+            padding: actionsPadding,
+            child: OverflowBar(
+              alignment: MainAxisAlignment.end,
+              spacing: 8,
+              overflowSpacing: 8,
+              children: actions!,
+            ),
+          );
+
+    return Dialog(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 560,
+          maxHeight: MediaQuery.of(context).size.height * 0.86,
+        ),
+        child: GlassSurface(
+          enabled: true,
+          borderRadius: BorderRadius.circular(24),
+          padding: EdgeInsets.zero,
+          child: Material(
+            type: MaterialType.transparency,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (titleWidget != null) titleWidget,
+                if (contentWidget != null) contentWidget,
+                if (actionsWidget != null) actionsWidget,
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GLASS CONTEXT MENU
+// ─────────────────────────────────────────────────────────────────────────────
+
+abstract class GlassContextMenuEntry<T> {
+  const GlassContextMenuEntry();
+}
+
+class GlassContextMenuItem<T> extends GlassContextMenuEntry<T> {
+  final T value;
+  final Widget child;
+  final bool enabled;
+
+  const GlassContextMenuItem({
+    required this.value,
+    required this.child,
+    this.enabled = true,
+  });
+}
+
+class GlassContextMenuDivider<T> extends GlassContextMenuEntry<T> {
+  const GlassContextMenuDivider();
+}
+
+class GlassContextMenuButton<T> extends ConsumerWidget {
+  final Widget icon;
+  final List<GlassContextMenuEntry<T>> Function(BuildContext context) itemBuilder;
+  final ValueChanged<T>? onSelected;
+  final String? tooltip;
+
+  const GlassContextMenuButton({
+    super.key,
+    required this.icon,
+    required this.itemBuilder,
+    this.onSelected,
+    this.tooltip,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton(
+      icon: icon,
+      tooltip: tooltip,
+      onPressed: () async {
+        final box = context.findRenderObject() as RenderBox?;
+        final overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
+        if (box == null || overlay == null) return;
+
+        final offset = box.localToGlobal(Offset.zero, ancestor: overlay);
+        final position = RelativeRect.fromRect(
+          Rect.fromLTWH(offset.dx, offset.dy + box.size.height, 0, 0),
+          Offset.zero & overlay.size,
+        );
+        final value = await showGlassContextMenu<T>(
+          context: context,
+          position: position,
+          items: itemBuilder(context),
+        );
+        if (value != null) onSelected?.call(value);
+      },
+    );
+  }
+}
+
+Future<T?> showGlassContextMenu<T>({
+  required BuildContext context,
+  required RelativeRect position,
+  required List<GlassContextMenuEntry<T>> items,
+}) {
+  return showGeneralDialog<T>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.transparent,
+    transitionDuration: const Duration(milliseconds: 120),
+    pageBuilder: (dialogContext, animation, secondaryAnimation) {
+      return _GlassContextMenuOverlay<T>(
+        position: position,
+        items: items,
+      );
+    },
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+      return FadeTransition(
+        opacity: curved,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
+          alignment: Alignment.topLeft,
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
+class _GlassContextMenuOverlay<T> extends ConsumerWidget {
+  final RelativeRect position;
+  final List<GlassContextMenuEntry<T>> items;
+
+  const _GlassContextMenuOverlay({
+    required this.position,
+    required this.items,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final glassMode = ref.watch(glassModeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    const menuWidth = 220.0;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final left = position.left.clamp(
+          8.0,
+          (constraints.maxWidth - menuWidth - 8).clamp(8.0, constraints.maxWidth),
+        ).toDouble();
+        final top = position.top.clamp(8.0, constraints.maxHeight - 8).toDouble();
+
+        return Stack(
+          children: [
+            Positioned(
+              left: left,
+              top: top,
+              width: menuWidth,
+              child: Material(
+                color: Colors.transparent,
+                child: GlassSurface(
+                  enabled: glassMode,
+                  color: glassMode
+                      ? null
+                      : (isDark ? AppColors.darkCard : AppColors.lightSurface),
+                  borderRadius: BorderRadius.circular(glassMode ? 18 : 12),
+                  blur: 18,
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(
+                        alpha: glassMode
+                            ? (isDark ? 0.36 : 0.14)
+                            : (isDark ? 0.22 : 0.12),
+                      ),
+                      blurRadius: glassMode ? 26 : 14,
+                      offset: const Offset(0, 12),
+                    ),
+                  ],
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: items.map((entry) {
+                      if (entry is GlassContextMenuDivider<T>) {
+                        return const Divider(height: 9, indent: 8, endIndent: 8);
+                      }
+                      final item = entry as GlassContextMenuItem<T>;
+                      return InkWell(
+                        onTap: item.enabled
+                            ? () => Navigator.of(context).pop(item.value)
+                            : null,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          child: IconTheme.merge(
+                            data: IconThemeData(
+                              size: 18,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            child: DefaultTextStyle(
+                              style: Theme.of(context).popupMenuTheme.textStyle ??
+                                  Theme.of(context).textTheme.bodyMedium!,
+                              child: item.child,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // APP CARD
 // ─────────────────────────────────────────────────────────────────────────────
 

@@ -305,11 +305,12 @@ class _CompanyCard extends StatelessWidget {
                   ],
                 ),
               ),
-              PopupMenuButton<String>(
+              GlassContextMenuButton<String>(
                 icon: const Icon(Icons.more_vert, size: 18),
                 itemBuilder: (_) => [
-                  PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
-                  PopupMenuItem(
+                  GlassContextMenuItem(
+                      value: 'edit', child: Text(MockUiText.edit)),
+                  GlassContextMenuItem(
                       value: 'delete',
                       child: Text(MockUiText.delete,
                           style: const TextStyle(color: AppColors.error))),
@@ -397,7 +398,7 @@ class _CompanyDialogState extends State<_CompanyDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return GlassAlertDialog(
       title: Text(widget.company == null
           ? MockUiText.newCompany
           : MockUiText.editCompany),

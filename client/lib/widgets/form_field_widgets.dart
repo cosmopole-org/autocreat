@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../models/form_definition.dart';
 import '../theme/app_colors.dart';
 import '../data/mock_ui_text.dart';
+import 'common_widgets.dart';
 
 class FormFieldRenderer extends StatefulWidget {
   final AppFormField field;
@@ -412,7 +413,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
               : () {
                   showDialog(
                     context: context,
-                    builder: (ctx) => AlertDialog(
+                    builder: (ctx) => GlassAlertDialog(
                       title: Text(MockUiText.pickAColor),
                       content: SingleChildScrollView(
                         child: ColorPicker(

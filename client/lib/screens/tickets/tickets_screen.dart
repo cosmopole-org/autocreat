@@ -725,12 +725,12 @@ class _TicketCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          PopupMenuButton<TicketStatus>(
+                          GlassContextMenuButton<TicketStatus>(
                             icon: Icon(Icons.more_vert,
                                 size: 18,
                                 color: cs.onSurface.withValues(alpha: 0.4)),
                             itemBuilder: (_) => TicketStatus.values
-                                .map((s) => PopupMenuItem(
+                                .map<GlassContextMenuEntry<TicketStatus>>((s) => GlassContextMenuItem(
                                       value: s,
                                       child: Text(s.displayName),
                                     ))
@@ -923,7 +923,7 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return GlassAlertDialog(
       title: Text(MockUiText.newTicket),
       content: SizedBox(
         width: 400,

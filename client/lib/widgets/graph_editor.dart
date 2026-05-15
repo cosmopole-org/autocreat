@@ -8,6 +8,7 @@ import '../models/flow.dart';
 import '../providers/theme_provider.dart';
 import '../theme/app_colors.dart';
 import '../data/mock_ui_text.dart';
+import 'common_widgets.dart';
 
 typedef NodeCallback = void Function(FlowNode node);
 typedef EdgeCallback = void Function(FlowEdge edge);
@@ -235,98 +236,68 @@ class _GraphEditorState extends State<GraphEditor>
 
   // ── context menu ──────────────────────────────────────────────────────────
 
-  bool get _glassMode =>
-      ProviderScope.containerOf(context, listen: false).read(glassModeProvider);
-
-  Color _contextMenuColor() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    if (!_glassMode) {
-      return isDark ? AppColors.darkCard : AppColors.lightSurface;
-    }
-    return Colors.white.withValues(alpha: isDark ? 0.10 : 0.74);
-  }
-
-  ShapeBorder _contextMenuShape() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(_glassMode ? 18 : 12),
-      side: BorderSide(
-        color: _glassMode
-            ? Colors.white.withValues(alpha: isDark ? 0.16 : 0.62)
-            : isDark
-                ? AppColors.darkBorder
-                : AppColors.lightBorder,
-      ),
-    );
-  }
 
   void _showNodeMenu(FlowNode node, Offset screenPos) {
     final RenderBox? overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox?;
     if (overlay == null) return;
 
-    showMenu(
+    showGlassContextMenu<String>(
       context: context,
       position: RelativeRect.fromSize(
         Rect.fromLTWH(screenPos.dx, screenPos.dy, 0, 0),
         overlay.size,
       ),
-      color: _contextMenuColor(),
-      surfaceTintColor: Colors.transparent,
-      elevation: _glassMode ? 14 : 4,
-      shadowColor: Colors.black.withValues(alpha: _glassMode ? 0.28 : 0.16),
-      shape: _contextMenuShape(),
-      items: <PopupMenuEntry<Object?>>[
-        PopupMenuItem<Object?>(
+      items: [
+        GlassContextMenuItem(
+          value: 'edit',
           child: Row(children: [
             const Icon(Icons.edit_outlined, size: 16),
             const SizedBox(width: 8),
             Text(MockUiText.editLabel),
           ]),
-          onTap: () =>
-              Future.microtask(() => widget.onNodeDoubleTap?.call(node)),
         ),
-        const PopupMenuDivider(height: 1),
-        PopupMenuItem<Object?>(
+        const GlassContextMenuDivider(),
+        GlassContextMenuItem(
+          value: 'delete',
           child: Row(children: [
             const Icon(Icons.delete_outline, size: 16, color: AppColors.error),
             const SizedBox(width: 8),
             Text(MockUiText.deleteNode,
                 style: const TextStyle(color: AppColors.error)),
           ]),
-          onTap: () => widget.onNodeDelete?.call(node.id),
         ),
       ],
-    );
+    ).then((value) {
+      if (value == 'edit') widget.onNodeDoubleTap?.call(node);
+      if (value == 'delete') widget.onNodeDelete?.call(node.id);
+    });
   }
 
   void _showEdgeMenu(FlowEdge edge, Offset screenPos) {
     final RenderBox? overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox?;
     if (overlay == null) return;
-    showMenu(
+    showGlassContextMenu<String>(
       context: context,
       position: RelativeRect.fromSize(
         Rect.fromLTWH(screenPos.dx, screenPos.dy, 0, 0),
         overlay.size,
       ),
-      color: _contextMenuColor(),
-      surfaceTintColor: Colors.transparent,
-      elevation: _glassMode ? 14 : 4,
-      shadowColor: Colors.black.withValues(alpha: _glassMode ? 0.28 : 0.16),
-      shape: _contextMenuShape(),
-      items: <PopupMenuEntry<Object?>>[
-        PopupMenuItem<Object?>(
+      items: [
+        GlassContextMenuItem(
+          value: 'delete',
           child: Row(children: [
             const Icon(Icons.delete_outline, size: 16, color: AppColors.error),
             const SizedBox(width: 8),
             Text(MockUiText.deleteEdge,
                 style: const TextStyle(color: AppColors.error)),
           ]),
-          onTap: () => widget.onEdgeDelete?.call(edge.id),
         ),
       ],
-    );
+    ).then((value) {
+      if (value == 'delete') widget.onEdgeDelete?.call(edge.id);
+    });
   }
 
   // ── gesture handlers ──────────────────────────────────────────────────────
