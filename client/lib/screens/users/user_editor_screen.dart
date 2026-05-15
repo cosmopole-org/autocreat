@@ -7,7 +7,7 @@ import '../../providers/role_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class UserEditorScreen extends ConsumerStatefulWidget {
   final String userId;
@@ -93,7 +93,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.userSaved),
+              content: Text(UiText.userSaved),
               backgroundColor: AppColors.success),
         );
       }
@@ -101,7 +101,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.error(e)),
+              content: Text(UiText.error(e)),
               backgroundColor: AppColors.error),
         );
       }
@@ -141,10 +141,10 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        title: Text(_user == null ? MockUiText.newUser : MockUiText.editUser),
+        title: Text(_user == null ? UiText.newUser : UiText.editUser),
         actions: [
           AppButton(
-            label: MockUiText.save,
+            label: UiText.save,
             loading: _saving,
             onPressed: _save,
             icon: Icons.save_outlined,
@@ -194,8 +194,8 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                 onPressed: _pickAvatar,
                 icon: const Icon(Icons.photo_library_outlined, size: 16),
                 label: Text(_avatarPath != null || _user?.avatar != null
-                    ? MockUiText.changePhoto
-                    : MockUiText.uploadPhoto),
+                    ? UiText.changePhoto
+                    : UiText.uploadPhoto),
               ),
               const SizedBox(height: 16),
 
@@ -203,7 +203,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(MockUiText.userInfo,
+                    Text(UiText.userInfo,
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 16),
                     Row(
@@ -212,10 +212,10 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                           child: TextFormField(
                             controller: _firstNameController,
                             decoration: InputDecoration(
-                                labelText: MockUiText.firstNameRequired),
+                                labelText: UiText.firstNameRequired),
                             onChanged: (_) => setState(() {}),
                             validator: (v) => v?.isEmpty ?? true
-                                ? MockUiText.requiredText
+                                ? UiText.requiredText
                                 : null,
                           ),
                         ),
@@ -224,10 +224,10 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                           child: TextFormField(
                             controller: _lastNameController,
                             decoration: InputDecoration(
-                                labelText: MockUiText.lastNameRequired),
+                                labelText: UiText.lastNameRequired),
                             onChanged: (_) => setState(() {}),
                             validator: (v) => v?.isEmpty ?? true
-                                ? MockUiText.requiredText
+                                ? UiText.requiredText
                                 : null,
                           ),
                         ),
@@ -238,14 +238,14 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        labelText: MockUiText.emailRequired,
+                        labelText: UiText.emailRequired,
                         prefixIcon: const Icon(Icons.email_outlined, size: 18),
                       ),
                       validator: (v) {
-                        if (v?.isEmpty ?? true) return MockUiText.requiredText;
+                        if (v?.isEmpty ?? true) return UiText.requiredText;
                         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                             .hasMatch(v!)) {
-                          return MockUiText.invalidEmail;
+                          return UiText.invalidEmail;
                         }
                         return null;
                       },
@@ -255,7 +255,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
-                        labelText: MockUiText.phone,
+                        labelText: UiText.phone,
                         prefixIcon: const Icon(Icons.phone_outlined, size: 18),
                       ),
                     ),
@@ -265,17 +265,17 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: _user == null
-                            ? MockUiText.passwordRequired
-                            : MockUiText.newPasswordLeaveBlankToKeep,
+                            ? UiText.passwordRequired
+                            : UiText.newPasswordLeaveBlankToKeep,
                         prefixIcon: const Icon(Icons.lock_outline, size: 18),
                       ),
                       validator: _user == null
                           ? (v) {
                               if (v?.isEmpty ?? true) {
-                                return MockUiText.passwordIsRequired;
+                                return UiText.passwordIsRequired;
                               }
                               if (v!.length < 8) {
-                                return MockUiText.atLeast8Characters;
+                                return UiText.atLeast8Characters;
                               }
                               return null;
                             }
@@ -290,31 +290,31 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(MockUiText.access,
+                    Text(UiText.access,
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 16),
                     rolesAsync.when(
                       loading: () => const LinearProgressIndicator(),
-                      error: (_, __) => Text(MockUiText.errorLoadingRoles),
+                      error: (_, __) => Text(UiText.errorLoadingRoles),
                       data: (roles) => DropdownButtonFormField<String?>(
                         value: _selectedRoleId,
                         items: [
                           DropdownMenuItem(
-                              value: null, child: Text(MockUiText.noRole)),
+                              value: null, child: Text(UiText.noRole)),
                           ...roles.map((r) => DropdownMenuItem(
                               value: r.id, child: Text(r.name))),
                         ],
                         onChanged: (v) => setState(() => _selectedRoleId = v),
                         decoration: InputDecoration(
-                          labelText: MockUiText.assignedRole3,
+                          labelText: UiText.assignedRole3,
                           prefixIcon: const Icon(Icons.shield_outlined, size: 18),
                         ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     SwitchListTile(
-                      title: Text(MockUiText.activeAccount),
-                      subtitle: Text(MockUiText.inactiveUsersCannotLogIn),
+                      title: Text(UiText.activeAccount),
+                      subtitle: Text(UiText.inactiveUsersCannotLogIn),
                       value: _isActive,
                       onChanged: (v) => setState(() => _isActive = v),
                       contentPadding: EdgeInsets.zero,

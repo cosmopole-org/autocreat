@@ -7,7 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/demo_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -27,13 +27,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   static final _demoAccounts = [
     {
       'email': 'demo@autocreat.io',
-      'password': MockUiText.demo123,
-      'label': MockUiText.demo
+      'password': UiText.demo123,
+      'label': UiText.demo
     },
     {
       'email': 'admin@demo.com',
       'password': 'password123',
-      'label': MockUiText.admin
+      'label': UiText.admin
     },
   ];
 
@@ -57,7 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           );
     } catch (e) {
       setState(() =>
-          _errorMessage = e.toString().replaceAll(MockUiText.exception, ''));
+          _errorMessage = e.toString().replaceAll(UiText.exception, ''));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -152,7 +152,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(width: 12),
             Text(
-              MockUiText.autocreat,
+              UiText.autocreat,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w800,
@@ -162,12 +162,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ).animate().fadeIn(duration: 500.ms),
         const SizedBox(height: 20),
         Text(
-          MockUiText.welcomeBack,
+          UiText.welcomeBack,
           style: Theme.of(context).textTheme.headlineSmall,
         ).animate().fadeIn(delay: 100.ms, duration: 400.ms),
         const SizedBox(height: 6),
         Text(
-          MockUiText.signInToYourOrganizationAccount,
+          UiText.signInToYourOrganizationAccount,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppColors.lightTextSecondary,
               ),
@@ -189,7 +189,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             children: _demoAccounts
                 .map((a) => ActionChip(
                       label: Text(
-                          MockUiText.demoAccountLabel(a['label'] as String)),
+                          UiText.demoAccountLabel(a['label'] as String)),
                       avatar: const Icon(Icons.person_outline, size: 14),
                       onPressed: () => _fillDemo(Map<String, String>.from(a)),
                     ))
@@ -229,13 +229,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
-              labelText: MockUiText.emailAddress,
+              labelText: UiText.emailAddress,
               prefixIcon: const Icon(Icons.email_outlined, size: 20),
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return MockUiText.emailIsRequired;
+              if (v == null || v.isEmpty) return UiText.emailIsRequired;
               if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v)) {
-                return MockUiText.invalidEmail;
+                return UiText.invalidEmail;
               }
               return null;
             },
@@ -250,7 +250,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             controller: _passwordController,
             obscureText: _obscurePassword,
             decoration: InputDecoration(
-              labelText: MockUiText.password,
+              labelText: UiText.password,
               prefixIcon: const Icon(Icons.lock_outline, size: 20),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -264,8 +264,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return MockUiText.passwordIsRequired;
-              if (v.length < 6) return MockUiText.passwordTooShort;
+              if (v == null || v.isEmpty) return UiText.passwordIsRequired;
+              if (v.length < 6) return UiText.passwordTooShort;
               return null;
             },
             onFieldSubmitted: (_) => _login(),
@@ -276,10 +276,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           const SizedBox(height: 8),
 
           Align(
-            alignment: Alignment.centerRight,
+            alignment: AlignmentDirectional.centerEnd,
             child: TextButton(
               onPressed: () {},
-              child: Text(MockUiText.forgotPassword),
+              child: Text(UiText.forgotPassword),
             ),
           ),
           const SizedBox(height: 20),
@@ -292,7 +292,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           const SizedBox(height: 12),
 
           AppButton(
-            label: MockUiText.signIn3,
+            label: UiText.signIn3,
             onPressed: _login,
             loading: _isLoading,
             icon: Icons.login,
@@ -307,12 +307,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                MockUiText.donTHaveAnAccount,
+                UiText.donTHaveAnAccount,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               TextButton(
                 onPressed: () => context.go(AppRoutes.register),
-                child: Text(MockUiText.createAccount3),
+                child: Text(UiText.createAccount3),
               ),
             ],
           ).animate().fadeIn(delay: 700.ms, duration: 400.ms),
@@ -328,7 +328,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
 /// A visually distinct card-style button that enters client-side demo mode.
 ///
-/// Uses a gradient matching the app accent palette and a subtle MockUiText.demo3 badge
+/// Uses a gradient matching the app accent palette and a subtle UiText.demo3 badge
 /// to make it clear no account is needed.
 class _DemoModeButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -378,7 +378,7 @@ class _DemoModeButton extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    MockUiText.tryDemoMode,
+                    UiText.tryDemoMode,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -387,7 +387,7 @@ class _DemoModeButton extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    MockUiText.noAccountNeededExploreWithSampleData,
+                    UiText.noAccountNeededExploreWithSampleData,
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 11,
@@ -396,7 +396,7 @@ class _DemoModeButton extends StatelessWidget {
                 ],
               ),
             ),
-            // MockUiText.demo3 badge
+            // UiText.demo3 badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
@@ -405,7 +405,7 @@ class _DemoModeButton extends StatelessWidget {
                 border: Border.all(color: Colors.white38),
               ),
               child: Text(
-                MockUiText.demo3,
+                UiText.demo3,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 10,
@@ -447,7 +447,7 @@ class _LeftPanel extends StatelessWidget {
               .scale(begin: const Offset(0.5, 0.5)),
           const SizedBox(height: 24),
           Text(
-            MockUiText.autocreat,
+            UiText.autocreat,
             style: Theme.of(context).textTheme.displayMedium?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
@@ -458,7 +458,7 @@ class _LeftPanel extends StatelessWidget {
               .slideX(begin: -0.1),
           const SizedBox(height: 16),
           Text(
-            MockUiText.organizationalSystemBuilder,
+            UiText.organizationalSystemBuilder,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: Colors.white.withValues(alpha: 0.85),
                 ),
@@ -469,12 +469,12 @@ class _LeftPanel extends StatelessWidget {
           const SizedBox(height: 40),
           ...[
             (
-              MockUiText.designComplexOrganizationalFlows,
+              UiText.designComplexOrganizationalFlows,
               Icons.account_tree_outlined
             ),
-            (MockUiText.buildFormsAndDataModels, Icons.dynamic_form_outlined),
-            (MockUiText.manageRolesAndPermissions, Icons.shield_outlined),
-            (MockUiText.communicateViaTickets, Icons.support_agent_outlined),
+            (UiText.buildFormsAndDataModels, Icons.dynamic_form_outlined),
+            (UiText.manageRolesAndPermissions, Icons.shield_outlined),
+            (UiText.communicateViaTickets, Icons.support_agent_outlined),
           ].asMap().entries.map(
                 (e) => Padding(
                   padding: const EdgeInsets.only(bottom: 16),

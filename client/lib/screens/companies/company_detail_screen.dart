@@ -13,7 +13,7 @@ import '../../providers/flow_provider.dart';
 import '../../data/demo_overrides.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class CompanyDetailScreen extends ConsumerStatefulWidget {
   final String id;
@@ -156,14 +156,14 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(MockUiText.capacity,
+                      Text(UiText.capacity,
                           style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 16),
                       Row(
                         children: [
                           Expanded(
                             child: _CapacityIndicator(
-                              label: MockUiText.members,
+                              label: UiText.members,
                               value: memberUsage,
                               count: company.memberCount,
                               max: 50,
@@ -173,7 +173,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                           const SizedBox(width: 24),
                           Expanded(
                             child: _CapacityIndicator(
-                              label: MockUiText.flows,
+                              label: UiText.flows,
                               value: flowUsage,
                               count: company.flowCount,
                               max: 20,
@@ -192,33 +192,33 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(MockUiText.details,
+                      Text(UiText.details,
                           style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 12),
                       if (company.description != null)
                         InfoRow(
-                            label: MockUiText.description,
+                            label: UiText.description,
                             value: company.description!),
                       if (company.website != null)
                         InfoRow(
-                            label: MockUiText.website,
+                            label: UiText.website,
                             value: company.website!,
                             icon: Icons.link),
                       InfoRow(
-                          label: MockUiText.members,
+                          label: UiText.members,
                           value: '${company.memberCount}',
                           icon: Icons.people),
                       InfoRow(
-                          label: MockUiText.flows,
+                          label: UiText.flows,
                           value: '${company.flowCount}',
                           icon: Icons.account_tree),
                       if (company.createdAt != null)
                         InfoRow(
-                          label: MockUiText.created,
+                          label: UiText.created,
                           value: company.createdAt!
                               .toLocal()
                               .toString()
-                              .split(MockUiText.text)[0],
+                              .split(UiText.text)[0],
                           icon: Icons.calendar_today,
                         ),
                     ],
@@ -230,11 +230,11 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(MockUiText.flows,
+                    Text(UiText.flows,
                         style: Theme.of(context).textTheme.titleMedium),
                     TextButton.icon(
                       icon: const Icon(Icons.add, size: 16),
-                      label: Text(MockUiText.newFlow),
+                      label: Text(UiText.newFlow),
                       onPressed: () => context.go(AppRoutes.flows),
                     ),
                   ],
@@ -247,7 +247,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                     if (flows.isEmpty) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Text(MockUiText.noFlowsYet,
+                        child: Text(UiText.noFlowsYet,
                             style:
                                 const TextStyle(color: AppColors.lightTextSecondary)),
                       );
@@ -259,7 +259,11 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                                     color: AppColors.primary),
                                 title: Text(f.name),
                                 subtitle: Text(f.status),
-                                trailing: const Icon(Icons.chevron_right),
+                                trailing: Icon(
+                                  Directionality.of(context) == TextDirection.rtl
+                                      ? Icons.chevron_left
+                                      : Icons.chevron_right,
+                                ),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12)),
                                 onTap: () =>
@@ -365,7 +369,7 @@ class _CapacityIndicator extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label, style: Theme.of(context).textTheme.labelMedium),
-            Text(MockUiText.capacityRatio(count, max),
+            Text(UiText.capacityRatio(count, max),
                 style: Theme.of(context)
                     .textTheme
                     .labelMedium

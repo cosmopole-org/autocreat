@@ -7,7 +7,7 @@ import '../../models/flow.dart';
 import '../../providers/flow_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class FlowsScreen extends ConsumerStatefulWidget {
   const FlowsScreen({super.key});
@@ -29,12 +29,12 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
   Future<void> _createFlow(BuildContext context) async {
     final repo = ref.read(flowRepositoryProvider);
     final flow = await repo.createFlow({
-      'name': MockUiText.newFlow,
+      'name': UiText.newFlow,
       'status': 'draft',
       'nodes': [
         {
           'id': 'start_1',
-          'label': MockUiText.start,
+          'label': UiText.start,
           'type': 'start',
           'x': 100.0,
           'y': 200.0,
@@ -43,7 +43,7 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
         },
         {
           'id': 'end_1',
-          'label': MockUiText.end,
+          'label': UiText.end,
           'type': 'end',
           'x': 400.0,
           'y': 200.0,
@@ -96,11 +96,11 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
               children: [
                 // Header
                 AppPageHeader(
-                  title: MockUiText.automationFlows,
-                  description: MockUiText
+                  title: UiText.automationFlows,
+                  description: UiText
                       .designReviewAndLaunchOrganizationalProcessFlowsWithClearStep,
-                  actionLabel: MockUiText.newFlow,
-                  compactActionLabel: MockUiText.newText,
+                  actionLabel: UiText.newFlow,
+                  compactActionLabel: UiText.newText,
                   actionIcon: Icons.add,
                   onAction: () => _createFlow(context),
                 ).animate().fadeIn(duration: 300.ms),
@@ -125,7 +125,7 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
                 // Search
                 SearchField(
                   controller: _searchController,
-                  hintText: MockUiText.searchFlows,
+                  hintText: UiText.searchFlows,
                   onChanged: (v) => setState(() => _search = v),
                 ).animate().fadeIn(delay: 250.ms),
                 const SizedBox(height: 16),
@@ -136,10 +136,10 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
         if (filtered.isEmpty)
           SliverFillRemaining(
             child: EmptyState(
-              title: MockUiText.noFlowsYet,
-              subtitle: MockUiText.createYourFirstOrganizationalFlow,
+              title: UiText.noFlowsYet,
+              subtitle: UiText.createYourFirstOrganizationalFlow,
               icon: Icons.account_tree_outlined,
-              actionLabel: MockUiText.createFlow,
+              actionLabel: UiText.createFlow,
               onAction: () => _createFlow(context),
             ),
           )
@@ -161,8 +161,8 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
                     final confirmed = await showDialog<bool>(
                       context: context,
                       builder: (_) => ConfirmDialog(
-                        title: MockUiText.deleteFlow,
-                        message: MockUiText.thisWillDeleteTheFlowPermanently,
+                        title: UiText.deleteFlow,
+                        message: UiText.thisWillDeleteTheFlowPermanently,
                       ),
                     );
                     if (confirmed == true) {
@@ -202,25 +202,25 @@ class _FlowStatsRow extends StatelessWidget {
     final stats = [
       (
         Icons.account_tree_rounded,
-        MockUiText.totalFlows,
+        UiText.totalFlows,
         total.toString(),
         AppColors.primary
       ),
       (
         Icons.play_circle_rounded,
-        MockUiText.active,
+        UiText.active,
         active.toString(),
         AppColors.success
       ),
       (
         Icons.edit_note_rounded,
-        MockUiText.draft,
+        UiText.draft,
         draft.toString(),
         AppColors.warning
       ),
       (
         Icons.hub_rounded,
-        MockUiText.totalNodes,
+        UiText.totalNodes,
         totalNodes.toString(),
         AppColors.accent
       ),
@@ -239,7 +239,7 @@ class _FlowStatsRow extends StatelessWidget {
               .entries
               .map((e) => Expanded(
                     child: Padding(
-                      padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+                      padding: EdgeInsetsDirectional.only(start: e.key == 0 ? 0 : 12),
                       child: e.value,
                     ),
                   ))
@@ -305,12 +305,12 @@ class _FlowsChart extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(MockUiText.flowComplexity,
+                  Text(UiText.flowComplexity,
                       style: Theme.of(context)
                           .textTheme
                           .titleSmall
                           ?.copyWith(fontWeight: FontWeight.w700)),
-                  Text(MockUiText.nodesAndEdgesPerFlow,
+                  Text(UiText.nodesAndEdgesPerFlow,
                       style: TextStyle(
                           fontSize: 11,
                           color: cs.onSurface.withValues(alpha: 0.45))),
@@ -330,7 +330,7 @@ class _FlowsChart extends StatelessWidget {
                         size: 12, color: AppColors.accent),
                     const SizedBox(width: 4),
                     Text(
-                      MockUiText.totalEdges(totalEdges),
+                      UiText.totalEdges(totalEdges),
                       style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.accent,
@@ -407,7 +407,7 @@ class _FlowsChart extends StatelessWidget {
                 if (idx >= flows.length) return const SizedBox();
                 final name = flows[idx].name;
                 final short =
-                    name.length > 10 ? MockUiText.truncatedName(name) : name;
+                    name.length > 10 ? UiText.truncatedName(name) : name;
                 return Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(short,
@@ -453,7 +453,7 @@ class _FlowsChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(MockUiText.nodeTypes,
+        Text(UiText.nodeTypes,
             style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -562,10 +562,10 @@ class _FlowCard extends StatelessWidget {
                     size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                 itemBuilder: (_) => [
                   GlassContextMenuItem(
-                      value: 'edit', child: Text(MockUiText.openEditor)),
+                      value: 'edit', child: Text(UiText.openEditor)),
                   GlassContextMenuItem(
                       value: 'delete',
-                      child: Text(MockUiText.delete,
+                      child: Text(UiText.delete,
                           style: const TextStyle(color: AppColors.error))),
                 ],
                 onSelected: (v) {
@@ -609,24 +609,24 @@ class _FlowCard extends StatelessWidget {
             children: [
               _FlowChip(
                 icon: Icons.hub_rounded,
-                label: MockUiText.nodesCount(flow.nodes.length),
+                label: UiText.nodesCount(flow.nodes.length),
                 color: AppColors.primary,
               ),
               _FlowChip(
                 icon: Icons.timeline_rounded,
-                label: MockUiText.edgesCount(flow.edges.length),
+                label: UiText.edgesCount(flow.edges.length),
                 color: AppColors.accent,
               ),
               if (steps > 0)
                 _FlowChip(
                   icon: Icons.task_alt_rounded,
-                  label: MockUiText.stepsCount(steps),
+                  label: UiText.stepsCount(steps),
                   color: AppColors.success,
                 ),
               if (decisions > 0)
                 _FlowChip(
                   icon: Icons.call_split_rounded,
-                  label: MockUiText.decisionsCount(decisions),
+                  label: UiText.decisionsCount(decisions),
                   color: AppColors.warning,
                 ),
             ],

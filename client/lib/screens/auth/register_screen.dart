@@ -6,7 +6,7 @@ import '../../core/constants.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -57,7 +57,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           );
     } catch (e) {
       setState(() =>
-          _errorMessage = e.toString().replaceAll(MockUiText.exception, ''));
+          _errorMessage = e.toString().replaceAll(UiText.exception, ''));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -109,7 +109,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
             const SizedBox(width: 12),
             Text(
-              MockUiText.autocreat,
+              UiText.autocreat,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w800,
@@ -119,12 +119,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ).animate().fadeIn(duration: 400.ms),
         const SizedBox(height: 20),
         Text(
-          MockUiText.createYourAccount,
+          UiText.createYourAccount,
           style: Theme.of(context).textTheme.headlineSmall,
         ).animate().fadeIn(delay: 100.ms),
         const SizedBox(height: 6),
         Text(
-          MockUiText.startBuildingYourOrganizationalSystem,
+          UiText.startBuildingYourOrganizationalSystem,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppColors.lightTextSecondary,
               ),
@@ -168,18 +168,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               Expanded(
                 child: TextFormField(
                   controller: _firstNameController,
-                  decoration: InputDecoration(labelText: MockUiText.firstName),
+                  decoration: InputDecoration(labelText: UiText.firstName),
                   validator: (v) =>
-                      v?.isEmpty ?? true ? MockUiText.requiredText : null,
+                      v?.isEmpty ?? true ? UiText.requiredText : null,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: TextFormField(
                   controller: _lastNameController,
-                  decoration: InputDecoration(labelText: MockUiText.lastName),
+                  decoration: InputDecoration(labelText: UiText.lastName),
                   validator: (v) =>
-                      v?.isEmpty ?? true ? MockUiText.requiredText : null,
+                      v?.isEmpty ?? true ? UiText.requiredText : null,
                 ),
               ),
             ],
@@ -189,13 +189,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
-              labelText: MockUiText.emailAddress,
+              labelText: UiText.emailAddress,
               prefixIcon: const Icon(Icons.email_outlined, size: 20),
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return MockUiText.emailIsRequired;
+              if (v == null || v.isEmpty) return UiText.emailIsRequired;
               if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v)) {
-                return MockUiText.invalidEmail;
+                return UiText.invalidEmail;
               }
               return null;
             },
@@ -204,7 +204,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           TextFormField(
             controller: _companyNameController,
             decoration: InputDecoration(
-              labelText: MockUiText.companyNameOptional,
+              labelText: UiText.companyNameOptional,
               prefixIcon: const Icon(Icons.business_outlined, size: 20),
             ),
           ).animate().fadeIn(delay: 450.ms).slideY(begin: 0.1),
@@ -213,7 +213,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             controller: _passwordController,
             obscureText: _obscurePassword,
             decoration: InputDecoration(
-              labelText: MockUiText.password,
+              labelText: UiText.password,
               prefixIcon: const Icon(Icons.lock_outline, size: 20),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -227,8 +227,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return MockUiText.passwordIsRequired;
-              if (v.length < 8) return MockUiText.atLeast8Characters;
+              if (v == null || v.isEmpty) return UiText.passwordIsRequired;
+              if (v.length < 8) return UiText.atLeast8Characters;
               return null;
             },
           ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1),
@@ -237,7 +237,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             controller: _confirmPasswordController,
             obscureText: _obscureConfirm,
             decoration: InputDecoration(
-              labelText: MockUiText.confirmPassword,
+              labelText: UiText.confirmPassword,
               prefixIcon: const Icon(Icons.lock_outline, size: 20),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -252,14 +252,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
             validator: (v) {
               if (v != _passwordController.text) {
-                return MockUiText.passwordsDoNotMatch;
+                return UiText.passwordsDoNotMatch;
               }
               return null;
             },
           ).animate().fadeIn(delay: 550.ms).slideY(begin: 0.1),
           const SizedBox(height: 24),
           AppButton(
-            label: MockUiText.createAccount,
+            label: UiText.createAccount,
             onPressed: _register,
             loading: _isLoading,
             icon: Icons.person_add_outlined,
@@ -270,12 +270,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                MockUiText.alreadyHaveAnAccount,
+                UiText.alreadyHaveAnAccount,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               TextButton(
                 onPressed: () => context.go(AppRoutes.login),
-                child: Text(MockUiText.signIn),
+                child: Text(UiText.signIn),
               ),
             ],
           ).animate().fadeIn(delay: 700.ms),

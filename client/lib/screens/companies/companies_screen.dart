@@ -6,7 +6,7 @@ import '../../models/company.dart';
 import '../../providers/company_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class CompaniesScreen extends ConsumerStatefulWidget {
   const CompaniesScreen({super.key});
@@ -48,11 +48,11 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
               child: Padding(
                 padding: AppPageLayout.contentPadding(context, horizontal: 20),
                 child: AppPageHeader(
-                  title: MockUiText.companies,
-                  description: MockUiText
+                  title: UiText.companies,
+                  description: UiText
                       .organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK,
-                  actionLabel: MockUiText.newCompany,
-                  compactActionLabel: MockUiText.newText,
+                  actionLabel: UiText.newCompany,
+                  compactActionLabel: UiText.newText,
                   actionIcon: Icons.add,
                   onAction: () => _showCreateDialog(context),
                 ).animate().fadeIn(duration: 300.ms),
@@ -83,11 +83,11 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppPageHeader(
-                        title: MockUiText.companies,
-                        description: MockUiText
+                        title: UiText.companies,
+                        description: UiText
                             .organizeClientAndPartnerWorkspacesMonitorPortfolioHealthAndK,
-                        actionLabel: MockUiText.newCompany,
-                        compactActionLabel: MockUiText.newText,
+                        actionLabel: UiText.newCompany,
+                        compactActionLabel: UiText.newText,
                         actionIcon: Icons.add,
                         onAction: () => _showCreateDialog(context),
                       ).animate().fadeIn(duration: 300.ms),
@@ -98,7 +98,7 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                       const SizedBox(height: 24),
                       SearchField(
                         controller: _searchController,
-                        hintText: MockUiText.searchCompanies,
+                        hintText: UiText.searchCompanies,
                         onChanged: (v) => setState(() => _search = v),
                       ),
                       const SizedBox(height: 20),
@@ -110,14 +110,14 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                 SliverFillRemaining(
                   child: EmptyState(
                     title: _search.isEmpty
-                        ? MockUiText.noCompaniesYet
-                        : MockUiText.noResultsFound,
+                        ? UiText.noCompaniesYet
+                        : UiText.noResultsFound,
                     subtitle: _search.isEmpty
-                        ? MockUiText.createYourFirstCompanyToGetStarted
+                        ? UiText.createYourFirstCompanyToGetStarted
                         : null,
                     icon: Icons.business_outlined,
                     actionLabel:
-                        _search.isEmpty ? MockUiText.createCompany : null,
+                        _search.isEmpty ? UiText.createCompany : null,
                     onAction: _search.isEmpty
                         ? () => _showCreateDialog(context)
                         : null,
@@ -147,8 +147,8 @@ class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
                           final confirmed = await showDialog<bool>(
                             context: context,
                             builder: (_) => ConfirmDialog(
-                              title: MockUiText.deleteCompany,
-                              message: MockUiText
+                              title: UiText.deleteCompany,
+                              message: UiText
                                   .areYouSureYouWantToDeleteThisCompany,
                             ),
                           );
@@ -212,25 +212,25 @@ class _CompanyStatsRow extends StatelessWidget {
           AppStatCard(
             icon: Icons.business_rounded,
             value: '$total',
-            label: MockUiText.companies,
+            label: UiText.companies,
             color: AppColors.primary,
           ),
           AppStatCard(
             icon: Icons.check_circle_rounded,
             value: '$active',
-            label: MockUiText.active,
+            label: UiText.active,
             color: AppColors.success,
           ),
           AppStatCard(
             icon: Icons.people_rounded,
             value: '$members',
-            label: MockUiText.members,
+            label: UiText.members,
             color: AppColors.accent,
           ),
           AppStatCard(
             icon: Icons.account_tree_rounded,
             value: '$flows',
-            label: MockUiText.flows,
+            label: UiText.flows,
             color: AppColors.warning,
           ),
         ],
@@ -309,10 +309,10 @@ class _CompanyCard extends StatelessWidget {
                 icon: const Icon(Icons.more_vert, size: 18),
                 itemBuilder: (_) => [
                   GlassContextMenuItem(
-                      value: 'edit', child: Text(MockUiText.edit)),
+                      value: 'edit', child: Text(UiText.edit)),
                   GlassContextMenuItem(
                       value: 'delete',
-                      child: Text(MockUiText.delete,
+                      child: Text(UiText.delete,
                           style: const TextStyle(color: AppColors.error))),
                 ],
                 onSelected: (v) {
@@ -400,8 +400,8 @@ class _CompanyDialogState extends State<_CompanyDialog> {
   Widget build(BuildContext context) {
     return GlassAlertDialog(
       title: Text(widget.company == null
-          ? MockUiText.newCompany
-          : MockUiText.editCompany),
+          ? UiText.newCompany
+          : UiText.editCompany),
       content: SizedBox(
         width: 400,
         child: Form(
@@ -412,24 +412,24 @@ class _CompanyDialogState extends State<_CompanyDialog> {
               TextFormField(
                 controller: _nameController,
                 decoration:
-                    InputDecoration(labelText: MockUiText.companyNameRequired),
+                    InputDecoration(labelText: UiText.companyNameRequired),
                 validator: (v) =>
-                    v?.isEmpty ?? true ? MockUiText.nameIsRequired : null,
+                    v?.isEmpty ?? true ? UiText.nameIsRequired : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _industryController,
-                decoration: InputDecoration(labelText: MockUiText.industry),
+                decoration: InputDecoration(labelText: UiText.industry),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _websiteController,
-                decoration: InputDecoration(labelText: MockUiText.website),
+                decoration: InputDecoration(labelText: UiText.website),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _descController,
-                decoration: InputDecoration(labelText: MockUiText.description),
+                decoration: InputDecoration(labelText: UiText.description),
                 maxLines: 3,
               ),
             ],
@@ -439,10 +439,10 @@ class _CompanyDialogState extends State<_CompanyDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(MockUiText.cancel),
+          child: Text(UiText.cancel),
         ),
         AppButton(
-          label: MockUiText.save,
+          label: UiText.save,
           loading: _saving,
           onPressed: () async {
             if (!_formKey.currentState!.validate()) return;

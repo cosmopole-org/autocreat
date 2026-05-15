@@ -15,7 +15,7 @@ import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -154,32 +154,32 @@ class _WelcomeBanner extends StatelessWidget {
     final now = DateTime.now();
     final hour = now.hour;
     final greeting = hour < 12
-        ? MockUiText.goodMorning
+        ? UiText.goodMorning
         : hour < 17
-            ? MockUiText.goodAfternoon
-            : MockUiText.goodEvening;
+            ? UiText.goodAfternoon
+            : UiText.goodEvening;
     final dayName = [
-      MockUiText.mon,
-      MockUiText.tue,
-      MockUiText.wed,
-      MockUiText.thu,
-      MockUiText.fri,
-      MockUiText.sat,
-      MockUiText.sun
+      UiText.mon,
+      UiText.tue,
+      UiText.wed,
+      UiText.thu,
+      UiText.fri,
+      UiText.sat,
+      UiText.sun
     ][now.weekday - 1];
     final monthName = [
-      MockUiText.jan,
-      MockUiText.feb,
-      MockUiText.mar,
-      MockUiText.apr,
-      MockUiText.may,
-      MockUiText.jun,
-      MockUiText.jul,
-      MockUiText.aug,
-      MockUiText.sep,
-      MockUiText.oct,
-      MockUiText.nov,
-      MockUiText.dec,
+      UiText.jan,
+      UiText.feb,
+      UiText.mar,
+      UiText.apr,
+      UiText.may,
+      UiText.jun,
+      UiText.jul,
+      UiText.aug,
+      UiText.sep,
+      UiText.oct,
+      UiText.nov,
+      UiText.dec,
     ][now.month - 1];
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -210,8 +210,8 @@ class _WelcomeBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  MockUiText.greetingLine(
-                      greeting, user?.firstName ?? MockUiText.there),
+                  UiText.greetingLine(
+                      greeting, user?.firstName ?? UiText.there),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: narrow ? 18 : 22,
@@ -221,7 +221,7 @@ class _WelcomeBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  MockUiText.hereSWhatSHappeningInYourOrganizationToday,
+                  UiText.hereSWhatSHappeningInYourOrganizationToday,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.8),
                     fontSize: narrow ? 13 : 14,
@@ -234,12 +234,12 @@ class _WelcomeBanner extends StatelessWidget {
                   children: [
                     _BannerPill(
                       icon: Icons.calendar_today_rounded,
-                      label: MockUiText.dateLine(
+                      label: UiText.dateLine(
                           dayName, now.day, monthName, now.year),
                     ),
                     _BannerPill(
                       icon: Icons.access_time_rounded,
-                      label: MockUiText.timeLine(now.hour, now.minute),
+                      label: UiText.timeLine(now.hour, now.minute),
                     ),
                   ],
                 ),
@@ -324,36 +324,36 @@ class _KpiRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final cards = [
       _KpiCardData(
-        label: MockUiText.companies,
+        label: UiText.companies,
         value: isLoading ? '—' : companyCount.toString(),
-        subtitle: MockUiText.activeOrganizations,
+        subtitle: UiText.activeOrganizations,
         icon: Icons.business_rounded,
         color: AppColors.primary,
         route: AppRoutes.companies,
         trendUp: true,
       ),
       _KpiCardData(
-        label: MockUiText.activeFlows,
+        label: UiText.activeFlows,
         value: isLoading ? '—' : flowCount.toString(),
-        subtitle: MockUiText.automationPipelines,
+        subtitle: UiText.automationPipelines,
         icon: Icons.account_tree_rounded,
         color: AppColors.accent,
         route: AppRoutes.flows,
         trendUp: true,
       ),
       _KpiCardData(
-        label: MockUiText.openTickets,
+        label: UiText.openTickets,
         value: isLoading ? '—' : openTickets.toString(),
-        subtitle: MockUiText.needsAttention,
+        subtitle: UiText.needsAttention,
         icon: Icons.support_agent_rounded,
         color: AppColors.warning,
         route: AppRoutes.tickets,
         trendUp: false,
       ),
       _KpiCardData(
-        label: MockUiText.resolved,
+        label: UiText.resolved,
         value: isLoading ? '—' : resolvedTickets.toString(),
-        subtitle: MockUiText.closedTickets,
+        subtitle: UiText.closedTickets,
         icon: Icons.check_circle_rounded,
         color: AppColors.success,
         route: AppRoutes.tickets,
@@ -368,7 +368,7 @@ class _KpiRow extends StatelessWidget {
           children: cards.asMap().entries.map((e) {
             return Expanded(
               child: Padding(
-                padding: EdgeInsets.only(left: e.key == 0 ? 0 : 12),
+                padding: EdgeInsetsDirectional.only(start: e.key == 0 ? 0 : 12),
                 child: _KpiCard(data: e.value)
                     .animate(delay: (e.key * 80).ms)
                     .fadeIn()
@@ -521,13 +521,13 @@ class _ActivityLineChart extends StatelessWidget {
   static const _ticketData = [3.0, 7.0, 4.0, 10.0, 6.0, 8.0, 5.0];
   static const _flowData = [1.0, 4.0, 2.0, 6.0, 4.0, 5.0, 3.0];
   static List<String> get _days => [
-        MockUiText.mon,
-        MockUiText.tue,
-        MockUiText.wed,
-        MockUiText.thu,
-        MockUiText.fri,
-        MockUiText.sat,
-        MockUiText.sun
+        UiText.mon,
+        UiText.tue,
+        UiText.wed,
+        UiText.thu,
+        UiText.fri,
+        UiText.sat,
+        UiText.sun
       ];
 
   const _ActivityLineChart();
@@ -538,14 +538,14 @@ class _ActivityLineChart extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return _ChartCard(
-      title: MockUiText.activityOverview,
-      subtitle: MockUiText.ticketsFlowsLast7Days,
+      title: UiText.activityOverview,
+      subtitle: UiText.ticketsFlowsLast7Days,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _ChartLegend(color: AppColors.primary, label: MockUiText.tickets),
+          _ChartLegend(color: AppColors.primary, label: UiText.tickets),
           const SizedBox(width: 12),
-          _ChartLegend(color: AppColors.accent, label: MockUiText.flows),
+          _ChartLegend(color: AppColors.accent, label: UiText.flows),
         ],
       ),
       child: SizedBox(
@@ -596,11 +596,11 @@ class _ActivityLineChart extends StatelessWidget {
                 tooltipRoundedRadius: 10,
                 getTooltipItems: (spots) => spots.map((s) {
                   final label =
-                      s.barIndex == 0 ? MockUiText.tickets : MockUiText.flows;
+                      s.barIndex == 0 ? UiText.tickets : UiText.flows;
                   final color =
                       s.barIndex == 0 ? AppColors.primary : AppColors.accent;
                   return LineTooltipItem(
-                    MockUiText.chartValue(label, s.y.toInt()),
+                    UiText.chartValue(label, s.y.toInt()),
                     TextStyle(
                       color: color,
                       fontWeight: FontWeight.w600,
@@ -686,10 +686,10 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
       widget.tickets.where((t) => t.status == TicketStatus.closed).length,
     ];
     final labels = [
-      MockUiText.open,
-      MockUiText.inProgress,
-      MockUiText.resolved,
-      MockUiText.closed
+      UiText.open,
+      UiText.inProgress,
+      UiText.resolved,
+      UiText.closed
     ];
     final colors = [
       AppColors.chartColors[3], // amber (open)
@@ -700,8 +700,8 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
     final total = counts.fold(0, (a, b) => a + b);
 
     return _ChartCard(
-      title: MockUiText.ticketStatus,
-      subtitle: MockUiText.distributionOverview,
+      title: UiText.ticketStatus,
+      subtitle: UiText.distributionOverview,
       child: Column(
         children: [
           SizedBox(
@@ -709,7 +709,7 @@ class _TicketStatusDonutState extends State<_TicketStatusDonut> {
             child: total == 0
                 ? Center(
                     child: Text(
-                      MockUiText.noTicketsYet,
+                      UiText.noTicketsYet,
                       style:
                           TextStyle(color: cs.onSurface.withValues(alpha: 0.4)),
                     ),
@@ -809,15 +809,15 @@ class _PriorityBarChart extends StatelessWidget {
       AppColors.error,
     ];
     final labels = [
-      MockUiText.low,
-      MockUiText.med,
-      MockUiText.high,
-      MockUiText.urgent
+      UiText.low,
+      UiText.med,
+      UiText.high,
+      UiText.urgent
     ];
 
     return _ChartCard(
-      title: MockUiText.priorityBreakdown,
-      subtitle: MockUiText.ticketsByPriorityLevel,
+      title: UiText.priorityBreakdown,
+      subtitle: UiText.ticketsByPriorityLevel,
       child: SizedBox(
         height: 180,
         child: BarChart(
@@ -903,8 +903,8 @@ class _RecentTicketsList extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return _ChartCard(
-      title: MockUiText.recentTickets,
-      subtitle: MockUiText.latestActivity,
+      title: UiText.recentTickets,
+      subtitle: UiText.latestActivity,
       trailing: TextButton(
         onPressed: () => context.go(AppRoutes.tickets),
         style: TextButton.styleFrom(
@@ -912,14 +912,14 @@ class _RecentTicketsList extends StatelessWidget {
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-        child: Text(MockUiText.viewAll, style: const TextStyle(fontSize: 12)),
+        child: Text(UiText.viewAll, style: const TextStyle(fontSize: 12)),
       ),
       child: tickets.isEmpty
           ? Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Center(
                 child: Text(
-                  MockUiText.noTicketsYet,
+                  UiText.noTicketsYet,
                   style: TextStyle(
                     color: cs.onSurface.withValues(alpha: 0.4),
                     fontSize: 13,
@@ -988,7 +988,9 @@ class _RecentTicketsList extends StatelessWidget {
                         ),
                       ),
                       Icon(
-                        Icons.chevron_right_rounded,
+                        Directionality.of(context) == TextDirection.rtl
+                            ? Icons.chevron_left_rounded
+                            : Icons.chevron_right_rounded,
                         size: 16,
                         color: cs.onSurface.withValues(alpha: 0.3),
                       ),
@@ -1043,9 +1045,9 @@ class _PerformanceSection extends StatelessWidget {
     final List<_MetricData> metrics;
     if (total == 0) {
       metrics = [
-        _MetricData(MockUiText.resolutionRate, 0.0, AppColors.success),
-        _MetricData(MockUiText.inProgress, 0.0, AppColors.info),
-        _MetricData(MockUiText.slaCompliance, 0.0, AppColors.primary),
+        _MetricData(UiText.resolutionRate, 0.0, AppColors.success),
+        _MetricData(UiText.inProgress, 0.0, AppColors.info),
+        _MetricData(UiText.slaCompliance, 0.0, AppColors.primary),
       ];
     } else {
       final resolved =
@@ -1056,16 +1058,16 @@ class _PerformanceSection extends StatelessWidget {
           tickets.where((t) => t.priority != TicketPriority.urgent).length;
       metrics = [
         _MetricData(
-            MockUiText.resolutionRate, resolved / total, AppColors.success),
-        _MetricData(MockUiText.inProgress, inProgress / total, AppColors.info),
+            UiText.resolutionRate, resolved / total, AppColors.success),
+        _MetricData(UiText.inProgress, inProgress / total, AppColors.info),
         _MetricData(
-            MockUiText.slaCompliance, nonUrgent / total, AppColors.primary),
+            UiText.slaCompliance, nonUrgent / total, AppColors.primary),
       ];
     }
 
     return _ChartCard(
-      title: MockUiText.performanceMetrics,
-      subtitle: MockUiText.ticketKpisAtAGlance,
+      title: UiText.performanceMetrics,
+      subtitle: UiText.ticketKpisAtAGlance,
       child: Column(
         children: metrics.map((m) {
           return Padding(
@@ -1082,7 +1084,7 @@ class _PerformanceSection extends StatelessWidget {
                           fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                     Text(
-                      MockUiText.percent(m.value),
+                      UiText.percent(m.value),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -1128,25 +1130,25 @@ class _QuickActionsSection extends StatelessWidget {
 
   static final _actions = [
     (
-      label: MockUiText.newFlow,
+      label: UiText.newFlow,
       icon: Icons.account_tree_rounded,
       color: AppColors.primary,
       route: AppRoutes.flows,
     ),
     (
-      label: MockUiText.newForm,
+      label: UiText.newForm,
       icon: Icons.dynamic_form_rounded,
       color: AppColors.accent,
       route: AppRoutes.forms,
     ),
     (
-      label: MockUiText.addUser,
+      label: UiText.addUser,
       icon: Icons.person_add_rounded,
       color: AppColors.success,
       route: AppRoutes.users,
     ),
     (
-      label: MockUiText.newTicket,
+      label: UiText.newTicket,
       icon: Icons.support_agent_rounded,
       color: AppColors.warning,
       route: AppRoutes.tickets,
@@ -1161,7 +1163,7 @@ class _QuickActionsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          MockUiText.quickActions,
+          UiText.quickActions,
           style: Theme.of(context)
               .textTheme
               .titleMedium
@@ -1206,7 +1208,9 @@ class _QuickActionsSection extends StatelessWidget {
                         ),
                       ),
                       Icon(
-                        Icons.arrow_forward_ios_rounded,
+                        Directionality.of(context) == TextDirection.rtl
+                            ? Icons.arrow_back_ios_new_rounded
+                            : Icons.arrow_forward_ios_rounded,
                         size: 12,
                         color: action.color.withValues(alpha: 0.6),
                       ),

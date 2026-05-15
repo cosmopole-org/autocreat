@@ -7,7 +7,7 @@ import '../../models/role.dart';
 import '../../providers/role_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class RoleEditorScreen extends ConsumerStatefulWidget {
   final String roleId;
@@ -86,7 +86,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.roleSaved),
+              content: Text(UiText.roleSaved),
               backgroundColor: AppColors.success),
         );
       }
@@ -94,7 +94,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.error(e)),
+              content: Text(UiText.error(e)),
               backgroundColor: AppColors.error),
         );
       }
@@ -137,10 +137,10 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        title: Text(_role == null ? MockUiText.newRole : MockUiText.editRole),
+        title: Text(_role == null ? UiText.newRole : UiText.editRole),
         actions: [
           AppButton(
-            label: MockUiText.save,
+            label: UiText.save,
             loading: _saving,
             onPressed: _save,
             icon: Icons.save_outlined,
@@ -159,21 +159,21 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(MockUiText.roleDetails,
+                    Text(UiText.roleDetails,
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                          labelText: MockUiText.roleNameRequired),
+                          labelText: UiText.roleNameRequired),
                       validator: (v) =>
-                          v?.isEmpty ?? true ? MockUiText.nameIsRequired : null,
+                          v?.isEmpty ?? true ? UiText.nameIsRequired : null,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _descController,
                       decoration:
-                          InputDecoration(labelText: MockUiText.description),
+                          InputDecoration(labelText: UiText.description),
                       maxLines: 2,
                     ),
                     const SizedBox(height: 12),
@@ -181,23 +181,23 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                       value: _level,
                       items: [
                         DropdownMenuItem(
-                            value: 'owner', child: Text(MockUiText.owner)),
+                            value: 'owner', child: Text(UiText.owner)),
                         DropdownMenuItem(
-                            value: 'admin', child: Text(MockUiText.admin)),
+                            value: 'admin', child: Text(UiText.admin)),
                         DropdownMenuItem(
-                            value: 'manager', child: Text(MockUiText.manager)),
+                            value: 'manager', child: Text(UiText.manager)),
                         DropdownMenuItem(
-                            value: 'member', child: Text(MockUiText.member)),
+                            value: 'member', child: Text(UiText.member)),
                         DropdownMenuItem(
-                            value: 'viewer', child: Text(MockUiText.viewer)),
+                            value: 'viewer', child: Text(UiText.viewer)),
                       ],
                       onChanged: (v) => setState(() => _level = v!),
                       decoration:
-                          InputDecoration(labelText: MockUiText.accessLevel),
+                          InputDecoration(labelText: UiText.accessLevel),
                     ),
                     const SizedBox(height: 12),
                     SwitchListTile(
-                      title: Text(MockUiText.active),
+                      title: Text(UiText.active),
                       value: _isActive,
                       onChanged: (v) => setState(() => _isActive = v),
                       contentPadding: EdgeInsets.zero,
@@ -216,7 +216,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                       lineWidth: 8,
                       percent: coverage,
                       center: Text(
-                        MockUiText.percent(coverage),
+                        UiText.percent(coverage),
                         style: const TextStyle(
                             fontWeight: FontWeight.w700, fontSize: 13),
                       ),
@@ -233,12 +233,12 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            MockUiText.permissionCoverage,
+                            UiText.permissionCoverage,
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            MockUiText.crudCoverage(coverage),
+                            UiText.crudCoverage(coverage),
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
@@ -260,13 +260,13 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                      child: Text(MockUiText.permissions,
+                      child: Text(UiText.permissions,
                           style: Theme.of(context).textTheme.titleMedium),
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                       child: Text(
-                        MockUiText.configureCrudPermissionsPerResource,
+                        UiText.configureCrudPermissionsPerResource,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
@@ -281,22 +281,22 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                             fontWeight: FontWeight.w700, fontSize: 12),
                         columns: [
                           DataColumn2(
-                              label: Text(MockUiText.resource),
+                              label: Text(UiText.resource),
                               size: ColumnSize.L),
                           DataColumn2(
-                              label: Center(child: Text(MockUiText.create)),
+                              label: Center(child: Text(UiText.create)),
                               size: ColumnSize.S,
                               numeric: true),
                           DataColumn2(
-                              label: Center(child: Text(MockUiText.read)),
+                              label: Center(child: Text(UiText.read)),
                               size: ColumnSize.S,
                               numeric: true),
                           DataColumn2(
-                              label: Center(child: Text(MockUiText.update)),
+                              label: Center(child: Text(UiText.update)),
                               size: ColumnSize.S,
                               numeric: true),
                           DataColumn2(
-                              label: Center(child: Text(MockUiText.delete)),
+                              label: Center(child: Text(UiText.delete)),
                               size: ColumnSize.S,
                               numeric: true),
                         ],

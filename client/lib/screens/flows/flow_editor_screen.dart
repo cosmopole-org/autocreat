@@ -11,7 +11,7 @@ import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/graph_editor.dart';
 import 'flow_node_editor.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class FlowEditorScreen extends ConsumerStatefulWidget {
   final String flowId;
@@ -43,7 +43,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(MockUiText.errorLoadingFlow(e))),
+          SnackBar(content: Text(UiText.errorLoadingFlow(e))),
         );
       }
     } finally {
@@ -59,7 +59,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(MockUiText.flowSaved),
+            content: Text(UiText.flowSaved),
             backgroundColor: AppColors.success,
           ),
         );
@@ -68,7 +68,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.errorSaving(e)),
+              content: Text(UiText.errorSaving(e)),
               backgroundColor: AppColors.error),
         );
       }
@@ -95,20 +95,20 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     showDialog(
       context: ctx,
       builder: (_) => GlassAlertDialog(
-        title: Text(MockUiText.editNodeLabel),
+        title: Text(UiText.editNodeLabel),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          decoration: InputDecoration(labelText: MockUiText.label),
+          decoration: InputDecoration(labelText: UiText.label),
           onSubmitted: (_) => Navigator.pop(ctx, ctrl.text),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text(MockUiText.cancel)),
+              child: Text(UiText.cancel)),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, ctrl.text),
-            child: Text(MockUiText.save),
+            child: Text(UiText.save),
           ),
         ],
       ),
@@ -207,14 +207,14 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                   ),
                 ),
                 Text(
-                  MockUiText.canvasControls,
+                  UiText.canvasControls,
                   style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  MockUiText.zoomPercent(editorState.scale),
+                  UiText.zoomPercent(editorState.scale),
                   style: TextStyle(
                       fontSize: 13,
                       color: cs.onSurface.withValues(alpha: 0.55)),
@@ -225,7 +225,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                     Expanded(
                       child: _ControlButton(
                         icon: Icons.remove_rounded,
-                        label: MockUiText.zoomOut,
+                        label: UiText.zoomOut,
                         color: AppColors.primary,
                         onTap: () {
                           ref
@@ -239,7 +239,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                     Expanded(
                       child: _ControlButton(
                         icon: Icons.add_rounded,
-                        label: MockUiText.zoomIn,
+                        label: UiText.zoomIn,
                         color: AppColors.primary,
                         onTap: () {
                           ref
@@ -257,7 +257,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                     Expanded(
                       child: _ControlButton(
                         icon: Icons.fit_screen_rounded,
-                        label: MockUiText.fitScreen,
+                        label: UiText.fitScreen,
                         color: AppColors.accent,
                         onTap: () {
                           ref.read(flowEditorProvider.notifier).setScale(1.0);
@@ -270,7 +270,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                     Expanded(
                       child: _ControlButton(
                         icon: Icons.auto_fix_high_rounded,
-                        label: MockUiText.autoLayout,
+                        label: UiText.autoLayout,
                         color: AppColors.accent,
                         onTap: () {
                           _autoLayout();
@@ -327,7 +327,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
           children: [
             Expanded(
               child: Text(
-                editorState.flow?.name ?? MockUiText.flowEditor,
+                editorState.flow?.name ?? UiText.flowEditor,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -343,7 +343,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                       color: AppColors.warning.withValues(alpha: 0.35)),
                 ),
                 child: Text(
-                  MockUiText.unsaved,
+                  UiText.unsaved,
                   style: const TextStyle(fontSize: 11, color: AppColors.warning),
                 ),
               ),
@@ -357,7 +357,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
               onPressed: () => ref
                   .read(flowEditorProvider.notifier)
                   .setScale(editorState.scale - 0.1),
-              tooltip: MockUiText.zoomOut3,
+              tooltip: UiText.zoomOut3,
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -367,7 +367,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                MockUiText.percent(editorState.scale),
+                UiText.percent(editorState.scale),
                 style:
                     const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
               ),
@@ -377,19 +377,19 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
               onPressed: () => ref
                   .read(flowEditorProvider.notifier)
                   .setScale(editorState.scale + 0.1),
-              tooltip: MockUiText.zoomIn3,
+              tooltip: UiText.zoomIn3,
             ),
             const SizedBox(width: 4),
           ],
           if (isMobile)
             IconButton(
               icon: const Icon(Icons.tune_rounded),
-              tooltip: MockUiText.canvasControls3,
+              tooltip: UiText.canvasControls3,
               onPressed: () =>
                   _showMobileControls(context, editorState, isDark),
             ),
           AppButton(
-            label: isMobile ? MockUiText.save : MockUiText.saveFlow,
+            label: isMobile ? UiText.save : UiText.saveFlow,
             icon: Icons.save_outlined,
             loading: _saving,
             onPressed: _save,
@@ -414,35 +414,35 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                 _ToolButton(
                   icon: Icons.play_circle_outline,
                   color: AppColors.nodeStart,
-                  tooltip: MockUiText.addStartNode,
+                  tooltip: UiText.addStartNode,
                   onTap: () => _addNode(NodeType.start),
                 ),
                 const SizedBox(height: 4),
                 _ToolButton(
                   icon: Icons.task_alt,
                   color: AppColors.nodeStep,
-                  tooltip: MockUiText.addStepNode,
+                  tooltip: UiText.addStepNode,
                   onTap: () => _addNode(NodeType.step),
                 ),
                 const SizedBox(height: 4),
                 _ToolButton(
                   icon: Icons.call_split,
                   color: AppColors.nodeDecision,
-                  tooltip: MockUiText.addDecisionNode,
+                  tooltip: UiText.addDecisionNode,
                   onTap: () => _addNode(NodeType.decision),
                 ),
                 const SizedBox(height: 4),
                 _ToolButton(
                   icon: Icons.stop_circle_outlined,
                   color: AppColors.nodeEnd,
-                  tooltip: MockUiText.addEndNode,
+                  tooltip: UiText.addEndNode,
                   onTap: () => _addNode(NodeType.end),
                 ),
                 const Spacer(),
                 _ToolButton(
                   icon: Icons.auto_fix_high_rounded,
                   color: AppColors.accent,
-                  tooltip: MockUiText.autoLayout,
+                  tooltip: UiText.autoLayout,
                   onTap: _autoLayout,
                 ),
                 _ToolButton(
@@ -450,7 +450,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                   color: isDark
                       ? AppColors.darkTextSecondary
                       : AppColors.lightTextSecondary,
-                  tooltip: MockUiText.fitToScreen,
+                  tooltip: UiText.fitToScreen,
                   onTap: () {
                     ref.read(flowEditorProvider.notifier).setScale(1.0);
                     ref.read(flowEditorProvider.notifier).setOffset(0, 0);
@@ -570,7 +570,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                       ],
                     ),
                     child: Text(
-                      MockUiText.nodesAndEdges(
+                      UiText.nodesAndEdges(
                           editorState.nodes.length, editorState.edges.length),
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
@@ -686,7 +686,7 @@ class _NodePropertiesSheet extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            MockUiText.nodeProperties,
+                            UiText.nodeProperties,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -716,7 +716,7 @@ class _NodePropertiesSheet extends StatelessWidget {
                       icon: const Icon(Icons.delete_outline_rounded,
                           color: AppColors.error, size: 22),
                       onPressed: onDelete,
-                      tooltip: MockUiText.deleteNode,
+                      tooltip: UiText.deleteNode,
                       style: IconButton.styleFrom(
                         backgroundColor:
                             AppColors.error.withValues(alpha: 0.08),
@@ -729,7 +729,7 @@ class _NodePropertiesSheet extends StatelessWidget {
                       icon: Icon(Icons.keyboard_arrow_down_rounded,
                           color: cs.onSurface.withValues(alpha: 0.5), size: 26),
                       onPressed: () => Navigator.of(context).pop(),
-                      tooltip: MockUiText.close,
+                      tooltip: UiText.close,
                     ),
                   ],
                 ),
@@ -854,7 +854,7 @@ class _EmptyCanvasHint extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    MockUiText.startBuildingYourFlow,
+                    UiText.startBuildingYourFlow,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color:
                               isDark ? AppColors.darkText : AppColors.lightText,
@@ -863,7 +863,7 @@ class _EmptyCanvasHint extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    MockUiText.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft,
+                    UiText.tapHereToAddAStartNodeNorUseTheToolbarOnTheLeft,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: isDark

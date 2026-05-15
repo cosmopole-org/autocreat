@@ -8,7 +8,7 @@ import '../../providers/form_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/form_field_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class FormEditorScreen extends ConsumerStatefulWidget {
   final String formId;
@@ -51,7 +51,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.formSaved),
+              content: Text(UiText.formSaved),
               backgroundColor: AppColors.success),
         );
       }
@@ -59,7 +59,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(MockUiText.error(e)),
+              content: Text(UiText.error(e)),
               backgroundColor: AppColors.error),
         );
       }
@@ -98,7 +98,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
         ),
         title: Row(
           children: [
-            Text(editorState.form?.name ?? MockUiText.formEditor),
+            Text(editorState.form?.name ?? UiText.formEditor),
             if (editorState.isDirty) ...[
               const SizedBox(width: 8),
               Container(
@@ -107,7 +107,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                   color: AppColors.warning.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(MockUiText.unsaved,
+                child: Text(UiText.unsaved,
                     style: const TextStyle(fontSize: 11, color: AppColors.warning)),
               ),
             ],
@@ -115,7 +115,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
         ),
         actions: [
           AppButton(
-            label: MockUiText.save,
+            label: UiText.save,
             icon: Icons.save_outlined,
             loading: _saving,
             onPressed: _save,
@@ -141,7 +141,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: Text(
-                    MockUiText.fieldTypes,
+                    UiText.fieldTypes,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
@@ -183,7 +183,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                   child: TextFormField(
                     initialValue: editorState.form?.name ?? '',
                     decoration: InputDecoration(
-                      labelText: MockUiText.formName,
+                      labelText: UiText.formName,
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
@@ -209,7 +209,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                MockUiText.clickAFieldTypeToAddIt,
+                                UiText.clickAFieldTypeToAddIt,
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ],
@@ -306,7 +306,7 @@ class _FieldCard extends StatelessWidget {
                   ),
                   Text(
                     field.type.displayName +
-                        (field.required ? MockUiText.requiredText3 : ''),
+                        (field.required ? UiText.requiredText3 : ''),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: AppColors.lightTextSecondary,
                         ),
@@ -392,7 +392,7 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
           children: [
             Row(
               children: [
-                Text(MockUiText.fieldProperties,
+                Text(UiText.fieldProperties,
                     style: Theme.of(context).textTheme.titleSmall),
                 const Spacer(),
                 Container(
@@ -416,28 +416,28 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
 
             TextFormField(
               controller: _labelController,
-              decoration: InputDecoration(labelText: MockUiText.label),
+              decoration: InputDecoration(labelText: UiText.label),
               onChanged: (v) => widget.onUpdate(field.copyWith(label: v)),
             ),
             const SizedBox(height: 12),
 
             TextFormField(
               controller: _placeholderController,
-              decoration: InputDecoration(labelText: MockUiText.placeholder),
+              decoration: InputDecoration(labelText: UiText.placeholder),
               onChanged: (v) => widget.onUpdate(field.copyWith(placeholder: v)),
             ),
             const SizedBox(height: 12),
 
             TextFormField(
               controller: _helpTextController,
-              decoration: InputDecoration(labelText: MockUiText.helpText),
+              decoration: InputDecoration(labelText: UiText.helpText),
               onChanged: (v) => widget.onUpdate(field.copyWith(helpText: v)),
             ),
             const SizedBox(height: 16),
 
             SwitchListTile(
               title:
-                  Text(MockUiText.requiredText, style: const TextStyle(fontSize: 14)),
+                  Text(UiText.requiredText, style: const TextStyle(fontSize: 14)),
               value: field.required,
               onChanged: (v) => widget.onUpdate(field.copyWith(required: v)),
               contentPadding: EdgeInsets.zero,
@@ -445,7 +445,7 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
             ),
 
             SwitchListTile(
-              title: Text(MockUiText.readOnly, style: const TextStyle(fontSize: 14)),
+              title: Text(UiText.readOnly, style: const TextStyle(fontSize: 14)),
               value: field.readOnly,
               onChanged: (v) => widget.onUpdate(field.copyWith(readOnly: v)),
               contentPadding: EdgeInsets.zero,
@@ -453,7 +453,7 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
             ),
 
             SwitchListTile(
-              title: Text(MockUiText.hidden, style: const TextStyle(fontSize: 14)),
+              title: Text(UiText.hidden, style: const TextStyle(fontSize: 14)),
               value: field.hidden,
               onChanged: (v) => widget.onUpdate(field.copyWith(hidden: v)),
               contentPadding: EdgeInsets.zero,
@@ -468,18 +468,18 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(MockUiText.options,
+                  Text(UiText.options,
                       style: Theme.of(context).textTheme.labelLarge),
                   TextButton.icon(
                     icon: const Icon(Icons.add, size: 14),
-                    label: Text(MockUiText.add),
+                    label: Text(UiText.add),
                     onPressed: () {
                       const uuid = Uuid();
                       final options = List<FormFieldOption>.from(field.options)
                         ..add(FormFieldOption(
                           value: uuid.v4().substring(0, 8),
                           label:
-                              MockUiText.optionNumber(field.options.length + 1),
+                              UiText.optionNumber(field.options.length + 1),
                         ));
                       widget.onUpdate(field.copyWith(options: options));
                     },
@@ -495,7 +495,7 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
                         child: TextFormField(
                           initialValue: e.value.label,
                           decoration: InputDecoration(
-                            hintText: MockUiText.optionNumber(e.key + 1),
+                            hintText: UiText.optionNumber(e.key + 1),
                             isDense: true,
                           ),
                           onChanged: (v) {

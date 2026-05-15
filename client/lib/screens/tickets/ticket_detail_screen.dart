@@ -13,7 +13,7 @@ import '../../providers/realtime_provider.dart';
 import '../../providers/ticket_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
-import '../../data/mock_ui_text.dart';
+import '../../data/ui_text.dart';
 
 class TicketDetailScreen extends ConsumerStatefulWidget {
   final String ticketId;
@@ -60,7 +60,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
       final repo = ref.read(ticketRepositoryProvider);
       final attachments = _attachmentName != null ? [_attachmentName!] : null;
       await repo.sendMessage(ticket.id,
-          content.isNotEmpty ? content : MockUiText.attachment, attachments);
+          content.isNotEmpty ? content : UiText.attachment, attachments);
       _messageController.clear();
       setState(() => _attachmentName = null);
       ref.invalidate(ticketDetailProvider(ticket.id));
@@ -171,7 +171,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                                     size: 48,
                                     color: AppColors.lightTextSecondary),
                                 const SizedBox(height: 12),
-                                Text(MockUiText.noMessagesYet,
+                                Text(UiText.noMessagesYet,
                                     style: const TextStyle(
                                         color: AppColors.lightTextSecondary)),
                               ],
@@ -240,7 +240,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                         IconButton(
                           icon: const Icon(Icons.attach_file, size: 20),
                           onPressed: _pickAttachment,
-                          tooltip: MockUiText.attachFile,
+                          tooltip: UiText.attachFile,
                           color: _attachmentName != null
                               ? AppColors.primary
                               : null,
@@ -250,7 +250,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                           child: TextField(
                             controller: _messageController,
                             decoration: InputDecoration(
-                              hintText: MockUiText.typeAMessage,
+                              hintText: UiText.typeAMessage,
                               border: const OutlineInputBorder(),
                             ),
                             maxLines: 3,
@@ -298,29 +298,29 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(MockUiText.ticketDetails,
+                    Text(UiText.ticketDetails,
                         style: Theme.of(context).textTheme.titleSmall),
                     const SizedBox(height: 16),
                     InfoRow(
-                        label: MockUiText.status,
+                        label: UiText.status,
                         value: ticket.status.displayName),
                     InfoRow(
-                        label: MockUiText.priority,
+                        label: UiText.priority,
                         value: ticket.priority.displayName),
                     InfoRow(
-                        label: MockUiText.creator,
+                        label: UiText.creator,
                         value: ticket.creatorName ?? ticket.creatorId),
                     if (ticket.assigneeName != null)
                       InfoRow(
-                          label: MockUiText.assignee,
+                          label: UiText.assignee,
                           value: ticket.assigneeName!),
                     if (ticket.dueDate != null)
                       InfoRow(
-                          label: MockUiText.dueDate,
+                          label: UiText.dueDate,
                           value: ticket.dueDate!.formatted),
                     if (ticket.createdAt != null)
                       InfoRow(
-                          label: MockUiText.created,
+                          label: UiText.created,
                           value: ticket.createdAt!.timeAgo),
                     const SizedBox(height: 16),
                     const Divider(),
@@ -328,7 +328,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
 
                     // SLA Progress
                     if (ticket.dueDate != null) ...[
-                      Text(MockUiText.slaProgress,
+                      Text(UiText.slaProgress,
                           style: Theme.of(context).textTheme.labelMedium),
                       const SizedBox(height: 8),
                       Builder(builder: (context) {
@@ -348,7 +348,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                           animation: true,
                           animationDuration: 800,
                           trailing: Text(
-                            MockUiText.percent(sla),
+                            UiText.percent(sla),
                             style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -378,7 +378,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                               color: _priorityColor(ticket.priority), size: 16),
                           const SizedBox(width: 8),
                           Text(
-                            MockUiText.priorityLabel(
+                            UiText.priorityLabel(
                                 ticket.priority.displayName),
                             style: TextStyle(
                                 color: _priorityColor(ticket.priority),
@@ -390,7 +390,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                     ),
                     if (ticket.tags.isNotEmpty) ...[
                       const SizedBox(height: 16),
-                      Text(MockUiText.tags,
+                      Text(UiText.tags,
                           style: Theme.of(context).textTheme.labelLarge),
                       const SizedBox(height: 6),
                       Wrap(

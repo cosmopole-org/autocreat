@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants.dart';
-import '../data/mock_ui_text.dart';
+import '../data/ui_text.dart';
 
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError('SharedPreferences not initialized');
@@ -69,7 +69,7 @@ class LanguageNotifier extends Notifier<AppLanguage> {
   Future<void> setLanguage(AppLanguage language) async {
     final prefs = ref.read(sharedPreferencesProvider);
     await prefs.setString(AppConstants.languageKey, language.code);
-    MockUiText.configureLanguage(language);
+    UiText.configureLanguage(language);
     state = language;
   }
 
