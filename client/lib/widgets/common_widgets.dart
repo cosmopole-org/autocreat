@@ -1977,7 +1977,6 @@ class AppBarActionButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final glassMode = ref.watch(glassModeProvider);
-    final cs = Theme.of(context).colorScheme;
     final enabled = (onPressed != null) && !loading;
     final accent = isDark ? AppColors.primaryLight : AppColors.primary;
     final foreground = outlined ? accent : Colors.white;

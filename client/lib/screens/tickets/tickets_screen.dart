@@ -676,9 +676,9 @@ class _TicketCard extends StatelessWidget {
                 width: 5,
                 decoration: BoxDecoration(
                   color: priorityColor,
-                  borderRadius: BorderRadiusDirectional.only(
-                    topStart: const Radius.circular(16),
-                    bottomStart: const Radius.circular(16),
+                  borderRadius: const BorderRadiusDirectional.only(
+                    topStart: Radius.circular(16),
+                    bottomStart: Radius.circular(16),
                   ).resolve(Directionality.of(context)),
                 ),
               ),
