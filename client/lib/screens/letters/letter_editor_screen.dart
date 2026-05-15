@@ -242,7 +242,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       ),
       child: QuillSimpleToolbar(
         controller: _quillController,
-        configurations: QuillSimpleToolbarConfigurations(
+        config: QuillSimpleToolbarConfig(
           showFontSize: !isMobile,
           showBoldButton: true,
           showItalicButton: true,
@@ -355,7 +355,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
               controller: _quillController,
               focusNode: _focusNode,
               scrollController: _scrollController,
-              configurations: QuillEditorConfigurations(
+              config: QuillEditorConfig(
                 placeholder: UiText.startWritingYourLetterTemplate,
                 padding: EdgeInsets.zero,
                 autoFocus: false,
@@ -425,62 +425,3 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Outlined secondary action button used in the AppBar on tablet/desktop
-// ─────────────────────────────────────────────────────────────────────────────
-class _OutlinedActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isDark;
-  final VoidCallback? onPressed;
-
-  const _OutlinedActionButton({
-    required this.icon,
-    required this.label,
-    required this.isDark,
-    this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final accent = isDark ? AppColors.primaryLight : AppColors.primary;
-    final borderColor = isDark
-        ? AppColors.darkBorder
-        : AppColors.lightBorder;
-    final bgColor = isDark
-        ? AppColors.darkSurface.withValues(alpha: 0.7)
-        : Colors.white;
-
-    return Material(
-      color: bgColor,
-      borderRadius: BorderRadius.circular(10),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: borderColor),
-          ),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 15, color: accent),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: accent,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
