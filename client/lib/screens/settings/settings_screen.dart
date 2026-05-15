@@ -324,7 +324,7 @@ class _SettingsHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    const Text(
                       'Settings',
                       style: TextStyle(
                         fontSize: 28,
@@ -752,7 +752,7 @@ class _WorkspaceSection extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
+                  const Expanded(
                     child: Text(
                       'Manage Companies',
                       style: TextStyle(
@@ -1347,7 +1347,7 @@ class _CompanyListItem extends StatelessWidget {
               if (isActive)
                 Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
@@ -1797,7 +1797,7 @@ class _LanguageCard extends StatelessWidget {
               ),
             ),
             if (isSelected)
-              Icon(
+              const Icon(
                 Icons.check_circle_rounded,
                 size: 18,
                 color: AppColors.primary,
@@ -1994,7 +1994,7 @@ class _AboutInfoRow extends StatelessWidget {
           ),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColors.primary,

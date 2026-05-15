@@ -561,99 +561,6 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
 
 
 
-class _LanguageToggleButton extends ConsumerWidget {
-  final bool compact;
-
-  const _LanguageToggleButton({this.compact = false});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final language = ref.watch(languageProvider);
-    final nextLanguage = language == AppLanguage.english ? AppLanguage.persian : AppLanguage.english;
-    final tooltip = UiText.languageToggleTooltip(nextLanguage);
-
-    if (compact) {
-      return Tooltip(
-        message: tooltip,
-        child: InkWell(
-          onTap: () => ref.read(languageProvider.notifier).toggleLanguage(),
-          borderRadius: BorderRadius.circular(9),
-          child: Container(
-            height: 30,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(9),
-              color: AppColors.primary.withValues(alpha: 0.10),
-            ),
-            child: Text(
-              nextLanguage.shortLabel,
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w800,
-                fontSize: 11,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Tooltip(
-      message: tooltip,
-      child: TextButton.icon(
-        onPressed: () => ref.read(languageProvider.notifier).toggleLanguage(),
-        icon: const Icon(Icons.translate_rounded, size: 18),
-        label: Text(nextLanguage.shortLabel),
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      ),
-    );
-  }
-}
-
-class _GlassModeButton extends ConsumerWidget {
-  final bool compact;
-
-  const _GlassModeButton({this.compact = false});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final glassMode = ref.watch(glassModeProvider);
-    final cs = Theme.of(context).colorScheme;
-    final icon = glassMode ? Icons.blur_on_rounded : Icons.blur_off_rounded;
-
-    if (compact) {
-      return _BarIconButton(
-        icon: icon,
-        onTap: () => ref.read(glassModeProvider.notifier).toggleGlassMode(),
-        tooltip: glassMode ? UiText.disableGlassMode : UiText.enableGlassMode,
-      );
-    }
-
-    return Tooltip(
-      message: glassMode ? UiText.disableGlassMode : UiText.enableGlassMode,
-      child: IconButton(
-        icon: Icon(
-          icon,
-          size: 20,
-          color: glassMode ? AppColors.primary : cs.onSurface.withValues(alpha: 0.82),
-        ),
-        onPressed: () => ref.read(glassModeProvider.notifier).toggleGlassMode(),
-        style: IconButton.styleFrom(
-          backgroundColor: glassMode ? AppColors.primary.withValues(alpha: 0.12) : null,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 // ────────────────────────────────────────────────────────────────
 // LOGO
 // ────────────────────────────────────────────────────────────────
@@ -1551,7 +1458,6 @@ class _CompanySelector extends ConsumerWidget {
     String? selectedId,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glassMode = ref.read(glassModeProvider);
     final cs = Theme.of(context).colorScheme;
 
     showModalBottomSheet(

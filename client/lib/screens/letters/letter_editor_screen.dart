@@ -146,7 +146,6 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
 
   PreferredSizeWidget _buildAppBar(
       BuildContext context, bool isDark, bool isMobile) {
-    final colorScheme = Theme.of(context).colorScheme;
     final accent = isDark ? AppColors.primaryLight : AppColors.primary;
 
     return AppBar(
