@@ -318,10 +318,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.pop(),
-        ),
+        leading: AppBarBackButton(onPressed: () => context.pop()),
         titleSpacing: 0,
         title: Row(
           children: [

@@ -133,10 +133,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        leading: AppBarBackButton(onPressed: () => context.pop()),
         title: TextField(
           controller: _nameController,
           decoration: InputDecoration(

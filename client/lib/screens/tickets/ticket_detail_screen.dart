@@ -125,10 +125,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
       error: (e, _) => Scaffold(body: AppErrorWidget(message: e.toString())),
       data: (ticket) => Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
+          leading: AppBarBackButton(onPressed: () => Navigator.of(context).pop()),
           title:
               Text(ticket.title, maxLines: 1, overflow: TextOverflow.ellipsis),
           actions: [

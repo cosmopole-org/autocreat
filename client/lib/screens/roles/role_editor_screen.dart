@@ -133,10 +133,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        leading: AppBarBackButton(onPressed: () => context.pop()),
         title: Text(_role == null ? UiText.newRole : UiText.editRole),
         actions: [
           AppButton(

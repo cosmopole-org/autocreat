@@ -54,19 +54,13 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
     return companyAsync.when(
       loading: () => Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => context.pop(),
-          ),
+          leading: AppBarBackButton(onPressed: () => context.pop()),
         ),
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, _) => Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => context.pop(),
-          ),
+          leading: AppBarBackButton(onPressed: () => context.pop()),
         ),
         body: AppErrorWidget(message: e.toString()),
       ),
@@ -81,10 +75,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded),
-              onPressed: () => context.pop(),
-            ),
+            leading: AppBarBackButton(onPressed: () => context.pop()),
             title: Text(company.name,
                 maxLines: 1, overflow: TextOverflow.ellipsis),
             titleSpacing: 0,
