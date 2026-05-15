@@ -119,6 +119,9 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
         ? ref.watch(demoCurrentUserProvider)
         : ref.watch(currentUserProvider);
 
+    final isMobile = MediaQuery.of(context).size.width < 768;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ticketAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -151,13 +154,19 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                     .toList(),
               ),
             ),
+            if (isMobile)
+              AppBarIconButton(
+                icon: Icons.info_outline_rounded,
+                tooltip: UiText.ticketDetails,
+                onPressed: () => _showTicketInfoSheet(context, ticket, isDark),
+              ),
             const SizedBox(width: 12),
           ],
         ),
         body: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Message thread
+            // Message thread — full width on mobile, flex-3 on wider screens
             Expanded(
               flex: 3,
               child: Column(
@@ -229,7 +238,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                     decoration: BoxDecoration(
                       border: Border(
                         top: BorderSide(
-                          color: Theme.of(context).brightness == Brightness.dark
+                          color: isDark
                               ? AppColors.darkBorder
                               : AppColors.lightBorder,
                         ),
@@ -282,134 +291,204 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
               ),
             ),
 
-            // Ticket info panel
-            Container(
-              width: 260,
-              decoration: BoxDecoration(
-                border: Border(
-                  left: BorderSide(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppColors.darkBorder
-                        : AppColors.lightBorder,
+            // Ticket info panel — hidden on mobile (opened via AppBar icon)
+            if (!isMobile)
+              Container(
+                width: 260,
+                decoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.lightBorder,
+                    ),
                   ),
                 ),
-              ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(UiText.ticketDetails,
-                        style: Theme.of(context).textTheme.titleSmall),
-                    const SizedBox(height: 16),
-                    InfoRow(
-                        label: UiText.status,
-                        value: ticket.status.displayName),
-                    InfoRow(
-                        label: UiText.priority,
-                        value: ticket.priority.displayName),
-                    InfoRow(
-                        label: UiText.creator,
-                        value: ticket.creatorName ?? ticket.creatorId),
-                    if (ticket.assigneeName != null)
-                      InfoRow(
-                          label: UiText.assignee,
-                          value: ticket.assigneeName!),
-                    if (ticket.dueDate != null)
-                      InfoRow(
-                          label: UiText.dueDate,
-                          value: ticket.dueDate!.formatted),
-                    if (ticket.createdAt != null)
-                      InfoRow(
-                          label: UiText.created,
-                          value: ticket.createdAt!.timeAgo),
-                    const SizedBox(height: 16),
-                    const Divider(),
-                    const SizedBox(height: 12),
-
-                    // SLA Progress
-                    if (ticket.dueDate != null) ...[
-                      Text(UiText.slaProgress,
-                          style: Theme.of(context).textTheme.labelMedium),
-                      const SizedBox(height: 8),
-                      Builder(builder: (context) {
-                        final sla = _slaProgress(ticket);
-                        final slaColor = sla >= 0.9
-                            ? AppColors.error
-                            : sla >= 0.7
-                                ? AppColors.warning
-                                : AppColors.success;
-                        return LinearPercentIndicator(
-                          lineHeight: 8,
-                          percent: sla,
-                          backgroundColor: slaColor.withValues(alpha: 0.15),
-                          progressColor: slaColor,
-                          barRadius: const Radius.circular(4),
-                          padding: EdgeInsets.zero,
-                          animation: true,
-                          animationDuration: 800,
-                          trailing: Text(
-                            UiText.percent(sla),
-                            style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: slaColor),
-                          ),
-                        );
-                      }),
-                      const SizedBox(height: 12),
-                      const Divider(),
-                      const SizedBox(height: 12),
-                    ],
-
-                    // Priority indicator
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: _priorityColor(ticket.priority)
-                            .withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                            color: _priorityColor(ticket.priority)
-                                .withValues(alpha: 0.3)),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.flag_outlined,
-                              color: _priorityColor(ticket.priority), size: 16),
-                          const SizedBox(width: 8),
-                          Text(
-                            UiText.priorityLabel(
-                                ticket.priority.displayName),
-                            style: TextStyle(
-                                color: _priorityColor(ticket.priority),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (ticket.tags.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      Text(UiText.tags,
-                          style: Theme.of(context).textTheme.labelLarge),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 4,
-                        runSpacing: 4,
-                        children: ticket.tags
-                            .map((t) =>
-                                Chip(label: Text(t), padding: EdgeInsets.zero))
-                            .toList(),
-                      ),
-                    ],
-                  ],
+                child: _TicketInfoPanel(
+                  ticket: ticket,
+                  slaProgress: _slaProgress(ticket),
+                  priorityColor: _priorityColor(ticket.priority),
                 ),
               ),
-            ),
           ],
         ),
       ),
+    );
+  }
+
+  void _showTicketInfoSheet(
+      BuildContext context, Ticket ticket, bool isDark) {
+    final cs = Theme.of(context).colorScheme;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (_) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkCard : AppColors.lightCard,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
+              blurRadius: 28,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag handle
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 14, bottom: 6),
+                decoration: BoxDecoration(
+                  color: cs.onSurface.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 16, 4),
+                child: Row(
+                  children: [
+                    Text(UiText.ticketDetails,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700)),
+                    const Spacer(),
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_down_rounded,
+                          color: cs.onSurface.withValues(alpha: 0.5)),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  child: _TicketInfoPanel(
+                    ticket: ticket,
+                    slaProgress: _slaProgress(ticket),
+                    priorityColor: _priorityColor(ticket.priority),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TICKET INFO PANEL  (shared by sidebar and mobile bottom sheet)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _TicketInfoPanel extends StatelessWidget {
+  final Ticket ticket;
+  final double slaProgress;
+  final Color priorityColor;
+
+  const _TicketInfoPanel({
+    required this.ticket,
+    required this.slaProgress,
+    required this.priorityColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InfoRow(label: UiText.status, value: ticket.status.displayName),
+        InfoRow(label: UiText.priority, value: ticket.priority.displayName),
+        InfoRow(
+            label: UiText.creator,
+            value: ticket.creatorName ?? ticket.creatorId),
+        if (ticket.assigneeName != null)
+          InfoRow(label: UiText.assignee, value: ticket.assigneeName!),
+        if (ticket.dueDate != null)
+          InfoRow(label: UiText.dueDate, value: ticket.dueDate!.formatted),
+        if (ticket.createdAt != null)
+          InfoRow(label: UiText.created, value: ticket.createdAt!.timeAgo),
+        const SizedBox(height: 16),
+        const Divider(),
+        const SizedBox(height: 12),
+        if (ticket.dueDate != null) ...[
+          Text(UiText.slaProgress,
+              style: Theme.of(context).textTheme.labelMedium),
+          const SizedBox(height: 8),
+          Builder(builder: (context) {
+            final slaColor = slaProgress >= 0.9
+                ? AppColors.error
+                : slaProgress >= 0.7
+                    ? AppColors.warning
+                    : AppColors.success;
+            return LinearPercentIndicator(
+              lineHeight: 8,
+              percent: slaProgress,
+              backgroundColor: slaColor.withValues(alpha: 0.15),
+              progressColor: slaColor,
+              barRadius: const Radius.circular(4),
+              padding: EdgeInsets.zero,
+              animation: true,
+              animationDuration: 800,
+              trailing: Text(
+                UiText.percent(slaProgress),
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: slaColor),
+              ),
+            );
+          }),
+          const SizedBox(height: 12),
+          const Divider(),
+          const SizedBox(height: 12),
+        ],
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: priorityColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
+            border:
+                Border.all(color: priorityColor.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.flag_outlined, color: priorityColor, size: 16),
+              const SizedBox(width: 8),
+              Text(
+                UiText.priorityLabel(ticket.priority.displayName),
+                style: TextStyle(
+                    color: priorityColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+        if (ticket.tags.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Text(UiText.tags,
+              style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children: ticket.tags
+                .map((t) => Chip(label: Text(t), padding: EdgeInsets.zero))
+                .toList(),
+          ),
+        ],
+      ],
     );
   }
 }

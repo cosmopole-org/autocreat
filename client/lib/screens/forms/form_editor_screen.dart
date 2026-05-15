@@ -80,10 +80,161 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
     ref.read(formEditorProvider.notifier).selectField(field.id);
   }
 
+  void _showFieldPaletteSheet(BuildContext context, bool isDark) {
+    final cs = Theme.of(context).colorScheme;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (_) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkCard : AppColors.lightCard,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
+              blurRadius: 28,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 14, bottom: 6),
+                decoration: BoxDecoration(
+                  color: cs.onSurface.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+                child: Text(UiText.fieldTypes,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700)),
+              ),
+              const Divider(height: 1),
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(12),
+                  children: FormFieldType.values
+                      .map((t) => Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: FieldPaletteItem(
+                              type: t,
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                _addField(t);
+                              },
+                            ),
+                          ))
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showPropertiesSheet(
+      BuildContext context, AppFormField field, bool isDark) {
+    final cs = Theme.of(context).colorScheme;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (sheetCtx) => DraggableScrollableSheet(
+        initialChildSize: 0.65,
+        minChildSize: 0.4,
+        maxChildSize: 0.92,
+        snap: true,
+        snapSizes: const [0.4, 0.65, 0.92],
+        expand: false,
+        builder: (context, scrollController) => Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkCard : AppColors.lightCard,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [
+              BoxShadow(
+                color:
+                    Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
+                blurRadius: 28,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 14, bottom: 6),
+                decoration: BoxDecoration(
+                  color: cs.onSurface.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 12, 8),
+                child: Row(
+                  children: [
+                    Text(UiText.fieldProperties,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700)),
+                    const Spacer(),
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_down_rounded,
+                          color: cs.onSurface.withValues(alpha: 0.5)),
+                      onPressed: () => Navigator.of(sheetCtx).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  padding: EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    top: 8,
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  ),
+                  child: _FieldPropertiesPanel(
+                    field: field,
+                    onUpdate: (updated) =>
+                        ref.read(formEditorProvider.notifier).updateField(updated),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final editorState = ref.watch(formEditorProvider);
-    final isDesktop = MediaQuery.of(context).size.width > 1000;
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = width > 1000;
+    final isMobile = width < 700;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (_loading) {
@@ -95,7 +246,13 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
         leading: AppBarBackButton(onPressed: () => context.pop()),
         title: Row(
           children: [
-            Text(editorState.form?.name ?? UiText.formEditor),
+            Expanded(
+              child: Text(
+                editorState.form?.name ?? UiText.formEditor,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             if (editorState.isDirty) ...[
               const SizedBox(width: 8),
               Container(
@@ -105,12 +262,19 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(UiText.unsaved,
-                    style: const TextStyle(fontSize: 11, color: AppColors.warning)),
+                    style: const TextStyle(
+                        fontSize: 11, color: AppColors.warning)),
               ),
             ],
           ],
         ),
         actions: [
+          if (isMobile)
+            AppBarIconButton(
+              icon: Icons.add_box_outlined,
+              tooltip: UiText.fieldTypes,
+              onPressed: () => _showFieldPaletteSheet(context, isDark),
+            ),
           AppBarActionButton(
             label: UiText.save,
             icon: Icons.save_outlined,
@@ -122,44 +286,46 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
       ),
       body: Row(
         children: [
-          // Field palette
-          Container(
-            width: isDesktop ? 220 : 160,
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-              border: Border(
-                right: BorderSide(
-                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+          // Field palette — hidden on mobile (use AppBar icon + bottom sheet)
+          if (!isMobile)
+            Container(
+              width: isDesktop ? 220 : 160,
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+                border: Border(
+                  right: BorderSide(
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                  ),
                 ),
               ),
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    UiText.fieldTypes,
-                    style: Theme.of(context).textTheme.titleSmall,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(
+                      UiText.fieldTypes,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
                   ),
-                ),
-                const Divider(height: 1),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.all(8),
-                    children: FormFieldType.values
-                        .map((t) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: FieldPaletteItem(
-                                type: t,
-                                onTap: () => _addField(t),
-                              ),
-                            ))
-                        .toList(),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.all(8),
+                      children: FormFieldType.values
+                          .map((t) => Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: FieldPaletteItem(
+                                  type: t,
+                                  onTap: () => _addField(t),
+                                ),
+                              ))
+                          .toList(),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
           // Form canvas
           Expanded(
@@ -208,6 +374,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                               Text(
                                 UiText.clickAFieldTypeToAddIt,
                                 style: Theme.of(context).textTheme.bodyMedium,
+                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
@@ -217,7 +384,9 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                           onReorder: (oldIndex, newIndex) {
                             ref.read(formEditorProvider.notifier).reorderFields(
                                 oldIndex,
-                                newIndex > oldIndex ? newIndex - 1 : newIndex);
+                                newIndex > oldIndex
+                                    ? newIndex - 1
+                                    : newIndex);
                           },
                           children: editorState.fields
                               .asMap()
@@ -226,11 +395,17 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
                                 (e) => _FieldCard(
                                   key: ValueKey(e.value.id),
                                   field: e.value,
-                                  isSelected:
-                                      editorState.selectedFieldId == e.value.id,
-                                  onSelect: () => ref
-                                      .read(formEditorProvider.notifier)
-                                      .selectField(e.value.id),
+                                  isSelected: editorState.selectedFieldId ==
+                                      e.value.id,
+                                  onSelect: () {
+                                    ref
+                                        .read(formEditorProvider.notifier)
+                                        .selectField(e.value.id);
+                                    if (isMobile) {
+                                      _showPropertiesSheet(
+                                          context, e.value, isDark);
+                                    }
+                                  },
                                   onDelete: () => ref
                                       .read(formEditorProvider.notifier)
                                       .deleteField(e.value.id),
@@ -243,8 +418,8 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
             ),
           ),
 
-          // Field properties panel
-          if (editorState.selectedField != null)
+          // Field properties panel — inline on tablet/desktop only
+          if (!isMobile && editorState.selectedField != null)
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: isDesktop ? 280 : 240,

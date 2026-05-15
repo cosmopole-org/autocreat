@@ -163,26 +163,52 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ],
               ),
             ).animate().shake().fadeIn(),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _firstNameController,
-                  decoration: InputDecoration(labelText: UiText.firstName),
-                  validator: (v) =>
-                      v?.isEmpty ?? true ? UiText.requiredText : null,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextFormField(
-                  controller: _lastNameController,
-                  decoration: InputDecoration(labelText: UiText.lastName),
-                  validator: (v) =>
-                      v?.isEmpty ?? true ? UiText.requiredText : null,
-                ),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth > 280;
+              if (wide) {
+                return Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _firstNameController,
+                        decoration:
+                            InputDecoration(labelText: UiText.firstName),
+                        validator: (v) =>
+                            v?.isEmpty ?? true ? UiText.requiredText : null,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _lastNameController,
+                        decoration:
+                            InputDecoration(labelText: UiText.lastName),
+                        validator: (v) =>
+                            v?.isEmpty ?? true ? UiText.requiredText : null,
+                      ),
+                    ),
+                  ],
+                );
+              }
+              return Column(
+                children: [
+                  TextFormField(
+                    controller: _firstNameController,
+                    decoration: InputDecoration(labelText: UiText.firstName),
+                    validator: (v) =>
+                        v?.isEmpty ?? true ? UiText.requiredText : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _lastNameController,
+                    decoration: InputDecoration(labelText: UiText.lastName),
+                    validator: (v) =>
+                        v?.isEmpty ?? true ? UiText.requiredText : null,
+                  ),
+                ],
+              );
+            },
           ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1),
           const SizedBox(height: 16),
           TextFormField(
