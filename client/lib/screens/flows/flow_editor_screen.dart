@@ -356,22 +356,19 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
                   .setScale(editorState.scale - 0.1),
               tooltip: UiText.zoomOut3,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.darkSurface
-                      : AppColors.primarySurface,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  UiText.percent(editorState.scale),
-                  style: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w600),
-                ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.darkSurface
+                    : AppColors.primarySurface,
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Text(
+                UiText.percent(editorState.scale),
+                style: const TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.w600),
               ),
             ),
             AppBarIconButton(

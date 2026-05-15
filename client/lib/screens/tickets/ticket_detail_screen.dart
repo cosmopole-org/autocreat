@@ -130,7 +130,7 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
               Text(ticket.title, maxLines: 1, overflow: TextOverflow.ellipsis),
           actions: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 11),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
               child: DropdownButton<TicketStatus>(
                 value: ticket.status,
                 underline: const SizedBox.shrink(),

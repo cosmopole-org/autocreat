@@ -150,7 +150,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
 
     return AppBar(
       leading: AppBarBackButton(onPressed: () => context.pop()),
-      titleSpacing: 0,
+      titleSpacing: 8,
       title: TextField(
         controller: _nameController,
         decoration: InputDecoration(
@@ -168,47 +168,50 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       ),
       actions: [
         // Attach — badge shows count when attachments present
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            AppBarIconButton(
-              icon: Icons.attach_file,
-              tooltip: UiText.attach,
-              onPressed: _pickAttachment,
-            ),
-            if (_attachments.isNotEmpty)
-              Positioned(
-                top: 9,
-                right: 3,
-                child: Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: accent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${_attachments.length}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold,
+        SizedBox(
+          width: 44,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              AppBarIconButton(
+                icon: Icons.attach_file,
+                tooltip: UiText.attach,
+                onPressed: _pickAttachment,
+              ),
+              if (_attachments.isNotEmpty)
+                Positioned(
+                  top: 9,
+                  right: 2,
+                  child: Container(
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: accent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${_attachments.length}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
         AppBarIconButton(
           icon: Icons.data_object,
           tooltip: UiText.variables,
           onPressed: _showVariablesPanel,
         ),
-        const SizedBox(width: 2),
+        const SizedBox(width: 4),
         AppBarActionButton(
-          label: UiText.save,
+          label: isMobile ? '' : UiText.save,
           loading: _saving,
           onPressed: _save,
           icon: Icons.save_outlined,
@@ -326,45 +329,55 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     final innerPadding = isMobile ? 16.0 : 32.0;
 
     return Expanded(
-      child: Container(
-        color: isDark ? AppColors.darkBg : const Color(0xFFF5F7FF),
-        child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 800),
-            margin: EdgeInsets.all(edgeMargin),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkCard : Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isDark
-                    ? AppColors.darkBorder
-                    : AppColors.lightBorder,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: isDark
-                      ? Colors.black.withValues(alpha: 0.20)
-                      : Colors.black.withValues(alpha: 0.05),
-                  blurRadius: isMobile ? 8 : 16,
-                  offset: const Offset(0, 4),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final editorWidth =
+              (constraints.maxWidth - edgeMargin * 2).clamp(0.0, 800.0);
+          final editorHeight = constraints.maxHeight - edgeMargin * 2;
+
+          return Container(
+            color: isDark ? AppColors.darkBg : const Color(0xFFF5F7FF),
+            child: Center(
+              child: SizedBox(
+                width: editorWidth,
+                height: editorHeight,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.darkCard : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.lightBorder,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.black.withValues(alpha: 0.20)
+                            : Colors.black.withValues(alpha: 0.05),
+                        blurRadius: isMobile ? 8 : 16,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.all(innerPadding),
+                  child: QuillEditor(
+                    controller: _quillController,
+                    focusNode: _focusNode,
+                    scrollController: _scrollController,
+                    config: QuillEditorConfig(
+                      placeholder: UiText.startWritingYourLetterTemplate,
+                      padding: EdgeInsets.zero,
+                      autoFocus: false,
+                      expands: true,
+                      scrollable: true,
+                    ),
+                  ),
                 ),
-              ],
-            ),
-            padding: EdgeInsets.all(innerPadding),
-            child: QuillEditor(
-              controller: _quillController,
-              focusNode: _focusNode,
-              scrollController: _scrollController,
-              config: QuillEditorConfig(
-                placeholder: UiText.startWritingYourLetterTemplate,
-                padding: EdgeInsets.zero,
-                autoFocus: false,
-                expands: false,
-                scrollable: true,
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

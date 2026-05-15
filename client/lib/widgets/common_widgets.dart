@@ -1899,9 +1899,10 @@ class AppBarIconButton extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final glassMode = ref.watch(glassModeProvider);
+    final radius = glassMode ? 11.0 : 9.0;
 
     Widget button = ClipRRect(
-      borderRadius: BorderRadius.circular(glassMode ? 10 : 8),
+      borderRadius: BorderRadius.circular(radius),
       child: BackdropFilter(
         filter: ImageFilter.blur(
           sigmaX: glassMode ? 10 : 0,
@@ -1909,32 +1910,27 @@ class AppBarIconButton extends ConsumerWidget {
         ),
         child: Material(
           color: glassMode
-              ? Colors.white.withValues(alpha: isDark ? 0.07 : 0.26)
-              : cs.onSurface.withValues(alpha: isDark ? 0.06 : 0.05),
-          borderRadius: BorderRadius.circular(glassMode ? 10 : 8),
+              ? Colors.white.withValues(alpha: isDark ? 0.06 : 0.28)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(radius),
           child: InkWell(
             onTap: onPressed,
-            borderRadius: BorderRadius.circular(glassMode ? 10 : 8),
+            borderRadius: BorderRadius.circular(radius),
             child: Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(glassMode ? 10 : 8),
-                border: glassMode
-                    ? Border.all(
+              padding: const EdgeInsets.all(6),
+              decoration: glassMode
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(radius),
+                      border: Border.all(
                         color: Colors.white
-                            .withValues(alpha: isDark ? 0.12 : 0.40),
-                        width: 1,
-                      )
-                    : Border.all(
-                        color: cs.outline.withValues(alpha: 0.28),
-                        width: 1,
+                            .withValues(alpha: isDark ? 0.10 : 0.42),
                       ),
-              ),
+                    )
+                  : null,
               child: Icon(
                 icon,
-                size: 17,
-                color: cs.onSurface.withValues(alpha: 0.72),
+                size: 18,
+                color: cs.onSurface.withValues(alpha: 0.75),
               ),
             ),
           ),
@@ -1947,7 +1943,7 @@ class AppBarIconButton extends ConsumerWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 2),
       child: button,
     );
   }
@@ -1980,7 +1976,7 @@ class AppBarActionButton extends ConsumerWidget {
     final enabled = (onPressed != null) && !loading;
     final accent = isDark ? AppColors.primaryLight : AppColors.primary;
     final foreground = outlined ? accent : Colors.white;
-    final radius = glassMode ? 12.0 : 10.0;
+    final radius = glassMode ? 11.0 : 9.0;
 
     final BoxDecoration decoration;
     if (glassMode) {
@@ -2067,7 +2063,7 @@ class AppBarActionButton extends ConsumerWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 2),
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 160),
         opacity: enabled ? 1.0 : 0.56,
@@ -2083,7 +2079,7 @@ class AppBarActionButton extends ConsumerWidget {
         onTap: loading ? null : onPressed,
         borderRadius: BorderRadius.circular(radius),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
