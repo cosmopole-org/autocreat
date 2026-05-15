@@ -1,11 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import '../core/utils.dart';
 import '../models/flow.dart';
-import '../providers/theme_provider.dart';
 import '../theme/app_colors.dart';
 import '../data/ui_text.dart';
 import 'common_widgets.dart';

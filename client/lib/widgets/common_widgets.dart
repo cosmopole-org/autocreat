@@ -527,11 +527,12 @@ Future<T?> showGlassContextMenu<T>({
     },
     transitionBuilder: (context, animation, secondaryAnimation, child) {
       final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+      final isRtl = Directionality.of(context) == TextDirection.rtl;
       return FadeTransition(
         opacity: curved,
         child: ScaleTransition(
           scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
-          alignment: AlignmentDirectional.topStart,
+          alignment: isRtl ? Alignment.topRight : Alignment.topLeft,
           child: child,
         ),
       );
