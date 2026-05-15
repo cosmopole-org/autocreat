@@ -263,7 +263,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {},
-              child: const Text(MockUiText.forgotPassword),
+              child: Text(MockUiText.forgotPassword),
             ),
           ),
           const SizedBox(height: 20),
@@ -293,7 +293,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               TextButton(
                 onPressed: () => context.go(AppRoutes.register),
-                child: const Text(MockUiText.createAccount3),
+                child: Text(MockUiText.createAccount3),
               ),
             ],
           ).animate().fadeIn(delay: 700.ms, duration: 400.ms),

@@ -409,8 +409,8 @@ class _RoleCard extends StatelessWidget {
                   icon: Icon(Icons.more_vert,
                       size: 18, color: cs.onSurface.withValues(alpha: 0.5)),
                   itemBuilder: (_) => [
-                    const PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
-                    const PopupMenuItem(
+                    PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
+                    PopupMenuItem(
                         value: 'delete',
                         child: Text(MockUiText.delete,
                             style: TextStyle(color: AppColors.error))),

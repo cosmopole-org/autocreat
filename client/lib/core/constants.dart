@@ -30,6 +30,7 @@ class AppConstants {
   static const String userIdKey = 'user_id';
   static const String themeKey = 'theme_mode';
   static const String glassModeKey = 'glass_mode';
+  static const String languageKey = 'language_code';
   static const String lastCompanyKey = 'last_company_id';
 
   // App info

@@ -131,7 +131,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         ],
 
         // ── Label ─────────────────────────────────────────────────
-        const _FieldLabel(MockUiText.nodeLabel),
+        _FieldLabel(MockUiText.nodeLabel),
         const SizedBox(height: 6),
         TextFormField(
           controller: _labelController,
@@ -144,7 +144,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 14),
 
         // ── Description ───────────────────────────────────────────
-        const _FieldLabel(MockUiText.description),
+        _FieldLabel(MockUiText.description),
         const SizedBox(height: 6),
         TextFormField(
           controller: _descController,
@@ -159,13 +159,13 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 16),
 
         // ── Role assignment ────────────────────────────────────────
-        const _FieldLabel(MockUiText.assignedRole),
+        _FieldLabel(MockUiText.assignedRole),
         const SizedBox(height: 6),
         rolesAsync.when(
           loading: () =>
               const LinearProgressIndicator(minHeight: 2),
           error: (_, __) =>
-              const _ErrorTile(MockUiText.errorLoadingRoles),
+              _ErrorTile(MockUiText.errorLoadingRoles),
           data: (roles) => DropdownButtonFormField<String?>(
             value: node.assignedRoleId,
             items: [
@@ -187,13 +187,13 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
         const SizedBox(height: 16),
 
         // ── Form assignment ───────────────────────────────────────
-        const _FieldLabel(MockUiText.assignedForm),
+        _FieldLabel(MockUiText.assignedForm),
         const SizedBox(height: 6),
         formsAsync.when(
           loading: () =>
               const LinearProgressIndicator(minHeight: 2),
           error: (_, __) =>
-              const _ErrorTile(MockUiText.errorLoadingForms),
+              _ErrorTile(MockUiText.errorLoadingForms),
           data: (forms) => DropdownButtonFormField<String?>(
             value: node.assignedFormId,
             items: [
@@ -226,7 +226,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
               const Spacer(),
               TextButton.icon(
                 icon: const Icon(Icons.add_rounded, size: 16),
-                label: const Text(MockUiText.addBranch),
+                label: Text(MockUiText.addBranch),
                 onPressed: () {
                   const uuid = Uuid();
                   final branch = BranchCondition(
@@ -289,7 +289,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
                                   .withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(MockUiText.defaultText,
+                            child: Text(MockUiText.defaultText,
                                 style: TextStyle(
                                     fontSize: 9,
                                     color: AppColors.success,

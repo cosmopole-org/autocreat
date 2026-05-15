@@ -303,8 +303,8 @@ class _CompanyCard extends StatelessWidget {
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, size: 18),
                 itemBuilder: (_) => [
-                  const PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
-                  const PopupMenuItem(
+                  PopupMenuItem(value: 'edit', child: Text(MockUiText.edit)),
+                  PopupMenuItem(
                       value: 'delete',
                       child: Text(MockUiText.delete,
                           style: TextStyle(color: AppColors.error))),
@@ -408,24 +408,24 @@ class _CompanyDialogState extends State<_CompanyDialog> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: MockUiText.companyNameRequired),
+                decoration: InputDecoration(labelText: MockUiText.companyNameRequired),
                 validator: (v) =>
                     v?.isEmpty ?? true ? MockUiText.nameIsRequired : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _industryController,
-                decoration: const InputDecoration(labelText: MockUiText.industry),
+                decoration: InputDecoration(labelText: MockUiText.industry),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _websiteController,
-                decoration: const InputDecoration(labelText: MockUiText.website),
+                decoration: InputDecoration(labelText: MockUiText.website),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _descController,
-                decoration: const InputDecoration(labelText: MockUiText.description),
+                decoration: InputDecoration(labelText: MockUiText.description),
                 maxLines: 3,
               ),
             ],
@@ -435,7 +435,7 @@ class _CompanyDialogState extends State<_CompanyDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text(MockUiText.cancel),
+          child: Text(MockUiText.cancel),
         ),
         AppButton(
           label: MockUiText.save,

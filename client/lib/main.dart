@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/theme_provider.dart';
@@ -33,6 +34,8 @@ class AutoCreatApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
     final themeMode = ref.watch(themeProvider);
     final glassMode = ref.watch(glassModeProvider);
+    final language = ref.watch(languageProvider);
+    MockUiText.configureLanguage(language);
 
     return MaterialApp.router(
       title: MockUiText.autocreat,
@@ -40,6 +43,13 @@ class AutoCreatApp extends ConsumerWidget {
       theme: AppTheme.light(glassMode: glassMode),
       darkTheme: AppTheme.dark(glassMode: glassMode),
       themeMode: themeMode,
+      locale: language.locale,
+      supportedLocales: const [Locale('en'), Locale('fa')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       routerConfig: router,
       builder: (context, child) {
         final brightness = Theme.of(context).brightness;
@@ -47,7 +57,10 @@ class AutoCreatApp extends ConsumerWidget {
         return _AppBackground(
           brightness: brightness,
           glassMode: glassMode,
-          child: child ?? const SizedBox.shrink(),
+          child: Directionality(
+            textDirection: language.textDirection,
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
     );

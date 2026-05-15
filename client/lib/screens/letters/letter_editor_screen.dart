@@ -160,7 +160,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
           // Variable chip
           TextButton.icon(
             icon: const Icon(Icons.data_object, size: 16),
-            label: const Text(MockUiText.variables),
+            label: Text(MockUiText.variables),
             onPressed: _showVariablesPanel,
           ),
           AppButton(
@@ -247,7 +247,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
                     TextButton.icon(
                       onPressed: _pickAttachment,
                       icon: const Icon(Icons.add, size: 14),
-                      label: const Text(MockUiText.addMore,
+                      label: Text(MockUiText.addMore,
                           style: TextStyle(fontSize: 11)),
                       style: TextButton.styleFrom(
                         minimumSize: Size.zero,
@@ -302,7 +302,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text(MockUiText.availableVariables),
+        title: Text(MockUiText.availableVariables),
         content: SizedBox(
           width: 320,
           child: Column(
@@ -344,7 +344,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(MockUiText.close),
+            child: Text(MockUiText.close),
           ),
         ],
       ),

@@ -235,7 +235,7 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                         style: Theme.of(context).textTheme.titleMedium),
                     TextButton.icon(
                       icon: const Icon(Icons.add, size: 16),
-                      label: const Text(MockUiText.newFlow),
+                      label: Text(MockUiText.newFlow),
                       onPressed: () => context.go(AppRoutes.flows),
                     ),
                   ],
