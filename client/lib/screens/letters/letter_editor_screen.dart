@@ -532,12 +532,15 @@ class _EditorPane extends StatelessWidget {
 
           final docW = (maxW - edgeMargin * 2).clamp(200.0, 800.0);
 
+          final docH = maxH - edgeMargin * 2;
+
           return SizedBox(
             width: maxW,
             height: maxH,
             child: Center(
               child: Container(
                 width: docW,
+                height: docH,
                 margin: EdgeInsets.symmetric(vertical: edgeMargin),
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.darkCard : Colors.white,
