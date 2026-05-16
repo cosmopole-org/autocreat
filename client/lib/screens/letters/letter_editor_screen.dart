@@ -39,7 +39,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
   double _zoom = 0.85;
   bool _showGrid = true;
   bool _snapToGrid = true;
-  double _gridSize = 8;
+  final double _gridSize = 8;
 
   bool _loading = true;
   bool _saving = false;

@@ -404,7 +404,7 @@ extension PageSizeMeta on PageSize {
 }
 
 // ─── helpers ───────────────────────────────────────────────────────────────
-String colorToHex(Color c) {
+String designColorToHex(Color c) {
   final argb = ((c.a * 255).round() << 24) |
       ((c.r * 255).round() << 16) |
       ((c.g * 255).round() << 8) |

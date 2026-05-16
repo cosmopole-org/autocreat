@@ -1668,7 +1668,7 @@ class _QrLikePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cells = 21;
+    const cells = 21;
     final cell = size.shortestSide / cells;
     final rand = math.Random(seed);
     final paint = Paint()..color = Colors.black;
