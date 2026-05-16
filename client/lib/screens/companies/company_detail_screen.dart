@@ -81,64 +81,74 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
             titleSpacing: 0,
           ),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Company header
-                AppCard(
-                  child: Row(
-                    children: [
-                      // Logo with upload capability
-                      GestureDetector(
-                        onTap: _pickLogo,
-                        child: Stack(
-                          children: [
-                            _CompanyLogo(
-                              logoUrl: _logoPath ?? company.logo,
-                              name: company.name,
-                              size: 72,
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                width: 22,
-                                height: 22,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      color: Colors.white, width: 1.5),
+                // Hero header — branded summary card
+                EditorHeroHeader(
+                  title: company.name,
+                  subtitle: company.industry,
+                  leading: GestureDetector(
+                    onTap: _pickLogo,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        _CompanyLogo(
+                          logoUrl: _logoPath ?? company.logo,
+                          name: company.name,
+                          size: 64,
+                        ),
+                        Positioned(
+                          bottom: -2,
+                          right: -2,
+                          child: Container(
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: Theme.of(context)
+                                      .scaffoldBackgroundColor,
+                                  width: 2),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary
+                                      .withValues(alpha: 0.30),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
                                 ),
-                                child: const Icon(Icons.camera_alt,
-                                    size: 12, color: Colors.white),
-                              ),
+                              ],
                             ),
-                          ],
+                            child: const Icon(Icons.camera_alt,
+                                size: 12, color: Colors.white),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              company.name,
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            if (company.industry != null)
-                              Text(
-                                company.industry!,
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            const SizedBox(height: 8),
-                            StatusChip(status: company.status),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  chips: [
+                    EditorHeroChip(
+                      icon: Icons.circle,
+                      label: company.status,
+                      color: company.status == 'active'
+                          ? AppColors.success
+                          : AppColors.warning,
+                    ),
+                    EditorHeroChip(
+                      icon: Icons.people_outline_rounded,
+                      label:
+                          '${company.memberCount} ${UiText.members.toLowerCase()}',
+                      color: AppColors.accent,
+                    ),
+                    EditorHeroChip(
+                      icon: Icons.account_tree_outlined,
+                      label:
+                          '${company.flowCount} ${UiText.flows.toLowerCase()}',
+                      color: AppColors.warning,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 
@@ -148,8 +158,11 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(UiText.capacity,
-                          style: Theme.of(context).textTheme.titleMedium),
-                      const SizedBox(height: 16),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 18),
                       Row(
                         children: [
                           Expanded(
@@ -184,7 +197,10 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(UiText.details,
-                          style: Theme.of(context).textTheme.titleMedium),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700)),
                       const SizedBox(height: 12),
                       if (company.description != null)
                         InfoRow(
@@ -218,49 +234,112 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                 const SizedBox(height: 16),
 
                 // Flows
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(UiText.flows,
-                        style: Theme.of(context).textTheme.titleMedium),
-                    TextButton.icon(
-                      icon: const Icon(Icons.add, size: 16),
-                      label: Text(UiText.newFlow),
-                      onPressed: () => context.go(AppRoutes.flows),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(UiText.flows,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700)),
+                      TextButton.icon(
+                        icon: const Icon(Icons.add, size: 16),
+                        label: Text(UiText.newFlow),
+                        onPressed: () => context.go(AppRoutes.flows),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 flowsAsync.when(
                   loading: () => const LoadingList(count: 3),
                   error: (e, _) => const SizedBox.shrink(),
                   data: (flows) {
                     if (flows.isEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Text(UiText.noFlowsYet,
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                      return AppCard(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Row(
+                            children: [
+                              Icon(Icons.account_tree_outlined,
+                                  size: 18,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.45)),
+                              const SizedBox(width: 10),
+                              Text(UiText.noFlowsYet,
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.62))),
+                            ],
+                          ),
+                        ),
                       );
                     }
                     return Column(
-                      children: flows
-                          .map((f) => ListTile(
-                                leading: const Icon(Icons.account_tree_outlined,
-                                    color: AppColors.primary),
-                                title: Text(f.name),
-                                subtitle: Text(f.status),
-                                trailing: Icon(
-                                  Directionality.of(context) == TextDirection.rtl
-                                      ? Icons.chevron_left
-                                      : Icons.chevron_right,
+                      children: [
+                        for (final f in flows) ...[
+                          AppCard(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 12),
+                            onTap: () => context.push('/flows/${f.id}/edit'),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 38,
+                                  height: 38,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary
+                                        .withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(
+                                      Icons.account_tree_outlined,
+                                      size: 18,
+                                      color: AppColors.primary),
                                 ),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                onTap: () =>
-                                    context.push('/flows/${f.id}/edit'),
-                              ))
-                          .toList(),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(f.name,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall
+                                              ?.copyWith(
+                                                  fontWeight:
+                                                      FontWeight.w600)),
+                                      const SizedBox(height: 2),
+                                      Text(f.status,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  Directionality.of(context) ==
+                                          TextDirection.rtl
+                                      ? Icons.chevron_left_rounded
+                                      : Icons.chevron_right_rounded,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.45),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      ],
                     );
                   },
                 ),

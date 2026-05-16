@@ -244,8 +244,11 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
 
                   // Message input
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
                     decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.darkSurface.withValues(alpha: 0.5)
+                          : AppColors.lightSurface.withValues(alpha: 0.5),
                       border: Border(
                         top: BorderSide(
                           color: isDark
@@ -257,42 +260,97 @@ class _TicketDetailScreenState extends ConsumerState<TicketDetailScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.attach_file, size: 20),
-                          onPressed: _pickAttachment,
-                          tooltip: UiText.attachFile,
+                        Material(
                           color: _attachmentName != null
-                              ? AppColors.primary
-                              : null,
+                              ? AppColors.primary.withValues(alpha: 0.12)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: _pickAttachment,
+                            child: Tooltip(
+                              message: UiText.attachFile,
+                              child: SizedBox(
+                                width: 44,
+                                height: 44,
+                                child: Icon(
+                                  Icons.attach_file_rounded,
+                                  size: 20,
+                                  color: _attachmentName != null
+                                      ? AppColors.primary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.62),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: TextField(
                             controller: _messageController,
                             decoration: InputDecoration(
                               hintText: UiText.typeAMessage,
-                              border: const OutlineInputBorder(),
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 12),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
-                            maxLines: 3,
+                            maxLines: 4,
                             minLines: 1,
                             onSubmitted: (_) => _sendMessage(ticket),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        IconButton.filled(
-                          onPressed: _sending ? null : () => _sendMessage(ticket),
-                          icon: _sending
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2, color: Colors.white),
-                                )
-                              : const Icon(Icons.send_rounded, size: 20),
-                          style: IconButton.styleFrom(
-                            minimumSize: const Size(48, 48),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
+                        const SizedBox(width: 10),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppColors.primary,
+                                AppColors.accent
+                                    .withValues(alpha: isDark ? 0.85 : 0.92),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary
+                                    .withValues(alpha: 0.30),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(14),
+                              onTap: _sending
+                                  ? null
+                                  : () => _sendMessage(ticket),
+                              child: SizedBox(
+                                width: 46,
+                                height: 46,
+                                child: Center(
+                                  child: _sending
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white),
+                                        )
+                                      : const Icon(Icons.send_rounded,
+                                          size: 20, color: Colors.white),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -584,14 +642,25 @@ class _MessageBubble extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
+                    gradient: isOwn
+                        ? LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              AppColors.primary,
+                              AppColors.accent.withValues(
+                                  alpha: isDark ? 0.82 : 0.88),
+                            ],
+                          )
+                        : null,
                     color: isOwn
-                        ? AppColors.primary
+                        ? null
                         : (isDark ? AppColors.darkCard : Colors.white),
                     borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(14),
-                      topRight: const Radius.circular(14),
-                      bottomLeft: Radius.circular(isOwn ? 14 : 4),
-                      bottomRight: Radius.circular(isOwn ? 4 : 14),
+                      topLeft: const Radius.circular(16),
+                      topRight: const Radius.circular(16),
+                      bottomLeft: Radius.circular(isOwn ? 16 : 4),
+                      bottomRight: Radius.circular(isOwn ? 4 : 16),
                     ),
                     border: isOwn
                         ? null
@@ -600,6 +669,16 @@ class _MessageBubble extends StatelessWidget {
                                 ? AppColors.darkBorder
                                 : AppColors.lightBorder,
                           ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isOwn
+                            ? AppColors.primary.withValues(alpha: 0.20)
+                            : Colors.black.withValues(
+                                alpha: isDark ? 0.18 : 0.04),
+                        blurRadius: isOwn ? 12 : 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Text(
                     message.content,
@@ -608,6 +687,7 @@ class _MessageBubble extends StatelessWidget {
                           ? Colors.white
                           : (isDark ? AppColors.darkText : AppColors.lightText),
                       fontSize: 14,
+                      height: 1.4,
                     ),
                   ),
                 ),
