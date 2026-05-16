@@ -107,7 +107,6 @@ extension _BlockTypeMeta on _BlockType {
   }
 
   bool get hasText => this != _BlockType.divider;
-  bool get allowsHardNewlines => this == _BlockType.code;
 }
 
 // ─── block model ────────────────────────────────────────────────────────────
@@ -323,7 +322,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
             plain.writeln('• ${b.text}');
             break;
           case _BlockType.numbered:
-            plain.writeln('${b.text}');
+            plain.writeln(b.text);
             break;
           case _BlockType.todo:
             plain.writeln('${b.checked ? "[x]" : "[ ]"} ${b.text}');
@@ -1516,11 +1515,11 @@ class _BlockActions extends StatelessWidget {
             ],
           ),
         ),
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'delete',
           height: 36,
           child: Row(
-            children: const [
+            children: [
               Icon(Icons.delete_outline_rounded,
                   size: 16, color: AppColors.error),
               SizedBox(width: 10),
