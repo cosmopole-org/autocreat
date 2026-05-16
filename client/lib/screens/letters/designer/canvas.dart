@@ -209,7 +209,7 @@ class _GridPainter extends CustomPainter {
       ..color = (isDark ? Colors.white : Colors.black)
           .withValues(alpha: isDark ? 0.10 : 0.10)
       ..strokeWidth = 1;
-    final majorEvery = 5;
+    const majorEvery = 5;
     int i = 0;
     for (double x = 0; x <= size.width; x += gridSize) {
       canvas.drawLine(

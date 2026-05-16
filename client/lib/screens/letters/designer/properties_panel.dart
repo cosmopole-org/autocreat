@@ -454,8 +454,8 @@ class _BodyState extends State<_Body> {
   }
 
   Widget _alignmentRow() {
-    final aligns = const ['left', 'center', 'right', 'justify'];
-    final icons = const [
+    const aligns = ['left', 'center', 'right', 'justify'];
+    const icons = [
       Icons.format_align_left_rounded,
       Icons.format_align_center_rounded,
       Icons.format_align_right_rounded,
@@ -519,7 +519,7 @@ class _BodyState extends State<_Body> {
             borderRadius: BorderRadius.circular(6),
             onTap: () async {
               final picked = await _showColorPicker(context, color);
-              if (picked != null) set(colorToHex(picked));
+              if (picked != null) set(designColorToHex(picked));
             },
             child: Container(
               width: 36,
