@@ -138,13 +138,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               glassMode: glassMode,
               cs: cs,
               icon: Icons.notifications_outlined,
-              title: 'Notifications',
+              title: UiText.notificationPrefs,
               child: Column(
                 children: [
                   _ToggleRow(
                     icon: Icons.email_outlined,
-                    title: 'Email Notifications',
-                    subtitle: 'Receive updates via email',
+                    title: UiText.emailNotifs,
+                    subtitle: UiText.emailNotifsDesc,
                     value: _emailNotifications,
                     cs: cs,
                     onChanged: (v) => setState(() => _emailNotifications = v),
@@ -152,8 +152,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _SectionDivider(cs: cs),
                   _ToggleRow(
                     icon: Icons.notifications_active_outlined,
-                    title: 'Push Notifications',
-                    subtitle: 'Browser & mobile alerts',
+                    title: UiText.pushNotifs,
+                    subtitle: UiText.pushNotifsDesc,
                     value: _pushNotifications,
                     cs: cs,
                     onChanged: (v) => setState(() => _pushNotifications = v),
@@ -161,8 +161,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _SectionDivider(cs: cs),
                   _ToggleRow(
                     icon: Icons.volume_up_outlined,
-                    title: 'Sound Effects',
-                    subtitle: 'Play sounds for events',
+                    title: UiText.soundEffects,
+                    subtitle: UiText.soundEffectsDesc,
                     value: _soundEffects,
                     cs: cs,
                     onChanged: (v) => setState(() => _soundEffects = v),
@@ -179,13 +179,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               glassMode: glassMode,
               cs: cs,
               icon: Icons.settings_suggest_outlined,
-              title: 'System',
+              title: UiText.systemSection,
               child: Column(
                 children: [
                   _ToggleRow(
                     icon: Icons.analytics_outlined,
-                    title: 'Usage Analytics',
-                    subtitle: 'Help improve AutoCreat',
+                    title: UiText.usageAnalytics,
+                    subtitle: UiText.usageAnalyticsDesc,
                     value: _usageAnalytics,
                     cs: cs,
                     onChanged: (v) => setState(() => _usageAnalytics = v),
@@ -193,8 +193,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _SectionDivider(cs: cs),
                   _ToggleRow(
                     icon: Icons.save_outlined,
-                    title: 'Auto Save',
-                    subtitle: 'Automatically save changes',
+                    title: UiText.autoSave,
+                    subtitle: UiText.autoSaveDesc,
                     value: _autoSave,
                     cs: cs,
                     onChanged: (v) => setState(() => _autoSave = v),
@@ -202,18 +202,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _SectionDivider(cs: cs),
                   _ActionRow(
                     icon: Icons.cleaning_services_outlined,
-                    title: 'Clear Cache',
-                    subtitle: 'Free up storage',
+                    title: UiText.clearCache,
+                    subtitle: UiText.clearCacheDesc,
                     cs: cs,
-                    onTap: () => _showSnackBar('Cache cleared'),
+                    onTap: () => _showSnackBar(UiText.cacheCleared),
                   ),
                   _SectionDivider(cs: cs),
                   _ActionRow(
                     icon: Icons.download_rounded,
-                    title: 'Export Data',
-                    subtitle: 'Download all your data',
+                    title: UiText.exportData,
+                    subtitle: UiText.exportDataDesc,
                     cs: cs,
-                    onTap: () => _showSnackBar('Export started'),
+                    onTap: () => _showSnackBar(UiText.exportStarted),
                   ),
                 ],
               ),
@@ -324,9 +324,9 @@ class _SettingsHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      'Settings',
-                      style: TextStyle(
+                    Text(
+                      UiText.settings,
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
@@ -336,7 +336,7 @@ class _SettingsHeader extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Customize your workspace',
+                      UiText.settingsSubtitle,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -705,7 +705,7 @@ class _WorkspaceSection extends ConsumerWidget {
       glassMode: glassMode,
       cs: cs,
       icon: Icons.business_rounded,
-      title: 'Workspace',
+      title: UiText.workspace,
       child: Column(
         children: [
           // Active company selector
@@ -752,10 +752,10 @@ class _WorkspaceSection extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Manage Companies',
-                      style: TextStyle(
+                      UiText.manageCompanies,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primary,
@@ -858,7 +858,7 @@ class _CompanySelectorTile extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'No company selected',
+                  UiText.noCompanySelected,
                   style: TextStyle(
                     fontSize: 14,
                     color: cs.onSurface.withValues(alpha: 0.5),
@@ -905,7 +905,7 @@ class _NoCompanyPlaceholder extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Text(
-        'Could not load companies',
+        UiText.couldNotLoadCompanies,
         style: TextStyle(
           fontSize: 13,
           color: cs.onSurface.withValues(alpha: 0.5),
@@ -1027,7 +1027,7 @@ class _CompanySelectorSheet extends ConsumerWidget {
               ),
               const SizedBox(width: 12),
               Text(
-                'Select Company',
+                UiText.selectCompanyTitle,
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -1047,7 +1047,7 @@ class _CompanySelectorSheet extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(32),
             child: Text(
-              'No companies available',
+              UiText.noCompaniesAvailable,
               style: TextStyle(
                 fontSize: 14,
                 color: cs.onSurface.withValues(alpha: 0.5),
@@ -1171,7 +1171,7 @@ class _CompanySelectorDialog extends ConsumerWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Select Active Company',
+                  UiText.selectCompanyTitle,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -1193,7 +1193,7 @@ class _CompanySelectorDialog extends ConsumerWidget {
             padding: const EdgeInsets.all(32),
             child: Center(
               child: Text(
-                'No companies available',
+                UiText.noCompaniesAvailable,
                 style: TextStyle(
                   fontSize: 14,
                   color: cs.onSurface.withValues(alpha: 0.5),
@@ -1389,7 +1389,7 @@ class _AppearanceSection extends ConsumerWidget {
       glassMode: glassMode,
       cs: cs,
       icon: Icons.palette_outlined,
-      title: 'Appearance',
+      title: UiText.appearance,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1400,7 +1400,7 @@ class _AppearanceSection extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Theme',
+                  UiText.themeMode,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -1413,7 +1413,7 @@ class _AppearanceSection extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: _ThemeCard(
-                        label: 'Light',
+                        label: UiText.lightMode,
                         icon: Icons.wb_sunny_rounded,
                         mode: ThemeMode.light,
                         currentMode: currentTheme,
@@ -1431,7 +1431,7 @@ class _AppearanceSection extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: _ThemeCard(
-                        label: 'Dark',
+                        label: UiText.darkMode,
                         icon: Icons.nightlight_round,
                         mode: ThemeMode.dark,
                         currentMode: currentTheme,
@@ -1449,7 +1449,7 @@ class _AppearanceSection extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: _ThemeCard(
-                        label: 'System',
+                        label: UiText.systemDefault,
                         icon: Icons.phone_android_rounded,
                         mode: ThemeMode.system,
                         currentMode: currentTheme,
@@ -1475,8 +1475,8 @@ class _AppearanceSection extends ConsumerWidget {
           // Glass mode toggle
           _ToggleRow(
             icon: Icons.blur_on_rounded,
-            title: 'Glass Effect',
-            subtitle: 'Translucent surfaces with blur',
+            title: UiText.glassEffect,
+            subtitle: UiText.glassEffectDesc,
             value: glassMode,
             cs: cs,
             onChanged: (v) =>
@@ -1627,7 +1627,7 @@ class _LanguageSection extends ConsumerWidget {
       glassMode: glassMode,
       cs: cs,
       icon: Icons.language_rounded,
-      title: 'Language & Region',
+      title: UiText.languageAndRegion,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
         child: Column(
@@ -1637,8 +1637,8 @@ class _LanguageSection extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _LanguageCard(
-                    code: 'EN',
-                    label: 'English',
+                    code: AppLanguage.english.shortLabel,
+                    label: AppLanguage.english.nativeLabel,
                     language: AppLanguage.english,
                     currentLanguage: currentLang,
                     isDark: isDark,
@@ -1651,8 +1651,8 @@ class _LanguageSection extends ConsumerWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: _LanguageCard(
-                    code: 'فا',
-                    label: 'فارسی',
+                    code: AppLanguage.persian.shortLabel,
+                    label: AppLanguage.persian.nativeLabel,
                     language: AppLanguage.persian,
                     currentLanguage: currentLang,
                     isDark: isDark,
@@ -1684,7 +1684,7 @@ class _LanguageSection extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'RTL layout is applied automatically for Persian',
+                      UiText.rtlNote,
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.info.withValues(alpha: 0.85),
@@ -1833,27 +1833,27 @@ class _AboutSection extends StatelessWidget {
       glassMode: glassMode,
       cs: cs,
       icon: Icons.info_outline_rounded,
-      title: 'About',
+      title: UiText.aboutSection,
       child: Column(
         children: [
           // Info rows
           _AboutInfoRow(
             icon: Icons.info_outline_rounded,
-            title: 'Version',
+            title: UiText.appVersionLabel,
             value: '1.0.0',
             cs: cs,
           ),
           _SectionDivider(cs: cs),
           _AboutInfoRow(
             icon: Icons.code_rounded,
-            title: 'Build',
+            title: UiText.buildLabel,
             value: '2024.1',
             cs: cs,
           ),
           _SectionDivider(cs: cs),
           _AboutInfoRow(
             icon: Icons.gavel_rounded,
-            title: 'License',
+            title: UiText.licenseLabel,
             value: 'MIT',
             cs: cs,
           ),
@@ -1862,26 +1862,26 @@ class _AboutSection extends StatelessWidget {
           // Action rows
           _ActionRow(
             icon: Icons.feedback_outlined,
-            title: 'Send Feedback',
-            subtitle: 'Share your thoughts with us',
+            title: UiText.sendFeedback,
+            subtitle: UiText.sendFeedbackDesc,
             cs: cs,
-            onTap: () => onSnackBar('Opening feedback...'),
+            onTap: () => onSnackBar(UiText.openingFeedback),
           ),
           _SectionDivider(cs: cs),
           _ActionRow(
             icon: Icons.bug_report_outlined,
-            title: 'Report a Bug',
-            subtitle: 'Help us fix issues',
+            title: UiText.reportBug,
+            subtitle: UiText.reportBugDesc,
             cs: cs,
-            onTap: () => onSnackBar('Opening issue tracker...'),
+            onTap: () => onSnackBar(UiText.openingBugTracker),
           ),
           _SectionDivider(cs: cs),
           _ActionRow(
             icon: Icons.privacy_tip_outlined,
-            title: 'Privacy Policy',
-            subtitle: 'How we handle your data',
+            title: UiText.privacyPolicy,
+            subtitle: UiText.privacyPolicyDesc,
             cs: cs,
-            onTap: () => onSnackBar('Opening privacy policy...'),
+            onTap: () => onSnackBar(UiText.openingPrivacy),
           ),
 
           // Branding footer
@@ -1930,9 +1930,9 @@ class _AboutSection extends StatelessWidget {
                               const LinearGradient(
                             colors: [AppColors.primary, AppColors.accent],
                           ).createShader(bounds),
-                          child: const Text(
-                            'AutoCreat',
-                            style: TextStyle(
+                          child: Text(
+                            UiText.autocreat,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
@@ -1941,7 +1941,7 @@ class _AboutSection extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Version 1.0.0 · Build 2024.1',
+                          UiText.appVersionBuild('1.0.0', '2024.1'),
                           style: TextStyle(
                             fontSize: 11,
                             color: cs.onSurface.withValues(alpha: 0.45),

@@ -499,13 +499,18 @@ enum _UiTextKey {
   buildLabel,
   licenseLabel,
   sendFeedback,
+  sendFeedbackDesc,
   reportBug,
+  reportBugDesc,
   privacyPolicy,
+  privacyPolicyDesc,
   openingFeedback,
   openingBugTracker,
   openingPrivacy,
   settingsButton,
   selectCompanyTitle,
+  noCompaniesAvailable,
+  couldNotLoadCompanies,
 }
 
 class UiText {
@@ -1029,13 +1034,18 @@ class UiText {
     _UiTextKey.buildLabel: "Build",
     _UiTextKey.licenseLabel: "License",
     _UiTextKey.sendFeedback: "Send Feedback",
+    _UiTextKey.sendFeedbackDesc: "Share your thoughts with us",
     _UiTextKey.reportBug: "Report a Bug",
+    _UiTextKey.reportBugDesc: "Help us fix issues",
     _UiTextKey.privacyPolicy: "Privacy Policy",
+    _UiTextKey.privacyPolicyDesc: "How we handle your data",
     _UiTextKey.openingFeedback: "Opening feedback form...",
     _UiTextKey.openingBugTracker: "Opening issue tracker...",
     _UiTextKey.openingPrivacy: "Opening privacy policy...",
     _UiTextKey.settingsButton: "Settings",
     _UiTextKey.selectCompanyTitle: "Select Company",
+    _UiTextKey.noCompaniesAvailable: "No companies available",
+    _UiTextKey.couldNotLoadCompanies: "Could not load companies",
   };
 
   static const Map<_UiTextKey, String> _persian = {
@@ -1536,13 +1546,18 @@ class UiText {
     _UiTextKey.buildLabel: "بیلد",
     _UiTextKey.licenseLabel: "مجوز",
     _UiTextKey.sendFeedback: "ارسال بازخورد",
+    _UiTextKey.sendFeedbackDesc: "نظرات خود را با ما در میان بگذارید",
     _UiTextKey.reportBug: "گزارش باگ",
+    _UiTextKey.reportBugDesc: "به ما در رفع مشکلات کمک کنید",
     _UiTextKey.privacyPolicy: "سیاست حریم خصوصی",
+    _UiTextKey.privacyPolicyDesc: "نحوه مدیریت داده‌های شما",
     _UiTextKey.openingFeedback: "در حال باز کردن فرم بازخورد...",
     _UiTextKey.openingBugTracker: "در حال باز کردن ردیاب مشکلات...",
     _UiTextKey.openingPrivacy: "در حال باز کردن سیاست حریم خصوصی...",
     _UiTextKey.settingsButton: "تنظیمات",
     _UiTextKey.selectCompanyTitle: "انتخاب شرکت",
+    _UiTextKey.noCompaniesAvailable: "هیچ شرکتی موجود نیست",
+    _UiTextKey.couldNotLoadCompanies: "بارگذاری شرکت‌ها ناموفق بود",
   };
 
   static String get exception => _text(_UiTextKey.exception);
@@ -2095,13 +2110,20 @@ class UiText {
   static String get buildLabel => _text(_UiTextKey.buildLabel);
   static String get licenseLabel => _text(_UiTextKey.licenseLabel);
   static String get sendFeedback => _text(_UiTextKey.sendFeedback);
+  static String get sendFeedbackDesc => _text(_UiTextKey.sendFeedbackDesc);
   static String get reportBug => _text(_UiTextKey.reportBug);
+  static String get reportBugDesc => _text(_UiTextKey.reportBugDesc);
   static String get privacyPolicy => _text(_UiTextKey.privacyPolicy);
+  static String get privacyPolicyDesc => _text(_UiTextKey.privacyPolicyDesc);
   static String get openingFeedback => _text(_UiTextKey.openingFeedback);
   static String get openingBugTracker => _text(_UiTextKey.openingBugTracker);
   static String get openingPrivacy => _text(_UiTextKey.openingPrivacy);
   static String get settingsButton => _text(_UiTextKey.settingsButton);
   static String get selectCompanyTitle => _text(_UiTextKey.selectCompanyTitle);
+  static String get noCompaniesAvailable =>
+      _text(_UiTextKey.noCompaniesAvailable);
+  static String get couldNotLoadCompanies =>
+      _text(_UiTextKey.couldNotLoadCompanies);
 
   static String languageToggleTooltip(AppLanguage nextLanguage) =>
       nextLanguage == AppLanguage.persian
@@ -2257,4 +2279,8 @@ class UiText {
       default: return type;
     }
   }
+
+  static String appVersionBuild(String version, String build) => isPersian
+      ? 'نسخه $version · بیلد $build'
+      : 'Version $version · Build $build';
 }
