@@ -79,7 +79,6 @@ class _DesignerCanvasState extends State<DesignerCanvas> {
   Widget build(BuildContext context) {
     final pageSize = widget.pageSize.pixels;
     final scaled = pageSize * widget.zoom;
-    final canvasBg = widget.isDark ? AppColors.darkBg : const Color(0xFFE7EAF5);
     final media = MediaQuery.of(context);
     final isMobile = media.size.width < 720;
     final canvasPadding = isMobile ? 16.0 : 48.0;
