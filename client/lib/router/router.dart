@@ -26,6 +26,7 @@ import '../screens/users/user_editor_screen.dart';
 import '../screens/users/users_screen.dart';
 import '../widgets/responsive_shell.dart';
 import '../widgets/secondary_page_wrapper.dart';
+import '../data/ui_text.dart';
 
 // Notifies GoRouter to re-evaluate its redirect whenever auth or demo state
 // changes, without recreating the GoRouter instance itself.
@@ -246,13 +247,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
-            Text('Page not found', style: Theme.of(context).textTheme.headlineSmall),
+            Text(UiText.pageNotFound, style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
             Text(state.error.toString()),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.go(AppRoutes.dashboard),
-              child: const Text('Go Home'),
+              child: Text(UiText.goHome),
             ),
           ],
         ),

@@ -25,6 +25,7 @@ import '../models/role.dart';
 import '../models/ticket.dart';
 import '../models/user.dart';
 import '../providers/demo_provider.dart';
+import '../providers/theme_provider.dart';
 import 'demo_data.dart';
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -32,32 +33,46 @@ import 'demo_data.dart';
 // ──────────────────────────────────────────────────────────────────────────────
 
 /// All users as raw maps (matches [User.fromJson] shape).
-final demoUsersProvider =
-    Provider<List<Map<String, dynamic>>>((ref) => DemoData.users);
+final demoUsersProvider = Provider<List<Map<String, dynamic>>>((ref) {
+  ref.watch(languageProvider);
+  return DemoData.users;
+});
 
 /// All roles as raw maps (matches [Role.fromJson] shape).
-final demoRolesProvider =
-    Provider<List<Map<String, dynamic>>>((ref) => DemoData.roles);
+final demoRolesProvider = Provider<List<Map<String, dynamic>>>((ref) {
+  ref.watch(languageProvider);
+  return DemoData.roles;
+});
 
 /// All flows as raw maps (matches [Flow.fromJson] shape).
-final demoFlowsProvider =
-    Provider<List<Map<String, dynamic>>>((ref) => DemoData.flows);
+final demoFlowsProvider = Provider<List<Map<String, dynamic>>>((ref) {
+  ref.watch(languageProvider);
+  return DemoData.flows;
+});
 
 /// All forms as raw maps (matches [FormDefinition.fromJson] shape).
-final demoFormsProvider =
-    Provider<List<Map<String, dynamic>>>((ref) => DemoData.forms);
+final demoFormsProvider = Provider<List<Map<String, dynamic>>>((ref) {
+  ref.watch(languageProvider);
+  return DemoData.forms;
+});
 
 /// All letter templates as raw maps (matches [LetterTemplate.fromJson] shape).
-final demoLettersProvider =
-    Provider<List<Map<String, dynamic>>>((ref) => DemoData.letters);
+final demoLettersProvider = Provider<List<Map<String, dynamic>>>((ref) {
+  ref.watch(languageProvider);
+  return DemoData.letters;
+});
 
 /// All model definitions as raw maps (matches [ModelDefinition.fromJson] shape).
-final demoModelsProvider =
-    Provider<List<Map<String, dynamic>>>((ref) => DemoData.models);
+final demoModelsProvider = Provider<List<Map<String, dynamic>>>((ref) {
+  ref.watch(languageProvider);
+  return DemoData.models;
+});
 
 /// All tickets as raw maps (matches [Ticket.fromJson] shape).
-final demoTicketsProvider =
-    Provider<List<Map<String, dynamic>>>((ref) => DemoData.tickets);
+final demoTicketsProvider = Provider<List<Map<String, dynamic>>>((ref) {
+  ref.watch(languageProvider);
+  return DemoData.tickets;
+});
 
 /// Dashboard stats map.
 final demoStatsProvider =
@@ -68,8 +83,10 @@ final demoCompanyProvider =
     Provider<Map<String, dynamic>>((ref) => DemoData.company);
 
 /// Flow instances raw maps.
-final demoInstancesProvider =
-    Provider<List<Map<String, dynamic>>>((ref) => DemoData.instances);
+final demoInstancesProvider = Provider<List<Map<String, dynamic>>>((ref) {
+  ref.watch(languageProvider);
+  return DemoData.instances;
+});
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Typed model providers — deserialized from the raw maps above.

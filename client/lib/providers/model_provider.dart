@@ -4,6 +4,7 @@ import '../data/repositories/model_repository.dart';
 import '../models/model_definition.dart';
 import 'auth_provider.dart';
 import 'demo_provider.dart';
+import 'theme_provider.dart';
 
 final modelRepositoryProvider = Provider<ModelRepository>((ref) {
   return ModelRepository(ref.watch(apiClientProvider));
@@ -12,6 +13,7 @@ final modelRepositoryProvider = Provider<ModelRepository>((ref) {
 final modelsProvider =
     FutureProvider.family<List<ModelDefinition>, String?>((ref, companyId) async {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) return DemoData.models.map(ModelDefinition.fromJson).toList();
   return ref.watch(modelRepositoryProvider).getModels(companyId: companyId);
 });
@@ -19,6 +21,7 @@ final modelsProvider =
 final modelDetailProvider =
     FutureProvider.family<ModelDefinition, String>((ref, id) async {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) {
     final match = DemoData.models.firstWhere(
       (m) => m['id'] == id,

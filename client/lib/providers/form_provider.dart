@@ -4,6 +4,7 @@ import '../data/repositories/form_repository.dart';
 import '../models/form_definition.dart';
 import 'auth_provider.dart';
 import 'demo_provider.dart';
+import 'theme_provider.dart';
 
 final formRepositoryProvider = Provider<FormRepository>((ref) {
   return FormRepository(ref.watch(apiClientProvider));
@@ -12,6 +13,7 @@ final formRepositoryProvider = Provider<FormRepository>((ref) {
 final formsProvider =
     FutureProvider.family<List<FormDefinition>, String?>((ref, companyId) async {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) return DemoData.forms.map(FormDefinition.fromJson).toList();
   return ref.watch(formRepositoryProvider).getForms(companyId: companyId);
 });
@@ -19,6 +21,7 @@ final formsProvider =
 final formDetailProvider =
     FutureProvider.family<FormDefinition, String>((ref, id) async {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) {
     final match = DemoData.forms.firstWhere(
       (f) => f['id'] == id,

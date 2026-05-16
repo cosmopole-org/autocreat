@@ -1860,8 +1860,8 @@ class _AppTabBarState extends ConsumerState<AppTabBar>
                   fit: StackFit.expand,
                   children: [
                     // Sliding pill indicator
-                    Positioned(
-                      left: _indicatorAnim.value * tabW + innerPad,
+                    PositionedDirectional(
+                      start: _indicatorAnim.value * tabW + innerPad,
                       top: innerPad,
                       bottom: innerPad,
                       width: tabW - innerPad * 2,
