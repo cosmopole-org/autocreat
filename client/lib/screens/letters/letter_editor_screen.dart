@@ -103,28 +103,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       _letterId = letter.id;
       _letterVariables = letter.variables;
 
-      QuillController newCtrl;
-      if (letter.deltaContent.isNotEmpty) {
-        try {
-          final ops = letter.deltaContent['ops'] as List<dynamic>? ?? [];
-          final doc = Document.fromJson(ops);
-          newCtrl = QuillController(
-            document: doc,
-            selection: const TextSelection.collapsed(offset: 0),
-          );
-        } catch (_) {
-          newCtrl = QuillController.basic();
-        }
-      } else if (letter.content.isNotEmpty) {
-        // Fall back to plain-text import
-        final doc = Document()..insert(0, letter.content);
-        newCtrl = QuillController(
-          document: doc,
-          selection: const TextSelection.collapsed(offset: 0),
-        );
-      } else {
-        newCtrl = QuillController.basic();
-      }
+      QuillController newCtrl = _buildController(letter);
 
       if (mounted) {
         final old = _quillCtrl;
@@ -136,6 +115,45 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     }
 
     if (mounted) setState(() => _loading = false);
+  }
+
+  // Builds a QuillController from a letter, falling back to a basic empty
+  // controller on any failure. flutter_quill 11.x is strict about document
+  // shape — invalid delta ops or `Document()..insert(0, multilineText)` can
+  // produce a corrupt document that crashes during render, blanking the page.
+  QuillController _buildController(LetterTemplate letter) {
+    // 1. Prefer structured delta if present and well-formed.
+    if (letter.deltaContent.isNotEmpty) {
+      try {
+        final ops = letter.deltaContent['ops'] as List<dynamic>? ?? [];
+        if (ops.isNotEmpty) {
+          final doc = Document.fromJson(ops);
+          return QuillController(
+            document: doc,
+            selection: const TextSelection.collapsed(offset: 0),
+          );
+        }
+      } catch (_) {/* fall through */}
+    }
+
+    // 2. Plain-text fallback — build the delta explicitly so multiline content
+    //    doesn't go through Document.insert (which is fragile in 11.x).
+    if (letter.content.isNotEmpty) {
+      try {
+        var text = letter.content;
+        if (!text.endsWith('\n')) text = '$text\n';
+        final doc = Document.fromJson([
+          {'insert': text},
+        ]);
+        return QuillController(
+          document: doc,
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      } catch (_) {/* fall through */}
+    }
+
+    // 3. Empty document.
+    return QuillController.basic();
   }
 
   // ── save ──────────────────────────────────────────────────────────────────
@@ -242,45 +260,52 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       child: Scaffold(
         backgroundColor: isDark ? AppColors.darkBg : const Color(0xFFF0F2FA),
         appBar: _buildAppBar(context, isDark, isMobile, isDesktop),
-        body: Column(
-          children: [
-            _QuillToolbarRow(
-              controller: _quillCtrl,
-              isDark: isDark,
-              isMobile: isMobile,
-            ),
-            if (_attachments.isNotEmpty)
-              _AttachmentStrip(
-                attachments: _attachments,
+        // SizedBox.expand forces tight constraints on the body, which is
+        // required because the Column below has an Expanded child. When this
+        // screen is hosted inside a modal wrapper (loose parent constraints),
+        // omitting this forces the Scaffold body to collapse to zero height
+        // and the page renders as just the grey Scaffold background.
+        body: SizedBox.expand(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _QuillToolbarRow(
+                controller: _quillCtrl,
                 isDark: isDark,
-                onAdd: _pickAttachment,
-                onRemove: _removeAttachment,
+                isMobile: isMobile,
               ),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: _EditorPane(
-                      controller: _quillCtrl,
-                      focusNode: _editorFocus,
-                      scrollController: _editorScroll,
-                      isDark: isDark,
-                      isMobile: isMobile,
+              if (_attachments.isNotEmpty)
+                _AttachmentStrip(
+                  attachments: _attachments,
+                  isDark: isDark,
+                  onAdd: _pickAttachment,
+                  onRemove: _removeAttachment,
+                ),
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _EditorPane(
+                        controller: _quillCtrl,
+                        focusNode: _editorFocus,
+                        scrollController: _editorScroll,
+                        isDark: isDark,
+                        isMobile: isMobile,
+                      ),
                     ),
-                  ),
-                  // desktop side panel
-                  if (isDesktop && _varsPanelOpen)
-                    _VarsSidePanel(
-                      isDark: isDark,
-                      letterVariables: _letterVariables,
-                      onInsert: _insertVariable,
-                      onClose: () => setState(() => _varsPanelOpen = false),
-                    ),
-                ],
+                    // desktop side panel
+                    if (isDesktop && _varsPanelOpen)
+                      _VarsSidePanel(
+                        isDark: isDark,
+                        letterVariables: _letterVariables,
+                        onInsert: _insertVariable,
+                        onClose: () => setState(() => _varsPanelOpen = false),
+                      ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -531,8 +556,7 @@ class _EditorPane extends StatelessWidget {
               : 600.0;
 
           final docW = (maxW - edgeMargin * 2).clamp(200.0, 800.0);
-
-          final docH = maxH - edgeMargin * 2;
+          final docH = (maxH - edgeMargin * 2).clamp(120.0, double.infinity);
 
           return SizedBox(
             width: maxW,
