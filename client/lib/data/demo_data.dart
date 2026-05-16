@@ -958,57 +958,43 @@ class DemoData {
   // Shape matches LetterTemplate.fromJson
   // ──────────────────────────────────────────────────────────────
 
-  static final List<Map<String, dynamic>> letters = [
+  static List<Map<String, dynamic>> get letters => [
     {
       'id': _let1,
-      'name': 'Welcome Letter',
-      'description': 'Sent to new clients after onboarding approval. Introduces the team and next steps.',
+      'name': MockDataText.letter1Name,
+      'description': MockDataText.letter1Desc,
       'companyId': companyId,
-      'content':
-          'Dear {{client_name}},\n\nWelcome to Horizon Digital Agency! We are thrilled to have {{company_name}} as a new client.\n\n'
-          'Your dedicated project manager is {{pm_name}}, who will be in touch within 24 hours to schedule your kickoff call.\n\n'
-          'In the meantime, please find attached your signed contract and the project brief for your records.\n\n'
-          'We look forward to delivering outstanding results together.\n\nWarm regards,\n{{sender_name}}\nHorizon Digital Agency',
+      'content': MockDataText.letter1Content,
       'deltaContent': <String, dynamic>{},
       'variables': ['client_name', 'company_name', 'pm_name', 'sender_name'],
       'status': 'active',
-      'category': 'Onboarding',
+      'category': MockDataText.letter1Category,
       'createdAt': '2026-01-25T11:00:00.000Z',
       'updatedAt': '2026-04-12T09:00:00.000Z',
     },
     {
       'id': _let2,
-      'name': 'Leave Approval Notice',
-      'description': 'HR notification confirming an approved employee leave request.',
+      'name': MockDataText.letter2Name,
+      'description': MockDataText.letter2Desc,
       'companyId': companyId,
-      'content':
-          'Dear {{employee_name}},\n\nThis letter confirms that your leave request has been approved.\n\n'
-          'Leave Type: {{leave_type}}\nStart Date: {{start_date}}\nEnd Date: {{end_date}}\n\n'
-          'Please ensure all pending tasks are handed over before your leave begins.\n\n'
-          'Should you have any questions, please contact HR at hr@horizondigital.io.\n\n'
-          'Best regards,\n{{manager_name}}\nHorizon Digital Agency — HR',
+      'content': MockDataText.letter2Content,
       'deltaContent': <String, dynamic>{},
       'variables': ['employee_name', 'leave_type', 'start_date', 'end_date', 'manager_name'],
       'status': 'active',
-      'category': 'HR',
+      'category': MockDataText.letter2Category,
       'createdAt': '2026-02-20T14:00:00.000Z',
       'updatedAt': '2026-04-18T11:30:00.000Z',
     },
     {
       'id': _let3,
-      'name': 'Project Completion Certificate',
-      'description': 'Formal certificate issued to clients on successful project delivery.',
+      'name': MockDataText.letter3Name,
+      'description': MockDataText.letter3Desc,
       'companyId': companyId,
-      'content':
-          'CERTIFICATE OF PROJECT COMPLETION\n\nThis is to certify that the project "{{project_name}}" commissioned by {{client_company}} '
-          'has been successfully completed by Horizon Digital Agency on {{completion_date}}.\n\n'
-          'Project Scope: {{project_scope}}\nDelivery Standard: {{standard}}\n\n'
-          'All deliverables have been tested, accepted, and handed over as per the agreed specifications.\n\n'
-          'Authorised by: {{authoriser_name}}\nDate: {{issue_date}}\n\nHorizon Digital Agency\nhttps://horizondigital.io',
+      'content': MockDataText.letter3Content,
       'deltaContent': <String, dynamic>{},
       'variables': ['project_name', 'client_company', 'completion_date', 'project_scope', 'standard', 'authoriser_name', 'issue_date'],
       'status': 'draft',
-      'category': 'Delivery',
+      'category': MockDataText.letter3Category,
       'createdAt': '2026-03-30T10:00:00.000Z',
       'updatedAt': '2026-04-29T16:00:00.000Z',
     },
@@ -1019,11 +1005,11 @@ class DemoData {
   // Shape matches ModelDefinition.fromJson
   // ──────────────────────────────────────────────────────────────
 
-  static final List<Map<String, dynamic>> models = [
+  static List<Map<String, dynamic>> get models => [
     {
       'id': _mod1,
-      'name': 'Client',
-      'description': 'Core entity representing an external client organisation.',
+      'name': MockDataText.model1Name,
+      'description': MockDataText.model1Desc,
       'companyId': companyId,
       'fields': [
         {'id': 'mf0101', 'name': 'company_name', 'type': 'string', 'required': true, 'unique': false, 'order': 1},
@@ -1040,8 +1026,8 @@ class DemoData {
     },
     {
       'id': _mod2,
-      'name': 'Project',
-      'description': 'Tracks individual delivery projects linked to a client.',
+      'name': MockDataText.model2Name,
+      'description': MockDataText.model2Desc,
       'companyId': companyId,
       'fields': [
         {'id': 'mf0201', 'name': 'project_name', 'type': 'string', 'required': true, 'unique': false, 'order': 1},
@@ -1064,12 +1050,11 @@ class DemoData {
   // Priority enum values: low, medium, high, urgent
   // ──────────────────────────────────────────────────────────────
 
-  static final List<Map<String, dynamic>> tickets = [
+  static List<Map<String, dynamic>> get tickets => [
     {
       'id': _tkt1,
-      'title': 'Login page crashes on iOS 17.4 Safari',
-      'description':
-          'Users on iPhone 15 running iOS 17.4 and using Safari cannot complete login — the page crashes after submitting credentials.',
+      'title': MockDataText.ticket1Title,
+      'description': MockDataText.ticket1Desc,
       'companyId': companyId,
       'flowId': _flo2,
       'creatorId': _uid3,
@@ -1087,7 +1072,7 @@ class DemoData {
           'ticketId': _tkt1,
           'senderId': _uid3,
           'senderName': 'Sofia Rodriguez',
-          'content': 'Reproduced on iPhone 15 Pro and SE 3rd gen. Both crash on form submit.',
+          'content': MockDataText.msg0101,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-28T09:15:00.000Z',
@@ -1097,7 +1082,7 @@ class DemoData {
           'ticketId': _tkt1,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'Checking the Safari console logs — looks like a memory issue with the auth token storage. Will patch today.',
+          'content': MockDataText.msg0102,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-28T10:30:00.000Z',
@@ -1107,7 +1092,7 @@ class DemoData {
           'ticketId': _tkt1,
           'senderId': _uid2,
           'senderName': 'Marcus Thompson',
-          'content': 'This is blocking onboarding for the Apex client. Priority escalated to Urgent.',
+          'content': MockDataText.msg0103,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-28T11:00:00.000Z',
@@ -1117,7 +1102,7 @@ class DemoData {
           'ticketId': _tkt1,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'Fix deployed to staging. Needs QA sign-off before going to production.',
+          'content': MockDataText.msg0104,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-29T14:00:00.000Z',
@@ -1129,9 +1114,8 @@ class DemoData {
     },
     {
       'id': _tkt2,
-      'title': 'Flow editor canvas zoom reset on node drag',
-      'description':
-          'When dragging a node in the flow editor, the canvas zoom level resets to 100% unexpectedly.',
+      'title': MockDataText.ticket2Title,
+      'description': MockDataText.ticket2Desc,
       'companyId': companyId,
       'creatorId': _uid4,
       'creatorName': 'James Park',
@@ -1148,7 +1132,7 @@ class DemoData {
           'ticketId': _tkt2,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'Happens consistently on all browsers. Steps: open editor → zoom to 150% → drag any node → zoom resets.',
+          'content': MockDataText.msg0201,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-30T08:00:00.000Z',
@@ -1158,7 +1142,7 @@ class DemoData {
           'ticketId': _tkt2,
           'senderId': _uid1,
           'senderName': 'Alexandra Chen',
-          'content': 'Confirmed. Blocking the UX review this week. Assign highest priority.',
+          'content': MockDataText.msg0202,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-30T09:15:00.000Z',
@@ -1168,7 +1152,7 @@ class DemoData {
           'ticketId': _tkt2,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'Root cause identified: scale state is not persisted in the zoom handler. Working on fix.',
+          'content': MockDataText.msg0203,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-05-01T10:00:00.000Z',
@@ -1180,8 +1164,8 @@ class DemoData {
     },
     {
       'id': _tkt3,
-      'title': 'Add CSV export for user list',
-      'description': 'Clients have requested the ability to export the full user list as a CSV for their own records.',
+      'title': MockDataText.ticket3Title,
+      'description': MockDataText.ticket3Desc,
       'companyId': companyId,
       'creatorId': _uid2,
       'creatorName': 'Marcus Thompson',
@@ -1198,7 +1182,7 @@ class DemoData {
           'ticketId': _tkt3,
           'senderId': _uid2,
           'senderName': 'Marcus Thompson',
-          'content': 'At least 3 enterprise clients have requested this. Should include: name, email, role, last login, status.',
+          'content': MockDataText.msg0301,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-05-02T11:00:00.000Z',
@@ -1208,7 +1192,7 @@ class DemoData {
           'ticketId': _tkt3,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'Will add to the next sprint. ETA end of week.',
+          'content': MockDataText.msg0302,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-05-02T13:30:00.000Z',
@@ -1219,9 +1203,8 @@ class DemoData {
     },
     {
       'id': _tkt4,
-      'title': 'Email notifications not sending for ticket assignment',
-      'description':
-          'When a ticket is assigned to a user, the email notification is not being sent. Confirmed across all SMTP configurations.',
+      'title': MockDataText.ticket4Title,
+      'description': MockDataText.ticket4Desc,
       'companyId': companyId,
       'creatorId': _uid5,
       'creatorName': 'Emily Watson',
@@ -1238,7 +1221,7 @@ class DemoData {
           'ticketId': _tkt4,
           'senderId': _uid5,
           'senderName': 'Emily Watson',
-          'content': 'Multiple users confirming no emails on ticket assignment. Checked spam — not there either.',
+          'content': MockDataText.msg0401,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-15T10:00:00.000Z',
@@ -1248,7 +1231,7 @@ class DemoData {
           'ticketId': _tkt4,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'Investigating the notification service. Will check queue logs.',
+          'content': MockDataText.msg0402,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-15T11:20:00.000Z',
@@ -1258,7 +1241,7 @@ class DemoData {
           'ticketId': _tkt4,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'Found it — a misconfiguration in the event handler was silently swallowing the SMTP error. Deploying fix now.',
+          'content': MockDataText.msg0403,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-16T09:00:00.000Z',
@@ -1268,7 +1251,7 @@ class DemoData {
           'ticketId': _tkt4,
           'senderId': _uid5,
           'senderName': 'Emily Watson',
-          'content': 'Just received a test notification. Fix confirmed working.',
+          'content': MockDataText.msg0404,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-16T15:30:00.000Z',
@@ -1278,7 +1261,7 @@ class DemoData {
           'ticketId': _tkt4,
           'senderId': _uid2,
           'senderName': 'Marcus Thompson',
-          'content': 'Closing this ticket. Great turnaround time.',
+          'content': MockDataText.msg0405,
           'attachments': <String>[],
           'isSystem': true,
           'createdAt': '2026-04-16T16:00:00.000Z',
@@ -1290,9 +1273,8 @@ class DemoData {
     },
     {
       'id': _tkt5,
-      'title': 'Role permissions not applying to form builder',
-      'description':
-          'Users with the Viewer role can still edit form fields in the form builder despite canUpdate being false on the forms resource.',
+      'title': MockDataText.ticket5Title,
+      'description': MockDataText.ticket5Desc,
       'companyId': companyId,
       'creatorId': _uid3,
       'creatorName': 'Sofia Rodriguez',
@@ -1309,7 +1291,7 @@ class DemoData {
           'ticketId': _tkt5,
           'senderId': _uid3,
           'senderName': 'Sofia Rodriguez',
-          'content': 'Tested with a Viewer account — I can drag fields and change labels. This is a security risk.',
+          'content': MockDataText.msg0501,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-05-05T08:30:00.000Z',
@@ -1319,7 +1301,7 @@ class DemoData {
           'ticketId': _tkt5,
           'senderId': _uid1,
           'senderName': 'Alexandra Chen',
-          'content': 'Security issue confirmed. Escalating to High. James, please fix before the next client demo.',
+          'content': MockDataText.msg0502,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-05-05T09:00:00.000Z',
@@ -1329,7 +1311,7 @@ class DemoData {
           'ticketId': _tkt5,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'The form builder widget was not checking the permission guard on render. Fix in progress — ETA tomorrow.',
+          'content': MockDataText.msg0503,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-05-05T10:45:00.000Z',
@@ -1341,8 +1323,8 @@ class DemoData {
     },
     {
       'id': _tkt6,
-      'title': 'Letter template variables not substituting on preview',
-      'description': 'Clicking "Preview" in the letter template editor shows the raw {{variable}} tags instead of substituted sample values.',
+      'title': MockDataText.ticket6Title,
+      'description': MockDataText.ticket6Desc,
       'companyId': companyId,
       'creatorId': _uid5,
       'creatorName': 'Emily Watson',
@@ -1359,7 +1341,7 @@ class DemoData {
           'ticketId': _tkt6,
           'senderId': _uid5,
           'senderName': 'Emily Watson',
-          'content': 'The {{client_name}} and {{sender_name}} tags are showing raw in the preview pane.',
+          'content': MockDataText.msg0601,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-03-18T14:00:00.000Z',
@@ -1369,7 +1351,7 @@ class DemoData {
           'ticketId': _tkt6,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'Good catch. The preview renderer was using the raw content field instead of the processed one. Fixed in v1.2.3.',
+          'content': MockDataText.msg0602,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-03-19T10:00:00.000Z',
@@ -1379,7 +1361,7 @@ class DemoData {
           'ticketId': _tkt6,
           'senderId': _uid5,
           'senderName': 'Emily Watson',
-          'content': 'Confirmed fixed. Closing.',
+          'content': MockDataText.msg0603,
           'attachments': <String>[],
           'isSystem': true,
           'createdAt': '2026-03-19T15:00:00.000Z',
@@ -1391,9 +1373,8 @@ class DemoData {
     },
     {
       'id': _tkt7,
-      'title': 'Dark mode: sidebar icon colours inconsistent',
-      'description':
-          'In dark mode, several sidebar navigation icons appear with a light background box rather than the expected transparent fill.',
+      'title': MockDataText.ticket7Title,
+      'description': MockDataText.ticket7Desc,
       'companyId': companyId,
       'creatorId': _uid2,
       'creatorName': 'Marcus Thompson',
@@ -1410,7 +1391,7 @@ class DemoData {
           'ticketId': _tkt7,
           'senderId': _uid2,
           'senderName': 'Marcus Thompson',
-          'content': 'Affects the Tickets, Roles, and Letters icons. Screenshot attached (not available in demo).',
+          'content': MockDataText.msg0701,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-02T09:00:00.000Z',
@@ -1420,7 +1401,7 @@ class DemoData {
           'ticketId': _tkt7,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'Those icons have a hardcoded white background in their SVG. Will update them.',
+          'content': MockDataText.msg0702,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-02T10:30:00.000Z',
@@ -1430,7 +1411,7 @@ class DemoData {
           'ticketId': _tkt7,
           'senderId': _uid4,
           'senderName': 'James Park',
-          'content': 'Updated all three icon assets. Deployed in v1.3.0.',
+          'content': MockDataText.msg0703,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-04-05T14:00:00.000Z',
@@ -1440,7 +1421,7 @@ class DemoData {
           'ticketId': _tkt7,
           'senderId': _uid2,
           'senderName': 'Marcus Thompson',
-          'content': 'Looks perfect now. Resolved.',
+          'content': MockDataText.msg0704,
           'attachments': <String>[],
           'isSystem': true,
           'createdAt': '2026-04-05T16:00:00.000Z',
@@ -1452,9 +1433,8 @@ class DemoData {
     },
     {
       'id': _tkt8,
-      'title': 'Onboarding flow — approval step silently fails for large files',
-      'description':
-          'When a client uploads a file larger than 10 MB in the Intake Form step, the approval step fails with no error displayed.',
+      'title': MockDataText.ticket8Title,
+      'description': MockDataText.ticket8Desc,
       'companyId': companyId,
       'flowId': _flo1,
       'creatorId': _uid3,
@@ -1472,7 +1452,7 @@ class DemoData {
           'ticketId': _tkt8,
           'senderId': _uid3,
           'senderName': 'Sofia Rodriguez',
-          'content': 'The Apex client tried to upload a 14 MB PDF proposal. Flow got stuck — no error, no progress.',
+          'content': MockDataText.msg0801,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-05-10T13:00:00.000Z',
@@ -1482,7 +1462,7 @@ class DemoData {
           'ticketId': _tkt8,
           'senderId': _uid2,
           'senderName': 'Marcus Thompson',
-          'content': 'This affects our active onboarding flow. Needs fixing before the next client intake.',
+          'content': MockDataText.msg0802,
           'attachments': <String>[],
           'isSystem': false,
           'createdAt': '2026-05-10T14:00:00.000Z',
@@ -1499,20 +1479,20 @@ class DemoData {
   // These are plain maps — no generated model class exists yet.
   // ──────────────────────────────────────────────────────────────
 
-  static final List<Map<String, dynamic>> instances = [
+  static List<Map<String, dynamic>> get instances => [
     {
       'id': _ins1,
       'flowId': _flo1,
-      'flowName': 'Client Onboarding',
+      'flowName': MockDataText.flow1Name,
       'companyId': companyId,
       'status': 'active',
       'startedById': _uid3,
       'startedByName': 'Sofia Rodriguez',
       'currentNodeId': 'n003',
-      'currentNodeLabel': 'Approval?',
+      'currentNodeLabel': MockDataText.nodeApprovalQuestion,
       'progressPercent': 40,
       'metadata': {
-        'client_name': 'Apex Dynamics Ltd',
+        'client_name': MockDataText.instanceMetaClientApex,
         'project_type': 'data_platform',
       },
       'createdAt': '2026-05-08T09:00:00.000Z',
@@ -1521,16 +1501,16 @@ class DemoData {
     {
       'id': _ins2,
       'flowId': _flo2,
-      'flowName': 'Bug Report Triage',
+      'flowName': MockDataText.flow2Name,
       'companyId': companyId,
       'status': 'active',
       'startedById': _uid5,
       'startedByName': 'Emily Watson',
       'currentNodeId': 'n104',
-      'currentNodeLabel': 'Escalate to Dev Lead',
+      'currentNodeLabel': MockDataText.nodeEscalateToDevLead,
       'progressPercent': 60,
       'metadata': {
-        'bug_title': 'Memory leak in report generator',
+        'bug_title': MockDataText.instanceMetaBugTitle,
         'severity': 'critical',
       },
       'createdAt': '2026-05-09T14:00:00.000Z',
@@ -1539,16 +1519,16 @@ class DemoData {
     {
       'id': _ins3,
       'flowId': _flo1,
-      'flowName': 'Client Onboarding',
+      'flowName': MockDataText.flow1Name,
       'companyId': companyId,
       'status': 'completed',
       'startedById': _uid2,
       'startedByName': 'Marcus Thompson',
       'currentNodeId': 'n005',
-      'currentNodeLabel': 'End',
+      'currentNodeLabel': MockDataText.nodeEnd,
       'progressPercent': 100,
       'metadata': {
-        'client_name': 'BlueSky Ventures',
+        'client_name': MockDataText.instanceMetaClientBlueSky,
         'project_type': 'web_app',
       },
       'completedAt': '2026-04-22T16:00:00.000Z',

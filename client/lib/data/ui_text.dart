@@ -511,6 +511,8 @@ enum _UiTextKey {
   selectCompanyTitle,
   noCompaniesAvailable,
   couldNotLoadCompanies,
+  pageNotFound,
+  goHome,
 }
 
 class UiText {
@@ -1046,6 +1048,8 @@ class UiText {
     _UiTextKey.selectCompanyTitle: "Select Company",
     _UiTextKey.noCompaniesAvailable: "No companies available",
     _UiTextKey.couldNotLoadCompanies: "Could not load companies",
+    _UiTextKey.pageNotFound: "Page not found",
+    _UiTextKey.goHome: "Go Home",
   };
 
   static const Map<_UiTextKey, String> _persian = {
@@ -1558,6 +1562,8 @@ class UiText {
     _UiTextKey.selectCompanyTitle: "انتخاب شرکت",
     _UiTextKey.noCompaniesAvailable: "هیچ شرکتی موجود نیست",
     _UiTextKey.couldNotLoadCompanies: "بارگذاری شرکت‌ها ناموفق بود",
+    _UiTextKey.pageNotFound: "صفحه یافت نشد",
+    _UiTextKey.goHome: "بازگشت به خانه",
   };
 
   static String get exception => _text(_UiTextKey.exception);
@@ -2124,6 +2130,8 @@ class UiText {
       _text(_UiTextKey.noCompaniesAvailable);
   static String get couldNotLoadCompanies =>
       _text(_UiTextKey.couldNotLoadCompanies);
+  static String get pageNotFound => _text(_UiTextKey.pageNotFound);
+  static String get goHome => _text(_UiTextKey.goHome);
 
   static String languageToggleTooltip(AppLanguage nextLanguage) =>
       nextLanguage == AppLanguage.persian

@@ -4,6 +4,7 @@ import '../data/repositories/user_repository.dart';
 import '../models/user.dart';
 import 'auth_provider.dart';
 import 'demo_provider.dart';
+import 'theme_provider.dart';
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {
   return UserRepository(ref.watch(apiClientProvider));
@@ -12,6 +13,7 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
 final usersProvider =
     FutureProvider.family<List<User>, String?>((ref, companyId) async {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) return DemoData.users.map(User.fromJson).toList();
   return ref.watch(userRepositoryProvider).getUsers(companyId: companyId);
 });
@@ -19,6 +21,7 @@ final usersProvider =
 final userDetailProvider =
     FutureProvider.family<User, String>((ref, id) async {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) {
     final match = DemoData.users.firstWhere(
       (u) => u['id'] == id,
@@ -33,6 +36,7 @@ class UserNotifier extends AsyncNotifier<List<User>> {
   @override
   Future<List<User>> build() async {
     final isDemo = ref.watch(isDemoModeProvider);
+    ref.watch(languageProvider);
     if (isDemo) return DemoData.users.map(User.fromJson).toList();
     return ref.watch(userRepositoryProvider).getUsers();
   }

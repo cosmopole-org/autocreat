@@ -4,6 +4,7 @@ import '../data/repositories/ticket_repository.dart';
 import '../models/ticket.dart';
 import 'auth_provider.dart';
 import 'demo_provider.dart';
+import 'theme_provider.dart';
 
 final ticketRepositoryProvider = Provider<TicketRepository>((ref) {
   return TicketRepository(ref.watch(apiClientProvider));
@@ -12,6 +13,7 @@ final ticketRepositoryProvider = Provider<TicketRepository>((ref) {
 final ticketsProvider =
     FutureProvider.family<List<Ticket>, String?>((ref, companyId) async {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) return DemoData.tickets.map(Ticket.fromJson).toList();
   return ref.watch(ticketRepositoryProvider).getTickets(companyId: companyId);
 });
@@ -19,6 +21,7 @@ final ticketsProvider =
 final ticketDetailProvider =
     FutureProvider.family<Ticket, String>((ref, id) async {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) {
     final match = DemoData.tickets.firstWhere(
       (t) => t['id'] == id,
@@ -33,6 +36,7 @@ class TicketNotifier extends AsyncNotifier<List<Ticket>> {
   @override
   Future<List<Ticket>> build() async {
     final isDemo = ref.watch(isDemoModeProvider);
+    ref.watch(languageProvider);
     if (isDemo) return DemoData.tickets.map(Ticket.fromJson).toList();
     return ref.watch(ticketRepositoryProvider).getTickets();
   }
@@ -66,6 +70,7 @@ final ticketNotifierProvider =
 
 final unreadTicketCountProvider = Provider<int>((ref) {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) {
     final demoTickets = DemoData.tickets.map(Ticket.fromJson).toList();
     return demoTickets.where((t) => !t.isRead).length;

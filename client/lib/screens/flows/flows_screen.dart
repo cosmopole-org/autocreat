@@ -473,7 +473,7 @@ class _FlowsChart extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(e.key,
+                  child: Text(UiText.nodeTypeLabel(e.key),
                       style: const TextStyle(fontSize: 11),
                       overflow: TextOverflow.ellipsis),
                 ),

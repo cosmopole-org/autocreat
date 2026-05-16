@@ -4,6 +4,7 @@ import '../data/repositories/role_repository.dart';
 import '../models/role.dart';
 import 'auth_provider.dart';
 import 'demo_provider.dart';
+import 'theme_provider.dart';
 
 final roleRepositoryProvider = Provider<RoleRepository>((ref) {
   return RoleRepository(ref.watch(apiClientProvider));
@@ -12,6 +13,7 @@ final roleRepositoryProvider = Provider<RoleRepository>((ref) {
 final rolesProvider =
     FutureProvider.family<List<Role>, String?>((ref, companyId) async {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) return DemoData.roles.map(Role.fromJson).toList();
   return ref.watch(roleRepositoryProvider).getRoles(companyId: companyId);
 });
@@ -19,6 +21,7 @@ final rolesProvider =
 final roleDetailProvider =
     FutureProvider.family<Role, String>((ref, id) async {
   final isDemo = ref.watch(isDemoModeProvider);
+  ref.watch(languageProvider);
   if (isDemo) {
     final match = DemoData.roles.firstWhere(
       (r) => r['id'] == id,
@@ -33,6 +36,7 @@ class RoleNotifier extends AsyncNotifier<List<Role>> {
   @override
   Future<List<Role>> build() async {
     final isDemo = ref.watch(isDemoModeProvider);
+    ref.watch(languageProvider);
     if (isDemo) return DemoData.roles.map(Role.fromJson).toList();
     return ref.watch(roleRepositoryProvider).getRoles();
   }

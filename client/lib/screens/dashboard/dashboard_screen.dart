@@ -447,13 +447,8 @@ class _KpiCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final tintedSurface = data.color.withValues(alpha: isDark ? 0.13 : 0.10);
 
-    return AppCard(
-      onTap: () => context.go(data.route),
-      color: tintedSurface,
-      padding: const EdgeInsets.all(16),
-      child: Column(
+    final cardContent = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -508,7 +503,44 @@ class _KpiCard extends ConsumerWidget {
             ),
           ),
         ],
-      ),
+    );
+
+    if (isDark) {
+      return GestureDetector(
+        onTap: () => context.go(data.route),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: AlignmentDirectional.topStart,
+              end: AlignmentDirectional.bottomEnd,
+              colors: [
+                Color.alphaBlend(
+                    data.color.withValues(alpha: 0.22), AppColors.darkCard),
+                AppColors.darkCard,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: data.color.withValues(alpha: 0.32)),
+            boxShadow: [
+              BoxShadow(
+                color: data.color.withValues(alpha: 0.12),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: cardContent,
+        ),
+      );
+    }
+
+    return AppCard(
+      onTap: () => context.go(data.route),
+      color: data.color.withValues(alpha: 0.10),
+      padding: const EdgeInsets.all(16),
+      child: cardContent,
     );
   }
 }

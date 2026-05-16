@@ -20,7 +20,8 @@ class UsersScreen extends ConsumerStatefulWidget {
 class _UsersScreenState extends ConsumerState<UsersScreen> {
   final _searchController = TextEditingController();
   String _search = '';
-  String _roleFilter = UiText.all;
+  // null means "All roles" — a language-neutral sentinel
+  String? _roleFilter;
   int _touchedIndex = -1;
 
   @override
@@ -52,13 +53,13 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
           onRetry: () => ref.read(userNotifierProvider.notifier).refresh(),
         ),
         data: (users) {
-          final roles = <String>{UiText.all, ...users.map((u) => u.role)};
+          final roles = users.map((u) => u.role).toSet().toList();
           final filtered = users.where((u) {
             final matchesSearch = _search.isEmpty ||
                 u.fullName.toLowerCase().contains(_search.toLowerCase()) ||
                 u.email.toLowerCase().contains(_search.toLowerCase());
             final matchesRole =
-                _roleFilter == UiText.all || u.role == _roleFilter;
+                _roleFilter == null || u.role == _roleFilter;
             return matchesSearch && matchesRole;
           }).toList();
 
@@ -142,9 +143,9 @@ class _UsersScreenState extends ConsumerState<UsersScreen> {
                           ),
                           const SizedBox(width: 8),
                           _RoleDropdown(
-                            roles: roles.toList(),
+                            roles: roles,
                             selected: _roleFilter,
-                            onChanged: (v) => setState(() => _roleFilter = v!),
+                            onChanged: (v) => setState(() => _roleFilter = v),
                           ),
                         ],
                       ),
@@ -349,7 +350,7 @@ class _RoleDonut extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              e.value.key,
+                              UiText.roleLevelLabel(e.value.key),
                               style: const TextStyle(
                                   fontSize: 12, fontWeight: FontWeight.w500),
                               overflow: TextOverflow.ellipsis,
@@ -471,7 +472,7 @@ class _StatusBar extends StatelessWidget {
 
 class _RoleDropdown extends StatelessWidget {
   final List<String> roles;
-  final String selected;
+  final String? selected;
   final ValueChanged<String?> onChanged;
 
   const _RoleDropdown({
@@ -491,14 +492,19 @@ class _RoleDropdown extends StatelessWidget {
         color: cs.surface,
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
+        child: DropdownButton<String?>(
           value: selected,
           isDense: true,
-          items: roles
-              .map((r) => DropdownMenuItem(
-                  value: r,
-                  child: Text(r, style: const TextStyle(fontSize: 13))))
-              .toList(),
+          items: [
+            DropdownMenuItem<String?>(
+              value: null,
+              child: Text(UiText.all, style: const TextStyle(fontSize: 13)),
+            ),
+            ...roles.map((r) => DropdownMenuItem<String?>(
+                value: r,
+                child: Text(UiText.roleLevelLabel(r),
+                    style: const TextStyle(fontSize: 13)))),
+          ],
           onChanged: onChanged,
         ),
       ),
