@@ -8,6 +8,7 @@ import 'models.dart';
 class PropertiesPanel extends StatelessWidget {
   final DesignElement? element;
   final bool isDark;
+  final bool compact;
   final void Function(DesignElement) onChanged;
   final VoidCallback onDelete;
   final VoidCallback onDuplicate;
@@ -24,6 +25,7 @@ class PropertiesPanel extends StatelessWidget {
     required this.onDuplicate,
     required this.onBringForward,
     required this.onSendBackward,
+    this.compact = false,
     this.onClose,
   });
 
@@ -32,24 +34,30 @@ class PropertiesPanel extends StatelessWidget {
     final bg = isDark ? AppColors.darkSurface : AppColors.lightSurface;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
+    final body = element == null
+        ? _Empty(isDark: isDark)
+        : _Body(
+            element: element!,
+            isDark: isDark,
+            compact: compact,
+            onChanged: onChanged,
+            onDelete: onDelete,
+            onDuplicate: onDuplicate,
+            onBringForward: onBringForward,
+            onSendBackward: onSendBackward,
+            onClose: onClose,
+          );
+
+    if (compact) {
+      return Container(color: bg, child: body);
+    }
     return Container(
       width: 280,
       decoration: BoxDecoration(
         color: bg,
         border: Border(left: BorderSide(color: border)),
       ),
-      child: element == null
-          ? _Empty(isDark: isDark)
-          : _Body(
-              element: element!,
-              isDark: isDark,
-              onChanged: onChanged,
-              onDelete: onDelete,
-              onDuplicate: onDuplicate,
-              onBringForward: onBringForward,
-              onSendBackward: onSendBackward,
-              onClose: onClose,
-            ),
+      child: body,
     );
   }
 }
@@ -104,6 +112,7 @@ class _Empty extends StatelessWidget {
 class _Body extends StatefulWidget {
   final DesignElement element;
   final bool isDark;
+  final bool compact;
   final void Function(DesignElement) onChanged;
   final VoidCallback onDelete;
   final VoidCallback onDuplicate;
@@ -119,6 +128,7 @@ class _Body extends StatefulWidget {
     required this.onDuplicate,
     required this.onBringForward,
     required this.onSendBackward,
+    this.compact = false,
     this.onClose,
   });
 
@@ -126,7 +136,24 @@ class _Body extends StatefulWidget {
   State<_Body> createState() => _BodyState();
 }
 
-class _BodyState extends State<_Body> {
+class _BodyState extends State<_Body>
+    with SingleTickerProviderStateMixin {
+  TabController? _tabs;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.compact) {
+      _tabs = TabController(length: 3, vsync: this);
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabs?.dispose();
+    super.dispose();
+  }
+
   void _setState(void Function() apply) {
     setState(apply);
     widget.onChanged(widget.element);
@@ -134,6 +161,10 @@ class _BodyState extends State<_Body> {
 
   @override
   Widget build(BuildContext context) {
+    return widget.compact ? _buildCompact() : _buildExpanded();
+  }
+
+  Widget _buildExpanded() {
     final el = widget.element;
     final isDark = widget.isDark;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
@@ -182,50 +213,10 @@ class _BodyState extends State<_Body> {
             children: [
               _toolbarRow(),
               const SizedBox(height: 14),
-              _section('Position & Size'),
-              _xyRow(),
-              const SizedBox(height: 8),
-              _whRow(),
-              const SizedBox(height: 10),
-              _rotationRow(),
-              const SizedBox(height: 10),
-              _opacityRow(),
-              if (el.kind.isTextual) ...[
-                const SizedBox(height: 18),
-                _section('Typography'),
-                _fontPicker(),
-                const SizedBox(height: 8),
-                _fontSizeRow(),
-                const SizedBox(height: 10),
-                _stylePillsRow(),
-                const SizedBox(height: 10),
-                _alignmentRow(),
-                const SizedBox(height: 10),
-                _lineHeightRow(),
-              ],
+              ..._layoutSection(),
+              if (widget.element.kind.isTextual) ..._typographySection(),
               const SizedBox(height: 18),
-              _section('Appearance'),
-              _colorRow('Text', el.colorHex,
-                  (h) => _setState(() => el.colorHex = h)),
-              _colorRow('Background', el.bgHex,
-                  (h) => _setState(() => el.bgHex = h)),
-              _colorRow('Border', el.borderHex,
-                  (h) => _setState(() => el.borderHex = h)),
-              const SizedBox(height: 8),
-              _sliderRow(
-                label: 'Border width',
-                value: el.borderWidth,
-                min: 0,
-                max: 8,
-                onChanged: (v) => _setState(() => el.borderWidth = v),
-              ),
-              _sliderRow(
-                label: 'Corner radius',
-                value: el.borderRadius,
-                min: 0,
-                max: 40,
-                onChanged: (v) => _setState(() => el.borderRadius = v),
-              ),
+              ..._appearanceSection(),
               ..._kindSpecific(),
             ],
           ),
@@ -233,6 +224,221 @@ class _BodyState extends State<_Body> {
       ],
     );
   }
+
+  Widget _buildCompact() {
+    final el = widget.element;
+    final isDark = widget.isDark;
+    final accent = isDark ? AppColors.primaryLight : AppColors.primary;
+    final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final showsTypography = el.kind.isTextual;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // gradient header
+        Container(
+          padding: const EdgeInsets.fromLTRB(14, 10, 8, 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                accent.withValues(alpha: isDark ? 0.18 : 0.12),
+                accent.withValues(alpha: isDark ? 0.06 : 0.03),
+              ],
+            ),
+            border: Border(bottom: BorderSide(color: border)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      accent,
+                      accent.withValues(alpha: 0.78),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: accent.withValues(alpha: 0.4),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Icon(el.kind.icon, color: Colors.white, size: 19),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      el.kind.label,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: isDark
+                            ? AppColors.darkText
+                            : AppColors.lightText,
+                      ),
+                    ),
+                    Text(
+                      '${el.x.round()}, ${el.y.round()} · ${el.width.round()} × ${el.height.round()}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _miniBtn(Icons.flip_to_back_rounded, 'Back',
+                  widget.onSendBackward),
+              const SizedBox(width: 4),
+              _miniBtn(Icons.flip_to_front_rounded, 'Forward',
+                  widget.onBringForward),
+              const SizedBox(width: 4),
+              _miniBtn(Icons.copy_rounded, 'Duplicate', widget.onDuplicate),
+              const SizedBox(width: 4),
+              _miniBtn(Icons.delete_outline_rounded, 'Delete',
+                  widget.onDelete,
+                  destructive: true),
+              if (widget.onClose != null) ...[
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 18),
+                  padding: EdgeInsets.zero,
+                  constraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
+                  onPressed: widget.onClose,
+                ),
+              ],
+            ],
+          ),
+        ),
+        // tabs
+        Container(
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: border)),
+          ),
+          child: TabBar(
+            controller: _tabs,
+            labelColor: accent,
+            unselectedLabelColor: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.lightTextSecondary,
+            indicatorColor: accent,
+            indicatorWeight: 2.4,
+            labelStyle: const TextStyle(
+                fontSize: 12, fontWeight: FontWeight.w800),
+            tabs: [
+              const Tab(text: 'Layout'),
+              Tab(text: showsTypography ? 'Type' : 'Style'),
+              const Tab(text: 'Effects'),
+            ],
+          ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabs,
+            children: [
+              _padded(_layoutSection()),
+              _padded(
+                showsTypography
+                    ? _typographySection(headerless: true)
+                    : _appearanceSection(headerless: true),
+              ),
+              _padded([
+                if (showsTypography) ..._appearanceSection(),
+                ..._kindSpecific(),
+                if (!showsTypography && _kindSpecific().isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text(
+                        'No additional effects',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark
+                              ? AppColors.darkTextSecondary
+                              : AppColors.lightTextSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+              ]),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _padded(List<Widget> children) => ListView(
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 20),
+        children: children,
+      );
+
+  List<Widget> _layoutSection() => [
+        _section('Position & Size'),
+        _xyRow(),
+        const SizedBox(height: 8),
+        _whRow(),
+        const SizedBox(height: 10),
+        _rotationRow(),
+        const SizedBox(height: 10),
+        _opacityRow(),
+      ];
+
+  List<Widget> _typographySection({bool headerless = false}) => [
+        if (!headerless) const SizedBox(height: 18),
+        if (!headerless) _section('Typography'),
+        _fontPicker(),
+        const SizedBox(height: 8),
+        _fontSizeRow(),
+        const SizedBox(height: 10),
+        _stylePillsRow(),
+        const SizedBox(height: 10),
+        _alignmentRow(),
+        const SizedBox(height: 10),
+        _lineHeightRow(),
+      ];
+
+  List<Widget> _appearanceSection({bool headerless = false}) => [
+        if (!headerless) _section('Appearance'),
+        _colorRow('Text', widget.element.colorHex,
+            (h) => _setState(() => widget.element.colorHex = h)),
+        _colorRow('Background', widget.element.bgHex,
+            (h) => _setState(() => widget.element.bgHex = h)),
+        _colorRow('Border', widget.element.borderHex,
+            (h) => _setState(() => widget.element.borderHex = h)),
+        const SizedBox(height: 8),
+        _sliderRow(
+          label: 'Border width',
+          value: widget.element.borderWidth,
+          min: 0,
+          max: 8,
+          onChanged: (v) =>
+              _setState(() => widget.element.borderWidth = v),
+        ),
+        _sliderRow(
+          label: 'Corner radius',
+          value: widget.element.borderRadius,
+          min: 0,
+          max: 40,
+          onChanged: (v) =>
+              _setState(() => widget.element.borderRadius = v),
+        ),
+      ];
 
   // ─── header toolbar ──────────────────────────────────────────────────────
   Widget _toolbarRow() {

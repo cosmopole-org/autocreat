@@ -401,6 +401,22 @@ extension PageSizeMeta on PageSize {
         return 'Letter · Landscape';
     }
   }
+
+  String get shortLabel {
+    switch (this) {
+      case PageSize.a4Portrait:
+        return 'A4';
+      case PageSize.a4Landscape:
+        return 'A4 L';
+      case PageSize.letterPortrait:
+        return 'US';
+      case PageSize.letterLandscape:
+        return 'US L';
+    }
+  }
+
+  bool get isLandscape =>
+      this == PageSize.a4Landscape || this == PageSize.letterLandscape;
 }
 
 // ─── helpers ───────────────────────────────────────────────────────────────
