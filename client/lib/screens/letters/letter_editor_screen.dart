@@ -133,13 +133,16 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
 
     return Scaffold(
       appBar: _buildAppBar(context, isDark, isMobile),
-      body: Column(
-        children: [
-          _buildToolbar(context, isDark, isMobile),
-          if (_attachments.isNotEmpty)
-            _buildAttachmentStrip(context, isDark, isMobile),
-          _buildEditorBody(context, isDark, isMobile),
-        ],
+      body: SizedBox.expand(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildToolbar(context, isDark, isMobile),
+            if (_attachments.isNotEmpty)
+              _buildAttachmentStrip(context, isDark, isMobile),
+            _buildEditorBody(context, isDark, isMobile),
+          ],
+        ),
       ),
     );
   }
@@ -331,11 +334,22 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     return Expanded(
       child: LayoutBuilder(
         builder: (context, constraints) {
+          // Guard against infinite constraints which can occur on web.
+          final safeMaxW = constraints.maxWidth.isFinite
+              ? constraints.maxWidth
+              : (isMobile ? 400.0 : 900.0);
+          final safeMaxH = constraints.maxHeight.isFinite
+              ? constraints.maxHeight
+              : 600.0;
+
           final editorWidth =
-              (constraints.maxWidth - edgeMargin * 2).clamp(0.0, 800.0);
-          final editorHeight = constraints.maxHeight - edgeMargin * 2;
+              (safeMaxW - edgeMargin * 2).clamp(200.0, 800.0);
+          final editorHeight =
+              (safeMaxH - edgeMargin * 2).clamp(300.0, double.infinity);
 
           return Container(
+            width: safeMaxW,
+            height: safeMaxH,
             color: isDark ? AppColors.darkBg : const Color(0xFFF5F7FF),
             child: Center(
               child: SizedBox(
