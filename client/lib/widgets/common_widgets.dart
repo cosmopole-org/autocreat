@@ -1399,6 +1399,262 @@ class StatusChip extends ConsumerWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// EDITOR HERO HEADER  –  branded summary card shown at the top of secondary
+// editor pages (User, Role, Model, Company detail…).  Provides a consistent,
+// modern profile/identity strip with optional avatar/icon, title, subtitle
+// and a row of compact info chips.
+// ─────────────────────────────────────────────────────────────────────────────
+
+class EditorHeroChip {
+  final IconData icon;
+  final String label;
+  final Color? color;
+
+  const EditorHeroChip({
+    required this.icon,
+    required this.label,
+    this.color,
+  });
+}
+
+class EditorHeroHeader extends ConsumerWidget {
+  final String title;
+  final String? subtitle;
+  final Widget? leading;
+  final IconData? icon;
+  final Color? accent;
+  final List<EditorHeroChip> chips;
+  final Widget? trailing;
+
+  const EditorHeroHeader({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.leading,
+    this.icon,
+    this.accent,
+    this.chips = const [],
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final glassMode = ref.watch(glassModeProvider);
+    final primary = accent ?? AppColors.primary;
+
+    final titleStyle = theme.textTheme.titleLarge?.copyWith(
+      fontWeight: FontWeight.w800,
+      height: 1.15,
+      letterSpacing: -0.4,
+      color: theme.colorScheme.onSurface,
+    );
+    final subtitleStyle = theme.textTheme.bodySmall?.copyWith(
+      height: 1.45,
+      color: theme.colorScheme.onSurface
+          .withValues(alpha: isDark ? 0.62 : 0.58),
+    );
+
+    final cardRadius = BorderRadius.circular(20);
+    final hasLeading = leading != null || icon != null;
+
+    final Widget leadingWidget;
+    if (leading != null) {
+      leadingWidget = leading!;
+    } else if (icon != null) {
+      leadingWidget = _HeroIconBadge(icon: icon!, accent: primary);
+    } else {
+      leadingWidget = const SizedBox.shrink();
+    }
+
+    final content = Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (hasLeading) ...[
+                leadingWidget,
+                const SizedBox(width: 16),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(title,
+                        style: titleStyle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
+                    if (subtitle != null && subtitle!.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(subtitle!, style: subtitleStyle),
+                    ],
+                  ],
+                ),
+              ),
+              if (trailing != null) ...[
+                const SizedBox(width: 12),
+                trailing!,
+              ],
+            ],
+          ),
+          if (chips.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: chips
+                  .map((c) =>
+                      _HeroInfoChip(chip: c, isDark: isDark, primary: primary))
+                  .toList(),
+            ),
+          ],
+        ],
+      ),
+    );
+
+    final decoratedBox = glassMode
+        ? Container(
+            decoration: BoxDecoration(
+              borderRadius: cardRadius,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  primary.withValues(alpha: isDark ? 0.20 : 0.12),
+                  Colors.white.withValues(alpha: isDark ? 0.05 : 0.40),
+                ],
+              ),
+              border: Border.all(
+                color: primary.withValues(alpha: isDark ? 0.30 : 0.20),
+              ),
+            ),
+            child: content,
+          )
+        : Container(
+            decoration: BoxDecoration(
+              borderRadius: cardRadius,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [
+                        primary.withValues(alpha: 0.18),
+                        AppColors.darkCard,
+                      ]
+                    : [
+                        primary.withValues(alpha: 0.08),
+                        Colors.white,
+                      ],
+              ),
+              border: Border.all(
+                color: primary.withValues(alpha: isDark ? 0.24 : 0.14),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: primary.withValues(alpha: isDark ? 0.10 : 0.07),
+                  blurRadius: 22,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: content,
+          );
+
+    if (!glassMode) {
+      return ClipRRect(borderRadius: cardRadius, child: decoratedBox);
+    }
+    return ClipRRect(
+      borderRadius: cardRadius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: decoratedBox,
+      ),
+    );
+  }
+}
+
+class _HeroIconBadge extends StatelessWidget {
+  final IconData icon;
+  final Color accent;
+
+  const _HeroIconBadge({required this.icon, required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            accent.withValues(alpha: isDark ? 0.55 : 0.85),
+            AppColors.accent.withValues(alpha: isDark ? 0.45 : 0.75),
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: isDark ? 0.30 : 0.20),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Icon(icon, color: Colors.white, size: 26),
+    );
+  }
+}
+
+class _HeroInfoChip extends StatelessWidget {
+  final EditorHeroChip chip;
+  final bool isDark;
+  final Color primary;
+
+  const _HeroInfoChip(
+      {required this.chip, required this.isDark, required this.primary});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = chip.color ?? primary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: isDark ? 0.16 : 0.10),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: color.withValues(alpha: isDark ? 0.32 : 0.20),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(chip.icon, size: 13, color: color),
+          const SizedBox(width: 6),
+          Text(
+            chip.label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+              letterSpacing: -0.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // SECTION HEADER
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1461,32 +1717,49 @@ class InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (icon != null) ...[
-            Icon(icon,
-                size: 16,
-                color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.lightTextSecondary),
-            const SizedBox(width: 8),
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: secondary.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 14, color: secondary),
+            ),
+            const SizedBox(width: 12),
           ],
           SizedBox(
             width: 120,
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall,
+            child: Padding(
+              padding: EdgeInsets.only(top: icon != null ? 6 : 0),
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: secondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
             ),
           ),
           Expanded(
-            child: Text(
-              value,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(fontWeight: FontWeight.w500),
+            child: Padding(
+              padding: EdgeInsets.only(top: icon != null ? 5 : 0),
+              child: Text(
+                value,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.w600, height: 1.4),
+              ),
             ),
           ),
         ],

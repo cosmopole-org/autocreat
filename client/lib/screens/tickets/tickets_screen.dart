@@ -36,11 +36,25 @@ class _TicketsScreenState extends ConsumerState<TicketsScreen> {
         UiText.closed
       ];
 
+  bool _autoCreateHandled = false;
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _measureHeader());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _measureHeader();
+      _maybeAutoOpenCreate();
+    });
+  }
+
+  void _maybeAutoOpenCreate() {
+    if (_autoCreateHandled || !mounted) return;
+    final state = GoRouterState.of(context);
+    if (state.uri.queryParameters['create'] == '1') {
+      _autoCreateHandled = true;
+      _showCreateTicket(context);
+    }
   }
 
   @override

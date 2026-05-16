@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import '../../core/constants.dart';
+import '../../core/create_actions.dart';
 import '../../models/company.dart';
 import '../../models/ticket.dart';
 import '../../providers/auth_provider.dart';
@@ -1157,39 +1158,41 @@ class _MetricData {
 // QUICK ACTIONS
 // ─────────────────────────────────────────────────────────────
 
-class _QuickActionsSection extends StatelessWidget {
+class _QuickActionsSection extends ConsumerWidget {
   const _QuickActionsSection();
 
-  static final _actions = [
-    (
-      label: UiText.newFlow,
-      icon: Icons.account_tree_rounded,
-      color: AppColors.primary,
-      route: AppRoutes.flows,
-    ),
-    (
-      label: UiText.newForm,
-      icon: Icons.dynamic_form_rounded,
-      color: AppColors.accent,
-      route: AppRoutes.forms,
-    ),
-    (
-      label: UiText.addUser,
-      icon: Icons.person_add_rounded,
-      color: AppColors.success,
-      route: AppRoutes.users,
-    ),
-    (
-      label: UiText.newTicket,
-      icon: Icons.support_agent_rounded,
-      color: AppColors.warning,
-      route: AppRoutes.tickets,
-    ),
-  ];
+  List<({String label, IconData icon, Color color, VoidCallback onTap})>
+      _actions(BuildContext context, WidgetRef ref) => [
+            (
+              label: UiText.newFlow,
+              icon: Icons.account_tree_rounded,
+              color: AppColors.primary,
+              onTap: () => CreateActions.createFlow(context, ref),
+            ),
+            (
+              label: UiText.newForm,
+              icon: Icons.dynamic_form_rounded,
+              color: AppColors.accent,
+              onTap: () => CreateActions.createForm(context, ref),
+            ),
+            (
+              label: UiText.addUser,
+              icon: Icons.person_add_rounded,
+              color: AppColors.success,
+              onTap: () => CreateActions.createUser(context),
+            ),
+            (
+              label: UiText.newTicket,
+              icon: Icons.support_agent_rounded,
+              color: AppColors.warning,
+              onTap: () => CreateActions.createTicket(context),
+            ),
+          ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final actions = _actions(context, ref);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1207,7 +1210,7 @@ class _QuickActionsSection extends StatelessWidget {
           return Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: _actions.asMap().entries.map((e) {
+            children: actions.asMap().entries.map((e) {
               final idx = e.key;
               final action = e.value;
               final cardWidth = wide
@@ -1216,7 +1219,7 @@ class _QuickActionsSection extends StatelessWidget {
               return SizedBox(
                 width: cardWidth,
                 child: AppCard(
-                  onTap: () => context.go(action.route),
+                  onTap: action.onTap,
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [

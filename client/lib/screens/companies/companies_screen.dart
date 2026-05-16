@@ -18,6 +18,20 @@ class CompaniesScreen extends ConsumerStatefulWidget {
 class _CompaniesScreenState extends ConsumerState<CompaniesScreen> {
   final _searchController = TextEditingController();
   String _search = '';
+  bool _autoCreateHandled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_autoCreateHandled || !mounted) return;
+      final state = GoRouterState.of(context);
+      if (state.uri.queryParameters['create'] == '1') {
+        _autoCreateHandled = true;
+        _showCreateDialog(context);
+      }
+    });
+  }
 
   @override
   void dispose() {

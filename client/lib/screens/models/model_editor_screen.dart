@@ -110,27 +110,50 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
           Expanded(
             flex: 2,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  EditorHeroHeader(
+                    title: _nameController.text.isNotEmpty
+                        ? _nameController.text
+                        : (editorState.model?.name ?? UiText.modelEditor),
+                    subtitle: _descController.text.isNotEmpty
+                        ? _descController.text
+                        : UiText.modelInfo,
+                    icon: Icons.dataset_outlined,
+                    chips: [
+                      EditorHeroChip(
+                        icon: Icons.view_column_outlined,
+                        label: UiText.fieldsTitle(editorState.fields.length),
+                        color: AppColors.accent,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
                   AppCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(UiText.modelInfo,
-                            style: Theme.of(context).textTheme.titleMedium),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w700)),
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _nameController,
                           decoration: InputDecoration(
                               labelText: UiText.modelNameRequired),
-                          onChanged: (_) => ref
-                              .read(modelEditorProvider.notifier)
-                              .updateModelMeta(
-                                _nameController.text,
-                                _descController.text,
-                              ),
+                          onChanged: (_) {
+                            ref
+                                .read(modelEditorProvider.notifier)
+                                .updateModelMeta(
+                                  _nameController.text,
+                                  _descController.text,
+                                );
+                            setState(() {});
+                          },
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
@@ -138,12 +161,15 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                           decoration: InputDecoration(
                               labelText: UiText.description),
                           maxLines: 2,
-                          onChanged: (_) => ref
-                              .read(modelEditorProvider.notifier)
-                              .updateModelMeta(
-                                _nameController.text,
-                                _descController.text,
-                              ),
+                          onChanged: (_) {
+                            ref
+                                .read(modelEditorProvider.notifier)
+                                .updateModelMeta(
+                                  _nameController.text,
+                                  _descController.text,
+                                );
+                            setState(() {});
+                          },
                         ),
                       ],
                     ),
@@ -151,34 +177,56 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                   const SizedBox(height: 16),
 
                   // Fields
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(UiText.fieldsTitle(editorState.fields.length),
-                          style: Theme.of(context).textTheme.titleMedium),
-                      AppButton(
-                        label: UiText.addField,
-                        icon: Icons.add,
-                        onPressed: () => _showAddFieldDialog(context),
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(UiText.fieldsTitle(editorState.fields.length),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w700)),
+                        AppButton(
+                          label: UiText.addField,
+                          icon: Icons.add,
+                          onPressed: () => _showAddFieldDialog(context),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 12),
 
                   if (editorState.fields.isEmpty)
                     AppCard(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        padding: const EdgeInsets.symmetric(vertical: 32),
                         child: Center(
                           child: Column(
                             children: [
-                              Icon(Icons.add_box_outlined,
-                                  size: 36,
-                                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
-                              const SizedBox(height: 8),
-                              Text(UiText.noFieldsYetAddYourFirstField,
-                                  style: TextStyle(
-                                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary)),
+                              Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary
+                                      .withValues(alpha: 0.10),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(Icons.add_box_outlined,
+                                    size: 28, color: AppColors.primary),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                UiText.noFieldsYetAddYourFirstField,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: isDark
+                                          ? AppColors.darkTextSecondary
+                                          : AppColors.lightTextSecondary,
+                                    ),
+                              ),
                             ],
                           ),
                         ),
@@ -209,7 +257,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
           // Schema preview
           if (isDesktop)
             Container(
-              width: 280,
+              width: 300,
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                 border: Border(
@@ -219,32 +267,63 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
                   ),
                 ),
               ),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(UiText.jsonSchemaPreview,
-                      style: Theme.of(context).textTheme.titleSmall),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color:
-                          isDark ? AppColors.darkBg : const Color(0xFFF8F9FA),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isDark
-                            ? AppColors.darkBorder
-                            : AppColors.lightBorder,
+                  Row(
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color:
+                              AppColors.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.code_rounded,
+                            size: 15, color: AppColors.primary),
                       ),
-                    ),
-                    child: Text(
-                      _buildSchemaPreview(editorState),
-                      style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 11,
-                        color:
-                            isDark ? AppColors.darkText : AppColors.lightText,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(UiText.jsonSchemaPreview,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Expanded(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppColors.darkBg
+                            : const Color(0xFFF8F9FA),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark
+                              ? AppColors.darkBorder
+                              : AppColors.lightBorder,
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        child: SelectableText(
+                          _buildSchemaPreview(editorState),
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 11.5,
+                            height: 1.5,
+                            color: isDark
+                                ? AppColors.darkText
+                                : AppColors.lightText,
+                          ),
+                        ),
                       ),
                     ),
                   ),

@@ -150,49 +150,86 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Avatar picker
-              Center(
-                child: Stack(
-                  children: [
-                    AvatarWidget(
-                      imageUrl: _avatarPath ?? _user?.avatar,
-                      initials:
-                          initials.isNotEmpty ? initials.toUpperCase() : '?',
-                      size: 88,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: _pickAvatar,
+              // Hero header — identity strip
+              EditorHeroHeader(
+                title: () {
+                  final fullName =
+                      '${_firstNameController.text} ${_lastNameController.text}'
+                          .trim();
+                  if (fullName.isNotEmpty) return fullName;
+                  return _user == null ? UiText.newUser : UiText.editUser;
+                }(),
+                subtitle: _emailController.text.isNotEmpty
+                    ? _emailController.text
+                    : (_user == null ? UiText.newUser : UiText.editUser),
+                leading: GestureDetector(
+                  onTap: _pickAvatar,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      AvatarWidget(
+                        imageUrl: _avatarPath ?? _user?.avatar,
+                        initials:
+                            initials.isNotEmpty ? initials.toUpperCase() : '?',
+                        size: 64,
+                      ),
+                      Positioned(
+                        bottom: -2,
+                        right: -2,
                         child: Container(
-                          width: 28,
-                          height: 28,
+                          width: 24,
+                          height: 24,
                           decoration: BoxDecoration(
                             color: AppColors.primary,
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
+                            border: Border.all(
+                                color: Theme.of(context)
+                                    .scaffoldBackgroundColor,
+                                width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary
+                                    .withValues(alpha: 0.30),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: const Icon(Icons.camera_alt,
-                              size: 14, color: Colors.white),
+                              size: 12, color: Colors.white),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              TextButton.icon(
-                onPressed: _pickAvatar,
-                icon: const Icon(Icons.photo_library_outlined, size: 16),
-                label: Text(_avatarPath != null || _user?.avatar != null
-                    ? UiText.changePhoto
-                    : UiText.uploadPhoto),
+                chips: [
+                  EditorHeroChip(
+                    icon: _isActive
+                        ? Icons.check_circle_rounded
+                        : Icons.pause_circle_outline_rounded,
+                    label: _isActive ? UiText.active : UiText.inactive,
+                    color: _isActive ? AppColors.success : AppColors.warning,
+                  ),
+                  if (_phoneController.text.isNotEmpty)
+                    EditorHeroChip(
+                      icon: Icons.phone_outlined,
+                      label: _phoneController.text,
+                      color: AppColors.accent,
+                    ),
+                ],
+                trailing: TextButton.icon(
+                  onPressed: _pickAvatar,
+                  icon: const Icon(Icons.photo_library_outlined, size: 16),
+                  label: Text(_avatarPath != null || _user?.avatar != null
+                      ? UiText.changePhoto
+                      : UiText.uploadPhoto),
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -201,7 +238,10 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(UiText.userInfo,
-                        style: Theme.of(context).textTheme.titleMedium),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700)),
                     const SizedBox(height: 16),
                     Row(
                       children: [
@@ -238,6 +278,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                         labelText: UiText.emailRequired,
                         prefixIcon: const Icon(Icons.email_outlined, size: 18),
                       ),
+                      onChanged: (_) => setState(() {}),
                       validator: (v) {
                         if (v?.isEmpty ?? true) return UiText.requiredText;
                         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
@@ -255,6 +296,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                         labelText: UiText.phone,
                         prefixIcon: const Icon(Icons.phone_outlined, size: 18),
                       ),
+                      onChanged: (_) => setState(() {}),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
@@ -288,7 +330,10 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(UiText.access,
-                        style: Theme.of(context).textTheme.titleMedium),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700)),
                     const SizedBox(height: 16),
                     rolesAsync.when(
                       loading: () => const LinearProgressIndicator(),

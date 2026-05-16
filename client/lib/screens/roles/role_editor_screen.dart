@@ -146,23 +146,58 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              EditorHeroHeader(
+                title: _nameController.text.isNotEmpty
+                    ? _nameController.text
+                    : (_role == null ? UiText.newRole : UiText.editRole),
+                subtitle: _descController.text.isNotEmpty
+                    ? _descController.text
+                    : UiText.configureCrudPermissionsPerResource,
+                icon: Icons.shield_outlined,
+                accent: _coverageColor(coverage),
+                chips: [
+                  EditorHeroChip(
+                    icon: Icons.layers_outlined,
+                    label: _levelLabel(_level),
+                    color: AppColors.accent,
+                  ),
+                  EditorHeroChip(
+                    icon: Icons.percent_rounded,
+                    label: UiText.percent(coverage),
+                    color: _coverageColor(coverage),
+                  ),
+                  EditorHeroChip(
+                    icon: _isActive
+                        ? Icons.check_circle_rounded
+                        : Icons.pause_circle_outline_rounded,
+                    label: _isActive ? UiText.active : UiText.inactive,
+                    color:
+                        _isActive ? AppColors.success : AppColors.warning,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
               AppCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(UiText.roleDetails,
-                        style: Theme.of(context).textTheme.titleMedium),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700)),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _nameController,
                       decoration: InputDecoration(
                           labelText: UiText.roleNameRequired),
+                      onChanged: (_) => setState(() {}),
                       validator: (v) =>
                           v?.isEmpty ?? true ? UiText.nameIsRequired : null,
                     ),
@@ -171,6 +206,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                       controller: _descController,
                       decoration:
                           InputDecoration(labelText: UiText.description),
+                      onChanged: (_) => setState(() {}),
                       maxLines: 2,
                     ),
                     const SizedBox(height: 12),
@@ -261,12 +297,31 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                      child: Text(UiText.permissions,
-                          style: Theme.of(context).textTheme.titleMedium),
+                      padding: const EdgeInsets.fromLTRB(20, 18, 16, 4),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary
+                                  .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.lock_outline,
+                                size: 16, color: AppColors.primary),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(UiText.permissions,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700)),
+                        ],
+                      ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                      padding: const EdgeInsets.fromLTRB(20, 4, 16, 14),
                       child: Text(
                         UiText.configureCrudPermissionsPerResource,
                         style: Theme.of(context).textTheme.bodySmall,
@@ -389,5 +444,21 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
     if (coverage >= 0.7) return AppColors.success;
     if (coverage >= 0.4) return AppColors.warning;
     return AppColors.info;
+  }
+
+  String _levelLabel(String level) {
+    switch (level) {
+      case 'owner':
+        return UiText.owner;
+      case 'admin':
+        return UiText.admin;
+      case 'manager':
+        return UiText.manager;
+      case 'viewer':
+        return UiText.viewer;
+      case 'member':
+      default:
+        return UiText.member;
+    }
   }
 }
