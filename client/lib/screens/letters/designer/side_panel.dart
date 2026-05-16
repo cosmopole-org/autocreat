@@ -20,6 +20,7 @@ List<_SysVar> _systemVars() => [
 
 class SidePanel extends StatefulWidget {
   final bool isDark;
+  final bool compact;
   final List<String> letterVariables;
   final List<PlatformFile> attachments;
   final ValueChanged<String> onInsertVariable;
@@ -37,6 +38,7 @@ class SidePanel extends StatefulWidget {
     required this.onInsertAttachment,
     required this.onPickAttachment,
     required this.onRemoveAttachment,
+    this.compact = false,
     this.onClose,
   });
 
@@ -67,82 +69,127 @@ class _SidePanelState extends State<SidePanel>
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final accent = isDark ? AppColors.primaryLight : AppColors.primary;
 
+    final content = Column(
+      children: [
+        Container(
+          padding: EdgeInsets.fromLTRB(
+              widget.compact ? 14 : 14, widget.compact ? 6 : 12, 6, 0),
+          decoration: BoxDecoration(
+            gradient: widget.compact
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      accent.withValues(alpha: isDark ? 0.16 : 0.10),
+                      accent.withValues(alpha: isDark ? 0.05 : 0.02),
+                    ],
+                  )
+                : null,
+            border: Border(bottom: BorderSide(color: border)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  if (widget.compact) ...[
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            accent,
+                            accent.withValues(alpha: 0.78),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                      child: const Icon(
+                        Icons.auto_awesome_mosaic_rounded,
+                        color: Colors.white,
+                        size: 17,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                  ],
+                  Expanded(
+                    child: Text(
+                      'Library',
+                      style: TextStyle(
+                        fontSize: widget.compact ? 15 : 13,
+                        fontWeight:
+                            widget.compact ? FontWeight.w800 : FontWeight.w700,
+                        letterSpacing: 0.4,
+                        color: isDark
+                            ? AppColors.darkText
+                            : AppColors.lightText,
+                      ),
+                    ),
+                  ),
+                  if (widget.onClose != null)
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 18),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                          minWidth: 32, minHeight: 32),
+                      onPressed: widget.onClose,
+                    ),
+                ],
+              ),
+              TabBar(
+                controller: _tabs,
+                labelColor: accent,
+                unselectedLabelColor: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary,
+                indicatorColor: accent,
+                indicatorWeight: widget.compact ? 2.4 : 2,
+                labelStyle: TextStyle(
+                    fontSize: widget.compact ? 13 : 12,
+                    fontWeight: FontWeight.w800),
+                tabs: const [
+                  Tab(text: 'Variables'),
+                  Tab(text: 'Attachments'),
+                ],
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabs,
+            children: [
+              _VariablesTab(
+                isDark: isDark,
+                letterVariables: widget.letterVariables,
+                onInsert: widget.onInsertVariable,
+              ),
+              _AttachmentsTab(
+                isDark: isDark,
+                attachments: widget.attachments,
+                onPick: widget.onPickAttachment,
+                onRemove: widget.onRemoveAttachment,
+                onInsert: widget.onInsertAttachment,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (widget.compact) {
+      return Container(color: bg, child: content);
+    }
     return Container(
       width: 280,
       decoration: BoxDecoration(
         color: bg,
         border: Border(left: BorderSide(color: border)),
       ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(14, 12, 6, 0),
-            decoration:
-                BoxDecoration(border: Border(bottom: BorderSide(color: border))),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        'Library',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.4,
-                        ),
-                      ),
-                    ),
-                    if (widget.onClose != null)
-                      IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 18),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(
-                            minWidth: 32, minHeight: 32),
-                        onPressed: widget.onClose,
-                      ),
-                  ],
-                ),
-                TabBar(
-                  controller: _tabs,
-                  labelColor: accent,
-                  unselectedLabelColor: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.lightTextSecondary,
-                  indicatorColor: accent,
-                  indicatorWeight: 2,
-                  labelStyle: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w700),
-                  tabs: const [
-                    Tab(text: 'Variables'),
-                    Tab(text: 'Attachments'),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabs,
-              children: [
-                _VariablesTab(
-                  isDark: isDark,
-                  letterVariables: widget.letterVariables,
-                  onInsert: widget.onInsertVariable,
-                ),
-                _AttachmentsTab(
-                  isDark: isDark,
-                  attachments: widget.attachments,
-                  onPick: widget.onPickAttachment,
-                  onRemove: widget.onRemoveAttachment,
-                  onInsert: widget.onInsertAttachment,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      child: content,
     );
   }
 }

@@ -46,6 +46,11 @@ class _DesignerCanvasState extends State<DesignerCanvas> {
   final _vController = ScrollController();
   final _focus = FocusNode();
 
+  // pinch-to-zoom state
+  final Map<int, Offset> _pointers = {};
+  double? _pinchStartDist;
+  double? _pinchStartZoom;
+
   @override
   void dispose() {
     _hController.dispose();
@@ -60,11 +65,25 @@ class _DesignerCanvasState extends State<DesignerCanvas> {
     return (v / g).round() * g;
   }
 
+  double _fitZoom(Size viewport, double padding) {
+    final page = widget.pageSize.pixels;
+    if (viewport.width <= 0 || viewport.height <= 0) return widget.zoom;
+    final usableW = (viewport.width - padding * 2).clamp(40.0, double.infinity);
+    final usableH = (viewport.height - padding * 2).clamp(40.0, double.infinity);
+    final fitW = usableW / page.width;
+    final fitH = usableH / page.height;
+    return (fitW < fitH ? fitW : fitH).clamp(0.2, 2.5).toDouble();
+  }
+
   @override
   Widget build(BuildContext context) {
     final pageSize = widget.pageSize.pixels;
     final scaled = pageSize * widget.zoom;
     final canvasBg = widget.isDark ? AppColors.darkBg : const Color(0xFFE7EAF5);
+    final media = MediaQuery.of(context);
+    final isMobile = media.size.width < 720;
+    final canvasPadding = isMobile ? 16.0 : 48.0;
+    final handleSize = isMobile ? 20.0 : 12.0;
 
     return KeyboardListener(
       focusNode: _focus,
@@ -76,64 +95,140 @@ class _DesignerCanvasState extends State<DesignerCanvas> {
           widget.onDeleteSelected?.call();
         }
       },
-      child: Container(
-        color: canvasBg,
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              controller: _vController,
-              child: SingleChildScrollView(
-                controller: _hController,
-                scrollDirection: Axis.horizontal,
-                child: Padding(
-                  padding: const EdgeInsets.all(48),
-                  child: SizedBox(
-                    width: scaled.width,
-                    height: scaled.height,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => widget.onSelect(null),
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          _PageBackground(
-                            width: scaled.width,
-                            height: scaled.height,
-                            showGrid: widget.showGrid,
-                            gridSize: widget.gridSize * widget.zoom,
-                            isDark: widget.isDark,
-                          ),
-                          for (final el in _sorted())
-                            _PositionedElement(
-                              key: ValueKey(el.id),
-                              element: el,
-                              zoom: widget.zoom,
-                              isSelected: widget.selectedId == el.id,
-                              isDark: widget.isDark,
-                              pageBounds: pageSize,
-                              snap: _snap,
-                              onSelect: () => widget.onSelect(el.id),
-                              onActivate: () => widget.onActivate(el.id),
-                              onChanged: widget.onChanged,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final viewport = Size(constraints.maxWidth, constraints.maxHeight);
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: widget.isDark
+                    ? [
+                        AppColors.darkBg,
+                        const Color(0xFF0A1228),
+                      ]
+                    : [
+                        const Color(0xFFE7EAF5),
+                        const Color(0xFFDFE5F4),
+                      ],
+              ),
+            ),
+            child: Listener(
+              onPointerDown: (e) {
+                _pointers[e.pointer] = e.position;
+                if (_pointers.length == 2) {
+                  final pts = _pointers.values.toList();
+                  _pinchStartDist = (pts[0] - pts[1]).distance;
+                  _pinchStartZoom = widget.zoom;
+                }
+              },
+              onPointerMove: (e) {
+                if (!_pointers.containsKey(e.pointer)) return;
+                _pointers[e.pointer] = e.position;
+                if (_pointers.length >= 2 &&
+                    _pinchStartDist != null &&
+                    _pinchStartZoom != null) {
+                  final pts = _pointers.values.toList();
+                  final d = (pts[0] - pts[1]).distance;
+                  if (_pinchStartDist! > 0) {
+                    final factor = d / _pinchStartDist!;
+                    final next =
+                        (_pinchStartZoom! * factor).clamp(0.2, 2.5).toDouble();
+                    if ((next - widget.zoom).abs() > 0.005) {
+                      widget.onZoom(next);
+                    }
+                  }
+                }
+              },
+              onPointerUp: (e) {
+                _pointers.remove(e.pointer);
+                if (_pointers.length < 2) {
+                  _pinchStartDist = null;
+                  _pinchStartZoom = null;
+                }
+              },
+              onPointerCancel: (e) {
+                _pointers.remove(e.pointer);
+                if (_pointers.length < 2) {
+                  _pinchStartDist = null;
+                  _pinchStartZoom = null;
+                }
+              },
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    controller: _vController,
+                    physics: const ClampingScrollPhysics(),
+                    child: SingleChildScrollView(
+                      controller: _hController,
+                      scrollDirection: Axis.horizontal,
+                      physics: const ClampingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minWidth: viewport.width,
+                          minHeight: viewport.height,
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(canvasPadding),
+                            child: SizedBox(
+                              width: scaled.width,
+                              height: scaled.height,
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () => widget.onSelect(null),
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    _PageBackground(
+                                      width: scaled.width,
+                                      height: scaled.height,
+                                      showGrid: widget.showGrid,
+                                      gridSize: widget.gridSize * widget.zoom,
+                                      isDark: widget.isDark,
+                                    ),
+                                    for (final el in _sorted())
+                                      _PositionedElement(
+                                        key: ValueKey(el.id),
+                                        element: el,
+                                        zoom: widget.zoom,
+                                        isSelected: widget.selectedId == el.id,
+                                        isDark: widget.isDark,
+                                        pageBounds: pageSize,
+                                        snap: _snap,
+                                        handleSize: handleSize,
+                                        onSelect: () => widget.onSelect(el.id),
+                                        onActivate: () =>
+                                            widget.onActivate(el.id),
+                                        onChanged: widget.onChanged,
+                                      ),
+                                  ],
+                                ),
+                              ),
                             ),
-                        ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                  Positioned(
+                    right: isMobile ? 10 : 16,
+                    bottom: isMobile ? 10 : 16,
+                    child: _ZoomBadge(
+                      zoom: widget.zoom,
+                      onZoom: widget.onZoom,
+                      onFit: () =>
+                          widget.onZoom(_fitZoom(viewport, canvasPadding)),
+                      isDark: widget.isDark,
+                      isMobile: isMobile,
+                    ),
+                  ),
+                ],
               ),
             ),
-            Positioned(
-              right: 16,
-              bottom: 16,
-              child: _ZoomBadge(
-                zoom: widget.zoom,
-                onZoom: widget.onZoom,
-                isDark: widget.isDark,
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -168,18 +263,29 @@ class _PageBackground extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkCard : Colors.white,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.black.withValues(alpha: 0.04),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.16),
-            blurRadius: 32,
-            offset: const Offset(0, 14),
+            color: Colors.black.withValues(alpha: isDark ? 0.55 : 0.18),
+            blurRadius: 40,
+            spreadRadius: -4,
+            offset: const Offset(0, 18),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: showGrid
           ? ClipRRect(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
               child: CustomPaint(
                 painter: _GridPainter(
                   gridSize: gridSize,
@@ -203,11 +309,11 @@ class _GridPainter extends CustomPainter {
     if (gridSize < 4) return;
     final minor = Paint()
       ..color = (isDark ? Colors.white : Colors.black)
-          .withValues(alpha: isDark ? 0.06 : 0.05)
+          .withValues(alpha: isDark ? 0.05 : 0.045)
       ..strokeWidth = 1;
     final major = Paint()
       ..color = (isDark ? Colors.white : Colors.black)
-          .withValues(alpha: isDark ? 0.10 : 0.10)
+          .withValues(alpha: isDark ? 0.10 : 0.09)
       ..strokeWidth = 1;
     const majorEvery = 5;
     int i = 0;
@@ -243,6 +349,7 @@ class _PositionedElement extends StatefulWidget {
   final bool isDark;
   final Size pageBounds;
   final double Function(double) snap;
+  final double handleSize;
   final VoidCallback onSelect;
   final VoidCallback onActivate;
   final void Function(DesignElement) onChanged;
@@ -255,6 +362,7 @@ class _PositionedElement extends StatefulWidget {
     required this.isDark,
     required this.pageBounds,
     required this.snap,
+    required this.handleSize,
     required this.onSelect,
     required this.onActivate,
     required this.onChanged,
@@ -315,12 +423,21 @@ class _PositionedElementState extends State<_PositionedElement> {
                 children: [
                   Positioned.fill(
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 80),
+                      duration: const Duration(milliseconds: 90),
                       decoration: BoxDecoration(
                         border: widget.isSelected
-                            ? Border.all(color: accent, width: 1.4)
+                            ? Border.all(color: accent, width: 1.6)
                             : null,
                         borderRadius: BorderRadius.circular(4),
+                        boxShadow: widget.isSelected
+                            ? [
+                                BoxShadow(
+                                  color: accent.withValues(alpha: 0.20),
+                                  blurRadius: 14,
+                                  spreadRadius: -2,
+                                ),
+                              ]
+                            : null,
                       ),
                       child: ClipRect(
                         child: ElementRenderer(
@@ -351,6 +468,7 @@ class _PositionedElementState extends State<_PositionedElement> {
         _ResizeHandle(
           anchor: a,
           accent: accent,
+          size: widget.handleSize,
           onStart: (g) {
             _resizeStartPointer = g;
             _resizeStartRect = Rect.fromLTWH(
@@ -449,6 +567,7 @@ class _PositionedElementState extends State<_PositionedElement> {
 class _ResizeHandle extends StatelessWidget {
   final String anchor;
   final Color accent;
+  final double size;
   final ValueChanged<Offset> onStart;
   final ValueChanged<Offset> onUpdate;
   final VoidCallback onEnd;
@@ -456,6 +575,7 @@ class _ResizeHandle extends StatelessWidget {
   const _ResizeHandle({
     required this.anchor,
     required this.accent,
+    required this.size,
     required this.onStart,
     required this.onUpdate,
     required this.onEnd,
@@ -463,9 +583,9 @@ class _ResizeHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const handleSize = 12.0;
     AlignmentDirectional align;
     SystemMouseCursor cursor = SystemMouseCursors.resizeUpLeftDownRight;
+    final isCorner = anchor.length == 2;
     switch (anchor) {
       case 'tl':
         align = AlignmentDirectional.topStart;
@@ -502,13 +622,15 @@ class _ResizeHandle extends StatelessWidget {
         break;
     }
 
+    final visualSize = isCorner ? size : size * 0.75;
+
     return Positioned.fill(
       child: Align(
         alignment: align,
         child: Transform.translate(
           offset: Offset(
-            anchor.contains('l') ? -handleSize / 2 : (anchor.contains('r') ? handleSize / 2 : 0),
-            anchor.contains('t') ? -handleSize / 2 : (anchor.contains('b') ? handleSize / 2 : 0),
+            anchor.contains('l') ? -size / 2 : (anchor.contains('r') ? size / 2 : 0),
+            anchor.contains('t') ? -size / 2 : (anchor.contains('b') ? size / 2 : 0),
           ),
           child: MouseRegion(
             cursor: cursor,
@@ -517,20 +639,27 @@ class _ResizeHandle extends StatelessWidget {
               onPanStart: (d) => onStart(d.globalPosition),
               onPanUpdate: (d) => onUpdate(d.globalPosition),
               onPanEnd: (_) => onEnd(),
-              child: Container(
-                width: handleSize,
-                height: handleSize,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: accent, width: 1.5),
-                  borderRadius: BorderRadius.circular(2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.18),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
+              child: SizedBox(
+                width: size,
+                height: size,
+                child: Center(
+                  child: Container(
+                    width: visualSize,
+                    height: visualSize,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: accent, width: 1.6),
+                      borderRadius:
+                          BorderRadius.circular(isCorner ? 3 : visualSize / 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.22),
+                          blurRadius: 5,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -545,71 +674,117 @@ class _ResizeHandle extends StatelessWidget {
 class _ZoomBadge extends StatelessWidget {
   final double zoom;
   final ValueChanged<double> onZoom;
+  final VoidCallback onFit;
   final bool isDark;
+  final bool isMobile;
 
   const _ZoomBadge({
     required this.zoom,
     required this.onZoom,
+    required this.onFit,
     required this.isDark,
+    required this.isMobile,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bg = isDark
+        ? AppColors.darkCard.withValues(alpha: 0.94)
+        : Colors.white.withValues(alpha: 0.96);
+    final fg = isDark ? AppColors.darkText : AppColors.lightText;
+    final accent = isDark ? AppColors.primaryLight : AppColors.primary;
+    final btnSize = isMobile ? 34.0 : 30.0;
+
     return Material(
       color: Colors.transparent,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        padding:
+            EdgeInsets.symmetric(horizontal: 6, vertical: isMobile ? 5 : 4),
         decoration: BoxDecoration(
-          color: isDark
-              ? AppColors.darkCard.withValues(alpha: 0.95)
-              : Colors.white.withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(28),
+          color: bg,
+          borderRadius: BorderRadius.circular(40),
           border: Border.all(
             color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
+            _circleBtn(
+              icon: Icons.remove_rounded,
               tooltip: 'Zoom out',
-              icon: const Icon(Icons.remove_rounded, size: 18),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
-              onPressed: () =>
-                  onZoom((zoom - 0.1).clamp(0.3, 2.5).toDouble()),
+              size: btnSize,
+              fg: fg,
+              onTap: () =>
+                  onZoom((zoom - 0.1).clamp(0.2, 2.5).toDouble()),
             ),
             GestureDetector(
               onTap: () => onZoom(1.0),
               child: SizedBox(
-                width: 52,
+                width: isMobile ? 50 : 48,
                 child: Text(
                   '${(zoom * 100).round()}%',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFeatures: [FontFeature.tabularFigures()],
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
+                  style: TextStyle(
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                    fontWeight: FontWeight.w700,
+                    fontSize: isMobile ? 13 : 12,
+                    color: fg,
                   ),
                 ),
               ),
             ),
-            IconButton(
+            _circleBtn(
+              icon: Icons.add_rounded,
               tooltip: 'Zoom in',
-              icon: const Icon(Icons.add_rounded, size: 18),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
-              onPressed: () =>
-                  onZoom((zoom + 0.1).clamp(0.3, 2.5).toDouble()),
+              size: btnSize,
+              fg: fg,
+              onTap: () =>
+                  onZoom((zoom + 0.1).clamp(0.2, 2.5).toDouble()),
+            ),
+            Container(
+              width: 1,
+              height: 20,
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              color: (isDark ? Colors.white : Colors.black)
+                  .withValues(alpha: 0.08),
+            ),
+            _circleBtn(
+              icon: Icons.fit_screen_outlined,
+              tooltip: 'Fit to screen',
+              size: btnSize,
+              fg: accent,
+              onTap: onFit,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _circleBtn({
+    required IconData icon,
+    required String tooltip,
+    required double size,
+    required Color fg,
+    required VoidCallback onTap,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(size / 2),
+        onTap: onTap,
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Icon(icon, size: isMobile ? 19 : 17, color: fg),
         ),
       ),
     );

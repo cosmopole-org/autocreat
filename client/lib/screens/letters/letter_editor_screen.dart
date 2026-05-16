@@ -40,6 +40,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
   bool _showGrid = true;
   bool _snapToGrid = true;
   final double _gridSize = 8;
+  bool _zoomInitialized = false;
 
   bool _loading = true;
   bool _saving = false;
@@ -568,10 +569,34 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final w = MediaQuery.sizeOf(context).width;
+    final media = MediaQuery.of(context);
+    final w = media.size.width;
     final isMobile = w < _kTablet;
     final isCompact = w < _kDesktop;
     final isRtl = UiText.isRtl;
+
+    // auto-fit initial zoom on mobile so the page fits the viewport
+    if (!_zoomInitialized && isMobile) {
+      final page = _pageSize.pixels;
+      // estimate canvas viewport height: full height minus app bar (56),
+      // secondary toolbar (44), bottom bar (56) and safe area
+      final viewportH = media.size.height -
+          56 -
+          44 -
+          56 -
+          media.padding.top -
+          media.padding.bottom;
+      final usableW = (w - 32).clamp(60.0, double.infinity);
+      final usableH = (viewportH - 32).clamp(60.0, double.infinity);
+      final fitW = usableW / page.width;
+      final fitH = usableH / page.height;
+      final fit =
+          (fitW < fitH ? fitW : fitH).clamp(0.25, 1.0).toDouble();
+      _zoom = fit;
+      _zoomInitialized = true;
+    } else if (!_zoomInitialized) {
+      _zoomInitialized = true;
+    }
 
     return Directionality(
       textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
@@ -664,11 +689,13 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
             if (isMobile)
               _MobileBottomBar(
                 isDark: isDark,
-                hasSelection: _selectedId != null,
+                selected: _selectedElement,
                 onInsert: () => _showMobileInsertSheet(context, isDark),
                 onProperties: () =>
                     _showMobilePropertiesSheet(context, isDark),
                 onVariables: () => _showMobileSidePanel(context, isDark),
+                onDuplicate:
+                    _selectedId == null ? null : _duplicateSelected,
                 onDelete: _selectedId == null ? null : _deleteSelected,
               ),
           ],
@@ -747,17 +774,15 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSt) {
-          return SizedBox(
-            height: MediaQuery.of(ctx).size.height * 0.78,
+          return _MobileSheet(
+            isDark: isDark,
             child: PropertiesPanel(
               element: _selectedElement,
               isDark: isDark,
+              compact: true,
               onChanged: (_) {
                 setSt(() {});
                 setState(() {});
@@ -785,14 +810,12 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-      ),
-      builder: (ctx) => SizedBox(
-        height: MediaQuery.of(ctx).size.height * 0.78,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _MobileSheet(
+        isDark: isDark,
         child: SidePanel(
           isDark: isDark,
+          compact: true,
           letterVariables: _letterVariables,
           attachments: _attachments,
           onInsertVariable: (t) {
@@ -807,6 +830,49 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
           onRemoveAttachment: (i) =>
               setState(() => _attachments.removeAt(i)),
           onClose: () => Navigator.pop(ctx),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── mobile sheet wrapper ─────────────────────────────────────────────────
+class _MobileSheet extends StatelessWidget {
+  final bool isDark;
+  final Widget child;
+  const _MobileSheet({required this.isDark, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final bg = isDark ? AppColors.darkSurface : Colors.white;
+    return Padding(
+      padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
+      child: SizedBox(
+        height: media.size.height * 0.82,
+        child: Container(
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 44,
+                height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 9),
+                decoration: BoxDecoration(
+                  color: (isDark
+                          ? AppColors.darkTextHint
+                          : AppColors.lightTextHint)
+                      .withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Expanded(child: child),
+            ],
+          ),
         ),
       ),
     );
@@ -857,15 +923,26 @@ class _SecondaryToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = isDark ? AppColors.darkSurface : Colors.white;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final height = isMobile ? 42.0 : 44.0;
     return Container(
-      height: 44,
+      height: height,
       decoration: BoxDecoration(
         color: bg,
         border: Border(bottom: BorderSide(color: border)),
+        boxShadow: isMobile
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                )
+              ]
+            : null,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
         child: Row(
           children: [
             _ToolbarBtn(
@@ -897,10 +974,8 @@ class _SecondaryToolbar extends StatelessWidget {
               active: snapToGrid,
               onTap: onToggleSnap,
             ),
-            if (!isMobile) ...[
-              _div(border),
-              _pageSizeMenu(context),
-            ],
+            _div(border),
+            _pageSizeChip(context),
             if (hasSelection) ...[
               _div(border),
               _ToolbarBtn(
@@ -945,11 +1020,14 @@ class _SecondaryToolbar extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 6),
       );
 
-  Widget _pageSizeMenu(BuildContext context) {
+  Widget _pageSizeChip(BuildContext context) {
     final accent = isDark ? AppColors.primaryLight : AppColors.primary;
+    final compact = isMobile;
+    final shortLabel = pageSize.shortLabel;
     return PopupMenuButton<PageSize>(
       tooltip: 'Page size',
       onSelected: onPageSize,
+      offset: const Offset(0, 38),
       itemBuilder: (ctx) => [
         for (final p in PageSize.values)
           PopupMenuItem(
@@ -970,26 +1048,36 @@ class _SecondaryToolbar extends StatelessWidget {
           ),
       ],
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: EdgeInsets.symmetric(
+            horizontal: compact ? 8 : 10, vertical: 4),
         margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
-          color: accent.withValues(alpha: isDark ? 0.16 : 0.10),
-          borderRadius: BorderRadius.circular(7),
+          color: accent.withValues(alpha: isDark ? 0.18 : 0.12),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: accent.withValues(alpha: isDark ? 0.35 : 0.25),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.crop_portrait_rounded, size: 14, color: accent),
+            Icon(
+              pageSize.isLandscape
+                  ? Icons.crop_landscape_rounded
+                  : Icons.crop_portrait_rounded,
+              size: 14,
+              color: accent,
+            ),
             const SizedBox(width: 6),
             Text(
-              pageSize.label,
+              compact ? shortLabel : pageSize.label,
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
                 color: accent,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 2),
             Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: accent),
           ],
         ),
@@ -1057,18 +1145,20 @@ class _ToolbarBtn extends StatelessWidget {
 // ─── mobile bottom bar ─────────────────────────────────────────────────────
 class _MobileBottomBar extends StatelessWidget {
   final bool isDark;
-  final bool hasSelection;
+  final DesignElement? selected;
   final VoidCallback onInsert;
   final VoidCallback onProperties;
   final VoidCallback onVariables;
+  final VoidCallback? onDuplicate;
   final VoidCallback? onDelete;
 
   const _MobileBottomBar({
     required this.isDark,
-    required this.hasSelection,
+    required this.selected,
     required this.onInsert,
     required this.onProperties,
     required this.onVariables,
+    this.onDuplicate,
     this.onDelete,
   });
 
@@ -1076,38 +1166,140 @@ class _MobileBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = isDark ? AppColors.darkSurface : Colors.white;
     final border = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final accent = isDark ? AppColors.primaryLight : AppColors.primary;
+    final hasSelection = selected != null;
+
     return SafeArea(
       top: false,
       child: Container(
-        height: 56,
         decoration: BoxDecoration(
           color: bg,
           border: Border(top: BorderSide(color: border)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, -4),
+            ),
+          ],
         ),
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _bottomBtn(Icons.add_circle_outline_rounded, 'Insert', onInsert,
-                isPrimary: true),
-            _bottomBtn(Icons.tune_rounded, 'Style',
-                hasSelection ? onProperties : null),
-            _bottomBtn(Icons.data_object_rounded, 'Library', onVariables),
-            _bottomBtn(
-                Icons.delete_outline_rounded, 'Delete', onDelete,
-                destructive: true),
+            if (hasSelection)
+              _selectionRow(context, accent, border),
+            SizedBox(
+              height: 60,
+              child: Row(
+                children: [
+                  _bottomBtn(
+                    icon: Icons.add_rounded,
+                    label: 'Insert',
+                    onTap: onInsert,
+                    isPrimary: true,
+                    accent: accent,
+                  ),
+                  _bottomBtn(
+                    icon: Icons.tune_rounded,
+                    label: 'Style',
+                    onTap: hasSelection ? onProperties : null,
+                    accent: accent,
+                  ),
+                  _bottomBtn(
+                    icon: Icons.auto_awesome_mosaic_outlined,
+                    label: 'Library',
+                    onTap: onVariables,
+                    accent: accent,
+                  ),
+                  _bottomBtn(
+                    icon: Icons.delete_outline_rounded,
+                    label: 'Delete',
+                    onTap: onDelete,
+                    destructive: true,
+                    accent: accent,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _bottomBtn(IconData icon, String label, VoidCallback? onTap,
-      {bool isPrimary = false, bool destructive = false}) {
-    final accent = isDark ? AppColors.primaryLight : AppColors.primary;
+  Widget _selectionRow(BuildContext context, Color accent, Color border) {
+    final el = selected!;
+    return Container(
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: isDark ? 0.10 : 0.06),
+        border: Border(bottom: BorderSide(color: border)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 22,
+            height: 22,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: isDark ? 0.22 : 0.16),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(el.kind.icon, size: 13, color: accent),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              el.kind.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: accent,
+              ),
+            ),
+          ),
+          Text(
+            '${el.width.round()} × ${el.height.round()}',
+            style: TextStyle(
+              fontSize: 10.5,
+              fontFeatures: const [FontFeature.tabularFigures()],
+              color: accent.withValues(alpha: 0.85),
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (onDuplicate != null)
+            InkWell(
+              borderRadius: BorderRadius.circular(6),
+              onTap: onDuplicate,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 6, vertical: 4),
+                child: Icon(Icons.copy_rounded, size: 14, color: accent),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bottomBtn({
+    required IconData icon,
+    required String label,
+    required VoidCallback? onTap,
+    required Color accent,
+    bool isPrimary = false,
+    bool destructive = false,
+  }) {
+    final disabled = onTap == null;
     final fg = destructive
-        ? (onTap == null ? AppColors.error.withValues(alpha: 0.4) : AppColors.error)
+        ? (disabled
+            ? AppColors.error.withValues(alpha: 0.35)
+            : AppColors.error)
         : isPrimary
-            ? accent
-            : (onTap == null
+            ? Colors.white
+            : (disabled
                 ? (isDark
                     ? AppColors.darkTextHint
                     : AppColors.lightTextHint)
@@ -1117,18 +1309,56 @@ class _MobileBottomBar extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 20, color: fg),
-            const SizedBox(height: 2),
-            Text(label,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isPrimary)
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        accent,
+                        accent.withValues(alpha: 0.78),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(11),
+                    boxShadow: [
+                      BoxShadow(
+                        color: accent.withValues(alpha: 0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(icon, size: 20, color: fg),
+                )
+              else
+                SizedBox(
+                  width: 36,
+                  height: 28,
+                  child: Icon(icon, size: 22, color: fg),
+                ),
+              const SizedBox(height: 2),
+              Text(
+                label,
                 style: TextStyle(
-                  fontSize: 10,
-                  color: fg,
-                  fontWeight: isPrimary ? FontWeight.w700 : FontWeight.w500,
-                )),
-          ],
+                  fontSize: 10.5,
+                  color: isPrimary
+                      ? (isDark
+                          ? AppColors.darkText
+                          : AppColors.lightText)
+                      : fg,
+                  fontWeight:
+                      isPrimary ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1146,26 +1376,46 @@ class _MobileInsertSheet extends StatefulWidget {
 
 class _MobileInsertSheetState extends State<_MobileInsertSheet> {
   String _cat = 'Text';
+  String _query = '';
   static const _cats = ['Text', 'Visuals', 'Data', 'Misc'];
+
+  IconData _catIcon(String c) {
+    switch (c) {
+      case 'Text':
+        return Icons.text_fields_rounded;
+      case 'Visuals':
+        return Icons.image_outlined;
+      case 'Data':
+        return Icons.bar_chart_rounded;
+      case 'Misc':
+      default:
+        return Icons.widgets_outlined;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = widget.isDark;
     final accent = isDark ? AppColors.primaryLight : AppColors.primary;
-    final items =
-        ElementKind.values.where((k) => k.category == _cat).toList();
+    final media = MediaQuery.of(context);
+    final q = _query.trim().toLowerCase();
+    final items = q.isEmpty
+        ? ElementKind.values.where((k) => k.category == _cat).toList()
+        : ElementKind.values
+            .where((k) => k.label.toLowerCase().contains(q))
+            .toList();
+
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+      padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.62,
+        height: media.size.height * 0.72,
         child: Column(
           children: [
+            // ─── grip ─────────────────────────────────────────────
             Container(
               width: 44,
               height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 8),
+              margin: const EdgeInsets.symmetric(vertical: 9),
               decoration: BoxDecoration(
                 color: (isDark
                         ? AppColors.darkTextHint
@@ -1174,18 +1424,55 @@ class _MobileInsertSheetState extends State<_MobileInsertSheet> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
+            // ─── header ──────────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.fromLTRB(16, 0, 8, 8),
               child: Row(
                 children: [
-                  const Text(
-                    'Add element',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          accent,
+                          accent.withValues(alpha: 0.75),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(9),
+                    ),
+                    child: const Icon(Icons.add_rounded,
+                        color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Add element',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: isDark
+                                ? AppColors.darkText
+                                : AppColors.lightText,
+                          ),
+                        ),
+                        Text(
+                          'Tap to insert · drag to position',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.close_rounded),
                     onPressed: () => Navigator.pop(context),
@@ -1193,113 +1480,260 @@ class _MobileInsertSheetState extends State<_MobileInsertSheet> {
                 ],
               ),
             ),
-            const SizedBox(height: 4),
-            SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  for (final c in _cats)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: () => setState(() => _cat = c),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: _cat == c
-                                ? accent.withValues(
-                                    alpha: isDark ? 0.20 : 0.12)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: _cat == c
-                                  ? accent
-                                  : (isDark
-                                      ? AppColors.darkBorder
-                                      : AppColors.lightBorder),
-                            ),
-                          ),
-                          child: Text(
-                            c,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: _cat == c
-                                  ? accent
-                                  : (isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.lightTextSecondary),
-                            ),
+            // ─── search ──────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Container(
+                height: 38,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkCard
+                      : const Color(0xFFF5F7FB),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    Icon(Icons.search_rounded,
+                        size: 16,
+                        color: isDark
+                            ? AppColors.darkTextHint
+                            : AppColors.lightTextHint),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: TextField(
+                        onChanged: (v) => setState(() => _query = v),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDark
+                              ? AppColors.darkText
+                              : AppColors.lightText,
+                        ),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          border: InputBorder.none,
+                          hintText: 'Search elements',
+                          hintStyle: TextStyle(
+                            fontSize: 13,
+                            color: isDark
+                                ? AppColors.darkTextHint
+                                : AppColors.lightTextHint,
                           ),
                         ),
                       ),
                     ),
-                ],
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 6),
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(16),
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: 1,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                ),
-                itemCount: items.length,
-                itemBuilder: (_, i) {
-                  final k = items[i];
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(10),
-                    onTap: () => Navigator.pop(context, k),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.darkCard
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isDark
-                              ? AppColors.darkBorder
-                              : AppColors.lightBorder,
+            // ─── category chips ───────────────────────────────────
+            if (q.isEmpty)
+              SizedBox(
+                height: 38,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  children: [
+                    for (final c in _cats)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(20),
+                          onTap: () => setState(() => _cat = c),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: _cat == c
+                                  ? accent.withValues(
+                                      alpha: isDark ? 0.22 : 0.14)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: _cat == c
+                                    ? accent
+                                    : (isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.lightBorder),
+                                width: _cat == c ? 1.4 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _catIcon(c),
+                                  size: 13,
+                                  color: _cat == c
+                                      ? accent
+                                      : (isDark
+                                          ? AppColors.darkTextSecondary
+                                          : AppColors.lightTextSecondary),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  c,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: _cat == c
+                                        ? accent
+                                        : (isDark
+                                            ? AppColors.darkTextSecondary
+                                            : AppColors
+                                                .lightTextSecondary),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 4),
+            // ─── element grid ─────────────────────────────────────
+            Expanded(
+              child: items.isEmpty
+                  ? Center(
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: accent.withValues(
-                                  alpha: isDark ? 0.18 : 0.12),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(k.icon, color: accent, size: 18),
-                          ),
-                          const SizedBox(height: 8),
+                          Icon(Icons.search_off_rounded,
+                              size: 28,
+                              color: isDark
+                                  ? AppColors.darkTextHint
+                                  : AppColors.lightTextHint),
+                          const SizedBox(height: 6),
                           Text(
-                            k.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w600),
+                            'No matches',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.lightTextSecondary,
+                            ),
                           ),
                         ],
                       ),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.fromLTRB(14, 10, 14, 16),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 0.92,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                      ),
+                      itemCount: items.length,
+                      itemBuilder: (_, i) {
+                        final k = items[i];
+                        return _ElementGridTile(
+                          kind: k,
+                          isDark: isDark,
+                          onTap: () => Navigator.pop(context, k),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ElementGridTile extends StatefulWidget {
+  final ElementKind kind;
+  final bool isDark;
+  final VoidCallback onTap;
+  const _ElementGridTile({
+    required this.kind,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  State<_ElementGridTile> createState() => _ElementGridTileState();
+}
+
+class _ElementGridTileState extends State<_ElementGridTile> {
+  bool _down = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = widget.isDark;
+    final accent = isDark ? AppColors.primaryLight : AppColors.primary;
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _down = true),
+      onTapUp: (_) => setState(() => _down = false),
+      onTapCancel: () => setState(() => _down = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _down ? 0.96 : 1.0,
+        duration: const Duration(milliseconds: 90),
+        child: Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkCard : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? AppColors.darkBorder
+                  : AppColors.lightBorder,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.20 : 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      accent.withValues(alpha: isDark ? 0.22 : 0.16),
+                      accent.withValues(alpha: isDark ? 0.10 : 0.06),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(widget.kind.icon, color: accent, size: 20),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  widget.kind.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: isDark
+                        ? AppColors.darkText
+                        : AppColors.lightText,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
