@@ -1780,32 +1780,42 @@ class AppTabBar extends ConsumerStatefulWidget {
   ConsumerState<AppTabBar> createState() => _AppTabBarState();
 }
 
-class _AppTabBarState extends ConsumerState<AppTabBar> {
-  final ScrollController _scrollController = ScrollController();
-  static const double _tabApproxWidth = 110.0;
+class _AppTabBarState extends ConsumerState<AppTabBar>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _indicatorController;
+  late Animation<double> _indicatorAnim;
+  int _prevIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _prevIndex = widget.selectedIndex;
+    _indicatorController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+    );
+    _resetAnim(widget.selectedIndex.toDouble(), widget.selectedIndex.toDouble());
+  }
+
+  void _resetAnim(double from, double to) {
+    _indicatorAnim = Tween<double>(begin: from, end: to).animate(
+      CurvedAnimation(parent: _indicatorController, curve: Curves.easeOutCubic),
+    );
+  }
 
   @override
   void didUpdateWidget(AppTabBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedIndex != widget.selectedIndex) {
-      _scrollToSelected();
+      _resetAnim(_prevIndex.toDouble(), widget.selectedIndex.toDouble());
+      _prevIndex = widget.selectedIndex;
+      _indicatorController.forward(from: 0);
     }
-  }
-
-  void _scrollToSelected() {
-    if (!_scrollController.hasClients) return;
-    final target = (widget.selectedIndex * _tabApproxWidth - 40.0)
-        .clamp(0.0, _scrollController.position.maxScrollExtent);
-    _scrollController.animateTo(
-      target,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutCubic,
-    );
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _indicatorController.dispose();
     super.dispose();
   }
 
@@ -1819,66 +1829,98 @@ class _AppTabBarState extends ConsumerState<AppTabBar> {
         ? Colors.white.withValues(alpha: 0.09)
         : Colors.black.withValues(alpha: 0.055);
 
-    final segments = Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        color: pillBg,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(widget.tabs.length, (i) {
-          final isSelected = i == widget.selectedIndex;
-          final selectedBg = isDark
-              ? cs.primary.withValues(alpha: 0.88)
-              : cs.primary;
-          return GestureDetector(
-            onTap: () => widget.onTabSelected(i),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-              decoration: BoxDecoration(
-                color: isSelected ? selectedBg : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: cs.primary.withValues(alpha: 0.28),
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 13,
-                  fontWeight:
-                      isSelected ? FontWeight.w600 : FontWeight.w400,
-                  color: isSelected
-                      ? Colors.white
-                      : cs.onSurface.withValues(
-                          alpha: isDark ? 0.52 : 0.48),
-                ),
-                child: Text(widget.tabs[i]),
-              ),
-            ),
-          );
-        }),
-      ),
-    );
+    final selectedBg = isDark ? cs.primary.withValues(alpha: 0.88) : cs.primary;
 
+    // The bar: fixed height, 20px horizontal margin to match content peers.
     final bar = SizedBox(
       height: AppTabBar.barHeight,
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-        child: segments,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
+        // LayoutBuilder here so we know the exact pill width for indicator math.
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final totalW = constraints.maxWidth;
+            final totalH = constraints.maxHeight;
+            final n = widget.tabs.length;
+            const innerPad = 3.0;
+            // Each tab occupies totalW / n; indicator has innerPad inset on each side.
+            final tabW = totalW / n;
+
+            return Container(
+              width: totalW,
+              height: totalH,
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                color: pillBg,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: AnimatedBuilder(
+                animation: _indicatorAnim,
+                builder: (context, _) => Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Sliding pill indicator
+                    Positioned(
+                      left: _indicatorAnim.value * tabW + innerPad,
+                      top: innerPad,
+                      bottom: innerPad,
+                      width: tabW - innerPad * 2,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: selectedBg,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: cs.primary.withValues(alpha: 0.26),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Tab labels — drawn above the indicator
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: List.generate(n, (i) {
+                        final isSelected = i == widget.selectedIndex;
+                        return Expanded(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => widget.onTabSelected(i),
+                            child: Center(
+                              child: AnimatedDefaultTextStyle(
+                                duration: const Duration(milliseconds: 220),
+                                curve: Curves.easeOutCubic,
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 13,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : cs.onSurface.withValues(
+                                          alpha: isDark ? 0.52 : 0.48),
+                                ),
+                                child: Text(
+                                  widget.tabs[i],
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
 

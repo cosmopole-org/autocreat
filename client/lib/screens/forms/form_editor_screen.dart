@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/form_definition.dart';
 import '../../providers/form_provider.dart';
+import '../../providers/theme_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/common_widgets.dart';
 import '../../widgets/form_field_widgets.dart';
@@ -81,154 +84,242 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
   }
 
   void _showFieldPaletteSheet(BuildContext context, bool isDark) {
-    final cs = Theme.of(context).colorScheme;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       useSafeArea: true,
-      builder: (_) => Container(
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.darkCard : AppColors.lightCard,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
-              blurRadius: 28,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(top: 14, bottom: 6),
-                decoration: BoxDecoration(
-                  color: cs.onSurface.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(2),
+      builder: (_) => Consumer(
+        builder: (ctx, ref, _) {
+          final glassMode = ref.watch(glassModeProvider);
+          final cs = Theme.of(ctx).colorScheme;
+
+          final sheetContent = SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 14, bottom: 6),
+                  decoration: BoxDecoration(
+                    color: cs.onSurface.withValues(alpha: 0.20),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
-                child: Text(UiText.fieldTypes,
-                    style: Theme.of(context)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+                  child: Text(
+                    UiText.fieldTypes,
+                    style: Theme.of(ctx)
                         .textTheme
                         .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700)),
-              ),
-              const Divider(height: 1),
-              Flexible(
-                child: ListView(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.all(12),
-                  children: FormFieldType.values
-                      .map((t) => Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: FieldPaletteItem(
-                              type: t,
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                _addField(t);
-                              },
-                            ),
-                          ))
-                      .toList(),
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                Divider(
+                  height: 1,
+                  color: cs.onSurface.withValues(
+                      alpha: glassMode ? 0.12 : 0.10),
+                ),
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.all(12),
+                    children: FormFieldType.values
+                        .map((t) => Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: FieldPaletteItem(
+                                type: t,
+                                onTap: () {
+                                  Navigator.of(ctx).pop();
+                                  _addField(t);
+                                },
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          const sheetRadius =
+              BorderRadius.vertical(top: Radius.circular(24));
+
+          if (glassMode) {
+            return ClipRRect(
+              borderRadius: sheetRadius,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.10)
+                        : Colors.white.withValues(alpha: 0.68),
+                    borderRadius: sheetRadius,
+                    border: Border(
+                      top: BorderSide(
+                        color: Colors.white.withValues(
+                            alpha: isDark ? 0.14 : 0.60),
+                      ),
+                    ),
+                  ),
+                  child: sheetContent,
                 ),
               ),
-            ],
-          ),
-        ),
+            );
+          }
+
+          return Container(
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkCard : AppColors.lightCard,
+              borderRadius: sheetRadius,
+              boxShadow: [
+                BoxShadow(
+                  color:
+                      Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
+                  blurRadius: 28,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
+            child: sheetContent,
+          );
+        },
       ),
     );
   }
 
   void _showPropertiesSheet(
       BuildContext context, AppFormField field, bool isDark) {
-    final cs = Theme.of(context).colorScheme;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       useSafeArea: true,
-      builder: (sheetCtx) => DraggableScrollableSheet(
-        initialChildSize: 0.65,
-        minChildSize: 0.4,
-        maxChildSize: 0.92,
-        snap: true,
-        snapSizes: const [0.4, 0.65, 0.92],
-        expand: false,
-        builder: (context, scrollController) => Container(
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkCard : AppColors.lightCard,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: [
-              BoxShadow(
-                color:
-                    Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
-                blurRadius: 28,
-                offset: const Offset(0, -4),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(top: 14, bottom: 6),
-                decoration: BoxDecoration(
-                  color: cs.onSurface.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 4, 12, 8),
-                child: Row(
-                  children: [
-                    Text(UiText.fieldProperties,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700)),
-                    const Spacer(),
-                    IconButton(
-                      icon: Icon(Icons.keyboard_arrow_down_rounded,
-                          color: cs.onSurface.withValues(alpha: 0.5)),
-                      onPressed: () => Navigator.of(sheetCtx).pop(),
-                      style: IconButton.styleFrom(
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        padding: const EdgeInsets.all(4),
+      builder: (sheetCtx) => Consumer(
+        builder: (ctx, ref, _) {
+          final glassMode = ref.watch(glassModeProvider);
+          final cs = Theme.of(ctx).colorScheme;
+
+          const sheetRadius =
+              BorderRadius.vertical(top: Radius.circular(24));
+
+          return DraggableScrollableSheet(
+            initialChildSize: 0.65,
+            minChildSize: 0.4,
+            maxChildSize: 0.92,
+            snap: true,
+            snapSizes: const [0.4, 0.65, 0.92],
+            expand: false,
+            builder: (innerCtx, scrollController) {
+              final sheetInner = Column(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(top: 14, bottom: 6),
+                    decoration: BoxDecoration(
+                      color: cs.onSurface.withValues(alpha: 0.20),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 4, 12, 8),
+                    child: Row(
+                      children: [
+                        Text(
+                          UiText.fieldProperties,
+                          style: Theme.of(ctx)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: Icon(Icons.keyboard_arrow_down_rounded,
+                              color:
+                                  cs.onSurface.withValues(alpha: 0.5)),
+                          onPressed: () => Navigator.of(sheetCtx).pop(),
+                          style: IconButton.styleFrom(
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            padding: const EdgeInsets.all(4),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                    color: cs.onSurface.withValues(
+                        alpha: glassMode ? 0.12 : 0.10),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: scrollController,
+                      padding: EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 8,
+                        bottom:
+                            MediaQuery.of(innerCtx).viewInsets.bottom + 16,
                       ),
+                      child: _FieldPropertiesPanel(
+                        field: field,
+                        transparent: true,
+                        onUpdate: (updated) => ref
+                            .read(formEditorProvider.notifier)
+                            .updateField(updated),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+
+              if (glassMode) {
+                return ClipRRect(
+                  borderRadius: sheetRadius,
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.10)
+                            : Colors.white.withValues(alpha: 0.68),
+                        borderRadius: sheetRadius,
+                        border: Border(
+                          top: BorderSide(
+                            color: Colors.white.withValues(
+                                alpha: isDark ? 0.14 : 0.60),
+                          ),
+                        ),
+                      ),
+                      child: sheetInner,
+                    ),
+                  ),
+                );
+              }
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkCard : AppColors.lightCard,
+                  borderRadius: sheetRadius,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black
+                          .withValues(alpha: isDark ? 0.45 : 0.14),
+                      blurRadius: 28,
+                      offset: const Offset(0, -4),
                     ),
                   ],
                 ),
-              ),
-              const Divider(height: 1),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  padding: EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    top: 8,
-                    bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-                  ),
-                  child: _FieldPropertiesPanel(
-                    field: field,
-                    onUpdate: (updated) =>
-                        ref.read(formEditorProvider.notifier).updateField(updated),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+                child: sheetInner,
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -336,24 +427,12 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
             child: Column(
               children: [
                 // Form name editor
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: isDark
-                            ? AppColors.darkBorder
-                            : AppColors.lightBorder,
-                      ),
-                    ),
-                  ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                   child: TextFormField(
                     initialValue: editorState.form?.name ?? '',
                     decoration: InputDecoration(
-                      labelText: UiText.formName,
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
+                      hintText: UiText.formName,
                     ),
                     style: Theme.of(context).textTheme.titleMedium,
                     onChanged: (v) => ref
@@ -508,8 +587,13 @@ class _FieldCard extends StatelessWidget {
 class _FieldPropertiesPanel extends StatefulWidget {
   final AppFormField field;
   final ValueChanged<AppFormField> onUpdate;
+  final bool transparent;
 
-  const _FieldPropertiesPanel({required this.field, required this.onUpdate});
+  const _FieldPropertiesPanel({
+    required this.field,
+    required this.onUpdate,
+    this.transparent = false,
+  });
 
   @override
   State<_FieldPropertiesPanel> createState() => _FieldPropertiesPanelState();
@@ -553,18 +637,9 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final field = widget.field;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        border: Border(
-          left: BorderSide(
-            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-          ),
-        ),
-      ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+    final scrollContent = SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -709,7 +784,22 @@ class _FieldPropertiesPanelState extends State<_FieldPropertiesPanel> {
             ],
           ],
         ),
+    );
+
+    if (widget.transparent) {
+      return Material(color: Colors.transparent, child: scrollContent);
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        border: Border(
+          left: BorderSide(
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+          ),
+        ),
       ),
+      child: scrollContent,
     );
   }
 }
