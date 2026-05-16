@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import '../../core/constants.dart';
+import '../../core/create_actions.dart';
 import '../../data/demo_data.dart';
 import '../../models/company.dart';
 import '../../providers/company_provider.dart';
@@ -247,7 +247,8 @@ class _CompanyDetailScreenState extends ConsumerState<CompanyDetailScreen> {
                       TextButton.icon(
                         icon: const Icon(Icons.add, size: 16),
                         label: Text(UiText.newFlow),
-                        onPressed: () => context.go(AppRoutes.flows),
+                        onPressed: () =>
+                            CreateActions.createFlow(context, ref),
                       ),
                     ],
                   ),
