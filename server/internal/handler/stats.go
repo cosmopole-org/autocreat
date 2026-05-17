@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+
 type StatsHandler struct {
 	db *gorm.DB
 }
@@ -28,16 +29,20 @@ type StatsResponse struct {
 }
 
 func (h *StatsHandler) GetStats(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	ctx := c.Request.Context()
 
 	var stats StatsResponse
 
 	h.db.WithContext(ctx).Table("users").Where("company_id = ?", cid).Count(&stats.TotalUsers)
 	h.db.WithContext(ctx).Table("flows").Where("company_id = ?", cid).Count(&stats.TotalFlows)
-	h.db.WithContext(ctx).Table("flow_instances").Where("company_id = ? AND status = 'ACTIVE'", cid).Count(&stats.ActiveInstances)
+	h.db.WithContext(ctx).Table("flow_instances").Where("company_id = ? AND status = 'active'", cid).Count(&stats.ActiveInstances)
 	h.db.WithContext(ctx).Table("tickets").Where("company_id = ?", cid).Count(&stats.TotalTickets)
-	h.db.WithContext(ctx).Table("tickets").Where("company_id = ? AND status = 'OPEN'", cid).Count(&stats.OpenTickets)
+	h.db.WithContext(ctx).Table("tickets").Where("company_id = ? AND status = 'open'", cid).Count(&stats.OpenTickets)
 	h.db.WithContext(ctx).Table("form_definitions").Where("company_id = ?", cid).Count(&stats.TotalForms)
 	h.db.WithContext(ctx).Table("model_definitions").Where("company_id = ?", cid).Count(&stats.TotalModels)
 	h.db.WithContext(ctx).Table("letter_templates").Where("company_id = ?", cid).Count(&stats.TotalLetterTemplates)

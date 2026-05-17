@@ -38,6 +38,18 @@ func (r *FlowRepository) FindByID(ctx context.Context, id uuid.UUID) (*models.Fl
 	return &flow, nil
 }
 
+// FindByIDWithGraph loads the flow with nodes and edges preloaded.
+func (r *FlowRepository) FindByIDWithGraph(ctx context.Context, id uuid.UUID) (*models.Flow, error) {
+	var flow models.Flow
+	if err := r.db.WithContext(ctx).
+		Preload("Nodes").
+		Preload("Edges").
+		First(&flow, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &flow, nil
+}
+
 func (r *FlowRepository) Update(ctx context.Context, flow *models.Flow) error {
 	return r.db.WithContext(ctx).Save(flow).Error
 }

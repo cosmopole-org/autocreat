@@ -19,7 +19,11 @@ func NewModelHandler(svc *service.ModelService) *ModelHandler {
 }
 
 func (h *ModelHandler) List(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	models, err := h.svc.List(c.Request.Context(), cid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -29,10 +33,19 @@ func (h *ModelHandler) List(c *gin.Context) {
 }
 
 func (h *ModelHandler) Create(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
 	var req dto.CreateModelRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if cid == uuid.Nil && req.CompanyID != "" {
+		if id, err := uuid.Parse(req.CompanyID); err == nil {
+			cid = id
+		}
+	}
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
 		return
 	}
 	m, err := h.svc.Create(c.Request.Context(), cid, req)
@@ -109,7 +122,11 @@ func (h *ModelHandler) CreateEntity(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid model id"})
 		return
 	}
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	userID := c.MustGet(middleware.ContextUserID).(uuid.UUID)
 	var req dto.CreateEntityRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

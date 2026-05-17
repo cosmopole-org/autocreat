@@ -10,7 +10,6 @@ import (
 	"github.com/autocreat/server/internal/models"
 	"github.com/autocreat/server/internal/repository"
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -26,28 +25,48 @@ func NewFlowService(repo *repository.FlowRepository, db *gorm.DB, hub *Hub) *Flo
 
 // ---------- Flow CRUD ----------
 
-func (s *FlowService) Create(ctx context.Context, companyID uuid.UUID, req dto.CreateFlowRequest) (*models.Flow, error) {
+func (s *FlowService) Create(ctx context.Context, companyID uuid.UUID, req dto.CreateFlowRequest) (*dto.FlowResponse, error) {
+	status := req.Status
+	if status == "" {
+		status = "draft"
+	}
 	flow := &models.Flow{
 		CompanyID:   companyID,
 		Name:        req.Name,
 		Description: req.Description,
-		IsActive:    req.IsActive,
+		Status:      status,
+		Settings:    "{}",
 	}
 	if err := s.repo.Create(ctx, flow); err != nil {
 		return nil, err
 	}
-	return flow, nil
+	s.hub.BroadcastToCompany(flow.CompanyID, "flow.created", map[string]interface{}{"id": flow.ID})
+	resp := s.toFlowResponse(ctx, flow)
+	return &resp, nil
 }
 
-func (s *FlowService) List(ctx context.Context, companyID uuid.UUID) ([]models.Flow, error) {
-	return s.repo.FindByCompany(ctx, companyID)
+func (s *FlowService) List(ctx context.Context, companyID uuid.UUID) ([]dto.FlowResponse, error) {
+	flows, err := s.repo.FindByCompany(ctx, companyID)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]dto.FlowResponse, len(flows))
+	for i, f := range flows {
+		result[i] = s.toFlowResponse(ctx, &f)
+	}
+	return result, nil
 }
 
-func (s *FlowService) GetByID(ctx context.Context, id uuid.UUID) (*models.Flow, error) {
-	return s.repo.FindByID(ctx, id)
+func (s *FlowService) GetByID(ctx context.Context, id uuid.UUID) (*dto.FlowResponse, error) {
+	flow, err := s.repo.FindByIDWithGraph(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	resp := s.toFlowResponse(ctx, flow)
+	return &resp, nil
 }
 
-func (s *FlowService) Update(ctx context.Context, id uuid.UUID, req dto.UpdateFlowRequest) (*models.Flow, error) {
+func (s *FlowService) Update(ctx context.Context, id uuid.UUID, req dto.UpdateFlowRequest) (*dto.FlowResponse, error) {
 	flow, err := s.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -58,10 +77,13 @@ func (s *FlowService) Update(ctx context.Context, id uuid.UUID, req dto.UpdateFl
 	if req.Description != "" {
 		flow.Description = req.Description
 	}
-	if req.IsActive != nil {
-		flow.IsActive = *req.IsActive
+	if req.Status != "" {
+		flow.Status = req.Status
 	}
-	return flow, s.repo.Update(ctx, flow)
+	if err := s.repo.Update(ctx, flow); err != nil {
+		return nil, err
+	}
+	return s.GetByID(ctx, id)
 }
 
 func (s *FlowService) Delete(ctx context.Context, id uuid.UUID) error {
@@ -71,16 +93,26 @@ func (s *FlowService) Delete(ctx context.Context, id uuid.UUID) error {
 // ---------- Nodes ----------
 
 func (s *FlowService) CreateNode(ctx context.Context, flowID uuid.UUID, req dto.CreateNodeRequest) (*models.FlowNode, error) {
-	props, _ := json.Marshal(req.Properties)
+	branchJSON, _ := json.Marshal(req.Branches)
 	node := &models.FlowNode{
 		FlowID:         flowID,
-		NodeType:       req.NodeType,
-		Name:           req.Name,
-		PositionX:      req.PositionX,
-		PositionY:      req.PositionY,
+		Label:          req.Label,
+		Type:           req.Type,
+		X:              req.X,
+		Y:              req.Y,
+		Width:          req.Width,
+		Height:         req.Height,
 		AssignedRoleID: req.AssignedRoleID,
 		AssignedFormID: req.AssignedFormID,
-		Properties:     datatypes.JSON(props),
+		Description:    req.Description,
+		Branches:       string(branchJSON),
+		Metadata:       "{}",
+	}
+	if node.Width == 0 {
+		node.Width = 160
+	}
+	if node.Height == 0 {
+		node.Height = 60
 	}
 	if err := s.repo.CreateNode(ctx, node); err != nil {
 		return nil, err
@@ -97,14 +129,20 @@ func (s *FlowService) UpdateNode(ctx context.Context, nodeID uuid.UUID, req dto.
 	if err != nil {
 		return nil, err
 	}
-	if req.Name != "" {
-		node.Name = req.Name
+	if req.Label != "" {
+		node.Label = req.Label
 	}
-	if req.PositionX != nil {
-		node.PositionX = *req.PositionX
+	if req.X != nil {
+		node.X = *req.X
 	}
-	if req.PositionY != nil {
-		node.PositionY = *req.PositionY
+	if req.Y != nil {
+		node.Y = *req.Y
+	}
+	if req.Width != nil {
+		node.Width = *req.Width
+	}
+	if req.Height != nil {
+		node.Height = *req.Height
 	}
 	if req.AssignedRoleID != nil {
 		node.AssignedRoleID = req.AssignedRoleID
@@ -112,9 +150,12 @@ func (s *FlowService) UpdateNode(ctx context.Context, nodeID uuid.UUID, req dto.
 	if req.AssignedFormID != nil {
 		node.AssignedFormID = req.AssignedFormID
 	}
-	if req.Properties != nil {
-		props, _ := json.Marshal(req.Properties)
-		node.Properties = datatypes.JSON(props)
+	if req.Description != "" {
+		node.Description = req.Description
+	}
+	if req.Branches != nil {
+		branchJSON, _ := json.Marshal(req.Branches)
+		node.Branches = string(branchJSON)
 	}
 	return node, s.repo.UpdateNode(ctx, node)
 }
@@ -126,13 +167,12 @@ func (s *FlowService) DeleteNode(ctx context.Context, nodeID uuid.UUID) error {
 // ---------- Edges ----------
 
 func (s *FlowService) CreateEdge(ctx context.Context, flowID uuid.UUID, req dto.CreateEdgeRequest) (*models.FlowEdge, error) {
-	cond, _ := json.Marshal(req.Condition)
 	edge := &models.FlowEdge{
 		FlowID:       flowID,
 		SourceNodeID: req.SourceNodeID,
 		TargetNodeID: req.TargetNodeID,
 		Label:        req.Label,
-		Condition:    datatypes.JSON(cond),
+		ConditionID:  req.ConditionID,
 	}
 	if err := s.repo.CreateEdge(ctx, edge); err != nil {
 		return nil, err
@@ -150,7 +190,7 @@ func (s *FlowService) DeleteEdge(ctx context.Context, edgeID uuid.UUID) error {
 
 // ---------- SaveGraph (atomic replace) ----------
 
-func (s *FlowService) SaveGraph(ctx context.Context, flowID uuid.UUID, req dto.SaveGraphRequest) error {
+func (s *FlowService) SaveGraph(ctx context.Context, flowID uuid.UUID, req dto.SaveGraphRequest) (*dto.FlowResponse, error) {
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("flow_id = ?", flowID).Delete(&models.FlowEdge{}).Error; err != nil {
 			return err
@@ -159,29 +199,53 @@ func (s *FlowService) SaveGraph(ctx context.Context, flowID uuid.UUID, req dto.S
 			return err
 		}
 		for _, nr := range req.Nodes {
-			props, _ := json.Marshal(nr.Properties)
+			branchJSON, _ := json.Marshal(nr.Branches)
+			metaJSON, _ := json.Marshal(nr.Metadata)
+			width := nr.Width
+			if width == 0 {
+				width = 160
+			}
+			height := nr.Height
+			if height == 0 {
+				height = 60
+			}
 			node := &models.FlowNode{
 				FlowID:         flowID,
-				NodeType:       nr.NodeType,
-				Name:           nr.Name,
-				PositionX:      nr.PositionX,
-				PositionY:      nr.PositionY,
+				Label:          nr.Label,
+				Type:           nr.Type,
+				X:              nr.X,
+				Y:              nr.Y,
+				Width:          width,
+				Height:         height,
 				AssignedRoleID: nr.AssignedRoleID,
 				AssignedFormID: nr.AssignedFormID,
-				Properties:     datatypes.JSON(props),
+				Description:    nr.Description,
+				Branches:       string(branchJSON),
+				Metadata:       string(metaJSON),
+			}
+			// Preserve client-supplied ID if it looks like a UUID; otherwise generate.
+			if id, err := uuid.Parse(nr.ID); err == nil {
+				node.ID = id
 			}
 			if err := tx.Create(node).Error; err != nil {
 				return err
 			}
 		}
 		for _, er := range req.Edges {
-			cond, _ := json.Marshal(er.Condition)
+			sourceID, err1 := uuid.Parse(er.SourceNodeID)
+			targetID, err2 := uuid.Parse(er.TargetNodeID)
+			if err1 != nil || err2 != nil {
+				continue
+			}
 			edge := &models.FlowEdge{
 				FlowID:       flowID,
-				SourceNodeID: er.SourceNodeID,
-				TargetNodeID: er.TargetNodeID,
+				SourceNodeID: sourceID,
+				TargetNodeID: targetID,
 				Label:        er.Label,
-				Condition:    datatypes.JSON(cond),
+				ConditionID:  er.ConditionID,
+			}
+			if id, err := uuid.Parse(er.ID); err == nil {
+				edge.ID = id
 			}
 			if err := tx.Create(edge).Error; err != nil {
 				return err
@@ -189,12 +253,15 @@ func (s *FlowService) SaveGraph(ctx context.Context, flowID uuid.UUID, req dto.S
 		}
 		return nil
 	})
-	if err == nil {
-		if flow, ferr := s.repo.FindByID(ctx, flowID); ferr == nil && flow != nil {
-			s.hub.BroadcastToCompany(flow.CompanyID, "flow.graph_saved", map[string]interface{}{"flowId": flowID})
-		}
+	if err != nil {
+		return nil, err
 	}
-	return err
+
+	if flow, ferr := s.repo.FindByID(ctx, flowID); ferr == nil && flow != nil {
+		s.hub.BroadcastToCompany(flow.CompanyID, "flow.graph_saved", map[string]interface{}{"flowId": flowID})
+	}
+
+	return s.GetByID(ctx, flowID)
 }
 
 // ---------- Assignments ----------
@@ -230,7 +297,7 @@ func (s *FlowService) StartInstance(ctx context.Context, companyID, userID uuid.
 
 	var startNode *models.FlowNode
 	for i := range nodes {
-		if nodes[i].NodeType == models.NodeTypeStart {
+		if nodes[i].Type == models.NodeTypeStart {
 			startNode = &nodes[i]
 			break
 		}
@@ -294,7 +361,6 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 		}
 	}
 
-	// Mark current step complete.
 	now := time.Now()
 	for i := range instance.Steps {
 		st := &instance.Steps[i]
@@ -324,7 +390,7 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 	}
 
 	instance.CurrentNodeID = nextNodeID
-	if nextNode.NodeType == models.NodeTypeEnd {
+	if nextNode.Type == models.NodeTypeEnd {
 		instance.Status = models.InstanceStatusCompleted
 	}
 	if err := s.repo.UpdateInstance(ctx, instance); err != nil {
@@ -332,7 +398,7 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 	}
 	s.hub.BroadcastToCompany(instance.CompanyID, "flow.instance_advanced", instance)
 
-	if nextNode.NodeType != models.NodeTypeEnd {
+	if nextNode.Type != models.NodeTypeEnd {
 		newStep := &models.FlowInstanceStep{
 			FlowInstanceID:   instance.ID,
 			NodeID:           *nextNodeID,
@@ -400,4 +466,46 @@ func (s *FlowService) RejectInstance(ctx context.Context, instanceID uuid.UUID, 
 
 func (s *FlowService) GetMyTasks(ctx context.Context, companyID, roleID uuid.UUID) ([]models.FlowInstanceStep, error) {
 	return s.repo.FindPendingStepsForRole(ctx, companyID, roleID)
+}
+
+// ---------- helpers ----------
+
+func (s *FlowService) toFlowResponse(ctx context.Context, f *models.Flow) dto.FlowResponse {
+	nodes, _ := s.repo.FindNodesByFlow(ctx, f.ID)
+	edges, _ := s.repo.FindEdgesByFlow(ctx, f.ID)
+
+	nodeResp := make([]dto.FlowNodeResponse, len(nodes))
+	for i, n := range nodes {
+		nodeResp[i] = dto.NodeFromModel(n)
+	}
+	edgeResp := make([]dto.FlowEdgeResponse, len(edges))
+	for i, e := range edges {
+		edgeResp[i] = dto.EdgeFromModel(e)
+	}
+
+	var settings map[string]interface{}
+	if f.Settings != "" && f.Settings != "{}" {
+		_ = json.Unmarshal([]byte(f.Settings), &settings)
+	}
+	if settings == nil {
+		settings = map[string]interface{}{}
+	}
+
+	status := f.Status
+	if status == "" {
+		status = "draft"
+	}
+
+	return dto.FlowResponse{
+		ID:          f.ID,
+		CompanyID:   f.CompanyID,
+		Name:        f.Name,
+		Description: f.Description,
+		Status:      status,
+		Nodes:       nodeResp,
+		Edges:       edgeResp,
+		Settings:    settings,
+		CreatedAt:   f.CreatedAt,
+		UpdatedAt:   f.UpdatedAt,
+	}
 }

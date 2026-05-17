@@ -18,7 +18,11 @@ func NewFormHandler(svc *service.FormService) *FormHandler {
 }
 
 func (h *FormHandler) List(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	forms, err := h.svc.List(c.Request.Context(), cid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -28,10 +32,19 @@ func (h *FormHandler) List(c *gin.Context) {
 }
 
 func (h *FormHandler) Create(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
 	var req dto.CreateFormRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if cid == uuid.Nil && req.CompanyID != "" {
+		if id, err := uuid.Parse(req.CompanyID); err == nil {
+			cid = id
+		}
+	}
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
 		return
 	}
 	form, err := h.svc.Create(c.Request.Context(), cid, req)

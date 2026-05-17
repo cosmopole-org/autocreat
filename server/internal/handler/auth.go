@@ -62,11 +62,10 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 
 func (h *AuthHandler) Logout(c *gin.Context) {
 	var req dto.RefreshRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	// refresh_token is optional for logout — best effort
+	if err := c.ShouldBindJSON(&req); err == nil {
+		_ = h.svc.Logout(c.Request.Context(), req.RefreshToken)
 	}
-	_ = h.svc.Logout(c.Request.Context(), req.RefreshToken)
 	c.JSON(http.StatusOK, gin.H{"message": "logged out"})
 }
 

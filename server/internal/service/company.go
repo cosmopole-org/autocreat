@@ -11,18 +11,19 @@ import (
 	"github.com/autocreat/server/internal/repository"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	"gorm.io/datatypes"
+	"gorm.io/gorm"
 )
 
 const companyTTL = 5 * time.Minute
 
 type CompanyService struct {
-	repo  *repository.CompanyRepository
+	repo *repository.CompanyRepository
+	db   *gorm.DB
 	redis *redis.Client
 }
 
-func NewCompanyService(repo *repository.CompanyRepository, redis *redis.Client) *CompanyService {
-	return &CompanyService{repo: repo, redis: redis}
+func NewCompanyService(repo *repository.CompanyRepository, db *gorm.DB, redis *redis.Client) *CompanyService {
+	return &CompanyService{repo: repo, db: db, redis: redis}
 }
 
 func (s *CompanyService) Create(ctx context.Context, ownerID uuid.UUID, req dto.CreateCompanyRequest) (*models.Company, error) {
@@ -30,6 +31,9 @@ func (s *CompanyService) Create(ctx context.Context, ownerID uuid.UUID, req dto.
 		Name:        req.Name,
 		Description: req.Description,
 		Logo:        req.Logo,
+		Website:     req.Website,
+		Industry:    req.Industry,
+		Status:      models.CompanyStatusActive,
 		OwnerID:     ownerID,
 	}
 	if err := s.repo.Create(ctx, company); err != nil {
@@ -43,7 +47,6 @@ func (s *CompanyService) List(ctx context.Context) ([]models.Company, error) {
 }
 
 func (s *CompanyService) GetByID(ctx context.Context, id uuid.UUID) (*models.Company, error) {
-	// Try Redis cache first.
 	if s.redis != nil {
 		key := fmt.Sprintf("company:%s", id)
 		if data, err := s.redis.Get(ctx, key).Bytes(); err == nil {
@@ -59,7 +62,6 @@ func (s *CompanyService) GetByID(ctx context.Context, id uuid.UUID) (*models.Com
 		return nil, err
 	}
 
-	// Cache result.
 	if s.redis != nil {
 		key := fmt.Sprintf("company:%s", id)
 		if data, err := json.Marshal(company); err == nil {
@@ -83,6 +85,12 @@ func (s *CompanyService) Update(ctx context.Context, id uuid.UUID, req dto.Updat
 	}
 	if req.Logo != "" {
 		company.Logo = req.Logo
+	}
+	if req.Website != "" {
+		company.Website = req.Website
+	}
+	if req.Industry != "" {
+		company.Industry = req.Industry
 	}
 	if err := s.repo.Update(ctx, company); err != nil {
 		return nil, err
@@ -123,32 +131,83 @@ func (s *CompanyService) invalidateCache(ctx context.Context, id uuid.UUID) {
 	}
 }
 
-// ToResponse converts a Company model to a DTO.
-func ToCompanyResponse(c *models.Company) dto.CompanyResponse {
+// ToCompanyResponse converts a Company model to a CompanyResponse DTO.
+// It queries member and flow counts from the DB.
+func (s *CompanyService) ToCompanyResponse(ctx context.Context, c *models.Company) dto.CompanyResponse {
+	var memberCount, flowCount int64
+	if s.db != nil {
+		s.db.WithContext(ctx).Table("company_members").Where("company_id = ?", c.ID).Count(&memberCount)
+		s.db.WithContext(ctx).Table("flows").Where("company_id = ?", c.ID).Count(&flowCount)
+	}
+	status := string(c.Status)
+	if status == "" {
+		status = "active"
+	}
 	return dto.CompanyResponse{
 		ID:          c.ID,
 		Name:        c.Name,
 		Description: c.Description,
 		Logo:        c.Logo,
+		Website:     c.Website,
+		Industry:    c.Industry,
 		OwnerID:     c.OwnerID,
+		Status:      status,
+		MemberCount: memberCount,
+		FlowCount:   flowCount,
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
 	}
 }
 
-// ToRoleResponse converts a Role model to a DTO.
+// ToCompanyResponseSimple converts without DB count queries (for list endpoints).
+func ToCompanyResponseSimple(c *models.Company) dto.CompanyResponse {
+	status := string(c.Status)
+	if status == "" {
+		status = "active"
+	}
+	return dto.CompanyResponse{
+		ID:          c.ID,
+		Name:        c.Name,
+		Description: c.Description,
+		Logo:        c.Logo,
+		Website:     c.Website,
+		Industry:    c.Industry,
+		OwnerID:     c.OwnerID,
+		Status:      status,
+		CreatedAt:   c.CreatedAt,
+		UpdatedAt:   c.UpdatedAt,
+	}
+}
+
+// ToRoleResponse converts a Role model to a RoleResponse DTO.
 func ToRoleResponse(r *models.Role) dto.RoleResponse {
-	raw, _ := json.Marshal(r.Permissions)
-	if r.Permissions != nil {
-		raw = datatypes.JSON(r.Permissions)
+	var perms []dto.Permission
+	if r.Permissions != "" && r.Permissions != "[]" {
+		_ = json.Unmarshal([]byte(r.Permissions), &perms)
+	}
+	if perms == nil {
+		perms = []dto.Permission{}
+	}
+	var ruleSets []dto.RuleSet
+	if r.RuleSets != "" && r.RuleSets != "[]" {
+		_ = json.Unmarshal([]byte(r.RuleSets), &ruleSets)
+	}
+	if ruleSets == nil {
+		ruleSets = []dto.RuleSet{}
+	}
+	level := r.Level
+	if level == "" {
+		level = "member"
 	}
 	return dto.RoleResponse{
 		ID:          r.ID,
 		CompanyID:   r.CompanyID,
 		Name:        r.Name,
 		Description: r.Description,
-		Color:       r.Color,
-		Permissions: raw,
+		Level:       level,
+		IsActive:    r.IsActive,
+		Permissions: perms,
+		RuleSets:    ruleSets,
 		CreatedAt:   r.CreatedAt,
 		UpdatedAt:   r.UpdatedAt,
 	}

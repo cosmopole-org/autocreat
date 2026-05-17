@@ -44,7 +44,7 @@ func New(cfg *config.Config, db *gorm.DB, rdb *redis.Client, log *zap.Logger) *A
 
 	// Services
 	authSvc := service.NewAuthService(authRepo, cfg)
-	companySvc := service.NewCompanyService(companyRepo, rdb)
+	companySvc := service.NewCompanyService(companyRepo, db, rdb)
 	roleSvc := service.NewRoleService(roleRepo, hub)
 	userSvc := service.NewUserService(userRepo, hub)
 	flowSvc := service.NewFlowService(flowRepo, db, hub)

@@ -20,10 +20,17 @@ func (r *TicketRepository) Create(ctx context.Context, ticket *models.Ticket) er
 	return r.db.WithContext(ctx).Create(ticket).Error
 }
 
-func (r *TicketRepository) FindByCompany(ctx context.Context, companyID uuid.UUID) ([]models.Ticket, error) {
+func (r *TicketRepository) FindByCompany(ctx context.Context, companyID uuid.UUID, status, assigneeID string) ([]models.Ticket, error) {
 	var tickets []models.Ticket
-	if err := r.db.WithContext(ctx).Where("company_id = ?", companyID).
-		Preload("Creator").Find(&tickets).Error; err != nil {
+	q := r.db.WithContext(ctx).Where("company_id = ?", companyID).
+		Preload("Creator").Preload("Assignee")
+	if status != "" {
+		q = q.Where("status = ?", status)
+	}
+	if assigneeID != "" {
+		q = q.Where("assignee_id = ?", assigneeID)
+	}
+	if err := q.Find(&tickets).Error; err != nil {
 		return nil, err
 	}
 	return tickets, nil
@@ -31,7 +38,11 @@ func (r *TicketRepository) FindByCompany(ctx context.Context, companyID uuid.UUI
 
 func (r *TicketRepository) FindByID(ctx context.Context, id uuid.UUID) (*models.Ticket, error) {
 	var ticket models.Ticket
-	if err := r.db.WithContext(ctx).Preload("Messages").Preload("Creator").
+	if err := r.db.WithContext(ctx).
+		Preload("Messages").
+		Preload("Messages.Sender").
+		Preload("Creator").
+		Preload("Assignee").
 		First(&ticket, "id = ?", id).Error; err != nil {
 		return nil, err
 	}

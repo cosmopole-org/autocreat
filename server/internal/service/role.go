@@ -9,7 +9,6 @@ import (
 	"github.com/autocreat/server/internal/models"
 	"github.com/autocreat/server/internal/repository"
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 )
 
 type RoleService struct {
@@ -22,21 +21,35 @@ func NewRoleService(repo *repository.RoleRepository, hub *Hub) *RoleService {
 }
 
 func (s *RoleService) Create(ctx context.Context, companyID uuid.UUID, req dto.CreateRoleRequest) (*models.Role, error) {
-	permJSON, err := json.Marshal(req.Permissions)
-	if err != nil {
-		return nil, fmt.Errorf("marshal permissions: %w", err)
+	permJSON, _ := json.Marshal(req.Permissions)
+	if permJSON == nil {
+		permJSON = []byte("[]")
+	}
+	ruleSetJSON, _ := json.Marshal(req.RuleSets)
+	if ruleSetJSON == nil {
+		ruleSetJSON = []byte("[]")
+	}
+	isActive := true
+	if req.IsActive != nil {
+		isActive = *req.IsActive
+	}
+	level := req.Level
+	if level == "" {
+		level = "member"
 	}
 	role := &models.Role{
 		CompanyID:   companyID,
 		Name:        req.Name,
 		Description: req.Description,
-		Color:       req.Color,
-		Permissions: datatypes.JSON(permJSON),
+		Level:       level,
+		IsActive:    isActive,
+		Permissions: string(permJSON),
+		RuleSets:    string(ruleSetJSON),
 	}
 	if err := s.repo.Create(ctx, role); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create role: %w", err)
 	}
-	s.hub.BroadcastToCompany(role.CompanyID, "role.created", role)
+	s.hub.BroadcastToCompany(role.CompanyID, "role.created", ToRoleResponse(role))
 	return role, nil
 }
 
@@ -59,20 +72,30 @@ func (s *RoleService) Update(ctx context.Context, id uuid.UUID, req dto.UpdateRo
 	if req.Description != "" {
 		role.Description = req.Description
 	}
-	if req.Color != "" {
-		role.Color = req.Color
+	if req.Level != "" {
+		role.Level = req.Level
+	}
+	if req.IsActive != nil {
+		role.IsActive = *req.IsActive
 	}
 	if req.Permissions != nil {
 		permJSON, err := json.Marshal(req.Permissions)
 		if err != nil {
 			return nil, fmt.Errorf("marshal permissions: %w", err)
 		}
-		role.Permissions = datatypes.JSON(permJSON)
+		role.Permissions = string(permJSON)
+	}
+	if req.RuleSets != nil {
+		rsJSON, err := json.Marshal(req.RuleSets)
+		if err != nil {
+			return nil, fmt.Errorf("marshal rule sets: %w", err)
+		}
+		role.RuleSets = string(rsJSON)
 	}
 	if err := s.repo.Update(ctx, role); err != nil {
 		return nil, err
 	}
-	s.hub.BroadcastToCompany(role.CompanyID, "role.updated", role)
+	s.hub.BroadcastToCompany(role.CompanyID, "role.updated", ToRoleResponse(role))
 	return role, nil
 }
 

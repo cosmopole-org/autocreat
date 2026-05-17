@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -50,11 +51,29 @@ func (s *AuthService) Register(ctx context.Context, req dto.RegisterRequest) (*d
 	user := &models.User{
 		Email:        req.Email,
 		PasswordHash: string(hash),
-		FullName:     req.FullName,
+		FirstName:    req.FirstName,
+		LastName:     req.LastName,
+		Phone:        req.Phone,
 		IsActive:     true,
 	}
 
-	if err := s.repo.CreateUser(ctx, user); err != nil {
+	companyName := req.CompanyName
+	if companyName == "" {
+		companyName = req.FirstName + "'s Workspace"
+	}
+	company := &models.Company{
+		Name:   companyName,
+		Status: models.CompanyStatusActive,
+	}
+	role := &models.Role{
+		Name:        "Owner",
+		Description: "Full administrative access",
+		Level:       "admin",
+		IsActive:    true,
+		Permissions: fullAccessPermissionsJSON(),
+		RuleSets:    "[]",
+	}
+	if err := s.repo.CreateUserWithCompany(ctx, user, company, role); err != nil {
 		return nil, fmt.Errorf("create user: %w", err)
 	}
 
@@ -64,7 +83,7 @@ func (s *AuthService) Register(ctx context.Context, req dto.RegisterRequest) (*d
 func (s *AuthService) Login(ctx context.Context, req dto.LoginRequest) (*dto.AuthResponse, error) {
 	// Demo mode: special credentials bypass DB lookup.
 	if req.Email == "demo@autocreat.io" && req.Password == "Demo123!" {
-		return s.buildDemoAuthResponse(ctx)
+		return s.buildDemoAuthResponse()
 	}
 
 	user, err := s.repo.FindUserByEmail(ctx, req.Email)
@@ -86,8 +105,7 @@ func (s *AuthService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Aut
 	return s.buildAuthResponse(ctx, user)
 }
 
-func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (*dto.TokenPair, error) {
-	// Validate refresh token signature.
+func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (*dto.TokenResponse, error) {
 	token, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
@@ -113,7 +131,6 @@ func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (*dto.To
 		return nil, errors.New("invalid user id in token")
 	}
 
-	// Verify the session still exists in the DB.
 	_, err = s.repo.FindSessionByToken(ctx, refreshToken)
 	if err != nil {
 		return nil, errors.New("session not found or expired")
@@ -124,9 +141,8 @@ func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (*dto.To
 		return nil, fmt.Errorf("user not found: %w", err)
 	}
 
-	// Rotate: delete old session, create new pair.
 	_ = s.repo.DeleteSession(ctx, refreshToken)
-	return s.issuePair(ctx, user)
+	return s.issueTokenResponse(ctx, user)
 }
 
 func (s *AuthService) Logout(ctx context.Context, refreshToken string) error {
@@ -156,7 +172,32 @@ func (s *AuthService) ValidateAccessToken(tokenStr string) (*Claims, error) {
 
 // ---------- helpers ----------
 
-func (s *AuthService) buildDemoAuthResponse(ctx context.Context) (*dto.AuthResponse, error) {
+// fullAccessPermissionsJSON returns a JSON array (matching Flutter's Permission
+// model shape) granting full CRUD on every resource, for a company owner.
+func fullAccessPermissionsJSON() string {
+	resources := []string{
+		"companies", "users", "roles", "flows", "forms",
+		"models", "letters", "tickets", "instances",
+	}
+	perms := make([]dto.Permission, len(resources))
+	for i, r := range resources {
+		perms[i] = dto.Permission{
+			Resource:      r,
+			CanCreate:     true,
+			CanRead:       true,
+			CanUpdate:     true,
+			CanDelete:     true,
+			CustomActions: []string{},
+		}
+	}
+	b, err := json.Marshal(perms)
+	if err != nil {
+		return "[]"
+	}
+	return string(b)
+}
+
+func (s *AuthService) buildDemoAuthResponse() (*dto.AuthResponse, error) {
 	cid := DemoCompanyID
 	now := time.Now()
 	accessClaims := &Claims{
@@ -174,7 +215,6 @@ func (s *AuthService) buildDemoAuthResponse(ctx context.Context) (*dto.AuthRespo
 	if err != nil {
 		return nil, fmt.Errorf("sign demo access token: %w", err)
 	}
-	// Demo refresh token never stored in DB.
 	refreshClaims := jwt.RegisteredClaims{
 		Subject:   DemoUserID.String(),
 		IssuedAt:  jwt.NewNumericDate(now),
@@ -185,46 +225,67 @@ func (s *AuthService) buildDemoAuthResponse(ctx context.Context) (*dto.AuthRespo
 		return nil, fmt.Errorf("sign demo refresh token: %w", err)
 	}
 	return &dto.AuthResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 		User: dto.UserResponse{
-			ID:        DemoUserID,
-			Email:     "demo@autocreat.io",
-			FullName:  "Demo User",
-			CompanyID: &cid,
-			IsActive:  true,
-			IsOwner:   true,
-		},
-		Tokens: dto.TokenPair{
-			AccessToken:  accessToken,
-			RefreshToken: refreshToken,
-			TokenType:    "Bearer",
-			ExpiresIn:    int64((365 * 24 * time.Hour).Seconds()),
+			ID:          DemoUserID,
+			Email:       "demo@autocreat.io",
+			FirstName:   "Demo",
+			LastName:    "User",
+			Role:        "owner",
+			IsActive:    true,
+			CompanyID:   &cid,
+			Permissions: []string{},
 		},
 	}, nil
 }
 
 func (s *AuthService) buildAuthResponse(ctx context.Context, user *models.User) (*dto.AuthResponse, error) {
-	pair, err := s.issuePair(ctx, user)
+	accessToken, refreshToken, err := s.issueTokens(ctx, user)
 	if err != nil {
 		return nil, err
 	}
 
+	role := "member"
+	if user.IsOwner {
+		role = "owner"
+	}
+
 	return &dto.AuthResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 		User: dto.UserResponse{
-			ID:        user.ID,
-			Email:     user.Email,
-			FullName:  user.FullName,
-			CompanyID: user.CompanyID,
-			RoleID:    user.RoleID,
-			Avatar:    user.Avatar,
-			IsActive:  user.IsActive,
-			IsOwner:   user.IsOwner,
-			CreatedAt: user.CreatedAt,
+			ID:          user.ID,
+			Email:       user.Email,
+			FirstName:   user.FirstName,
+			LastName:    user.LastName,
+			Phone:       user.Phone,
+			Avatar:      user.Avatar,
+			Role:        role,
+			IsActive:    user.IsActive,
+			CompanyID:   user.CompanyID,
+			RoleID:      user.RoleID,
+			Permissions: []string{},
+			CreatedAt:   user.CreatedAt,
+			UpdatedAt:   user.UpdatedAt,
 		},
-		Tokens: *pair,
 	}, nil
 }
 
-func (s *AuthService) issuePair(ctx context.Context, user *models.User) (*dto.TokenPair, error) {
+func (s *AuthService) issueTokenResponse(ctx context.Context, user *models.User) (*dto.TokenResponse, error) {
+	accessToken, refreshToken, err := s.issueTokens(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	return &dto.TokenResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		TokenType:    "Bearer",
+		ExpiresIn:    int64(s.cfg.AccessTokenTTL.Seconds()),
+	}, nil
+}
+
+func (s *AuthService) issueTokens(ctx context.Context, user *models.User) (string, string, error) {
 	now := time.Now()
 
 	accessClaims := &Claims{
@@ -240,7 +301,7 @@ func (s *AuthService) issuePair(ctx context.Context, user *models.User) (*dto.To
 	}
 	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims).SignedString([]byte(s.cfg.JWTSecret))
 	if err != nil {
-		return nil, fmt.Errorf("sign access token: %w", err)
+		return "", "", fmt.Errorf("sign access token: %w", err)
 	}
 
 	refreshExpiry := now.Add(s.cfg.RefreshTokenTTL)
@@ -251,7 +312,7 @@ func (s *AuthService) issuePair(ctx context.Context, user *models.User) (*dto.To
 	}
 	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(s.cfg.JWTRefreshSecret))
 	if err != nil {
-		return nil, fmt.Errorf("sign refresh token: %w", err)
+		return "", "", fmt.Errorf("sign refresh token: %w", err)
 	}
 
 	session := &models.Session{
@@ -261,13 +322,8 @@ func (s *AuthService) issuePair(ctx context.Context, user *models.User) (*dto.To
 		ExpiresAt:    refreshExpiry,
 	}
 	if err := s.repo.CreateSession(ctx, session); err != nil {
-		return nil, fmt.Errorf("persist session: %w", err)
+		return "", "", fmt.Errorf("persist session: %w", err)
 	}
 
-	return &dto.TokenPair{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		TokenType:    "Bearer",
-		ExpiresIn:    int64(s.cfg.AccessTokenTTL.Seconds()),
-	}, nil
+	return accessToken, refreshToken, nil
 }

@@ -21,7 +21,11 @@ func NewFlowHandler(svc *service.FlowService) *FlowHandler {
 // ---------- Flows ----------
 
 func (h *FlowHandler) List(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	flows, err := h.svc.List(c.Request.Context(), cid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -31,10 +35,20 @@ func (h *FlowHandler) List(c *gin.Context) {
 }
 
 func (h *FlowHandler) Create(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
 	var req dto.CreateFlowRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// Allow companyId from body for flat routes
+	if cid == uuid.Nil && req.CompanyID != "" {
+		if id, err := uuid.Parse(req.CompanyID); err == nil {
+			cid = id
+		}
+	}
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
 		return
 	}
 	flow, err := h.svc.Create(c.Request.Context(), cid, req)
@@ -104,7 +118,11 @@ func (h *FlowHandler) ListNodes(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, nodes)
+	resp := make([]dto.FlowNodeResponse, len(nodes))
+	for i, n := range nodes {
+		resp[i] = dto.NodeFromModel(n)
+	}
+	c.JSON(http.StatusOK, resp)
 }
 
 func (h *FlowHandler) CreateNode(c *gin.Context) {
@@ -123,7 +141,7 @@ func (h *FlowHandler) CreateNode(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, node)
+	c.JSON(http.StatusCreated, dto.NodeFromModel(*node))
 }
 
 func (h *FlowHandler) UpdateNode(c *gin.Context) {
@@ -142,7 +160,7 @@ func (h *FlowHandler) UpdateNode(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, node)
+	c.JSON(http.StatusOK, dto.NodeFromModel(*node))
 }
 
 func (h *FlowHandler) DeleteNode(c *gin.Context) {
@@ -171,7 +189,11 @@ func (h *FlowHandler) ListEdges(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, edges)
+	resp := make([]dto.FlowEdgeResponse, len(edges))
+	for i, e := range edges {
+		resp[i] = dto.EdgeFromModel(e)
+	}
+	c.JSON(http.StatusOK, resp)
 }
 
 func (h *FlowHandler) CreateEdge(c *gin.Context) {
@@ -190,7 +212,7 @@ func (h *FlowHandler) CreateEdge(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, edge)
+	c.JSON(http.StatusCreated, dto.EdgeFromModel(*edge))
 }
 
 func (h *FlowHandler) DeleteEdge(c *gin.Context) {
@@ -219,11 +241,12 @@ func (h *FlowHandler) SaveGraph(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := h.svc.SaveGraph(c.Request.Context(), flowID, req); err != nil {
+	flow, err := h.svc.SaveGraph(c.Request.Context(), flowID, req)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "graph saved"})
+	c.JSON(http.StatusOK, flow)
 }
 
 // ---------- Assignments ----------
@@ -277,7 +300,11 @@ func (h *FlowHandler) DeleteAssignment(c *gin.Context) {
 // ---------- Flow Instances ----------
 
 func (h *FlowHandler) ListInstances(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	instances, err := h.svc.ListInstances(c.Request.Context(), cid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -287,7 +314,11 @@ func (h *FlowHandler) ListInstances(c *gin.Context) {
 }
 
 func (h *FlowHandler) StartInstance(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	userID := c.MustGet(middleware.ContextUserID).(uuid.UUID)
 	var req dto.StartFlowRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -355,7 +386,11 @@ func (h *FlowHandler) RejectInstance(c *gin.Context) {
 }
 
 func (h *FlowHandler) GetMyTasks(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	roleIDVal, exists := c.Get(middleware.ContextRoleID)
 	if !exists {
 		c.JSON(http.StatusForbidden, gin.H{"error": "no role assigned"})

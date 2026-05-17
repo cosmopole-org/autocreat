@@ -1,10 +1,15 @@
 package dto
 
 // RegisterRequest is the payload for creating a new user account.
+// Accepts both camelCase (firstName) and snake_case (first_name) via Go's
+// case-insensitive JSON unmarshal.
 type RegisterRequest struct {
-	Email    string `json:"email"    binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
-	FullName string `json:"full_name" binding:"required"`
+	Email       string `json:"email"       binding:"required,email"`
+	Password    string `json:"password"    binding:"required,min=8"`
+	FirstName   string `json:"firstName"   binding:"required"`
+	LastName    string `json:"lastName"    binding:"required"`
+	CompanyName string `json:"companyName"`
+	Phone       string `json:"phone"`
 }
 
 // LoginRequest is the payload for authenticating with email + password.
@@ -18,16 +23,19 @@ type RefreshRequest struct {
 	RefreshToken string `json:"refresh_token" binding:"required"`
 }
 
-// TokenPair is returned after a successful login or token refresh.
-type TokenPair struct {
+// TokenResponse is returned by the refresh endpoint (snake_case for the
+// Flutter interceptor which reads response.data['access_token']).
+type TokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	TokenType    string `json:"token_type"`
-	ExpiresIn    int64  `json:"expires_in"` // seconds
+	ExpiresIn    int64  `json:"expires_in"`
 }
 
-// AuthResponse wraps a user profile together with token pair.
+// AuthResponse wraps a user profile together with tokens.
+// Uses camelCase to match Flutter's AuthResponse.fromJson.
 type AuthResponse struct {
-	User  UserResponse `json:"user"`
-	Tokens TokenPair   `json:"tokens"`
+	AccessToken  string       `json:"accessToken"`
+	RefreshToken string       `json:"refreshToken"`
+	User         UserResponse `json:"user"`
 }
