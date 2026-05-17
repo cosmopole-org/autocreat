@@ -25,7 +25,7 @@ func NewFlowService(repo *repository.FlowRepository, db *gorm.DB, hub *Hub) *Flo
 
 // ---------- Flow CRUD ----------
 
-func (s *FlowService) Create(ctx context.Context, companyID uuid.UUID, req dto.CreateFlowRequest) (*models.Flow, error) {
+func (s *FlowService) Create(ctx context.Context, companyID uuid.UUID, req dto.CreateFlowRequest) (*dto.FlowResponse, error) {
 	status := req.Status
 	if status == "" {
 		status = "draft"
@@ -40,7 +40,9 @@ func (s *FlowService) Create(ctx context.Context, companyID uuid.UUID, req dto.C
 	if err := s.repo.Create(ctx, flow); err != nil {
 		return nil, err
 	}
-	return flow, nil
+	s.hub.BroadcastToCompany(flow.CompanyID, "flow.created", map[string]interface{}{"id": flow.ID})
+	resp := s.toFlowResponse(ctx, flow)
+	return &resp, nil
 }
 
 func (s *FlowService) List(ctx context.Context, companyID uuid.UUID) ([]dto.FlowResponse, error) {

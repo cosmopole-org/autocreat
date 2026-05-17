@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -56,7 +57,23 @@ func (s *AuthService) Register(ctx context.Context, req dto.RegisterRequest) (*d
 		IsActive:     true,
 	}
 
-	if err := s.repo.CreateUser(ctx, user); err != nil {
+	companyName := req.CompanyName
+	if companyName == "" {
+		companyName = req.FirstName + "'s Workspace"
+	}
+	company := &models.Company{
+		Name:   companyName,
+		Status: models.CompanyStatusActive,
+	}
+	role := &models.Role{
+		Name:        "Owner",
+		Description: "Full administrative access",
+		Level:       "admin",
+		IsActive:    true,
+		Permissions: fullAccessPermissionsJSON(),
+		RuleSets:    "[]",
+	}
+	if err := s.repo.CreateUserWithCompany(ctx, user, company, role); err != nil {
 		return nil, fmt.Errorf("create user: %w", err)
 	}
 
@@ -154,6 +171,31 @@ func (s *AuthService) ValidateAccessToken(tokenStr string) (*Claims, error) {
 }
 
 // ---------- helpers ----------
+
+// fullAccessPermissionsJSON returns a JSON array (matching Flutter's Permission
+// model shape) granting full CRUD on every resource, for a company owner.
+func fullAccessPermissionsJSON() string {
+	resources := []string{
+		"companies", "users", "roles", "flows", "forms",
+		"models", "letters", "tickets", "instances",
+	}
+	perms := make([]dto.Permission, len(resources))
+	for i, r := range resources {
+		perms[i] = dto.Permission{
+			Resource:      r,
+			CanCreate:     true,
+			CanRead:       true,
+			CanUpdate:     true,
+			CanDelete:     true,
+			CustomActions: []string{},
+		}
+	}
+	b, err := json.Marshal(perms)
+	if err != nil {
+		return "[]"
+	}
+	return string(b)
+}
 
 func (s *AuthService) buildDemoAuthResponse() (*dto.AuthResponse, error) {
 	cid := DemoCompanyID

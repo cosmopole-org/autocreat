@@ -46,6 +46,11 @@ func (s *TicketService) Create(ctx context.Context, companyID, creatorID uuid.UU
 	if ticket.CompanyID != uuid.Nil {
 		s.hub.BroadcastToCompany(ticket.CompanyID, "ticket.created", ticket)
 	}
+	// Reload with Creator/Assignee/Messages preloaded so the response carries
+	// creatorName/assigneeName like every other ticket endpoint.
+	if full, err := s.repo.FindByID(ctx, ticket.ID); err == nil {
+		return s.toTicketResponse(ctx, full), nil
+	}
 	return s.toTicketResponse(ctx, ticket), nil
 }
 
