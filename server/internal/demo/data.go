@@ -56,7 +56,8 @@ const (
 	demoUserSofiaID     = "c0000001-0000-0000-0000-000000000003"
 	demoUserJamesID     = "c0000001-0000-0000-0000-000000000004"
 	demoUserEmilyID     = "c0000001-0000-0000-0000-000000000005"
-	demoUserDemoID      = "c0000001-0000-0000-0000-000000000006"
+	// demoUserDemoID must match service.DemoUserID and database.seedUserDemoID.
+	demoUserDemoID = "d0e1f2a3-b4c5-d6e7-f8a9-b0c1d2e3f4a5"
 
 	demoFormOnboardingID = "d0000001-0000-0000-0000-000000000001"
 	demoFormProjectID    = "d0000001-0000-0000-0000-000000000002"
@@ -887,6 +888,134 @@ func Handle(c *gin.Context) bool {
 		return true
 	case "/api/v1/companies/:id/members":
 		c.JSON(http.StatusOK, gin.H{"members": DemoUsers, "total": 6})
+		return true
+
+	// ---------- Flat routes (companyId supplied as ?companyId=... query param) ----------
+
+	case "/api/v1/stats":
+		c.JSON(http.StatusOK, DemoStats)
+		return true
+
+	case "/api/v1/roles":
+		c.JSON(http.StatusOK, DemoRoles)
+		return true
+	case "/api/v1/roles/:id":
+		id := c.Param("id")
+		for _, r := range DemoRoles {
+			if r["id"] == id {
+				c.JSON(http.StatusOK, r)
+				return true
+			}
+		}
+		c.JSON(http.StatusOK, DemoRoles[0])
+		return true
+
+	case "/api/v1/users":
+		c.JSON(http.StatusOK, DemoUsers)
+		return true
+	case "/api/v1/users/:id":
+		id := c.Param("id")
+		for _, u := range DemoUsers {
+			if u["id"] == id {
+				c.JSON(http.StatusOK, u)
+				return true
+			}
+		}
+		c.JSON(http.StatusOK, DemoUsers[0])
+		return true
+
+	case "/api/v1/flows":
+		c.JSON(http.StatusOK, DemoFlows)
+		return true
+	case "/api/v1/flows/:id",
+		"/api/v1/flows/:id/nodes",
+		"/api/v1/flows/:id/edges",
+		"/api/v1/flows/:id/assignments":
+		id := c.Param("id")
+		for _, f := range DemoFlows {
+			if f["id"] == id {
+				c.JSON(http.StatusOK, f)
+				return true
+			}
+		}
+		c.JSON(http.StatusOK, DemoFlows[0])
+		return true
+
+	case "/api/v1/forms":
+		c.JSON(http.StatusOK, DemoForms)
+		return true
+	case "/api/v1/forms/:id":
+		id := c.Param("id")
+		for _, f := range DemoForms {
+			if f["id"] == id {
+				c.JSON(http.StatusOK, f)
+				return true
+			}
+		}
+		c.JSON(http.StatusOK, DemoForms[0])
+		return true
+
+	case "/api/v1/letters":
+		c.JSON(http.StatusOK, DemoLetters)
+		return true
+	case "/api/v1/letters/:id":
+		id := c.Param("id")
+		for _, l := range DemoLetters {
+			if l["id"] == id {
+				c.JSON(http.StatusOK, l)
+				return true
+			}
+		}
+		c.JSON(http.StatusOK, DemoLetters[0])
+		return true
+
+	case "/api/v1/models":
+		c.JSON(http.StatusOK, DemoModels)
+		return true
+	case "/api/v1/models/:id":
+		id := c.Param("id")
+		for _, m := range DemoModels {
+			if m["id"] == id {
+				c.JSON(http.StatusOK, m)
+				return true
+			}
+		}
+		c.JSON(http.StatusOK, DemoModels[0])
+		return true
+	case "/api/v1/models/:id/entities",
+		"/api/v1/models/:id/entities/:eid":
+		c.JSON(http.StatusOK, []interface{}{})
+		return true
+
+	case "/api/v1/tickets":
+		c.JSON(http.StatusOK, DemoTickets)
+		return true
+	case "/api/v1/tickets/:id":
+		id := c.Param("id")
+		for _, t := range DemoTickets {
+			if t["id"] == id {
+				c.JSON(http.StatusOK, t)
+				return true
+			}
+		}
+		c.JSON(http.StatusOK, DemoTickets[0])
+		return true
+
+	case "/api/v1/instances":
+		c.JSON(http.StatusOK, DemoInstances)
+		return true
+	case "/api/v1/instances/:id":
+		id := c.Param("id")
+		for _, inst := range DemoInstances {
+			if inst["id"] == id {
+				c.JSON(http.StatusOK, inst)
+				return true
+			}
+		}
+		c.JSON(http.StatusOK, DemoInstances[0])
+		return true
+	case "/api/v1/instances/my-tasks":
+		c.JSON(http.StatusOK, []interface{}{})
 		return true
 	}
 
