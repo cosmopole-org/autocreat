@@ -185,12 +185,86 @@ func New(opts Options) *gin.Engine {
 		tickets.GET("", opts.TicketHandler.List)
 		tickets.POST("", opts.TicketHandler.Create)
 		tickets.GET("/:id", opts.TicketHandler.GetByID)
-		tickets.PUT("/:id/status", opts.TicketHandler.UpdateStatus)
+		tickets.PUT("/:id", opts.TicketHandler.Update)
+		tickets.PATCH("/:id/status", opts.TicketHandler.UpdateStatus)
 		tickets.POST("/:id/messages", opts.TicketHandler.SendMessage)
 	}
 
 	// Stats
 	cid.GET("/stats", opts.StatsHandler.GetStats)
+
+	// ---------- Flat routes (Flutter uses companyId as query param) ----------
+	flat := authed.Group("")
+
+	flat.GET("/roles", opts.RoleHandler.List)
+	flat.POST("/roles", opts.RoleHandler.Create)
+	flat.GET("/roles/:id", opts.RoleHandler.GetByID)
+	flat.PUT("/roles/:id", opts.RoleHandler.Update)
+	flat.DELETE("/roles/:id", opts.RoleHandler.Delete)
+
+	flat.GET("/users", opts.UserHandler.List)
+	flat.POST("/users", opts.UserHandler.Create)
+	flat.GET("/users/:id", opts.UserHandler.GetByID)
+	flat.PUT("/users/:id", opts.UserHandler.Update)
+	flat.DELETE("/users/:id", opts.UserHandler.Delete)
+	flat.PATCH("/users/:id/role", opts.UserHandler.AssignRole)
+
+	flat.GET("/flows", opts.FlowHandler.List)
+	flat.POST("/flows", opts.FlowHandler.Create)
+	flat.GET("/flows/:id", opts.FlowHandler.GetByID)
+	flat.PUT("/flows/:id", opts.FlowHandler.Update)
+	flat.DELETE("/flows/:id", opts.FlowHandler.Delete)
+	flat.GET("/flows/:id/nodes", opts.FlowHandler.ListNodes)
+	flat.POST("/flows/:id/nodes", opts.FlowHandler.CreateNode)
+	flat.PUT("/flows/:id/nodes/:nid", opts.FlowHandler.UpdateNode)
+	flat.DELETE("/flows/:id/nodes/:nid", opts.FlowHandler.DeleteNode)
+	flat.GET("/flows/:id/edges", opts.FlowHandler.ListEdges)
+	flat.POST("/flows/:id/edges", opts.FlowHandler.CreateEdge)
+	flat.DELETE("/flows/:id/edges/:eid", opts.FlowHandler.DeleteEdge)
+	flat.PUT("/flows/:id/graph", opts.FlowHandler.SaveGraph)
+	flat.GET("/flows/:id/assignments", opts.FlowHandler.ListAssignments)
+	flat.POST("/flows/:id/assignments", opts.FlowHandler.CreateAssignment)
+	flat.DELETE("/flows/:id/assignments/:aid", opts.FlowHandler.DeleteAssignment)
+
+	flat.GET("/instances", opts.FlowHandler.ListInstances)
+	flat.POST("/instances", opts.FlowHandler.StartInstance)
+	flat.GET("/instances/my-tasks", opts.FlowHandler.GetMyTasks)
+	flat.GET("/instances/:id", opts.FlowHandler.GetInstance)
+	flat.POST("/instances/:id/advance", opts.FlowHandler.AdvanceInstance)
+	flat.POST("/instances/:id/reject", opts.FlowHandler.RejectInstance)
+
+	flat.GET("/forms", opts.FormHandler.List)
+	flat.POST("/forms", opts.FormHandler.Create)
+	flat.GET("/forms/:id", opts.FormHandler.GetByID)
+	flat.PUT("/forms/:id", opts.FormHandler.Update)
+	flat.DELETE("/forms/:id", opts.FormHandler.Delete)
+
+	flat.GET("/models", opts.ModelHandler.List)
+	flat.POST("/models", opts.ModelHandler.Create)
+	flat.GET("/models/:id", opts.ModelHandler.GetByID)
+	flat.PUT("/models/:id", opts.ModelHandler.Update)
+	flat.DELETE("/models/:id", opts.ModelHandler.Delete)
+	flat.GET("/models/:id/entities", opts.ModelHandler.ListEntities)
+	flat.POST("/models/:id/entities", opts.ModelHandler.CreateEntity)
+	flat.GET("/models/:id/entities/:eid", opts.ModelHandler.GetEntity)
+	flat.PUT("/models/:id/entities/:eid", opts.ModelHandler.UpdateEntity)
+	flat.DELETE("/models/:id/entities/:eid", opts.ModelHandler.DeleteEntity)
+
+	flat.GET("/letters", opts.LetterHandler.List)
+	flat.POST("/letters", opts.LetterHandler.Create)
+	flat.GET("/letters/:id", opts.LetterHandler.GetByID)
+	flat.PUT("/letters/:id", opts.LetterHandler.Update)
+	flat.DELETE("/letters/:id", opts.LetterHandler.Delete)
+	flat.POST("/letters/:id/generate", opts.LetterHandler.Generate)
+
+	flat.GET("/tickets", opts.TicketHandler.List)
+	flat.POST("/tickets", opts.TicketHandler.Create)
+	flat.GET("/tickets/:id", opts.TicketHandler.GetByID)
+	flat.PUT("/tickets/:id", opts.TicketHandler.Update)
+	flat.PATCH("/tickets/:id/status", opts.TicketHandler.UpdateStatus)
+	flat.POST("/tickets/:id/messages", opts.TicketHandler.SendMessage)
+
+	flat.GET("/stats", opts.StatsHandler.GetStats)
 
 	// Realtime WebSocket
 	rt := v1.Group("/realtime")

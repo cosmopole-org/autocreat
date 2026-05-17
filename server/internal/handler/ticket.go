@@ -19,8 +19,16 @@ func NewTicketHandler(svc *service.TicketService) *TicketHandler {
 }
 
 func (h *TicketHandler) List(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
-	tickets, err := h.svc.List(c.Request.Context(), cid)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
+	filter := service.ListTicketsFilter{
+		Status:     c.Query("status"),
+		AssigneeID: c.Query("assigneeId"),
+	}
+	tickets, err := h.svc.List(c.Request.Context(), cid, filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -29,11 +37,21 @@ func (h *TicketHandler) List(c *gin.Context) {
 }
 
 func (h *TicketHandler) Create(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
 	userID := c.MustGet(middleware.ContextUserID).(uuid.UUID)
 	var req dto.CreateTicketRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	// Allow companyId from body for flat routes
+	if cid == uuid.Nil && req.CompanyID != "" {
+		if id, err := uuid.Parse(req.CompanyID); err == nil {
+			cid = id
+		}
+	}
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
 		return
 	}
 	ticket, err := h.svc.Create(c.Request.Context(), cid, userID, req)
@@ -53,6 +71,25 @@ func (h *TicketHandler) GetByID(c *gin.Context) {
 	ticket, err := h.svc.GetByID(c.Request.Context(), id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "ticket not found"})
+		return
+	}
+	c.JSON(http.StatusOK, ticket)
+}
+
+func (h *TicketHandler) Update(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+	var req dto.UpdateTicketRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ticket, err := h.svc.Update(c.Request.Context(), id, req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, ticket)

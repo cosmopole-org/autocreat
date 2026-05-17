@@ -26,7 +26,7 @@ func (h *CompanyHandler) List(c *gin.Context) {
 	}
 	resp := make([]dto.CompanyResponse, len(companies))
 	for i, co := range companies {
-		resp[i] = service.ToCompanyResponse(&co)
+		resp[i] = service.ToCompanyResponseSimple(&co)
 	}
 	c.JSON(http.StatusOK, resp)
 }
@@ -43,7 +43,7 @@ func (h *CompanyHandler) Create(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, service.ToCompanyResponse(company))
+	c.JSON(http.StatusCreated, h.svc.ToCompanyResponse(c.Request.Context(), company))
 }
 
 func (h *CompanyHandler) GetByID(c *gin.Context) {
@@ -57,7 +57,7 @@ func (h *CompanyHandler) GetByID(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "company not found"})
 		return
 	}
-	c.JSON(http.StatusOK, service.ToCompanyResponse(company))
+	c.JSON(http.StatusOK, h.svc.ToCompanyResponse(c.Request.Context(), company))
 }
 
 func (h *CompanyHandler) Update(c *gin.Context) {
@@ -76,7 +76,7 @@ func (h *CompanyHandler) Update(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, service.ToCompanyResponse(company))
+	c.JSON(http.StatusOK, h.svc.ToCompanyResponse(c.Request.Context(), company))
 }
 
 func (h *CompanyHandler) Delete(c *gin.Context) {

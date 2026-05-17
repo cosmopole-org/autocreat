@@ -1,42 +1,61 @@
 package models
 
 import (
+	"time"
+
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 )
 
 // TicketStatus enumerates the lifecycle states of a ticket.
 type TicketStatus string
 
 const (
-	TicketStatusOpen       TicketStatus = "OPEN"
-	TicketStatusInProgress TicketStatus = "IN_PROGRESS"
-	TicketStatusClosed     TicketStatus = "CLOSED"
+	TicketStatusOpen       TicketStatus = "open"
+	TicketStatusInProgress TicketStatus = "inProgress"
+	TicketStatusResolved   TicketStatus = "resolved"
+	TicketStatusClosed     TicketStatus = "closed"
+)
+
+// TicketPriority enumerates ticket urgency levels.
+type TicketPriority string
+
+const (
+	TicketPriorityLow    TicketPriority = "low"
+	TicketPriorityMedium TicketPriority = "medium"
+	TicketPriorityHigh   TicketPriority = "high"
+	TicketPriorityUrgent TicketPriority = "urgent"
 )
 
 // Ticket represents a support or work item within a company.
 type Ticket struct {
 	BaseModel
-	CompanyID      uuid.UUID    `gorm:"type:uuid;not null;index" json:"company_id"`
-	SubjectTitle   string       `gorm:"not null" json:"subject_title"`
-	Status         TicketStatus `gorm:"not null;default:'OPEN'" json:"status"`
-	CreatorID      uuid.UUID    `gorm:"type:uuid;not null" json:"creator_id"`
-	AssignedToID   *uuid.UUID   `gorm:"type:uuid" json:"assigned_to_id"`
-	FlowInstanceID *uuid.UUID   `gorm:"type:uuid" json:"flow_instance_id"`
+	CompanyID   uuid.UUID      `gorm:"type:uuid;not null;index" json:"companyId"`
+	Title       string         `gorm:"not null" json:"title"`
+	Description string         `gorm:"type:text" json:"description"`
+	FlowID      *uuid.UUID     `gorm:"type:uuid" json:"flowId"`
+	FlowNodeID  *uuid.UUID     `gorm:"type:uuid" json:"flowNodeId"`
+	Status      TicketStatus   `gorm:"not null;default:'open'" json:"status"`
+	Priority    TicketPriority `gorm:"not null;default:'medium'" json:"priority"`
+	Tags        string         `gorm:"type:jsonb;default:'[]'" json:"tags"`
+	CreatorID   uuid.UUID      `gorm:"type:uuid;not null" json:"creatorId"`
+	AssigneeID  *uuid.UUID     `gorm:"type:uuid" json:"assigneeId"`
+	IsRead      bool           `gorm:"default:false" json:"isRead"`
+	DueDate     *time.Time     `json:"dueDate"`
+	ResolvedAt  *time.Time     `json:"resolvedAt"`
 
-	Creator    *User           `gorm:"foreignKey:CreatorID" json:"creator,omitempty"`
-	AssignedTo *User           `gorm:"foreignKey:AssignedToID" json:"assigned_to,omitempty"`
-	Messages   []TicketMessage `gorm:"foreignKey:TicketID" json:"messages,omitempty"`
+	Creator  *User           `gorm:"foreignKey:CreatorID" json:"-"`
+	Assignee *User           `gorm:"foreignKey:AssigneeID" json:"-"`
+	Messages []TicketMessage `gorm:"foreignKey:TicketID" json:"messages,omitempty"`
 }
 
 // TicketMessage is a single message within a ticket thread.
 type TicketMessage struct {
 	BaseModel
-	TicketID    uuid.UUID      `gorm:"type:uuid;not null;index" json:"ticket_id"`
-	SenderID    uuid.UUID      `gorm:"type:uuid;not null" json:"sender_id"`
-	Content     string         `gorm:"type:text;not null" json:"content"`
-	// Attachments is a JSON array of file URLs or metadata.
-	Attachments datatypes.JSON `gorm:"type:jsonb" json:"attachments"`
+	TicketID    uuid.UUID `gorm:"type:uuid;not null;index" json:"ticketId"`
+	SenderID    uuid.UUID `gorm:"type:uuid;not null" json:"senderId"`
+	Content     string    `gorm:"type:text;not null" json:"content"`
+	Attachments string    `gorm:"type:jsonb;default:'[]'" json:"attachments"`
+	IsSystem    bool      `gorm:"default:false" json:"isSystem"`
 
-	Sender *User `gorm:"foreignKey:SenderID" json:"sender,omitempty"`
+	Sender *User `gorm:"foreignKey:SenderID" json:"-"`
 }

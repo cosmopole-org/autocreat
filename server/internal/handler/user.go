@@ -18,7 +18,11 @@ func NewUserHandler(svc *service.UserService) *UserHandler {
 }
 
 func (h *UserHandler) List(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	users, err := h.svc.List(c.Request.Context(), cid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -32,7 +36,11 @@ func (h *UserHandler) List(c *gin.Context) {
 }
 
 func (h *UserHandler) Create(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	var req dto.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -90,4 +98,29 @@ func (h *UserHandler) Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusNoContent, nil)
+}
+
+// AssignRole handles PATCH /users/:id/role
+func (h *UserHandler) AssignRole(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		return
+	}
+	var req dto.AssignRoleRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	roleID, err := uuid.Parse(req.RoleID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid roleId"})
+		return
+	}
+	user, err := h.svc.AssignRole(c.Request.Context(), id, roleID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, service.ToUserResponse(user))
 }

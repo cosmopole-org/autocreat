@@ -11,7 +11,6 @@ import (
 	"github.com/autocreat/server/internal/models"
 	"github.com/autocreat/server/internal/repository"
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 )
 
 type LetterService struct {
@@ -22,29 +21,52 @@ func NewLetterService(repo *repository.LetterRepository) *LetterService {
 	return &LetterService{repo: repo}
 }
 
-func (s *LetterService) Create(ctx context.Context, companyID uuid.UUID, req dto.CreateLetterTemplateRequest) (*models.LetterTemplate, error) {
+func (s *LetterService) Create(ctx context.Context, companyID uuid.UUID, req dto.CreateLetterRequest) (*dto.LetterResponse, error) {
+	deltaJSON, _ := json.Marshal(req.DeltaContent)
+	varsJSON, _ := json.Marshal(req.Variables)
+	status := req.Status
+	if status == "" {
+		status = "draft"
+	}
 	t := &models.LetterTemplate{
-		CompanyID:   companyID,
-		Name:        req.Name,
-		Description: req.Description,
-		Content:     datatypes.JSON(req.Content),
-		Variables:   datatypes.JSON(req.Variables),
+		CompanyID:    companyID,
+		Name:         req.Name,
+		Description:  req.Description,
+		Content:      req.Content,
+		DeltaContent: string(deltaJSON),
+		Variables:    string(varsJSON),
+		Status:       status,
+		Category:     req.Category,
 	}
 	if err := s.repo.Create(ctx, t); err != nil {
 		return nil, err
 	}
-	return t, nil
+	resp := toLetterResponse(t)
+	return &resp, nil
 }
 
-func (s *LetterService) List(ctx context.Context, companyID uuid.UUID) ([]models.LetterTemplate, error) {
-	return s.repo.FindByCompany(ctx, companyID)
+func (s *LetterService) List(ctx context.Context, companyID uuid.UUID) ([]dto.LetterResponse, error) {
+	templates, err := s.repo.FindByCompany(ctx, companyID)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]dto.LetterResponse, len(templates))
+	for i, t := range templates {
+		result[i] = toLetterResponse(&t)
+	}
+	return result, nil
 }
 
-func (s *LetterService) GetByID(ctx context.Context, id uuid.UUID) (*models.LetterTemplate, error) {
-	return s.repo.FindByID(ctx, id)
+func (s *LetterService) GetByID(ctx context.Context, id uuid.UUID) (*dto.LetterResponse, error) {
+	t, err := s.repo.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	resp := toLetterResponse(t)
+	return &resp, nil
 }
 
-func (s *LetterService) Update(ctx context.Context, id uuid.UUID, req dto.UpdateLetterTemplateRequest) (*models.LetterTemplate, error) {
+func (s *LetterService) Update(ctx context.Context, id uuid.UUID, req dto.UpdateLetterRequest) (*dto.LetterResponse, error) {
 	t, err := s.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -55,34 +77,45 @@ func (s *LetterService) Update(ctx context.Context, id uuid.UUID, req dto.Update
 	if req.Description != "" {
 		t.Description = req.Description
 	}
-	if req.Content != nil {
-		t.Content = datatypes.JSON(req.Content)
+	if req.Content != "" {
+		t.Content = req.Content
+	}
+	if req.DeltaContent != nil {
+		deltaJSON, _ := json.Marshal(req.DeltaContent)
+		t.DeltaContent = string(deltaJSON)
 	}
 	if req.Variables != nil {
-		t.Variables = datatypes.JSON(req.Variables)
+		varsJSON, _ := json.Marshal(req.Variables)
+		t.Variables = string(varsJSON)
 	}
-	return t, s.repo.Update(ctx, t)
+	if req.Status != "" {
+		t.Status = req.Status
+	}
+	if req.Category != "" {
+		t.Category = req.Category
+	}
+	if err := s.repo.Update(ctx, t); err != nil {
+		return nil, err
+	}
+	resp := toLetterResponse(t)
+	return &resp, nil
 }
 
 func (s *LetterService) Delete(ctx context.Context, id uuid.UUID) error {
 	return s.repo.Delete(ctx, id)
 }
 
-// Generate produces a letter by substituting variables in the template's raw text content.
 func (s *LetterService) Generate(ctx context.Context, templateID, createdByID uuid.UUID, req dto.GenerateLetterRequest) (*models.GeneratedLetter, error) {
 	tmpl, err := s.repo.FindByID(ctx, templateID)
 	if err != nil {
 		return nil, fmt.Errorf("template not found: %w", err)
 	}
 
-	// Build variable map from request data.
+	dataJSON, _ := json.Marshal(req.Data)
 	var vars map[string]string
-	if err := json.Unmarshal(req.Data, &vars); err != nil {
-		return nil, fmt.Errorf("invalid data: %w", err)
-	}
+	_ = json.Unmarshal(dataJSON, &vars)
 
-	// Simple variable substitution: replace {{KEY}} tokens in the content JSON string.
-	contentStr := string(tmpl.Content)
+	contentStr := tmpl.Content
 	re := regexp.MustCompile(`\{\{(\w+)\}\}`)
 	generated := re.ReplaceAllStringFunc(contentStr, func(match string) string {
 		key := strings.Trim(match, "{}")
@@ -95,7 +128,7 @@ func (s *LetterService) Generate(ctx context.Context, templateID, createdByID uu
 	g := &models.GeneratedLetter{
 		TemplateID:       templateID,
 		FlowInstanceID:   req.FlowInstanceID,
-		Data:             datatypes.JSON(req.Data),
+		Data:             string(dataJSON),
 		GeneratedContent: generated,
 		CreatedByID:      createdByID,
 	}
@@ -103,4 +136,41 @@ func (s *LetterService) Generate(ctx context.Context, templateID, createdByID uu
 		return nil, err
 	}
 	return g, nil
+}
+
+func toLetterResponse(t *models.LetterTemplate) dto.LetterResponse {
+	var deltaContent interface{}
+	if t.DeltaContent != "" && t.DeltaContent != "{}" {
+		_ = json.Unmarshal([]byte(t.DeltaContent), &deltaContent)
+	}
+	if deltaContent == nil {
+		deltaContent = map[string]interface{}{}
+	}
+
+	var variables []string
+	if t.Variables != "" && t.Variables != "[]" {
+		_ = json.Unmarshal([]byte(t.Variables), &variables)
+	}
+	if variables == nil {
+		variables = []string{}
+	}
+
+	status := t.Status
+	if status == "" {
+		status = "draft"
+	}
+
+	return dto.LetterResponse{
+		ID:           t.ID,
+		CompanyID:    t.CompanyID,
+		Name:         t.Name,
+		Description:  t.Description,
+		Content:      t.Content,
+		DeltaContent: deltaContent,
+		Variables:    variables,
+		Status:       status,
+		Category:     t.Category,
+		CreatedAt:    t.CreatedAt,
+		UpdatedAt:    t.UpdatedAt,
+	}
 }

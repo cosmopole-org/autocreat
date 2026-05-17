@@ -18,7 +18,11 @@ func NewRoleHandler(svc *service.RoleService) *RoleHandler {
 }
 
 func (h *RoleHandler) List(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	roles, err := h.svc.List(c.Request.Context(), cid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -32,7 +36,11 @@ func (h *RoleHandler) List(c *gin.Context) {
 }
 
 func (h *RoleHandler) Create(c *gin.Context) {
-	cid := c.MustGet("routeCompanyID").(uuid.UUID)
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
 	var req dto.CreateRoleRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
