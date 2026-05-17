@@ -7,8 +7,6 @@ import 'package:autocreat/core/constants.dart';
 
 ProviderContainer buildContainer({Map<String, Object> prefs = const {}}) {
   SharedPreferences.setMockInitialValues(prefs);
-  late SharedPreferences sharedPrefs;
-  SharedPreferences.getInstance().then((p) => sharedPrefs = p);
   // We use a synchronous approach via setMockInitialValues
   return ProviderContainer(
     overrides: [
