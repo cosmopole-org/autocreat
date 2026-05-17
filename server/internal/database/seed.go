@@ -31,7 +31,8 @@ var (
 	seedUserSofiaID     = uuid.MustParse("c0000001-0000-0000-0000-000000000003")
 	seedUserJamesID     = uuid.MustParse("c0000001-0000-0000-0000-000000000004")
 	seedUserEmilyID     = uuid.MustParse("c0000001-0000-0000-0000-000000000005")
-	seedUserDemoID      = uuid.MustParse("c0000001-0000-0000-0000-000000000006")
+	// seedUserDemoID must match service.DemoUserID so that /auth/me works for demo logins.
+	seedUserDemoID = uuid.MustParse("d0e1f2a3-b4c5-d6e7-f8a9-b0c1d2e3f4a5")
 
 	// Forms
 	seedFormOnboardingID = uuid.MustParse("d0000001-0000-0000-0000-000000000001")

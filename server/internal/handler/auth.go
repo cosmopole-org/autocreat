@@ -76,6 +76,23 @@ func (h *AuthHandler) Me(c *gin.Context) {
 		return
 	}
 	userID := userIDVal.(uuid.UUID)
+
+	// Short-circuit for demo users: return a synthetic response without a DB lookup.
+	if isDemo, _ := c.Get(middleware.ContextIsDemo); isDemo == true { //nolint:gosimple
+		cid := service.DemoCompanyID
+		c.JSON(http.StatusOK, dto.UserResponse{
+			ID:          service.DemoUserID,
+			Email:       "demo@autocreat.io",
+			FirstName:   "Demo",
+			LastName:    "User",
+			Role:        "owner",
+			IsActive:    true,
+			CompanyID:   &cid,
+			Permissions: []string{},
+		})
+		return
+	}
+
 	user, err := h.svc.GetMe(c.Request.Context(), userID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
