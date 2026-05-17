@@ -339,7 +339,7 @@ class _UserEditorScreenState extends ConsumerState<UserEditorScreen> {
                       loading: () => const LinearProgressIndicator(),
                       error: (_, __) => Text(UiText.errorLoadingRoles),
                       data: (roles) => DropdownButtonFormField<String?>(
-                        value: _selectedRoleId,
+                        initialValue: _selectedRoleId,
                         items: [
                           DropdownMenuItem(
                               value: null, child: Text(UiText.noRole)),

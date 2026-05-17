@@ -118,7 +118,7 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
 
       case FormFieldType.dropdown:
         return DropdownButtonFormField<String>(
-          value: widget.value as String?,
+          initialValue: widget.value as String?,
           items: widget.field.options
               .map(
                   (o) => DropdownMenuItem(value: o.value, child: Text(o.label)))
@@ -166,19 +166,19 @@ class _FormFieldRendererState extends State<FormFieldRenderer> {
 
       case FormFieldType.radio:
         final selected = widget.value as String?;
-        return Column(
-          children: widget.field.options
-              .map((o) => RadioListTile<String>(
-                    title: Text(o.label),
-                    value: o.value,
-                    groupValue: selected,
-                    onChanged: widget.readOnly
-                        ? null
-                        : (v) => widget.onChanged?.call(v),
-                    dense: true,
-                    contentPadding: EdgeInsets.zero,
-                  ))
-              .toList(),
+        return RadioGroup<String>(
+          groupValue: selected,
+          onChanged: widget.readOnly ? (_) {} : (v) => widget.onChanged?.call(v),
+          child: Column(
+            children: widget.field.options
+                .map((o) => RadioListTile<String>(
+                      title: Text(o.label),
+                      value: o.value,
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ))
+                .toList(),
+          ),
         );
 
       case FormFieldType.date:

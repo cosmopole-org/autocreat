@@ -487,7 +487,7 @@ class _AddFieldDialogState extends State<_AddFieldDialog> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<ModelFieldType>(
-              value: _type,
+              initialValue: _type,
               items: ModelFieldType.values
                   .map((t) =>
                       DropdownMenuItem(value: t, child: Text(t.displayName)))

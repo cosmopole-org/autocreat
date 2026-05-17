@@ -306,6 +306,7 @@ func (s *AuthService) issueTokens(ctx context.Context, user *models.User) (strin
 
 	refreshExpiry := now.Add(s.cfg.RefreshTokenTTL)
 	refreshClaims := jwt.RegisteredClaims{
+		ID:        uuid.New().String(), // unique jti prevents duplicate-key collisions
 		Subject:   user.ID.String(),
 		IssuedAt:  jwt.NewNumericDate(now),
 		ExpiresAt: jwt.NewNumericDate(refreshExpiry),

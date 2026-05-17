@@ -463,8 +463,8 @@ CREATE TABLE IF NOT EXISTS tickets (
 
 CREATE INDEX IF NOT EXISTS idx_tickets_company_id       ON tickets (company_id);
 CREATE INDEX IF NOT EXISTS idx_tickets_creator_id       ON tickets (creator_id);
-CREATE INDEX IF NOT EXISTS idx_tickets_assigned_to_id   ON tickets (assigned_to_id);
-CREATE INDEX IF NOT EXISTS idx_tickets_flow_instance_id ON tickets (flow_instance_id);
+CREATE INDEX IF NOT EXISTS idx_tickets_assignee_id  ON tickets (assignee_id);
+CREATE INDEX IF NOT EXISTS idx_tickets_flow_id      ON tickets (flow_id);
 CREATE INDEX IF NOT EXISTS idx_tickets_status           ON tickets (status);
 
 -- ---------------------------------------------------------------------------

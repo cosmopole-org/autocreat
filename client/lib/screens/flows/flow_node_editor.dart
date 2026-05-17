@@ -163,7 +163,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
           loading: () => const LinearProgressIndicator(minHeight: 2),
           error: (_, __) => _ErrorTile(UiText.errorLoadingRoles),
           data: (roles) => DropdownButtonFormField<String?>(
-            value: node.assignedRoleId,
+            initialValue: node.assignedRoleId,
             items: [
               DropdownMenuItem(
                   value: null, child: Text(UiText.noRoleAssigned)),
@@ -186,7 +186,7 @@ class _FlowNodeEditorState extends ConsumerState<FlowNodeEditor> {
           loading: () => const LinearProgressIndicator(minHeight: 2),
           error: (_, __) => _ErrorTile(UiText.errorLoadingForms),
           data: (forms) => DropdownButtonFormField<String?>(
-            value: node.assignedFormId,
+            initialValue: node.assignedFormId,
             items: [
               DropdownMenuItem(
                   value: null, child: Text(UiText.noFormAssigned)),

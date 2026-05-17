@@ -954,7 +954,7 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<TicketPriority>(
-                value: _priority,
+                initialValue: _priority,
                 items: TicketPriority.values
                     .map((p) =>
                         DropdownMenuItem(value: p, child: Text(p.displayName)))
