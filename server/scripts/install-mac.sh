@@ -159,7 +159,7 @@ setup_database() {
     || die "Cannot connect to PostgreSQL at ${DB_HOST}:${DB_PORT} as '${DB_USER}'.\nOn macOS the default superuser is your macOS username, not 'postgres'.\nTry: psql -c '\\l' to find your username."
   ok "Connected to PostgreSQL"
 
-  # Create database
+  # Create main database if missing
   local exists
   exists=$(PGPASSWORD="$DB_PASS" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
     -tAc "SELECT 1 FROM pg_database WHERE datname='${DB_NAME}'" 2>/dev/null || echo "")
@@ -170,6 +170,20 @@ setup_database() {
       -c "CREATE DATABASE \"${DB_NAME}\";" \
       || die "Failed to create database '${DB_NAME}'"
     ok "Database '${DB_NAME}' created"
+  fi
+
+  # Create test database if missing (used by go test ./...)
+  local test_db="${DB_NAME}_test"
+  local test_exists
+  test_exists=$(PGPASSWORD="$DB_PASS" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
+    -tAc "SELECT 1 FROM pg_database WHERE datname='${test_db}'" 2>/dev/null || echo "")
+  if [ "$test_exists" = "1" ]; then
+    ok "Test database '${test_db}' already exists"
+  else
+    PGPASSWORD="$DB_PASS" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
+      -c "CREATE DATABASE \"${test_db}\";" \
+      || die "Failed to create test database '${test_db}'"
+    ok "Test database '${test_db}' created"
   fi
 
   export CFG_DATABASE_URL="postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"
@@ -216,8 +230,11 @@ DB_CONN_MAX_LIFETIME=1h
 # ── Redis (optional — comment out to disable caching) ─────────
 # REDIS_URL=redis://localhost:6379
 
-# ── Demo data (set to "true" once to seed, then remove) ───────
-# SEED_DB=true
+# ── Demo data ─────────────────────────────────────────────────
+# Seeding runs automatically when ENV=development (the default).
+# Set SEED_DB=false to suppress it, or SEED_DB=true to force it
+# in any environment.
+# SEED_DB=false
 ENVEOF
 
   ok ".env written to ${env_file}"

@@ -40,6 +40,14 @@ func (s *FlowService) Create(ctx context.Context, companyID uuid.UUID, req dto.C
 	if err := s.repo.Create(ctx, flow); err != nil {
 		return nil, err
 	}
+	if len(req.Nodes) > 0 || len(req.Edges) > 0 {
+		if _, err := s.SaveGraph(ctx, flow.ID, dto.SaveGraphRequest{
+			Nodes: req.Nodes,
+			Edges: req.Edges,
+		}); err != nil {
+			return nil, err
+		}
+	}
 	s.hub.BroadcastToCompany(flow.CompanyID, "flow.created", map[string]interface{}{"id": flow.ID})
 	resp := s.toFlowResponse(ctx, flow)
 	return &resp, nil

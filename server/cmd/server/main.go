@@ -46,8 +46,11 @@ func main() {
 		rdb = nil
 	}
 
-	// Seed database when SEED_DB=true (idempotent)
-	if os.Getenv("SEED_DB") == "true" {
+	// Seed demo data automatically in development mode.
+	// Override: set SEED_DB=false to suppress seeding even in development,
+	// or SEED_DB=true to force seeding in any environment.
+	seedDB := os.Getenv("SEED_DB")
+	if seedDB == "true" || (seedDB != "false" && cfg.Env == "development") {
 		if err := database.SeedDatabase(db, log); err != nil {
 			log.Warn("seed database failed", zap.Error(err))
 		}

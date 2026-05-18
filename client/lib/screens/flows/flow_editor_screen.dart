@@ -29,6 +29,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
   Size _canvasSize = Size.zero;
   // Track which node id currently has the bottom sheet open (mobile)
   String? _sheetNodeId;
+  final TextEditingController _nameController = TextEditingController();
 
   @override
   void initState() {
@@ -36,11 +37,20 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     _loadFlow();
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadFlow() async {
     final repo = ref.read(flowRepositoryProvider);
     try {
       final flow = await repo.getFlow(widget.flowId);
       ref.read(flowEditorProvider.notifier).loadFlow(flow);
+      if (mounted) {
+        _nameController.text = flow.name;
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -50,6 +60,15 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _renameFlow(String newName) async {
+    if (newName.trim().isEmpty) return;
+    try {
+      final repo = ref.read(flowRepositoryProvider);
+      final updated = await repo.updateFlow(widget.flowId, {'name': newName.trim()});
+      ref.read(flowEditorProvider.notifier).loadFlow(updated);
+    } catch (_) {}
   }
 
   Future<void> _save() async {
@@ -322,10 +341,17 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
         title: Row(
           children: [
             Expanded(
-              child: Text(
-                editorState.flow?.name ?? UiText.flowEditor,
+              child: TextField(
+                controller: _nameController,
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                onSubmitted: _renameFlow,
+                onEditingComplete: () => _renameFlow(_nameController.text),
               ),
             ),
             if (editorState.isDirty) ...[

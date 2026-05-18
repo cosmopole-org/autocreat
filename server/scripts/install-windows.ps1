@@ -223,7 +223,7 @@ function Setup-Database {
         Write-Fatal "Cannot connect to PostgreSQL at ${dbHost}:${dbPort} as '${dbUser}'.`nCheck credentials and ensure the service is running."
     }
 
-    # Create DB
+    # Create main database if missing
     $exists = & psql -h $dbHost -p $dbPort -U $dbUser -tAc "SELECT 1 FROM pg_database WHERE datname='$dbName'" 2>$null
     if ($exists -match '1') {
         Write-Ok "Database '$dbName' already exists"
@@ -231,6 +231,17 @@ function Setup-Database {
         & psql -h $dbHost -p $dbPort -U $dbUser -c "CREATE DATABASE `"$dbName`";"
         if ($LASTEXITCODE -ne 0) { Write-Fatal "Failed to create database '$dbName'" }
         Write-Ok "Database '$dbName' created"
+    }
+
+    # Create test database if missing (used by go test ./...)
+    $testDbName = "${dbName}_test"
+    $testExists = & psql -h $dbHost -p $dbPort -U $dbUser -tAc "SELECT 1 FROM pg_database WHERE datname='$testDbName'" 2>$null
+    if ($testExists -match '1') {
+        Write-Ok "Test database '$testDbName' already exists"
+    } else {
+        & psql -h $dbHost -p $dbPort -U $dbUser -c "CREATE DATABASE `"$testDbName`";"
+        if ($LASTEXITCODE -ne 0) { Write-Fatal "Failed to create test database '$testDbName'" }
+        Write-Ok "Test database '$testDbName' created"
     }
 
     $script:CfgDbUrl = "postgres://${dbUser}:${dbPass}@${dbHost}:${dbPort}/${dbName}?sslmode=disable"
@@ -282,8 +293,11 @@ DB_CONN_MAX_LIFETIME=1h
 # -- Redis (optional -- comment out to disable caching) -----------------------
 # REDIS_URL=redis://localhost:6379
 
-# -- Demo data (set to "true" once to seed, then remove) ----------------------
-# SEED_DB=true
+# -- Demo data -----------------------------------------------------------------
+# Seeding runs automatically when ENV=development (the default).
+# Set SEED_DB=false to suppress it, or SEED_DB=true to force it
+# in any environment.
+# SEED_DB=false
 "@
 
     Set-Content -Path $envPath -Value $content -Encoding UTF8

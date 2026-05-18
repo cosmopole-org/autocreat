@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../core/constants.dart';
+import '../core/token_storage.dart';
 
 class ApiClient {
   late final Dio _dio;
-  final FlutterSecureStorage _storage;
+  final TokenStorage _storage;
 
-  ApiClient({FlutterSecureStorage? storage, void Function()? onUnauthorized})
-      : _storage = storage ?? const FlutterSecureStorage() {
+  ApiClient({TokenStorage? storage, void Function()? onUnauthorized})
+      : _storage = storage ?? const TokenStorage() {
     _dio = Dio(
       BaseOptions(
         baseUrl: AppConstants.fullBaseUrl,
@@ -100,7 +100,7 @@ class ApiClient {
 }
 
 class _AuthInterceptor extends Interceptor {
-  final FlutterSecureStorage _storage;
+  final TokenStorage _storage;
   final Dio _dio;
   final void Function()? _onUnauthorized;
 

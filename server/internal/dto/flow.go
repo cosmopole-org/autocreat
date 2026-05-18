@@ -11,10 +11,12 @@ import (
 // ---------- Flow ----------
 
 type CreateFlowRequest struct {
-	Name        string `json:"name"        binding:"required"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
-	CompanyID   string `json:"companyId"` // used by flat routes
+	Name        string        `json:"name"        binding:"required"`
+	Description string        `json:"description"`
+	Status      string        `json:"status"`
+	CompanyID   string        `json:"companyId"` // used by flat routes
+	Nodes       []NodeRequest `json:"nodes"`
+	Edges       []EdgeRequest `json:"edges"`
 }
 
 type UpdateFlowRequest struct {

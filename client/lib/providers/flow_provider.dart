@@ -10,7 +10,7 @@ final flowRepositoryProvider = Provider<FlowRepository>((ref) {
   return FlowRepository(ref.watch(apiClientProvider));
 });
 
-final flowsProvider = FutureProvider.family<List<Flow>, String?>((ref, companyId) async {
+final flowsProvider = FutureProvider.autoDispose.family<List<Flow>, String?>((ref, companyId) async {
   final isDemo = ref.watch(isDemoModeProvider);
   ref.watch(languageProvider);
   if (isDemo) return DemoData.flows.map(Flow.fromJson).toList();

@@ -985,6 +985,12 @@ class _CreateTicketDialogState extends State<_CreateTicketDialog> {
                 'status': TicketStatus.open.name,
               });
               if (context.mounted) Navigator.pop(context);
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed to create ticket: $e'), backgroundColor: Colors.red),
+                );
+              }
             } finally {
               if (mounted) setState(() => _saving = false);
             }

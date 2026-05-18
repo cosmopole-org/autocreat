@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../core/token_storage.dart';
 import '../data/api_client.dart';
 import '../data/repositories/auth_repository.dart';
 import '../models/user.dart';
 
-final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
-  return const FlutterSecureStorage();
+final secureStorageProvider = Provider<TokenStorage>((ref) {
+  return const TokenStorage();
 });
 
 final apiClientProvider = Provider<ApiClient>((ref) {

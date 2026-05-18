@@ -17,22 +17,29 @@ const (
 	ContextIsDemo    = "isDemo"
 )
 
-// Auth validates the Bearer JWT in the Authorization header.
+// Auth validates the Bearer JWT from the Authorization header or, as a
+// fallback, from the ?token= query parameter (required for WebSocket upgrades
+// because browsers cannot set headers on WebSocket connections).
 func Auth(authSvc *service.AuthService) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var tokenStr string
+
 		header := c.GetHeader("Authorization")
-		if header == "" {
+		if header != "" {
+			parts := strings.SplitN(header, " ", 2)
+			if len(parts) != 2 || !strings.EqualFold(parts[0], "bearer") {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid authorization format"})
+				return
+			}
+			tokenStr = parts[1]
+		} else if q := c.Query("token"); q != "" {
+			tokenStr = q
+		} else {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing authorization header"})
 			return
 		}
 
-		parts := strings.SplitN(header, " ", 2)
-		if len(parts) != 2 || !strings.EqualFold(parts[0], "bearer") {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid authorization format"})
-			return
-		}
-
-		claims, err := authSvc.ValidateAccessToken(parts[1])
+		claims, err := authSvc.ValidateAccessToken(tokenStr)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return

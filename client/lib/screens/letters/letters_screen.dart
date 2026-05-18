@@ -28,14 +28,22 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
   }
 
   Future<void> _createLetter(BuildContext context) async {
-    final repo = ref.read(letterRepositoryProvider);
-    final letter = await repo.createLetter({
-      'name': UiText.newLetterTemplate,
-      'status': 'draft',
-      'content': '',
-      UiText.deltacontent: {},
-    });
-    if (context.mounted) context.push('/letters/${letter.id}/edit');
+    try {
+      final repo = ref.read(letterRepositoryProvider);
+      final letter = await repo.createLetter({
+        'name': UiText.newLetterTemplate,
+        'status': 'draft',
+        'content': '',
+        UiText.deltacontent: {},
+      });
+      if (context.mounted) context.push('/letters/${letter.id}/edit');
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create letter: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   @override

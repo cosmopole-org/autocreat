@@ -11,7 +11,7 @@ server-build:
 	cd server && CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o autocreat-server ./cmd/server
 
 server-test:
-	cd server && go test -v -race -cover ./...
+	cd server && TEST_DATABASE_URL=postgres://postgres:2851332@localhost:5432/autocreat_test?sslmode=disable go test -v -race -cover ./...
 
 server-lint:
 	cd server && golangci-lint run
@@ -36,7 +36,10 @@ client-codegen:
 	cd client && flutter pub run build_runner build --delete-conflicting-outputs
 
 client-run-web:
-	cd client && flutter run -d chrome
+	cd client && NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 flutter run -d chrome --web-port 8080
+
+client-run-web-server:
+	cd client && NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 flutter run -d web-server --web-port 8080
 
 client-run-mobile:
 	cd client && flutter run
@@ -66,7 +69,7 @@ dev:
 	$(MAKE) server-docker-run
 	@sleep 2
 	$(MAKE) server-run &
-	$(MAKE) client-run-web
+	$(MAKE) client-run-web-server
 
 help:
 	@echo "AutoCreat — Build Targets"
@@ -80,7 +83,8 @@ help:
 	@echo "Client:"
 	@echo "  make client-deps         Install Flutter dependencies"
 	@echo "  make client-codegen      Run code generation (freezed, riverpod)"
-	@echo "  make client-run-web      Run Flutter web in browser"
+	@echo "  make client-run-web      Run Flutter web in Chrome (sets NO_PROXY)"
+	@echo "  make client-run-web-server Run Flutter web-server (sets NO_PROXY)"
 	@echo "  make client-build-android Build Android APK"
 	@echo "  make client-build-web    Build Flutter web bundle"
 	@echo ""

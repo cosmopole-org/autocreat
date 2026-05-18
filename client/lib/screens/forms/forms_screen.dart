@@ -27,14 +27,22 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
   }
 
   Future<void> _createForm(BuildContext context) async {
-    final repo = ref.read(formRepositoryProvider);
-    final form = await repo.createForm({
-      'name': UiText.newForm,
-      'status': 'draft',
-      'fields': [],
-    });
-    if (context.mounted) {
-      context.push('/forms/${form.id}/edit');
+    try {
+      final repo = ref.read(formRepositoryProvider);
+      final form = await repo.createForm({
+        'name': UiText.newForm,
+        'status': 'draft',
+        'fields': [],
+      });
+      if (context.mounted) {
+        context.push('/forms/${form.id}/edit');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create form: $e'), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 

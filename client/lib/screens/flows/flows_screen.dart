@@ -27,34 +27,42 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
   }
 
   Future<void> _createFlow(BuildContext context) async {
-    final repo = ref.read(flowRepositoryProvider);
-    final flow = await repo.createFlow({
-      'name': UiText.newFlow,
-      'status': 'draft',
-      'nodes': [
-        {
-          'id': 'start_1',
-          'label': UiText.start,
-          'type': 'start',
-          'x': 100.0,
-          'y': 200.0,
-          'width': 160.0,
-          'height': 60.0,
-        },
-        {
-          'id': 'end_1',
-          'label': UiText.end,
-          'type': 'end',
-          'x': 400.0,
-          'y': 200.0,
-          'width': 160.0,
-          'height': 60.0,
-        },
-      ],
-      'edges': [],
-    });
-    if (context.mounted) {
-      context.push('/flows/${flow.id}/edit');
+    // Capture router before async gap to avoid stale BuildContext issues.
+    final router = GoRouter.of(context);
+    try {
+      final repo = ref.read(flowRepositoryProvider);
+      final flow = await repo.createFlow({
+        'name': UiText.newFlow,
+        'status': 'draft',
+        'nodes': [
+          {
+            'id': 'start_1',
+            'label': UiText.start,
+            'type': 'start',
+            'x': 100.0,
+            'y': 200.0,
+            'width': 160.0,
+            'height': 60.0,
+          },
+          {
+            'id': 'end_1',
+            'label': UiText.end,
+            'type': 'end',
+            'x': 400.0,
+            'y': 200.0,
+            'width': 160.0,
+            'height': 60.0,
+          },
+        ],
+        'edges': [],
+      });
+      router.push('/flows/${flow.id}/edit');
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create flow: $e'), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 

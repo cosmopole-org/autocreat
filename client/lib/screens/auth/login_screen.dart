@@ -31,8 +31,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       'label': UiText.demo
     },
     {
-      'email': 'admin@demo.com',
-      'password': 'password123',
+      'email': 'admin@horizondigital.com',
+      'password': UiText.demo123,
       'label': UiText.admin
     },
   ];
@@ -68,14 +68,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _passwordController.text = account['password']!;
   }
 
-  /// Activates client-side demo mode without any network call.
+  /// Activates demo mode by logging in with the shared admin account.
   ///
-  /// Sets [isDemoModeProvider] to `true` and injects a synthetic demo user
-  /// into [authProvider].  The router sees both flags and redirects straight
-  /// to the dashboard, skipping the real login flow entirely.
-  void _enterDemoMode() {
-    ref.read(isDemoModeProvider.notifier).state = true;
-    ref.read(authProvider.notifier).loginAsDemoUser();
+  /// A real API login is performed so that the JWT token is stored in
+  /// [TokenStorage], which enables all write operations (create / update /
+  /// delete) to succeed.  No synthetic user is used; [isDemoModeProvider]
+  /// is intentionally left `false` so providers fetch live API data.
+  Future<void> _enterDemoMode() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    try {
+      await ref.read(authProvider.notifier).login(
+            'admin@horizondigital.com',
+            'Demo123!',
+          );
+    } catch (e) {
+      if (mounted) {
+        setState(() =>
+            _errorMessage = e.toString().replaceAll(UiText.exception, ''));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override

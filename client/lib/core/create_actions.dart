@@ -23,64 +23,96 @@ class CreateActions {
   const CreateActions._();
 
   static Future<void> createFlow(BuildContext context, WidgetRef ref) async {
-    final repo = ref.read(flowRepositoryProvider);
-    final flow = await repo.createFlow({
-      'name': UiText.newFlow,
-      'status': 'draft',
-      'nodes': [
-        {
-          'id': 'start_1',
-          'label': UiText.start,
-          'type': 'start',
-          'x': 100.0,
-          'y': 200.0,
-          'width': 160.0,
-          'height': 60.0,
-        },
-        {
-          'id': 'end_1',
-          'label': UiText.end,
-          'type': 'end',
-          'x': 400.0,
-          'y': 200.0,
-          'width': 160.0,
-          'height': 60.0,
-        },
-      ],
-      'edges': [],
-    });
-    if (context.mounted) context.push('/flows/${flow.id}/edit');
+    try {
+      final repo = ref.read(flowRepositoryProvider);
+      final flow = await repo.createFlow({
+        'name': UiText.newFlow,
+        'status': 'draft',
+        'nodes': [
+          {
+            'id': 'start_1',
+            'label': UiText.start,
+            'type': 'start',
+            'x': 100.0,
+            'y': 200.0,
+            'width': 160.0,
+            'height': 60.0,
+          },
+          {
+            'id': 'end_1',
+            'label': UiText.end,
+            'type': 'end',
+            'x': 400.0,
+            'y': 200.0,
+            'width': 160.0,
+            'height': 60.0,
+          },
+        ],
+        'edges': [],
+      });
+      if (context.mounted) context.push('/flows/${flow.id}/edit');
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create flow: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   static Future<void> createForm(BuildContext context, WidgetRef ref) async {
-    final repo = ref.read(formRepositoryProvider);
-    final form = await repo.createForm({
-      'name': UiText.newForm,
-      'status': 'draft',
-      'fields': [],
-    });
-    if (context.mounted) context.push('/forms/${form.id}/edit');
+    try {
+      final repo = ref.read(formRepositoryProvider);
+      final form = await repo.createForm({
+        'name': UiText.newForm,
+        'status': 'draft',
+        'fields': [],
+      });
+      if (context.mounted) context.push('/forms/${form.id}/edit');
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create form: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   static Future<void> createModel(BuildContext context, WidgetRef ref) async {
-    final repo = ref.read(modelRepositoryProvider);
-    final model = await repo.createModel({
-      'name': UiText.newModel,
-      'fields': [],
-    });
-    if (context.mounted) context.push('/models/${model.id}/edit');
+    try {
+      final repo = ref.read(modelRepositoryProvider);
+      final model = await repo.createModel({
+        'name': UiText.newModel,
+        'fields': [],
+      });
+      if (context.mounted) context.push('/models/${model.id}/edit');
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create model: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   static Future<void> createLetter(
       BuildContext context, WidgetRef ref) async {
-    final repo = ref.read(letterRepositoryProvider);
-    final letter = await repo.createLetter({
-      'name': UiText.newLetterTemplate,
-      'status': 'draft',
-      'content': '',
-      UiText.deltacontent: {},
-    });
-    if (context.mounted) context.push('/letters/${letter.id}/edit');
+    try {
+      final repo = ref.read(letterRepositoryProvider);
+      final letter = await repo.createLetter({
+        'name': UiText.newLetterTemplate,
+        'status': 'draft',
+        'content': '',
+        UiText.deltacontent: {},
+      });
+      if (context.mounted) context.push('/letters/${letter.id}/edit');
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create letter: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   static void createUser(BuildContext context) {

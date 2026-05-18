@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../core/constants.dart';
+import '../../core/token_storage.dart';
 import '../../models/user.dart';
 import '../api_client.dart';
 
 class AuthRepository {
   final ApiClient _apiClient;
-  final FlutterSecureStorage _storage;
+  final TokenStorage _storage;
 
   AuthRepository(this._apiClient, this._storage);
 
@@ -73,7 +73,7 @@ class AuthRepository {
     return token != null;
   }
 
-  Future<String?> getAccessToken() {
+  Future<String?> getAccessToken() async {
     return _storage.read(key: AppConstants.accessTokenKey);
   }
 

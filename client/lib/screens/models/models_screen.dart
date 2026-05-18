@@ -27,12 +27,20 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
   }
 
   Future<void> _createModel(BuildContext context) async {
-    final repo = ref.read(modelRepositoryProvider);
-    final model = await repo.createModel({
-      'name': UiText.newModel,
-      'fields': [],
-    });
-    if (context.mounted) context.push('/models/${model.id}/edit');
+    try {
+      final repo = ref.read(modelRepositoryProvider);
+      final model = await repo.createModel({
+        'name': UiText.newModel,
+        'fields': [],
+      });
+      if (context.mounted) context.push('/models/${model.id}/edit');
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create model: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   @override

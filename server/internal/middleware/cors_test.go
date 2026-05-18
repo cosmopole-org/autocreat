@@ -82,6 +82,28 @@ func TestCORS_MultipleOrigins(t *testing.T) {
 	}
 }
 
+func TestCORS_LocalhostWildcard(t *testing.T) {
+	r := newCORSEngine([]string{"http://localhost:*"})
+
+	for _, port := range []string{"8080", "46051", "62000"} {
+		origin := "http://localhost:" + port
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodOptions, "/data", nil)
+		req.Header.Set("Origin", origin)
+		req.Header.Set("Access-Control-Request-Method", "POST")
+		r.ServeHTTP(w, req)
+		assert.Equal(t, origin, w.Header().Get("Access-Control-Allow-Origin"), "port: %s", port)
+	}
+
+	// Non-localhost must still be blocked
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodOptions, "/data", nil)
+	req.Header.Set("Origin", "http://evil.example.com")
+	req.Header.Set("Access-Control-Request-Method", "GET")
+	r.ServeHTTP(w, req)
+	assert.NotEqual(t, "http://evil.example.com", w.Header().Get("Access-Control-Allow-Origin"))
+}
+
 func TestCORS_AllowedMethods(t *testing.T) {
 	r := newCORSEngine([]string{"http://localhost:3000"})
 

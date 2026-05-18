@@ -117,12 +117,11 @@ func pUUID(u uuid.UUID) *uuid.UUID { return &u }
 // SeedDatabase populates all tables with realistic demo data when the companies
 // table is empty. Running it a second time is safe (idempotent via ID checks).
 func SeedDatabase(db *gorm.DB, log *zap.Logger) error {
-	// Guard: only seed if the company table is empty.
-	var count int64
-	if err := db.Model(&models.Company{}).Count(&count).Error; err != nil {
-		return fmt.Errorf("seed: count companies: %w", err)
-	}
-	if count > 0 {
+	// Guard: skip if the canonical seed company already exists.
+	// Checking the specific UUID (rather than "any company") prevents
+	// integration-test companies from blocking the seed on fresh dev setups.
+	var existing models.Company
+	if err := db.First(&existing, "id = ?", seedCompanyID).Error; err == nil {
 		log.Info("seed: database already seeded, skipping")
 		return nil
 	}

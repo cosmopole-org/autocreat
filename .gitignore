@@ -24,10 +24,17 @@ client/coverage/
 # Go
 server/autocreat-server
 server/server
+server/bin/
 server/vendor/
 server/*.out
 server/.env
 server/tmp/
+
+# E2E tests
+e2e_tests/venv/
+e2e_tests/__pycache__/
+e2e_tests/.pytest_cache/
+e2e_tests/screenshots/
 
 # IDE
 .vscode/

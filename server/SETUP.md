@@ -274,13 +274,28 @@ psql -U postgres -c "CREATE DATABASE autocreat;"
 
 ## Seeding Demo Data
 
-To populate the database with realistic sample data (companies, users, roles, flows, tickets, etc.):
+**Seeding is automatic in development mode.** When `ENV=development` (the default), the server seeds demo data on startup if it has not already done so. No manual step is needed.
 
-1. Open `.env` and add or uncomment: `SEED_DB=true`
-2. Start (or restart) the server: `./scripts/server-linux.sh restart`
-3. **Remove** `SEED_DB=true` from `.env` (or set it to `false`) to prevent re-seeding on future restarts.
+The seed is idempotent — it only runs once (checks for the canonical seed company by UUID). Restarting the server does not duplicate data.
 
-The seeder creates a demo company (`demo@autocreat.io` / `Demo123!`) along with sample workflows, forms, models, and tickets you can explore immediately.
+Demo credentials created by the seeder:
+
+| Email | Password | Role |
+|-------|----------|------|
+| `admin@horizondigital.com` | `Demo123!` | Owner |
+| `marcus@horizondigital.com` | `Demo123!` | Operations Manager |
+| `sofia@horizondigital.com` | `Demo123!` | Support Agent |
+| `james@horizondigital.com` | `Demo123!` | Developer |
+| `emily@horizondigital.com` | `Demo123!` | Support Agent |
+| `demo@autocreat.io` | `Demo123!` | Owner (demo bypass) |
+
+### Disabling or forcing the seed
+
+| Scenario | Setting |
+|----------|---------|
+| Suppress seeding in development | `SEED_DB=false` in `.env` |
+| Force seeding in production / staging | `SEED_DB=true` in `.env` |
+| Default (auto-seed in dev, skip in prod) | Leave `SEED_DB` unset |
 
 ---
 
