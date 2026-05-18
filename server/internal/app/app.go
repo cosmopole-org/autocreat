@@ -1,6 +1,8 @@
 package app
 
 import (
+	"context"
+
 	"github.com/autocreat/server/internal/config"
 	"github.com/autocreat/server/internal/handler"
 	"github.com/autocreat/server/internal/repository"
@@ -83,6 +85,14 @@ func New(cfg *config.Config, db *gorm.DB, rdb *redis.Client, log *zap.Logger) *A
 		RateLimitRPS:    cfg.RateLimit,
 		RateLimitBurst:  cfg.RateLimitBurst,
 		Log:             log,
+		Env:             cfg.Env,
+		PingDB: func(ctx context.Context) error {
+			sqlDB, err := db.DB()
+			if err != nil {
+				return err
+			}
+			return sqlDB.PingContext(ctx)
+		},
 	})
 
 	return &App{

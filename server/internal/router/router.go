@@ -1,7 +1,11 @@
 package router
 
 import (
+	"context"
+	"fmt"
+	"html"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/autocreat/server/internal/handler"
@@ -29,6 +33,11 @@ type Options struct {
 	RateLimitRPS    int
 	RateLimitBurst  int
 	Log             *zap.Logger
+
+	// Env is reported by the /diag probe (e.g. "production").
+	Env string
+	// PingDB, when set, is called by /diag to check database connectivity.
+	PingDB func(ctx context.Context) error
 }
 
 // New builds and returns the configured Gin engine.
@@ -54,7 +63,15 @@ func New(opts Options) *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{"status": "ok", "service": "autocreat"})
 	})
 
+	// Diagnostic probe — meant to be opened in a browser (including mobile)
+	// without needing DevTools. Reports env, DB connectivity, and the
+	// configured CORS origins so client/server connection issues can be
+	// confirmed at a glance. Also accessible at /api/v1/diag.
+	diag := diagHandler(opts)
+	engine.GET("/diag", diag)
+
 	v1 := engine.Group("/api/v1")
+	v1.GET("/diag", diag)
 
 	// ---------- Auth ----------
 	auth := v1.Group("/auth")
@@ -166,4 +183,93 @@ func New(opts Options) *gin.Engine {
 	rt.GET("/ws", opts.RealtimeHandler.ServeWS)
 
 	return engine
+}
+
+// diagHandler returns a handler that reports basic connectivity info,
+// rendering as HTML for browsers and JSON for everything else.
+func diagHandler(opts Options) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		dbStatus := "skipped"
+		dbErr := ""
+		if opts.PingDB != nil {
+			ctx, cancel := context.WithTimeout(c.Request.Context(), 3*time.Second)
+			defer cancel()
+			if err := opts.PingDB(ctx); err != nil {
+				dbStatus = "down"
+				dbErr = err.Error()
+			} else {
+				dbStatus = "ok"
+			}
+		}
+
+		origin := c.GetHeader("Origin")
+		originAllowed := "n/a (no Origin header on request)"
+		if origin != "" {
+			originAllowed = "no"
+			for _, o := range opts.AllowedOrigins {
+				if o == origin || o == "http://localhost:*" || o == "http://127.0.0.1:*" {
+					originAllowed = "yes"
+					break
+				}
+			}
+		}
+
+		payload := gin.H{
+			"status":          "ok",
+			"service":         "autocreat",
+			"env":             opts.Env,
+			"db":              dbStatus,
+			"dbError":         dbErr,
+			"requestOrigin":   origin,
+			"originAllowed":   originAllowed,
+			"allowedOrigins":  opts.AllowedOrigins,
+			"serverTime":      time.Now().UTC().Format(time.RFC3339),
+		}
+
+		if strings.Contains(c.GetHeader("Accept"), "text/html") {
+			c.Header("Content-Type", "text/html; charset=utf-8")
+			c.String(http.StatusOK, renderDiagHTML(payload))
+			return
+		}
+		c.JSON(http.StatusOK, payload)
+	}
+}
+
+func renderDiagHTML(d gin.H) string {
+	row := func(k string, v any) string {
+		return fmt.Sprintf(
+			`<tr><th>%s</th><td>%s</td></tr>`,
+			html.EscapeString(k), html.EscapeString(fmt.Sprintf("%v", v)),
+		)
+	}
+	var b strings.Builder
+	b.WriteString(`<!doctype html><html><head><meta charset="utf-8">`)
+	b.WriteString(`<meta name="viewport" content="width=device-width,initial-scale=1">`)
+	b.WriteString(`<title>AutoCreat API diag</title>`)
+	b.WriteString(`<style>body{font:16px -apple-system,Segoe UI,Roboto,sans-serif;`)
+	b.WriteString(`margin:24px;color:#222}h1{font-size:22px;margin:0 0 16px}`)
+	b.WriteString(`table{border-collapse:collapse;width:100%;max-width:680px}`)
+	b.WriteString(`th,td{padding:8px 10px;border-bottom:1px solid #eee;text-align:left;`)
+	b.WriteString(`vertical-align:top;word-break:break-word}th{width:38%;color:#555;font-weight:600}`)
+	b.WriteString(`.ok{color:#0a7d2f}.bad{color:#b00020}</style></head><body>`)
+	b.WriteString(`<h1>AutoCreat API · diag</h1><table>`)
+	b.WriteString(row("status", d["status"]))
+	b.WriteString(row("env", d["env"]))
+	b.WriteString(row("db", d["db"]))
+	if s, _ := d["dbError"].(string); s != "" {
+		b.WriteString(row("dbError", s))
+	}
+	b.WriteString(row("requestOrigin", d["requestOrigin"]))
+	b.WriteString(row("originAllowed", d["originAllowed"]))
+	b.WriteString(row("allowedOrigins", strings.Join(toStringSlice(d["allowedOrigins"]), ", ")))
+	b.WriteString(row("serverTime", d["serverTime"]))
+	b.WriteString(`</table></body></html>`)
+	return b.String()
+}
+
+func toStringSlice(v any) []string {
+	if s, ok := v.([]string); ok {
+		return s
+	}
+	return nil
 }
