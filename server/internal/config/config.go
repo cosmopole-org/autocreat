@@ -50,7 +50,7 @@ func Load() (*Config, error) {
 		DBConnMaxLifetime: getDurationEnv("DB_CONN_MAX_LIFETIME", time.Hour),
 	}
 
-	origins := getEnv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8080")
+	origins := getEnv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8080,http://localhost:8081,https://cosmopole-org.github.io")
 	cfg.AllowedOrigins = strings.Split(origins, ",")
 	for i, o := range cfg.AllowedOrigins {
 		cfg.AllowedOrigins[i] = strings.TrimSpace(o)
