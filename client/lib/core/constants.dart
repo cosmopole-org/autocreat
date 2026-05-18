@@ -1,5 +1,11 @@
 class AppConstants {
-  static const String baseUrl = 'http://localhost:8081';
+  // API base URL — overridden at build time via:
+  //   flutter build ... --dart-define=API_BASE_URL=https://your-api.example.com
+  // Local dev defaults to the Go server's local install port (8081).
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:8081',
+  );
   static const String apiPrefix = '/api/v1';
   static const String fullBaseUrl = baseUrl + apiPrefix;
 
@@ -20,8 +26,17 @@ class AppConstants {
   static const String lettersEndpoint = '/letters';
   static const String ticketsEndpoint = '/tickets';
 
-  // WebSocket
-  static const String wsBaseUrl = 'ws://localhost:8081';
+  // WebSocket — derived from baseUrl so https→wss and http→ws stay in sync.
+  static String get wsBaseUrl {
+    if (baseUrl.startsWith('https://')) {
+      return 'wss://${baseUrl.substring('https://'.length)}';
+    }
+    if (baseUrl.startsWith('http://')) {
+      return 'ws://${baseUrl.substring('http://'.length)}';
+    }
+    return baseUrl;
+  }
+
   static const String wsRealtimeEndpoint = '/api/v1/realtime/ws';
 
   // Storage keys
