@@ -266,66 +266,58 @@ type StartableFlowInfo struct {
 }
 
 // FindStartableFlowsByRole returns flows where the given role is either:
-//  - assigned to the flow's START node directly (FlowNode.AssignedRoleID), or
-//  - granted start permission via FlowAssignment.
+//   - assigned to the flow's START node directly (FlowNode.AssignedRoleID), or
+//   - granted start permission via an active FlowAssignment.
 func (r *FlowRepository) FindStartableFlowsByRole(ctx context.Context, companyID, roleID uuid.UUID) ([]StartableFlowInfo, error) {
-	type scanRow struct {
-		FlowID          string
-		FlowName        string
-		FlowDescription string
-		StartNodeID     string
-		StartNodeLabel  string
-		AssignedFormID  *string
+	// Collect start_node_ids granted via active FlowAssignment records.
+	var assignedNodeIDs []uuid.UUID
+	r.db.WithContext(ctx).
+		Model(&models.FlowAssignment{}).
+		Select("start_node_id").
+		Where("role_id = ? AND is_active = ?", roleID, true).
+		Scan(&assignedNodeIDs)
+
+	// Find START nodes in flows owned by this company that this role can start.
+	var nodes []models.FlowNode
+	q := r.db.WithContext(ctx).
+		Joins("JOIN flows ON flows.id = flow_nodes.flow_id").
+		Where("flows.company_id = ? AND flow_nodes.type = ?", companyID, models.NodeTypeStart)
+
+	if len(assignedNodeIDs) > 0 {
+		q = q.Where("flow_nodes.assigned_role_id = ? OR flow_nodes.id IN ?", roleID, assignedNodeIDs)
+	} else {
+		q = q.Where("flow_nodes.assigned_role_id = ?", roleID)
 	}
-	var rows []scanRow
-	err := r.db.WithContext(ctx).Raw(`
-		SELECT DISTINCT
-			f.id          AS flow_id,
-			f.name        AS flow_name,
-			f.description AS flow_description,
-			n.id          AS start_node_id,
-			n.label       AS start_node_label,
-			n.assigned_form_id
-		FROM flows f
-		JOIN flow_nodes n ON n.flow_id = f.id AND n.type = 'start'
-		LEFT JOIN flow_assignments fa
-			ON fa.flow_id = f.id
-			AND fa.start_node_id = n.id
-			AND fa.role_id = ?
-			AND fa.is_active = true
-		WHERE f.company_id = ?
-		  AND (n.assigned_role_id = ? OR fa.id IS NOT NULL)
-	`, roleID, companyID, roleID).Scan(&rows).Error
-	if err != nil {
+
+	if err := q.Find(&nodes).Error; err != nil {
 		return nil, err
 	}
 
-	result := make([]StartableFlowInfo, 0, len(rows))
-	for _, row := range rows {
-		flowID, err := uuid.Parse(row.FlowID)
+	result := make([]StartableFlowInfo, 0, len(nodes))
+	for _, node := range nodes {
+		flow, err := r.FindByID(ctx, node.FlowID)
 		if err != nil {
 			continue
 		}
-		nodeID, err := uuid.Parse(row.StartNodeID)
-		if err != nil {
-			continue
-		}
-		info := StartableFlowInfo{
-			FlowID:          flowID,
-			FlowName:        row.FlowName,
-			FlowDescription: row.FlowDescription,
-			StartNodeID:     nodeID,
-			StartNodeLabel:  row.StartNodeLabel,
-		}
-		if row.AssignedFormID != nil && *row.AssignedFormID != "" {
-			fid, err := uuid.Parse(*row.AssignedFormID)
-			if err == nil {
-				info.AssignedFormID = &fid
-			}
-		}
-		result = append(result, info)
+		result = append(result, StartableFlowInfo{
+			FlowID:          flow.ID,
+			FlowName:        flow.Name,
+			FlowDescription: flow.Description,
+			StartNodeID:     node.ID,
+			StartNodeLabel:  node.Label,
+			AssignedFormID:  node.AssignedFormID,
+		})
 	}
 	return result, nil
+}
+
+// FindRoleIDForUser returns the role ID for the given user, or nil if not set.
+func (r *FlowRepository) FindRoleIDForUser(ctx context.Context, userID uuid.UUID) *uuid.UUID {
+	user, err := r.FindUserByID(ctx, userID)
+	if err != nil || user == nil {
+		return nil
+	}
+	return user.RoleID
 }
 
 // CountCompletedStepsByUser counts how many COMPLETED steps a user has handled in a company.
