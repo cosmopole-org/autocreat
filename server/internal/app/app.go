@@ -55,7 +55,7 @@ func New(cfg *config.Config, db *gorm.DB, rdb *redis.Client, log *zap.Logger) *A
 	modelSvc := service.NewModelService(modelRepo)
 	letterSvc := service.NewLetterService(letterRepo)
 	ticketSvc := service.NewTicketService(ticketRepo, hub)
-	bindingSvc := service.NewBindingService(bindingRepo, letterRepo, modelRepo)
+	bindingSvc := service.NewBindingService(bindingRepo, letterRepo, modelRepo, flowRepo, formRepo)
 	// Inject after construction to avoid circular deps.
 	flowSvc.SetBindingService(bindingSvc)
 

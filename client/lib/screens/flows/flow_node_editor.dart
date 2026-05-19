@@ -1089,6 +1089,7 @@ class _LetterAssignmentCardState
                   const VariableBindingEntry(formFieldKey: '');
               return _VarBindingRow(
                 varName: varName,
+                nodeId: widget.nodeId,
                 binding: binding,
                 onChanged: (updated) {
                   final newVb =
@@ -1177,22 +1178,217 @@ class _SettingToggle extends StatelessWidget {
   }
 }
 
-class _VarBindingRow extends StatefulWidget {
+class _VarBindingRow extends ConsumerStatefulWidget {
   final String varName;
+  final String nodeId;
   final VariableBindingEntry binding;
   final ValueChanged<VariableBindingEntry> onChanged;
 
   const _VarBindingRow({
     required this.varName,
+    required this.nodeId,
     required this.binding,
     required this.onChanged,
   });
 
   @override
-  State<_VarBindingRow> createState() => _VarBindingRowState();
+  ConsumerState<_VarBindingRow> createState() => _VarBindingRowState();
 }
 
-class _VarBindingRowState extends State<_VarBindingRow> {
+class _VarBindingRowState extends ConsumerState<_VarBindingRow> {
+  String? _selectedNodeId;
+  String? _selectedFieldKey;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedNodeId = widget.binding.sourceNodeId;
+    _selectedFieldKey = widget.binding.formFieldKey.isEmpty
+        ? null
+        : widget.binding.formFieldKey;
+  }
+
+  void _emit() => widget.onChanged(VariableBindingEntry(
+        sourceNodeId: _selectedNodeId,
+        formFieldKey: _selectedFieldKey ?? '',
+      ));
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final nodesAsync = ref.watch(nodeAccessibleFieldsProvider(widget.nodeId));
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Variable chip
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Text(
+              '{{${widget.varName}}}',
+              style: const TextStyle(
+                fontSize: 10,
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'monospace',
+              ),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            child: Icon(Icons.arrow_forward_rounded,
+                size: 14, color: AppColors.primary),
+          ),
+          Expanded(
+            child: nodesAsync.when(
+              loading: () => const LinearProgressIndicator(minHeight: 2),
+              error: (_, __) => _FallbackVarBindingRow(
+                binding: widget.binding,
+                onChanged: widget.onChanged,
+              ),
+              data: (nodes) {
+                // Collect fields for the selected node (or all nodes merged).
+                List<AccessibleFormField> availableFields = [];
+                if (_selectedNodeId == null) {
+                  final seen = <String>{};
+                  for (final n in nodes) {
+                    for (final f in n.fields) {
+                      if (seen.add(f.key)) availableFields.add(f);
+                    }
+                  }
+                } else {
+                  final match =
+                      nodes.where((n) => n.nodeId == _selectedNodeId).firstOrNull;
+                  availableFields = match?.fields ?? [];
+                }
+
+                // Keep a phantom entry if the saved key isn't in the list,
+                // so we never silently wipe existing data.
+                final fieldKeys = availableFields.map((f) => f.key).toSet();
+                if (_selectedFieldKey != null &&
+                    _selectedFieldKey!.isNotEmpty &&
+                    !fieldKeys.contains(_selectedFieldKey)) {
+                  availableFields = [
+                    AccessibleFormField(
+                        key: _selectedFieldKey!, label: _selectedFieldKey!),
+                    ...availableFields,
+                  ];
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Step selector ──────────────────────────────
+                    DropdownButtonFormField<String?>(
+                      value: _selectedNodeId,
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        labelText: 'Source step',
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 6),
+                        labelStyle: TextStyle(
+                            fontSize: 11,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary),
+                      ),
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: isDark
+                              ? AppColors.darkText
+                              : AppColors.lightText),
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text('Any step'),
+                        ),
+                        ...nodes.map((n) => DropdownMenuItem<String?>(
+                              value: n.nodeId,
+                              child: Text(n.isCurrent
+                                  ? '${n.nodeLabel} (current)'
+                                  : n.nodeLabel),
+                            )),
+                      ],
+                      onChanged: (v) {
+                        setState(() {
+                          _selectedNodeId = v;
+                          _selectedFieldKey = null;
+                        });
+                        _emit();
+                      },
+                    ),
+                    const SizedBox(height: 4),
+                    // ── Field selector ─────────────────────────────
+                    DropdownButtonFormField<String?>(
+                      value: availableFields
+                              .any((f) => f.key == _selectedFieldKey)
+                          ? _selectedFieldKey
+                          : null,
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        labelText: 'Form field',
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 6),
+                        labelStyle: TextStyle(
+                            fontSize: 11,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary),
+                      ),
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: isDark
+                              ? AppColors.darkText
+                              : AppColors.lightText),
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text('Select field…'),
+                        ),
+                        ...availableFields.map((f) => DropdownMenuItem<String?>(
+                              value: f.key,
+                              child: Text(f.label),
+                            )),
+                      ],
+                      onChanged: availableFields.isEmpty
+                          ? null
+                          : (v) {
+                              setState(() => _selectedFieldKey = v);
+                              _emit();
+                            },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Raw-text fallback shown when the accessible-form-fields endpoint fails.
+class _FallbackVarBindingRow extends StatefulWidget {
+  final VariableBindingEntry binding;
+  final ValueChanged<VariableBindingEntry> onChanged;
+
+  const _FallbackVarBindingRow(
+      {required this.binding, required this.onChanged});
+
+  @override
+  State<_FallbackVarBindingRow> createState() => _FallbackVarBindingRowState();
+}
+
+class _FallbackVarBindingRowState extends State<_FallbackVarBindingRow> {
   late TextEditingController _fieldCtrl;
   late TextEditingController _nodeCtrl;
 
@@ -1200,8 +1396,7 @@ class _VarBindingRowState extends State<_VarBindingRow> {
   void initState() {
     super.initState();
     _fieldCtrl = TextEditingController(text: widget.binding.formFieldKey);
-    _nodeCtrl =
-        TextEditingController(text: widget.binding.sourceNodeId ?? '');
+    _nodeCtrl = TextEditingController(text: widget.binding.sourceNodeId ?? '');
   }
 
   @override
@@ -1218,60 +1413,30 @@ class _VarBindingRowState extends State<_VarBindingRow> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Text('{{${widget.varName}}}',
-                style: const TextStyle(
-                    fontSize: 10,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'monospace')),
+    return Column(
+      children: [
+        TextFormField(
+          controller: _fieldCtrl,
+          decoration: const InputDecoration(
+            labelText: 'Form field key',
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-            child: Icon(Icons.arrow_forward_rounded,
-                size: 14, color: AppColors.primary),
+          style: const TextStyle(fontSize: 11),
+          onChanged: (_) => _emit(),
+        ),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: _nodeCtrl,
+          decoration: const InputDecoration(
+            labelText: 'Source node ID (blank = any step)',
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           ),
-          Expanded(
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: _fieldCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Form field key',
-                    isDense: true,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  ),
-                  style: const TextStyle(fontSize: 11),
-                  onChanged: (_) => _emit(),
-                ),
-                const SizedBox(height: 4),
-                TextFormField(
-                  controller: _nodeCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Source node ID (blank = any step)',
-                    isDense: true,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  ),
-                  style: const TextStyle(fontSize: 10),
-                  onChanged: (_) => _emit(),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+          style: const TextStyle(fontSize: 10),
+          onChanged: (_) => _emit(),
+        ),
+      ],
     );
   }
 }

@@ -17,14 +17,18 @@ type BindingService struct {
 	repo       *repository.BindingRepository
 	letterRepo *repository.LetterRepository
 	modelRepo  *repository.ModelRepository
+	flowRepo   *repository.FlowRepository
+	formRepo   *repository.FormRepository
 }
 
 func NewBindingService(
 	repo *repository.BindingRepository,
 	letterRepo *repository.LetterRepository,
 	modelRepo *repository.ModelRepository,
+	flowRepo *repository.FlowRepository,
+	formRepo *repository.FormRepository,
 ) *BindingService {
-	return &BindingService{repo: repo, letterRepo: letterRepo, modelRepo: modelRepo}
+	return &BindingService{repo: repo, letterRepo: letterRepo, modelRepo: modelRepo, flowRepo: flowRepo, formRepo: formRepo}
 }
 
 // ---------- Form-Model Bindings ----------
@@ -357,6 +361,86 @@ func (s *BindingService) AutoGenerateLettersForNode(
 	for _, a := range assignments {
 		_, _ = s.GenerateLetterForStep(ctx, instanceID, nodeID, stepID, a.ID, userID, "after_approve")
 	}
+}
+
+// GetAccessibleFormFields returns the current node + all ancestor nodes (BFS over
+// reversed edges) that have a form assigned, together with their parsed form fields.
+// The current node is always first in the result slice.
+func (s *BindingService) GetAccessibleFormFields(ctx context.Context, nodeID uuid.UUID) ([]dto.AccessibleNodeFormFields, error) {
+	node, err := s.flowRepo.FindNodeByID(ctx, nodeID)
+	if err != nil {
+		return nil, err
+	}
+
+	edges, err := s.flowRepo.FindEdgesByFlow(ctx, node.FlowID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Build reverse adjacency map: target → []sources
+	revAdj := make(map[uuid.UUID][]uuid.UUID, len(edges))
+	for _, e := range edges {
+		revAdj[e.TargetNodeID] = append(revAdj[e.TargetNodeID], e.SourceNodeID)
+	}
+
+	// BFS backward from nodeID to collect ordered node IDs (current first)
+	visited := map[uuid.UUID]bool{nodeID: true}
+	queue := []uuid.UUID{nodeID}
+	var orderedIDs []uuid.UUID
+	for len(queue) > 0 {
+		curr := queue[0]
+		queue = queue[1:]
+		orderedIDs = append(orderedIDs, curr)
+		for _, parent := range revAdj[curr] {
+			if !visited[parent] {
+				visited[parent] = true
+				queue = append(queue, parent)
+			}
+		}
+	}
+
+	result := make([]dto.AccessibleNodeFormFields, 0, len(orderedIDs))
+	for _, nid := range orderedIDs {
+		n, err := s.flowRepo.FindNodeByID(ctx, nid)
+		if err != nil || n.AssignedFormID == nil {
+			continue
+		}
+		form, err := s.formRepo.FindByID(ctx, *n.AssignedFormID)
+		if err != nil {
+			continue
+		}
+
+		var rawFields []map[string]interface{}
+		if form.Fields != "" && form.Fields != "[]" {
+			_ = json.Unmarshal([]byte(form.Fields), &rawFields)
+		}
+
+		fields := make([]dto.AccessibleFormField, 0, len(rawFields))
+		for _, f := range rawFields {
+			key := fmt.Sprintf("%v", f["id"])
+			label := fmt.Sprintf("%v", f["label"])
+			if key == "" || key == "<nil>" {
+				continue
+			}
+			if label == "" || label == "<nil>" {
+				label = key
+			}
+			fields = append(fields, dto.AccessibleFormField{Key: key, Label: label})
+		}
+		if len(fields) == 0 {
+			continue
+		}
+
+		result = append(result, dto.AccessibleNodeFormFields{
+			NodeID:    nid,
+			NodeLabel: n.Label,
+			IsCurrent: nid == nodeID,
+			FormID:    *n.AssignedFormID,
+			FormName:  form.Name,
+			Fields:    fields,
+		})
+	}
+	return result, nil
 }
 
 // ---------- helpers ----------
