@@ -483,6 +483,7 @@ class _ModelBindingsSectionState extends ConsumerState<_ModelBindingsSection> {
                 children: [
                   ...bindings.map((b) => _BindingCard(
                         binding: b,
+                        nodeId: widget.nodeId,
                         onSave: _saveBinding,
                         onDelete: () => _deleteBinding(b.id),
                         saving: _saving,
@@ -519,12 +520,14 @@ class _ModelBindingsSectionState extends ConsumerState<_ModelBindingsSection> {
 
 class _BindingCard extends ConsumerStatefulWidget {
   final FormModelBinding binding;
+  final String nodeId;
   final Future<void> Function(FormModelBinding) onSave;
   final VoidCallback onDelete;
   final bool saving;
 
   const _BindingCard({
     required this.binding,
+    required this.nodeId,
     required this.onSave,
     required this.onDelete,
     required this.saving,
@@ -639,6 +642,7 @@ class _BindingCardState extends ConsumerState<_BindingCard> {
               error: (_, __) => const SizedBox.shrink(),
               data: (models) => _RuleRow(
                 rule: rule,
+                nodeId: widget.nodeId,
                 models: models,
                 onUpdate: (updated) => _updateRule(idx, updated),
                 onRemove: () => _removeRule(idx),
@@ -685,72 +689,73 @@ class _BindingCardState extends ConsumerState<_BindingCard> {
   }
 }
 
-class _RuleRow extends StatefulWidget {
+class _RuleRow extends ConsumerStatefulWidget {
   final FormModelBindingRule rule;
+  final String nodeId;
   final List<ModelDefinition> models;
   final ValueChanged<FormModelBindingRule> onUpdate;
   final VoidCallback onRemove;
 
   const _RuleRow({
     required this.rule,
+    required this.nodeId,
     required this.models,
     required this.onUpdate,
     required this.onRemove,
   });
 
   @override
-  State<_RuleRow> createState() => _RuleRowState();
+  ConsumerState<_RuleRow> createState() => _RuleRowState();
 }
 
-class _RuleRowState extends State<_RuleRow> {
-  late TextEditingController _fieldKeyCtrl;
+class _RuleRowState extends ConsumerState<_RuleRow> {
   late TextEditingController _instanceKeyCtrl;
-  late TextEditingController _sourceNodeCtrl;
+  String? _selectedSourceNodeId; // null = current node
+  String? _selectedFormFieldKey;
   String? _selectedModelId;
-  String? _selectedFieldKey;
+  String? _selectedModelFieldKey;
 
   @override
   void initState() {
     super.initState();
-    _fieldKeyCtrl = TextEditingController(text: widget.rule.formFieldKey);
     _instanceKeyCtrl =
         TextEditingController(text: widget.rule.modelInstanceKey);
-    _sourceNodeCtrl =
-        TextEditingController(text: widget.rule.sourceNodeId ?? '');
+    _selectedSourceNodeId = widget.rule.sourceNodeId;
+    _selectedFormFieldKey = widget.rule.formFieldKey.isNotEmpty
+        ? widget.rule.formFieldKey
+        : null;
     _selectedModelId = widget.rule.modelDefinitionId.isNotEmpty
         ? widget.rule.modelDefinitionId
         : null;
-    _selectedFieldKey = widget.rule.modelFieldKey.isNotEmpty
+    _selectedModelFieldKey = widget.rule.modelFieldKey.isNotEmpty
         ? widget.rule.modelFieldKey
         : null;
   }
 
   @override
   void dispose() {
-    _fieldKeyCtrl.dispose();
     _instanceKeyCtrl.dispose();
-    _sourceNodeCtrl.dispose();
     super.dispose();
   }
 
   void _emit() {
     widget.onUpdate(widget.rule.copyWith(
-      formFieldKey: _fieldKeyCtrl.text,
+      sourceNodeId: _selectedSourceNodeId,
+      formFieldKey: _selectedFormFieldKey ?? '',
       modelDefinitionId: _selectedModelId ?? '',
-      modelInstanceKey:
-          _instanceKeyCtrl.text.isEmpty ? 'default' : _instanceKeyCtrl.text,
-      modelFieldKey: _selectedFieldKey ?? '',
-      sourceNodeId:
-          _sourceNodeCtrl.text.isEmpty ? null : _sourceNodeCtrl.text,
+      modelInstanceKey: _instanceKeyCtrl.text.isEmpty
+          ? 'default'
+          : _instanceKeyCtrl.text,
+      modelFieldKey: _selectedModelFieldKey ?? '',
     ));
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final selectedModel = widget.models
-        .where((m) => m.id == _selectedModelId)
-        .firstOrNull;
+    final nodesAsync = ref.watch(nodeAccessibleFieldsProvider(widget.nodeId));
+    final selectedModel =
+        widget.models.where((m) => m.id == _selectedModelId).firstOrNull;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -759,26 +764,63 @@ class _RuleRowState extends State<_RuleRow> {
         color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-            color: isDark
-                ? AppColors.darkBorder
-                : AppColors.lightBorder),
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Header row: source step + remove button ──────────────
           Row(
             children: [
               Expanded(
-                child: TextFormField(
-                  controller: _fieldKeyCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Form field key',
-                    isDense: true,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                child: nodesAsync.when(
+                  loading: () => const LinearProgressIndicator(minHeight: 2),
+                  error: (_, __) => TextFormField(
+                    initialValue: _selectedSourceNodeId ?? '',
+                    decoration: const InputDecoration(
+                      labelText: 'Source node ID',
+                      isDense: true,
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    ),
+                    style: const TextStyle(fontSize: 12),
+                    onChanged: (v) {
+                      _selectedSourceNodeId = v.isEmpty ? null : v;
+                      _emit();
+                    },
                   ),
-                  style: const TextStyle(fontSize: 12),
-                  onChanged: (_) => _emit(),
+                  data: (nodes) => DropdownButtonFormField<String?>(
+                    value: _selectedSourceNodeId,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Source step',
+                      isDense: true,
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    ),
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: isDark
+                            ? AppColors.darkText
+                            : AppColors.lightText),
+                    items: [
+                      const DropdownMenuItem<String?>(
+                          value: null, child: Text('Current step')),
+                      ...nodes
+                          .where((n) => !n.isCurrent)
+                          .map((n) => DropdownMenuItem<String?>(
+                                value: n.nodeId,
+                                child: Text(n.nodeLabel),
+                              )),
+                    ],
+                    onChanged: (v) {
+                      setState(() {
+                        _selectedSourceNodeId = v;
+                        _selectedFormFieldKey = null;
+                      });
+                      _emit();
+                    },
+                  ),
                 ),
               ),
               const SizedBox(width: 6),
@@ -797,6 +839,77 @@ class _RuleRowState extends State<_RuleRow> {
             ],
           ),
           const SizedBox(height: 6),
+          // ── Form field dropdown ───────────────────────────────────
+          nodesAsync.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => TextFormField(
+              initialValue: _selectedFormFieldKey ?? '',
+              decoration: const InputDecoration(
+                labelText: 'Form field key',
+                isDense: true,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              ),
+              style: const TextStyle(fontSize: 12),
+              onChanged: (v) {
+                _selectedFormFieldKey = v.isEmpty ? null : v;
+                _emit();
+              },
+            ),
+            data: (nodes) {
+              // Fields for the selected source node (or current node if null).
+              final sourceNode = _selectedSourceNodeId == null
+                  ? nodes.where((n) => n.isCurrent).firstOrNull
+                  : nodes
+                      .where((n) => n.nodeId == _selectedSourceNodeId)
+                      .firstOrNull;
+              final availableFields = sourceNode?.fields ?? <AccessibleFormField>[];
+
+              // Preserve a phantom entry so we never wipe saved data.
+              final allFields = [
+                ...availableFields,
+                if (_selectedFormFieldKey != null &&
+                    _selectedFormFieldKey!.isNotEmpty &&
+                    !availableFields.any((f) => f.key == _selectedFormFieldKey))
+                  AccessibleFormField(
+                      key: _selectedFormFieldKey!,
+                      label: _selectedFormFieldKey!),
+              ];
+
+              return DropdownButtonFormField<String?>(
+                value: allFields.any((f) => f.key == _selectedFormFieldKey)
+                    ? _selectedFormFieldKey
+                    : null,
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  labelText: 'Form field',
+                  isDense: true,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                ),
+                style: TextStyle(
+                    fontSize: 12,
+                    color:
+                        isDark ? AppColors.darkText : AppColors.lightText),
+                items: [
+                  const DropdownMenuItem<String?>(
+                      value: null, child: Text('Select field…')),
+                  ...allFields.map((f) => DropdownMenuItem<String?>(
+                        value: f.key,
+                        child: Text(f.label),
+                      )),
+                ],
+                onChanged: allFields.isEmpty
+                    ? null
+                    : (v) {
+                        setState(() => _selectedFormFieldKey = v);
+                        _emit();
+                      },
+              );
+            },
+          ),
+          const SizedBox(height: 6),
+          // ── Model dropdown ────────────────────────────────────────
           DropdownButtonFormField<String?>(
             value: _selectedModelId,
             isExpanded: true,
@@ -808,25 +921,27 @@ class _RuleRowState extends State<_RuleRow> {
             ),
             style: const TextStyle(fontSize: 12),
             items: [
-              const DropdownMenuItem(value: null, child: Text('Select model…')),
-              ...widget.models.map((m) =>
-                  DropdownMenuItem(value: m.id, child: Text(m.name))),
+              const DropdownMenuItem(
+                  value: null, child: Text('Select model…')),
+              ...widget.models
+                  .map((m) => DropdownMenuItem(value: m.id, child: Text(m.name))),
             ],
             onChanged: (v) {
               setState(() {
                 _selectedModelId = v;
-                _selectedFieldKey = null;
+                _selectedModelFieldKey = null;
               });
               _emit();
             },
           ),
           if (selectedModel != null) ...[
             const SizedBox(height: 6),
+            // ── Model field + instance key ────────────────────────
             Row(
               children: [
                 Expanded(
                   child: DropdownButtonFormField<String?>(
-                    value: _selectedFieldKey,
+                    value: _selectedModelFieldKey,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'Model field',
@@ -839,11 +954,10 @@ class _RuleRowState extends State<_RuleRow> {
                       const DropdownMenuItem(
                           value: null, child: Text('Select field…')),
                       ...selectedModel.fields.map((f) =>
-                          DropdownMenuItem(
-                              value: f.name, child: Text(f.name))),
+                          DropdownMenuItem(value: f.name, child: Text(f.name))),
                     ],
                     onChanged: (v) {
-                      setState(() => _selectedFieldKey = v);
+                      setState(() => _selectedModelFieldKey = v);
                       _emit();
                     },
                   ),
@@ -865,17 +979,6 @@ class _RuleRowState extends State<_RuleRow> {
               ],
             ),
           ],
-          const SizedBox(height: 6),
-          TextFormField(
-            controller: _sourceNodeCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Source node ID (blank = this node)',
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            ),
-            style: const TextStyle(fontSize: 11),
-            onChanged: (_) => _emit(),
-          ),
         ],
       ),
     );
