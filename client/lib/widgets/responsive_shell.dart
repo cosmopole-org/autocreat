@@ -121,7 +121,7 @@ class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
     super.initState();
     // Listen to realtime events for nav/task updates
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _wsSub = ref.read(realtimeStreamProvider.stream).listen(_onWsEvent);
+      _wsSub = ref.read(realtimeServiceProvider).messages.listen(_onWsEvent);
     });
   }
 

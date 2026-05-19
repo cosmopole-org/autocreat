@@ -585,7 +585,11 @@ class _ToggleRow extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: AppColors.primary,
+            thumbColor: WidgetStateProperty.resolveWith<Color?>(
+              (states) => states.contains(WidgetState.selected)
+                  ? AppColors.primary
+                  : null,
+            ),
           ),
         ],
       ),

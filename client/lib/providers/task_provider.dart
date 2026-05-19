@@ -20,7 +20,7 @@ class TaskListNotifier extends AsyncNotifier<List<MyTask>> {
     if (isDemo) return [];
 
     _wsSub?.cancel();
-    _wsSub = ref.watch(realtimeStreamProvider.stream).listen(_onWsMessage);
+    _wsSub = ref.watch(realtimeServiceProvider).messages.listen(_onWsMessage);
     ref.onDispose(() => _wsSub?.cancel());
 
     return _fetch();
