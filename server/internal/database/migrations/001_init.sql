@@ -31,7 +31,9 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     email        VARCHAR     NOT NULL,
     password_hash VARCHAR    NOT NULL,
-    full_name    VARCHAR     NOT NULL,
+    first_name   VARCHAR     NOT NULL DEFAULT '',
+    last_name    VARCHAR     NOT NULL DEFAULT '',
+    phone        VARCHAR     NOT NULL DEFAULT '',
     company_id   UUID,                          -- FK added after companies
     role_id      UUID,                          -- FK added after roles
     avatar       VARCHAR,
