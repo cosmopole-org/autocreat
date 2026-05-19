@@ -143,3 +143,114 @@ func TestFlowEdge_Connectivity(t *testing.T) {
 	assert.Equal(t, tgt, e.TargetNodeID)
 	assert.Equal(t, "approve", e.Label)
 }
+
+// ---- FormModelBinding ----
+
+func TestFormModelBinding_DefaultName(t *testing.T) {
+	nodeID := uuid.New()
+	b := models.FormModelBinding{
+		FlowNodeID: nodeID,
+		Name:       "Binding",
+	}
+	assert.Equal(t, "Binding", b.Name)
+	assert.Equal(t, nodeID, b.FlowNodeID)
+	assert.Nil(t, b.StoreAtNodeID)
+}
+
+func TestFormModelBinding_WithStoreAtNodeID(t *testing.T) {
+	nodeID := uuid.New()
+	storeAt := uuid.New()
+	b := models.FormModelBinding{
+		FlowNodeID:    nodeID,
+		Name:          "Deferred Binding",
+		StoreAtNodeID: &storeAt,
+	}
+	assert.NotNil(t, b.StoreAtNodeID)
+	assert.Equal(t, storeAt, *b.StoreAtNodeID)
+}
+
+func TestFormModelBindingRule_Fields(t *testing.T) {
+	bindingID := uuid.New()
+	modelDefID := uuid.New()
+	r := models.FormModelBindingRule{
+		BindingID:         bindingID,
+		FormFieldKey:      "full_name",
+		ModelDefinitionID: modelDefID,
+		ModelInstanceKey:  "person_1",
+		ModelFieldKey:     "name",
+	}
+	assert.Equal(t, "full_name", r.FormFieldKey)
+	assert.Equal(t, "person_1", r.ModelInstanceKey)
+	assert.Equal(t, "name", r.ModelFieldKey)
+	assert.Nil(t, r.SourceNodeID)
+}
+
+func TestFormModelBindingRule_WithSourceNodeID(t *testing.T) {
+	src := uuid.New()
+	r := models.FormModelBindingRule{
+		SourceNodeID: &src,
+		FormFieldKey: "email",
+	}
+	assert.NotNil(t, r.SourceNodeID)
+	assert.Equal(t, src, *r.SourceNodeID)
+}
+
+// ---- NodeLetterAssignment ----
+
+func TestNodeLetterAssignment_Defaults(t *testing.T) {
+	nodeID := uuid.New()
+	tmplID := uuid.New()
+	a := models.NodeLetterAssignment{
+		FlowNodeID:            nodeID,
+		LetterTemplateID:      tmplID,
+		AutoGenerateOnApprove: false,
+		AllowBeforeApprove:    true,
+		VariableBindings:      "{}",
+	}
+	assert.False(t, a.AutoGenerateOnApprove)
+	assert.True(t, a.AllowBeforeApprove)
+	assert.Equal(t, "{}", a.VariableBindings)
+}
+
+func TestNodeLetterAssignment_AutoGenerate(t *testing.T) {
+	a := models.NodeLetterAssignment{
+		AutoGenerateOnApprove: true,
+		AllowBeforeApprove:    false,
+		VariableBindings:      `{"name":{"formFieldKey":"full_name"}}`,
+	}
+	assert.True(t, a.AutoGenerateOnApprove)
+	assert.False(t, a.AllowBeforeApprove)
+}
+
+// ---- StepGeneratedLetter ----
+
+func TestStepGeneratedLetter_TriggerValues(t *testing.T) {
+	instanceID := uuid.New()
+	nodeID := uuid.New()
+	stepID := uuid.New()
+	aID := uuid.New()
+	tmplID := uuid.New()
+	userID := uuid.New()
+
+	for _, trigger := range []string{"manual", "before_approve", "after_approve"} {
+		l := models.StepGeneratedLetter{
+			FlowInstanceID:   instanceID,
+			FlowNodeID:       nodeID,
+			StepID:           stepID,
+			AssignmentID:     aID,
+			LetterTemplateID: tmplID,
+			GeneratedContent: "Hello World",
+			GeneratedByID:    userID,
+			Trigger:          trigger,
+		}
+		assert.Equal(t, trigger, l.Trigger)
+		assert.Equal(t, "Hello World", l.GeneratedContent)
+	}
+}
+
+func TestStepGeneratedLetter_ZeroValue(t *testing.T) {
+	var l models.StepGeneratedLetter
+	assert.Equal(t, uuid.Nil, l.FlowInstanceID)
+	assert.Equal(t, "", l.GeneratedContent)
+	assert.Equal(t, "", l.Trigger)
+}

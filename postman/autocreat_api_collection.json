@@ -2,28 +2,115 @@
   "info": {
     "_postman_id": "autocreat-api-test-collection",
     "name": "AutoCreat API - Full Test Suite",
-    "description": "Complete API test suite for the AutoCreat Go server. Tests all endpoints in dependency order: Auth → Companies → Roles → Users → Forms → Models → Flows → Instances → Letters → Tickets → Stats",
+    "description": "Complete API test suite for the AutoCreat Go server. Tests all endpoints in dependency order: Auth \u2192 Companies \u2192 Roles \u2192 Users \u2192 Forms \u2192 Models \u2192 Flows \u2192 Instances \u2192 Letters \u2192 Tickets \u2192 Stats",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8081", "type": "string" },
-    { "key": "accessToken", "value": "", "type": "string" },
-    { "key": "refreshToken", "value": "", "type": "string" },
-    { "key": "companyId", "value": "a1b2c3d4-e5f6-7890-abcd-ef1234567890", "type": "string" },
-    { "key": "userId", "value": "", "type": "string" },
-    { "key": "roleId", "value": "", "type": "string" },
-    { "key": "flowId", "value": "", "type": "string" },
-    { "key": "nodeId", "value": "", "type": "string" },
-    { "key": "node2Id", "value": "", "type": "string" },
-    { "key": "edgeId", "value": "", "type": "string" },
-    { "key": "formId", "value": "", "type": "string" },
-    { "key": "modelId", "value": "", "type": "string" },
-    { "key": "entityId", "value": "", "type": "string" },
-    { "key": "letterId", "value": "", "type": "string" },
-    { "key": "ticketId", "value": "", "type": "string" },
-    { "key": "instanceId", "value": "", "type": "string" },
-    { "key": "assignmentId", "value": "", "type": "string" },
-    { "key": "createdUserId", "value": "", "type": "string" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "companyId",
+      "value": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "roleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "flowId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "nodeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "node2Id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "edgeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "formId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "modelId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "entityId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "letterId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ticketId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "instanceId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "assignmentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bindingId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "stepId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "generatedLetterId",
+      "value": "",
+      "type": "string"
+    }
   ],
   "item": [
     {
@@ -62,7 +149,12 @@
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/auth/register",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"testuser_{{$timestamp}}@test.com\",\n  \"password\": \"TestPass123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"companyName\": \"Test Company {{$timestamp}}\"\n}"
@@ -90,7 +182,12 @@
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/auth/login",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"admin@horizondigital.com\",\n  \"password\": \"Demo123!\"\n}"
@@ -122,7 +219,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/auth/me",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -146,7 +248,12 @@
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/auth/refresh",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
@@ -175,7 +282,12 @@
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/auth/logout",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
@@ -201,7 +313,12 @@
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/auth/login",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"admin@horizondigital.com\",\n  \"password\": \"Demo123!\"\n}"
@@ -232,7 +349,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/companies",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -256,8 +378,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/companies",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -286,7 +414,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/companies/{{companyId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -310,8 +443,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/companies/{{companyId}}",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -338,7 +477,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/companies/{{companyId}}/members",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -366,11 +510,27 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/api/v1/roles?companyId={{companyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "roles"],
-              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "roles"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "{{companyId}}"
+                }
+              ]
             },
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -395,8 +555,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/roles",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -425,7 +591,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/roles/{{roleId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -449,8 +620,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/roles/{{newRoleId}}",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -477,7 +654,12 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/api/v1/roles/{{newRoleId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -503,11 +685,27 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/api/v1/users?companyId={{companyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "users"],
-              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "{{companyId}}"
+                }
+              ]
             },
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -531,8 +729,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/users",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -561,7 +765,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/users/{{createdUserId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -585,8 +794,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/users/{{createdUserId}}",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -614,8 +829,14 @@
             "method": "PATCH",
             "url": "{{baseUrl}}/api/v1/users/{{createdUserId}}/role",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -638,7 +859,12 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/api/v1/users/{{createdUserId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -664,11 +890,27 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/api/v1/forms?companyId={{companyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "forms"],
-              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "forms"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "{{companyId}}"
+                }
+              ]
             },
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -693,8 +935,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/forms",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -723,7 +971,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/forms/{{newFormId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -747,8 +1000,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/forms/{{newFormId}}",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -775,7 +1034,12 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/api/v1/forms/{{newFormId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -801,11 +1065,27 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/api/v1/models?companyId={{companyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "models"],
-              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "models"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "{{companyId}}"
+                }
+              ]
             },
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -830,8 +1110,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/models",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -860,7 +1146,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/models/{{newModelId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -883,8 +1174,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/models/{{newModelId}}",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -912,8 +1209,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/models/{{newModelId}}/entities",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -941,7 +1244,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/models/{{newModelId}}/entities",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -963,7 +1271,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/models/{{newModelId}}/entities/{{entityId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -987,8 +1300,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/models/{{newModelId}}/entities/{{entityId}}",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1011,7 +1330,12 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/api/v1/models/{{newModelId}}/entities/{{entityId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1031,7 +1355,12 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/api/v1/models/{{newModelId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1057,11 +1386,27 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/api/v1/flows?companyId={{companyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "flows"],
-              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "flows"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "{{companyId}}"
+                }
+              ]
             },
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1086,8 +1431,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/flows",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1116,7 +1467,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1139,8 +1495,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1168,8 +1530,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/nodes",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1198,8 +1566,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/nodes",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1227,7 +1601,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/nodes",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1251,8 +1630,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/nodes/{{nodeId}}",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1276,8 +1661,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/edges",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1305,7 +1696,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/edges",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1328,8 +1724,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/graph",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1353,8 +1755,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/assignments",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1382,7 +1790,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/assignments",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1404,7 +1817,12 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/assignments/{{assignmentId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1424,7 +1842,12 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/edges/{{edgeId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1444,7 +1867,12 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/nodes/{{nodeId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1464,7 +1892,12 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1490,11 +1923,27 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/api/v1/instances?companyId={{companyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "instances"],
-              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "instances"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "{{companyId}}"
+                }
+              ]
             },
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1520,8 +1969,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/instances",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1550,11 +2005,28 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/api/v1/instances/my-tasks?companyId={{companyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "instances", "my-tasks"],
-              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "instances",
+                "my-tasks"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "{{companyId}}"
+                }
+              ]
             },
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1576,7 +2048,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/instances/{{newInstanceId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1600,8 +2077,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/instances/{{newInstanceId}}/advance",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1627,8 +2110,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/instances/a3000001-0000-0000-0000-000000000001/reject",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1659,11 +2148,27 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/api/v1/letters?companyId={{companyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "letters"],
-              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "letters"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "{{companyId}}"
+                }
+              ]
             },
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1688,8 +2193,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/letters",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1718,7 +2229,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/letters/{{newLetterId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1741,8 +2257,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/letters/{{newLetterId}}",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1770,8 +2292,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/letters/{{newLetterId}}/generate",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1801,7 +2329,12 @@
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/api/v1/letters/{{newLetterId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1827,11 +2360,27 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/api/v1/tickets?companyId={{companyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "tickets"],
-              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tickets"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "{{companyId}}"
+                }
+              ]
             },
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1856,8 +2405,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/tickets",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1886,7 +2441,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/tickets/{{newTicketId}}",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -1909,8 +2469,14 @@
             "method": "PUT",
             "url": "{{baseUrl}}/api/v1/tickets/{{newTicketId}}",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1938,8 +2504,14 @@
             "method": "PATCH",
             "url": "{{baseUrl}}/api/v1/tickets/{{newTicketId}}/status",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1967,8 +2539,14 @@
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/tickets/{{newTicketId}}/messages",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -2002,11 +2580,27 @@
             "method": "GET",
             "url": {
               "raw": "{{baseUrl}}/api/v1/stats?companyId={{companyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "v1", "stats"],
-              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "stats"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "{{companyId}}"
+                }
+              ]
             },
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -2055,7 +2649,12 @@
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/auth/login",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"notexist@example.com\",\n  \"password\": \"wrongpassword\"\n}"
@@ -2077,7 +2676,12 @@
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/companies/00000000-0000-0000-0000-000000000000",
-            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
           },
           "event": [
             {
@@ -2095,7 +2699,12 @@
           "request": {
             "method": "POST",
             "url": "{{baseUrl}}/api/v1/auth/register",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"TestPass123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\"\n}"
@@ -2107,6 +2716,355 @@
               "script": {
                 "exec": [
                   "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "14 - Node Bindings",
+      "item": [
+        {
+          "name": "Get Node Bindings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/nodes/{{nodeId}}/bindings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "nodes",
+                "{{nodeId}}",
+                "bindings"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns array', () => {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Save Node Binding",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/nodes/{{nodeId}}/bindings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "nodes",
+                "{{nodeId}}",
+                "bindings"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Student Binding\",\n  \"rules\": [\n    {\n      \"formFieldKey\": \"full_name\",\n      \"modelDefinitionId\": \"{{modelId}}\",\n      \"modelInstanceKey\": \"default\",\n      \"modelFieldKey\": \"name\"\n    }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Binding has id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.collectionVariables.set('bindingId', body.id);",
+                  "});",
+                  "pm.test('Rules array present', () => {",
+                  "  pm.expect(pm.response.json().rules).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Binding",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/bindings/{{bindingId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "bindings",
+                "{{bindingId}}"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Node Letter Assignments",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/nodes/{{nodeId}}/letter-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "nodes",
+                "{{nodeId}}",
+                "letter-assignments"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns array', () => {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Save Node Letter Assignment",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/nodes/{{nodeId}}/letter-assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "nodes",
+                "{{nodeId}}",
+                "letter-assignments"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"letterTemplateId\": \"{{letterId}}\",\n  \"autoGenerateOnApprove\": false,\n  \"allowBeforeApprove\": true,\n  \"variableBindings\": {\n    \"name\": {\n      \"sourceNodeId\": null,\n      \"formFieldKey\": \"full_name\"\n    }\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Assignment has id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.collectionVariables.set('assignmentId', body.id);",
+                  "});",
+                  "pm.test('letterVariables array present', () => {",
+                  "  pm.expect(pm.response.json().letterVariables).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Letter Assignment",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/letter-assignments/{{assignmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "letter-assignments",
+                "{{assignmentId}}"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "15 - Step Letters",
+      "item": [
+        {
+          "name": "Get Generated Letters for Step",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/instances/{{instanceId}}/steps/{{stepId}}/generated-letters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "instances",
+                "{{instanceId}}",
+                "steps",
+                "{{stepId}}",
+                "generated-letters"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns array', () => {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generate Letter for Step",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/instances/{{instanceId}}/steps/{{stepId}}/generate-letter",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "instances",
+                "{{instanceId}}",
+                "steps",
+                "{{stepId}}",
+                "generate-letter"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignmentId\": \"{{assignmentId}}\",\n  \"trigger\": \"manual\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Has generatedContent', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('generatedContent');",
+                  "  pm.collectionVariables.set('generatedLetterId', body.id);",
+                  "});",
+                  "pm.test('trigger field present', () => {",
+                  "  pm.expect(pm.response.json().trigger).to.be.a('string');",
+                  "});"
                 ]
               }
             }
