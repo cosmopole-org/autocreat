@@ -39,11 +39,15 @@ func (r *BindingRepository) FindBindingByID(ctx context.Context, id uuid.UUID) (
 // SaveBinding upserts a binding and atomically replaces all its rules.
 func (r *BindingRepository) SaveBinding(ctx context.Context, binding *models.FormModelBinding, rules []models.FormModelBindingRule) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if binding.ID == uuid.Nil {
-			binding.ID = uuid.New()
-		}
-		if err := tx.Save(binding).Error; err != nil {
-			return err
+		isNew := binding.ID == uuid.Nil
+		if isNew {
+			if err := tx.Create(binding).Error; err != nil {
+				return err
+			}
+		} else {
+			if err := tx.Save(binding).Error; err != nil {
+				return err
+			}
 		}
 		// Replace rules atomically.
 		if err := tx.Where("binding_id = ?", binding.ID).Delete(&models.FormModelBindingRule{}).Error; err != nil {
@@ -99,7 +103,7 @@ func (r *BindingRepository) FindLetterAssignmentByID(ctx context.Context, id uui
 
 func (r *BindingRepository) SaveLetterAssignment(ctx context.Context, a *models.NodeLetterAssignment) error {
 	if a.ID == uuid.Nil {
-		a.ID = uuid.New()
+		return r.db.WithContext(ctx).Create(a).Error
 	}
 	return r.db.WithContext(ctx).Save(a).Error
 }
