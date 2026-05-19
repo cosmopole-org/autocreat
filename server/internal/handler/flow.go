@@ -375,12 +375,13 @@ func (h *FlowHandler) AdvanceInstance(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 		return
 	}
+	userID := c.MustGet(middleware.ContextUserID).(uuid.UUID)
 	var req dto.AdvanceFlowRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	instance, err := h.svc.AdvanceInstance(c.Request.Context(), id, req)
+	instance, err := h.svc.AdvanceInstance(c.Request.Context(), id, userID, req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

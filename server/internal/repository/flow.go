@@ -228,6 +228,11 @@ func (r *FlowRepository) FindFormByID(ctx context.Context, formID uuid.UUID) (*m
 	return &form, nil
 }
 
+// CreateFormSubmission persists a form submission and populates sub.ID.
+func (r *FlowRepository) CreateFormSubmission(ctx context.Context, sub *models.FormSubmission) error {
+	return r.db.WithContext(ctx).Create(sub).Error
+}
+
 // FindFormSubmissionByID fetches a form submission by ID.
 func (r *FlowRepository) FindFormSubmissionByID(ctx context.Context, id uuid.UUID) (*models.FormSubmission, error) {
 	var sub models.FormSubmission
