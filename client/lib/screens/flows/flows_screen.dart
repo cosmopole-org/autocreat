@@ -56,7 +56,9 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
         ],
         'edges': [],
       });
-      router.push('/flows/${flow.id}/edit');
+      ref.invalidate(flowsProvider);
+      await router.push('/flows/${flow.id}/edit');
+      ref.invalidate(flowsProvider);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -164,7 +166,10 @@ class _FlowsScreenState extends ConsumerState<FlowsScreen> {
               delegate: SliverChildBuilderDelegate(
                 (context, i) => _FlowCard(
                   flow: filtered[i],
-                  onEdit: () => context.push('/flows/${filtered[i].id}/edit'),
+                  onEdit: () async {
+                      await context.push('/flows/${filtered[i].id}/edit');
+                      ref.invalidate(flowsProvider);
+                    },
                   onDelete: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,

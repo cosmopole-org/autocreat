@@ -29,14 +29,16 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
 
   Future<void> _createLetter(BuildContext context) async {
     try {
-      final repo = ref.read(letterRepositoryProvider);
-      final letter = await repo.createLetter({
+      final letter = await ref.read(letterNotifierProvider.notifier).create({
         'name': UiText.newLetterTemplate,
         'status': 'draft',
         'content': '',
         UiText.deltacontent: {},
       });
-      if (context.mounted) context.push('/letters/${letter.id}/edit');
+      if (context.mounted) {
+        await context.push('/letters/${letter.id}/edit');
+        ref.read(letterNotifierProvider.notifier).refresh();
+      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -168,8 +170,10 @@ class _LettersScreenState extends ConsumerState<LettersScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (context, i) => _LetterCard(
                         letter: filtered[i],
-                        onEdit: () =>
-                            context.push('/letters/${filtered[i].id}/edit'),
+                        onEdit: () async {
+                            await context.push('/letters/${filtered[i].id}/edit');
+                            ref.read(letterNotifierProvider.notifier).refresh();
+                          },
                         onDelete: () async {
                           final confirmed = await showDialog<bool>(
                             context: context,

@@ -301,6 +301,7 @@ class _LetterEditorScreenState extends ConsumerState<LetterEditorScreen> {
           content: Text(UiText.templateSaved),
           backgroundColor: AppColors.success,
         ));
+        context.pop();
       }
     } catch (e) {
       if (mounted) {
