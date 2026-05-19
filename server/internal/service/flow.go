@@ -448,15 +448,19 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID, userID uu
 	}
 
 	instance.CurrentNodeID = nextNodeID
-	if nextNode.Type == models.NodeTypeEnd {
+	// Mark COMPLETED immediately only for end nodes that have no assigned role/work.
+	// If the end node has an assigned role, it still requires a human action, so
+	// keep the instance ACTIVE until that step is submitted.
+	if nextNode.Type == models.NodeTypeEnd && nextNode.AssignedRoleID == nil {
 		instance.Status = models.InstanceStatusCompleted
 	}
 	if err := s.repo.UpdateInstance(ctx, instance); err != nil {
 		return nil, err
 	}
 
-	// Create the next pending step (skip for END nodes).
-	if nextNode.Type != models.NodeTypeEnd {
+	// Create the next pending step.
+	// Skip only for END nodes that have no assigned role (purely terminal nodes).
+	if nextNode.Type != models.NodeTypeEnd || nextNode.AssignedRoleID != nil {
 		newStep := &models.FlowInstanceStep{
 			FlowInstanceID:   instance.ID,
 			NodeID:           *nextNodeID,
