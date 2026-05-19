@@ -369,7 +369,11 @@ func (s *FlowService) ListInstances(ctx context.Context, companyID uuid.UUID) ([
 	return s.repo.FindInstancesByCompany(ctx, companyID)
 }
 
-func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID, req dto.AdvanceFlowRequest) (*models.FlowInstance, error) {
+// AdvanceInstance marks the current pending step as completed, persists the
+// submitted form data, then creates the next pending step with the correct
+// role/user assignment. The company-wide broadcast is sent only after the new
+// step is committed, so re-fetching clients always see it.
+func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID, userID uuid.UUID, req dto.AdvanceFlowRequest) (*models.FlowInstance, error) {
 	instance, err := s.repo.FindInstanceByID(ctx, instanceID)
 	if err != nil {
 		return nil, err
@@ -395,12 +399,31 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 		}
 	}
 
+	// Persist submitted form data before marking the step complete.
+	var submissionID *uuid.UUID
+	if len(req.FormData) > 0 {
+		var check map[string]interface{}
+		if json.Unmarshal(req.FormData, &check) == nil && len(check) > 0 {
+			sub := &models.FormSubmission{
+				FlowInstanceID: instance.ID,
+				FlowNodeID:     *instance.CurrentNodeID,
+				SubmittedByID:  userID,
+				Data:           string(req.FormData),
+			}
+			if err := s.repo.CreateFormSubmission(ctx, sub); err == nil {
+				submissionID = &sub.ID
+			}
+		}
+	}
+
+	// Mark current pending step as completed.
 	now := time.Now()
 	for i := range instance.Steps {
 		st := &instance.Steps[i]
 		if st.NodeID == *instance.CurrentNodeID && st.Status == models.StepStatusPending {
 			st.Status = models.StepStatusCompleted
 			st.CompletedAt = &now
+			st.FormSubmissionID = submissionID
 			if err := s.repo.UpdateInstanceStep(ctx, st); err != nil {
 				return nil, err
 			}
@@ -408,6 +431,7 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 		}
 	}
 
+	// No next node — instance is complete.
 	if nextNodeID == nil {
 		instance.Status = models.InstanceStatusCompleted
 		instance.CurrentNodeID = nil
@@ -430,8 +454,8 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 	if err := s.repo.UpdateInstance(ctx, instance); err != nil {
 		return nil, err
 	}
-	s.hub.BroadcastToCompany(instance.CompanyID, "flow.instance_advanced", instance)
 
+	// Create the next pending step (skip for END nodes).
 	if nextNode.Type != models.NodeTypeEnd {
 		newStep := &models.FlowInstanceStep{
 			FlowInstanceID:   instance.ID,
@@ -440,7 +464,7 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 			AssignedToRoleID: nextNode.AssignedRoleID,
 		}
 
-		// Specific user assignment takes precedence over round-robin.
+		// Specific user takes precedence; fall back to round-robin.
 		if req.NextUserID != nil {
 			newStep.AssignedToUserID = req.NextUserID
 		} else if req.UseRoundRobin && nextNode.AssignedRoleID != nil {
@@ -454,7 +478,7 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 			return nil, err
 		}
 
-		// Notify the assigned user or all users with the role.
+		// Notify assigned user, or all users with the target role.
 		taskPayload := map[string]interface{}{
 			"instanceId": instance.ID,
 			"stepId":     newStep.ID,
@@ -473,6 +497,9 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 			}
 		}
 	}
+
+	// Broadcast after the new step is committed so clients see it immediately.
+	s.hub.BroadcastToCompany(instance.CompanyID, "flow.instance_advanced", instance)
 
 	return instance, nil
 }
@@ -516,7 +543,25 @@ func (s *FlowService) RejectInstance(ctx context.Context, instanceID uuid.UUID, 
 			Status:           models.StepStatusPending,
 			AssignedToRoleID: node.AssignedRoleID,
 		}
-		_ = s.repo.CreateInstanceStep(ctx, newStep)
+		if err := s.repo.CreateInstanceStep(ctx, newStep); err != nil {
+			return nil, err
+		}
+		// Notify users of the rejection-target node's role.
+		if node.AssignedRoleID != nil {
+			taskPayload := map[string]interface{}{
+				"instanceId": instance.ID,
+				"stepId":     newStep.ID,
+				"nodeId":     *req.RejectToNodeID,
+				"flowId":     instance.FlowID,
+				"companyId":  instance.CompanyID,
+			}
+			roleUsers, err := s.repo.FindUsersByRole(ctx, *node.AssignedRoleID)
+			if err == nil {
+				for _, u := range roleUsers {
+					s.hub.BroadcastToUser(u.ID, "task.assigned", taskPayload)
+				}
+			}
+		}
 	} else {
 		instance.Status = models.InstanceStatusRejected
 	}

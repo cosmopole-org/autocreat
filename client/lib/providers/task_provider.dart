@@ -37,7 +37,10 @@ class TaskListNotifier extends AsyncNotifier<List<MyTask>> {
 
   void _onWsMessage(Map<String, dynamic> msg) {
     final type = msg['type'] as String?;
-    if (type == 'task.assigned' || type == 'task.updated' || type == 'flow.instance_advanced') {
+    if (type == 'task.assigned' ||
+        type == 'task.updated' ||
+        type == 'flow.instance_advanced' ||
+        type == 'flow.instance_rejected') {
       ref.invalidateSelf();
     }
   }
