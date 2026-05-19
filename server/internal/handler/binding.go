@@ -122,9 +122,9 @@ func (h *BindingHandler) DeleteLetterAssignment(c *gin.Context) {
 
 // ---------- Step Letter Generation ----------
 
-// POST /instances/:instanceId/steps/:stepId/generate-letter
+// POST /instances/:id/steps/:stepId/generate-letter
 func (h *BindingHandler) GenerateStepLetter(c *gin.Context) {
-	instanceID, err := uuid.Parse(c.Param("instanceId"))
+	instanceID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid instanceId"})
 		return
@@ -175,9 +175,9 @@ func (h *BindingHandler) GenerateStepLetter(c *gin.Context) {
 	c.JSON(http.StatusCreated, result)
 }
 
-// GET /instances/:instanceId/steps/:stepId/generated-letters
+// GET /instances/:id/steps/:stepId/generated-letters
 func (h *BindingHandler) ListStepGeneratedLetters(c *gin.Context) {
-	instanceID, err := uuid.Parse(c.Param("instanceId"))
+	instanceID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid instanceId"})
 		return
