@@ -68,14 +68,19 @@ func TestLoad_EnvOverrides(t *testing.T) {
 	assert.Equal(t, 30*time.Minute, cfg.AccessTokenTTL)
 	// invalid "30d" duration falls back to default 7 days
 	assert.Equal(t, 7*24*time.Hour, cfg.RefreshTokenTTL)
-	assert.Equal(t, []string{"https://example.com", "https://api.example.com"}, cfg.AllowedOrigins)
+	// GitHub Pages origin is always included; env var origins are appended after it.
+	assert.Contains(t, cfg.AllowedOrigins, "https://cosmopole-org.github.io")
+	assert.Contains(t, cfg.AllowedOrigins, "https://example.com")
+	assert.Contains(t, cfg.AllowedOrigins, "https://api.example.com")
 }
 
 func TestLoad_AllowedOriginsTrimsSpaces(t *testing.T) {
 	t.Setenv("ALLOWED_ORIGINS", "  http://a.com  ,  http://b.com  ")
 	cfg, err := config.Load()
 	require.NoError(t, err)
-	assert.Equal(t, []string{"http://a.com", "http://b.com"}, cfg.AllowedOrigins)
+	assert.Contains(t, cfg.AllowedOrigins, "https://cosmopole-org.github.io")
+	assert.Contains(t, cfg.AllowedOrigins, "http://a.com")
+	assert.Contains(t, cfg.AllowedOrigins, "http://b.com")
 }
 
 func TestLoad_InvalidIntFallsToDefault(t *testing.T) {
