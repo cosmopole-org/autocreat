@@ -211,7 +211,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      initialValue: _level,
+                      value: _level,
                       items: [
                         DropdownMenuItem(
                             value: 'owner', child: Text(UiText.owner)),

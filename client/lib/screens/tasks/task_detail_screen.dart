@@ -216,14 +216,14 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
       ),
       child: TabBar(
         controller: _tabController,
-        tabs: [
+        tabs: const [
           Tab(
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.edit_note_rounded, size: 16),
-                const SizedBox(width: 6),
-                const Text('Fill Form'),
+                Icon(Icons.edit_note_rounded, size: 16),
+                SizedBox(width: 6),
+                Text('Fill Form'),
               ],
             ),
           ),
@@ -231,9 +231,9 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.history_rounded, size: 16),
-                const SizedBox(width: 6),
-                const Text('Step History'),
+                Icon(Icons.history_rounded, size: 16),
+                SizedBox(width: 6),
+                Text('Step History'),
               ],
             ),
           ),
@@ -597,6 +597,8 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
   }
 
   Future<void> _submit(BuildContext context, MyTask task) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
     setState(() => _submitting = true);
     try {
       await ref.read(taskListProvider.notifier).submitTask(
@@ -606,7 +608,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
             useRoundRobin: _useRoundRobin,
           );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(
             content: Row(
               children: [
@@ -622,11 +624,11 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
                 borderRadius: BorderRadius.circular(10)),
           ),
         );
-        context.go('/tasks');
+        router.go('/tasks');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
             backgroundColor: AppColors.error,
@@ -640,6 +642,8 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
   }
 
   Future<void> _showRejectDialog(BuildContext context, MyTask task) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -702,11 +706,11 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
                   : null,
             );
         if (mounted) {
-          context.go('/tasks');
+          router.go('/tasks');
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.showSnackBar(
             SnackBar(
               content: Text('Error: $e'),
               backgroundColor: AppColors.error,
@@ -1026,7 +1030,7 @@ class _NodeBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.radio_button_checked_rounded,
+          const Icon(Icons.radio_button_checked_rounded,
               size: 12, color: AppColors.nodeStep),
           const SizedBox(width: 5),
           Text(
@@ -1060,11 +1064,11 @@ class _RoleBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.shield_outlined, size: 12, color: AppColors.accent),
+          const Icon(Icons.shield_outlined, size: 12, color: AppColors.accent),
           const SizedBox(width: 5),
           Text(
             roleName,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: AppColors.accent,

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import '../../core/constants.dart';
 import '../../models/task.dart';
 import '../../providers/task_provider.dart';
 import '../../providers/realtime_provider.dart';
@@ -268,7 +266,7 @@ class _TaskCard extends ConsumerWidget {
                 // Header row
                 Row(
                   children: [
-                    _NodeTypeBadge(nodeType: 'step'),
+                    const _NodeTypeBadge(nodeType: 'step'),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
