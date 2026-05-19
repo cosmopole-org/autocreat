@@ -477,7 +477,7 @@ class _ModelBindingsSectionState extends ConsumerState<_ModelBindingsSection> {
                   const Padding(
                     padding: EdgeInsets.all(8),
                     child: LinearProgressIndicator(minHeight: 2)),
-              error: (e, _) => _ErrorTile('Failed to load bindings'),
+              error: (e, _) => const _ErrorTile('Failed to load bindings'),
               data: (bindings) => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -787,8 +787,8 @@ class _RuleRowState extends State<_RuleRow> {
                     size: 14, color: AppColors.error),
                 onPressed: widget.onRemove,
                 padding: const EdgeInsets.all(2),
-                minimumSize: const Size(22, 22),
                 style: IconButton.styleFrom(
+                  minimumSize: const Size(22, 22),
                   backgroundColor: AppColors.error.withValues(alpha: 0.08),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4)),
@@ -924,7 +924,7 @@ class _LetterAssignmentsSection extends ConsumerWidget {
                   padding: EdgeInsets.all(8),
                   child: LinearProgressIndicator(minHeight: 2)),
               error: (e, _) =>
-                  _ErrorTile('Failed to load letter assignments'),
+                  const _ErrorTile('Failed to load letter assignments'),
               data: (assignments) => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1169,7 +1169,7 @@ class _SettingToggle extends StatelessWidget {
             value: value,
             onChanged: onChanged,
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),

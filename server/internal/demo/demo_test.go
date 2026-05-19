@@ -102,16 +102,6 @@ func demoGET(t *testing.T, r *gin.Engine, token, path string) *httptest.Response
 	return w
 }
 
-func demoPOST(t *testing.T, r *gin.Engine, token, path string) *httptest.ResponseRecorder {
-	t.Helper()
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, path, nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", "application/json")
-	r.ServeHTTP(w, req)
-	return w
-}
-
 // ---- Write operations are blocked ----
 
 func TestDemoMode_BlocksWriteOperations(t *testing.T) {
