@@ -102,6 +102,10 @@ func Migrate(db *gorm.DB) error {
 		&models.GeneratedLetter{},
 		&models.Ticket{},
 		&models.TicketMessage{},
+		&models.FormModelBinding{},
+		&models.FormModelBindingRule{},
+		&models.NodeLetterAssignment{},
+		&models.StepGeneratedLetter{},
 	); err != nil {
 		return err
 	}
