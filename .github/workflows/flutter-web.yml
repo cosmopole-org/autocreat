@@ -56,7 +56,7 @@ jobs:
           flutter build web \
             --release \
             --base-href "/autocreat/" \
-            --dart-define=API_BASE_URL=${{ vars.API_BASE_URL || 'https://autocreat-api.vercel.app' }}
+            --dart-define=API_BASE_URL=${{ vars.API_BASE_URL || 'https://autocreat.vercel.app' }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

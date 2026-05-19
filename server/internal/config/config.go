@@ -50,11 +50,23 @@ func Load() (*Config, error) {
 		DBConnMaxLifetime: getDurationEnv("DB_CONN_MAX_LIFETIME", time.Hour),
 	}
 
-	origins := getEnv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8080,http://localhost:8081,https://cosmopole-org.github.io")
-	cfg.AllowedOrigins = strings.Split(origins, ",")
-	for i, o := range cfg.AllowedOrigins {
-		cfg.AllowedOrigins[i] = strings.TrimSpace(o)
+	origins := getEnv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8080,http://localhost:8081")
+	seen := make(map[string]struct{})
+	// Always allow the production frontend regardless of env override.
+	required := []string{"https://cosmopole-org.github.io"}
+	for _, o := range required {
+		seen[o] = struct{}{}
 	}
+	for _, o := range strings.Split(origins, ",") {
+		o = strings.TrimSpace(o)
+		if o != "" {
+			if _, dup := seen[o]; !dup {
+				required = append(required, o)
+				seen[o] = struct{}{}
+			}
+		}
+	}
+	cfg.AllowedOrigins = required
 
 	return cfg, nil
 }
