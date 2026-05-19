@@ -25,6 +25,9 @@ class AppConstants {
   static const String usersEndpoint = '/users';
   static const String lettersEndpoint = '/letters';
   static const String ticketsEndpoint = '/tickets';
+  static const String instancesEndpoint = '/instances';
+  static const String myTasksEndpoint = '/instances/my-tasks/full';
+  static const String taskDetailEndpoint = '/instances/task-detail';
 
   // WebSocket — derived from baseUrl so https→wss and http→ws stay in sync.
   static String get wsBaseUrl {
@@ -74,4 +77,6 @@ class AppRoutes {
   static const String tickets = '/tickets';
   static const String ticketDetail = '/tickets/:id';
   static const String settings = '/settings';
+  static const String tasks = '/tasks';
+  static const String taskDetail = '/tasks/:instanceId/:nodeId';
 }

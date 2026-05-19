@@ -103,13 +103,14 @@ type FlowInstance struct {
 // FlowInstanceStep records the history of each step taken in a flow instance.
 type FlowInstanceStep struct {
 	BaseModel
-	FlowInstanceID   uuid.UUID  `gorm:"type:uuid;not null;index" json:"flowInstanceId"`
-	NodeID           uuid.UUID  `gorm:"type:uuid;not null" json:"nodeId"`
-	Status           StepStatus `gorm:"not null;default:'PENDING'" json:"status"`
-	AssignedToRoleID *uuid.UUID `gorm:"type:uuid" json:"assignedToRoleId"`
-	FormSubmissionID *uuid.UUID `gorm:"type:uuid" json:"formSubmissionId"`
-	CompletedAt      *time.Time `json:"completedAt"`
-	RejectedAt       *time.Time `json:"rejectedAt"`
-	RejectionComment string     `json:"rejectionComment"`
-	RejectedToNodeID *uuid.UUID `gorm:"type:uuid" json:"rejectedToNodeId"`
+	FlowInstanceID    uuid.UUID  `gorm:"type:uuid;not null;index" json:"flowInstanceId"`
+	NodeID            uuid.UUID  `gorm:"type:uuid;not null" json:"nodeId"`
+	Status            StepStatus `gorm:"not null;default:'PENDING'" json:"status"`
+	AssignedToRoleID  *uuid.UUID `gorm:"type:uuid" json:"assignedToRoleId"`
+	AssignedToUserID  *uuid.UUID `gorm:"type:uuid" json:"assignedToUserId"`
+	FormSubmissionID  *uuid.UUID `gorm:"type:uuid" json:"formSubmissionId"`
+	CompletedAt       *time.Time `json:"completedAt"`
+	RejectedAt        *time.Time `json:"rejectedAt"`
+	RejectionComment  string     `json:"rejectionComment"`
+	RejectedToNodeID  *uuid.UUID `gorm:"type:uuid" json:"rejectedToNodeId"`
 }

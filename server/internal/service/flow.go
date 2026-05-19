@@ -267,6 +267,32 @@ func (s *FlowService) SaveGraph(ctx context.Context, flowID uuid.UUID, req dto.S
 
 	if flow, ferr := s.repo.FindByID(ctx, flowID); ferr == nil && flow != nil {
 		s.hub.BroadcastToCompany(flow.CompanyID, "flow.graph_saved", map[string]interface{}{"flowId": flowID})
+
+		// Broadcast flow.assignments_updated to every user that holds a role assigned to a node.
+		nodes, nerr := s.repo.FindNodesByFlow(ctx, flowID)
+		if nerr == nil {
+			// Collect unique role IDs and the node IDs mapped to each role.
+			roleNodeMap := make(map[uuid.UUID][]uuid.UUID)
+			for _, n := range nodes {
+				if n.AssignedRoleID != nil {
+					roleNodeMap[*n.AssignedRoleID] = append(roleNodeMap[*n.AssignedRoleID], n.ID)
+				}
+			}
+			for roleID, nodeIDs := range roleNodeMap {
+				payload := map[string]interface{}{
+					"flowId":    flowID,
+					"companyId": flow.CompanyID,
+					"roleId":    roleID,
+					"nodeIds":   nodeIDs,
+				}
+				roleUsers, rerr := s.repo.FindUsersByRole(ctx, roleID)
+				if rerr == nil {
+					for _, u := range roleUsers {
+						s.hub.BroadcastToUser(u.ID, "flow.assignments_updated", payload)
+					}
+				}
+			}
+		}
 	}
 
 	return s.GetByID(ctx, flowID)
@@ -413,8 +439,38 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID uuid.UUID,
 			Status:           models.StepStatusPending,
 			AssignedToRoleID: nextNode.AssignedRoleID,
 		}
+
+		// Specific user assignment takes precedence over round-robin.
+		if req.NextUserID != nil {
+			newStep.AssignedToUserID = req.NextUserID
+		} else if req.UseRoundRobin && nextNode.AssignedRoleID != nil {
+			picked, err := s.pickRoundRobinUser(ctx, *nextNode.AssignedRoleID, instance.CompanyID)
+			if err == nil && picked != nil {
+				newStep.AssignedToUserID = picked
+			}
+		}
+
 		if err := s.repo.CreateInstanceStep(ctx, newStep); err != nil {
 			return nil, err
+		}
+
+		// Notify the assigned user or all users with the role.
+		taskPayload := map[string]interface{}{
+			"instanceId": instance.ID,
+			"stepId":     newStep.ID,
+			"nodeId":     *nextNodeID,
+			"flowId":     instance.FlowID,
+			"companyId":  instance.CompanyID,
+		}
+		if newStep.AssignedToUserID != nil {
+			s.hub.BroadcastToUser(*newStep.AssignedToUserID, "task.assigned", taskPayload)
+		} else if nextNode.AssignedRoleID != nil {
+			roleUsers, err := s.repo.FindUsersByRole(ctx, *nextNode.AssignedRoleID)
+			if err == nil {
+				for _, u := range roleUsers {
+					s.hub.BroadcastToUser(u.ID, "task.assigned", taskPayload)
+				}
+			}
 		}
 	}
 
@@ -474,6 +530,267 @@ func (s *FlowService) RejectInstance(ctx context.Context, instanceID uuid.UUID, 
 
 func (s *FlowService) GetMyTasks(ctx context.Context, companyID, roleID uuid.UUID) ([]models.FlowInstanceStep, error) {
 	return s.repo.FindPendingStepsForRole(ctx, companyID, roleID)
+}
+
+// GetMyTasksFull returns enriched task responses for the given user.
+func (s *FlowService) GetMyTasksFull(ctx context.Context, companyID, userID uuid.UUID, roleID *uuid.UUID) ([]dto.MyTaskResponse, error) {
+	steps, err := s.repo.FindPendingStepsForUser(ctx, companyID, userID, roleID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]dto.MyTaskResponse, 0, len(steps))
+	for _, step := range steps {
+		task, err := s.buildMyTaskResponse(ctx, companyID, step)
+		if err != nil {
+			continue
+		}
+		result = append(result, task)
+	}
+	return result, nil
+}
+
+// GetTaskDetail returns a single enriched task for a given instance and node.
+func (s *FlowService) GetTaskDetail(ctx context.Context, companyID uuid.UUID, instanceID, nodeID uuid.UUID) (*dto.MyTaskResponse, error) {
+	steps, err := s.repo.FindInstanceStepsWithDetails(ctx, instanceID)
+	if err != nil {
+		return nil, fmt.Errorf("load steps: %w", err)
+	}
+	for _, step := range steps {
+		if step.NodeID == nodeID && step.Status == models.StepStatusPending {
+			task, err := s.buildMyTaskResponse(ctx, companyID, step)
+			if err != nil {
+				return nil, err
+			}
+			return &task, nil
+		}
+	}
+	return nil, fmt.Errorf("pending step not found for instance %s node %s", instanceID, nodeID)
+}
+
+// GetUsersForRole returns brief user info for all users with the given role.
+func (s *FlowService) GetUsersForRole(ctx context.Context, roleID uuid.UUID) ([]dto.UserBriefResponse, error) {
+	users, err := s.repo.FindUsersByRole(ctx, roleID)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]dto.UserBriefResponse, len(users))
+	for i, u := range users {
+		result[i] = userToBrief(u)
+	}
+	return result, nil
+}
+
+// pickRoundRobinUser selects the user with the fewest completed steps in the company from the given role.
+// If tied, the user with the lexicographically smallest ID wins.
+func (s *FlowService) pickRoundRobinUser(ctx context.Context, roleID, companyID uuid.UUID) (*uuid.UUID, error) {
+	users, err := s.repo.FindUsersByRole(ctx, roleID)
+	if err != nil || len(users) == 0 {
+		return nil, err
+	}
+
+	var chosen *models.User
+	var chosenCount int64 = -1
+
+	for i := range users {
+		u := &users[i]
+		count, err := s.repo.CountCompletedStepsByUser(ctx, u.ID, companyID)
+		if err != nil {
+			count = 0
+		}
+		if chosenCount == -1 || count < chosenCount ||
+			(count == chosenCount && u.ID.String() < chosen.ID.String()) {
+			chosen = u
+			chosenCount = count
+		}
+	}
+
+	if chosen == nil {
+		return nil, nil
+	}
+	id := chosen.ID
+	return &id, nil
+}
+
+// buildMyTaskResponse assembles a full MyTaskResponse for a single pending step.
+func (s *FlowService) buildMyTaskResponse(ctx context.Context, companyID uuid.UUID, step models.FlowInstanceStep) (dto.MyTaskResponse, error) {
+	task := dto.MyTaskResponse{
+		StepID:           step.ID,
+		InstanceID:       step.FlowInstanceID,
+		NodeID:           step.NodeID,
+		AssignedRoleID:   step.AssignedToRoleID,
+		AssignedToUserID: step.AssignedToUserID,
+		CompanyID:        companyID,
+		CreatedAt:        step.CreatedAt,
+		PreviousSteps:    []dto.StepHistoryItem{},
+		NextNodeRoleUsers: []dto.UserBriefResponse{},
+	}
+
+	// Load instance
+	instance, err := s.repo.FindInstanceByID(ctx, step.FlowInstanceID)
+	if err != nil {
+		return task, nil
+	}
+	task.InstanceCreatedAt = instance.CreatedAt
+	task.FlowID = instance.FlowID
+
+	// Load flow
+	flow, err := s.repo.FindByIDWithGraph(ctx, instance.FlowID)
+	if err == nil && flow != nil {
+		task.FlowName = flow.Name
+	}
+
+	// Load node info
+	node, err := s.repo.FindNodeByID(ctx, step.NodeID)
+	if err == nil && node != nil {
+		task.NodeLabel = node.Label
+		task.NodeDescription = node.Description
+		task.FormID = node.AssignedFormID
+	}
+
+	// Load role name
+	if step.AssignedToRoleID != nil {
+		role, err := s.repo.FindRoleByID(ctx, *step.AssignedToRoleID)
+		if err == nil && role != nil {
+			task.RoleName = role.Name
+		}
+	}
+
+	// Load form fields
+	if task.FormID != nil {
+		form, err := s.repo.FindFormByID(ctx, *task.FormID)
+		if err == nil && form != nil {
+			task.FormName = form.Name
+			var fields []map[string]interface{}
+			if form.Fields != "" && form.Fields != "[]" {
+				_ = json.Unmarshal([]byte(form.Fields), &fields)
+			}
+			if fields == nil {
+				fields = []map[string]interface{}{}
+			}
+			task.FormFields = fields
+		}
+	}
+	if task.FormFields == nil {
+		task.FormFields = []map[string]interface{}{}
+	}
+
+	// Load started-by user
+	startedBy, err := s.repo.FindUserByID(ctx, instance.StartedByID)
+	if err == nil && startedBy != nil {
+		brief := userToBrief(*startedBy)
+		task.StartedByUser = &brief
+	}
+
+	// Load history of all steps for this instance
+	allSteps, err := s.repo.FindInstanceStepsWithDetails(ctx, step.FlowInstanceID)
+	if err == nil {
+		for _, s2 := range allSteps {
+			// only include completed/rejected steps (not the current pending step)
+			if s2.ID == step.ID {
+				continue
+			}
+			if s2.Status != models.StepStatusCompleted && s2.Status != models.StepStatusRejected {
+				continue
+			}
+			histItem := dto.StepHistoryItem{
+				StepID:      s2.ID,
+				NodeID:      s2.NodeID,
+				Status:      string(s2.Status),
+				CompletedAt: s2.CompletedAt,
+				RejectedAt:  s2.RejectedAt,
+				Comment:     s2.RejectionComment,
+				FormFields:  []map[string]interface{}{},
+				FormData:    map[string]interface{}{},
+			}
+
+			// Node label/type for history
+			histNode, err := s.repo.FindNodeByID(ctx, s2.NodeID)
+			if err == nil && histNode != nil {
+				histItem.NodeLabel = histNode.Label
+				histItem.NodeType = string(histNode.Type)
+			}
+
+			// Role name for history step
+			if s2.AssignedToRoleID != nil {
+				role, err := s.repo.FindRoleByID(ctx, *s2.AssignedToRoleID)
+				if err == nil && role != nil {
+					histItem.RoleName = role.Name
+				}
+			}
+
+			// Form submission data
+			if s2.FormSubmissionID != nil {
+				sub, err := s.repo.FindFormSubmissionByID(ctx, *s2.FormSubmissionID)
+				if err == nil && sub != nil {
+					var formData map[string]interface{}
+					if sub.Data != "" && sub.Data != "{}" {
+						_ = json.Unmarshal([]byte(sub.Data), &formData)
+					}
+					if formData != nil {
+						histItem.FormData = formData
+					}
+
+					// Filled-by user
+					filledBy, err := s.repo.FindUserByID(ctx, sub.SubmittedByID)
+					if err == nil && filledBy != nil {
+						brief := userToBrief(*filledBy)
+						histItem.FilledByUser = &brief
+					}
+				}
+			}
+
+			// Form fields for history node
+			if histNode != nil && histNode.AssignedFormID != nil {
+				form, err := s.repo.FindFormByID(ctx, *histNode.AssignedFormID)
+				if err == nil && form != nil {
+					var fields []map[string]interface{}
+					if form.Fields != "" && form.Fields != "[]" {
+						_ = json.Unmarshal([]byte(form.Fields), &fields)
+					}
+					if fields != nil {
+						histItem.FormFields = fields
+					}
+				}
+			}
+
+			task.PreviousSteps = append(task.PreviousSteps, histItem)
+		}
+	}
+
+	// Load users for the next node's role (for assignment dropdown)
+	if flow != nil && instance.CurrentNodeID != nil {
+		edges, err := s.repo.FindEdgesByFlow(ctx, flow.ID)
+		if err == nil {
+			for _, e := range edges {
+				if e.SourceNodeID == *instance.CurrentNodeID {
+					nextNode, err := s.repo.FindNodeByID(ctx, e.TargetNodeID)
+					if err == nil && nextNode != nil && nextNode.AssignedRoleID != nil {
+						roleUsers, err := s.repo.FindUsersByRole(ctx, *nextNode.AssignedRoleID)
+						if err == nil {
+							for _, u := range roleUsers {
+								task.NextNodeRoleUsers = append(task.NextNodeRoleUsers, userToBrief(u))
+							}
+						}
+					}
+					break
+				}
+			}
+		}
+	}
+
+	return task, nil
+}
+
+// userToBrief converts a models.User to dto.UserBriefResponse.
+func userToBrief(u models.User) dto.UserBriefResponse {
+	return dto.UserBriefResponse{
+		ID:        u.ID,
+		FirstName: u.FirstName,
+		LastName:  u.LastName,
+		Email:     u.Email,
+		Avatar:    u.Avatar,
+	}
 }
 
 // ---------- helpers ----------

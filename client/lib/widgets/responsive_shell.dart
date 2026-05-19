@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:badges/badges.dart' as badges;
@@ -7,6 +8,8 @@ import 'package:go_router/go_router.dart';
 import '../core/constants.dart';
 import '../providers/auth_provider.dart';
 import '../providers/company_provider.dart';
+import '../providers/realtime_provider.dart';
+import '../providers/task_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/ticket_provider.dart';
 import '../theme/app_colors.dart';
@@ -89,6 +92,14 @@ List<_NavItem> get _navItems => [
     hasBadge: true,
     section: UiText.communication,
   ),
+  _NavItem(
+    label: 'My Tasks',
+    icon: Icons.task_alt_outlined,
+    selectedIcon: Icons.task_alt_rounded,
+    route: AppRoutes.tasks,
+    hasBadge: true,
+    section: 'Work',
+  ),
 ];
 
 class ResponsiveShell extends ConsumerStatefulWidget {
@@ -103,6 +114,32 @@ class ResponsiveShell extends ConsumerStatefulWidget {
 class _ResponsiveShellState extends ConsumerState<ResponsiveShell> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
+  StreamSubscription<Map<String, dynamic>>? _wsSub;
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen to realtime events for nav/task updates
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _wsSub = ref.read(realtimeStreamProvider.stream).listen(_onWsEvent);
+    });
+  }
+
+  void _onWsEvent(Map<String, dynamic> msg) {
+    final type = msg['type'] as String?;
+    // When flow assignments update or a task is assigned, refresh task list
+    if (type == 'task.assigned' ||
+        type == 'flow.assignments_updated' ||
+        type == 'flow.graph_saved') {
+      ref.invalidate(taskListProvider);
+    }
+  }
+
+  @override
+  void dispose() {
+    _wsSub?.cancel();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
@@ -247,6 +284,7 @@ class _FloatingMobileBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final unread = ref.watch(unreadTicketCountProvider);
+    final taskCount = ref.watch(pendingTaskCountProvider);
     final user = ref.watch(currentUserProvider);
     final glassMode = ref.watch(glassModeProvider);
 
@@ -332,6 +370,24 @@ class _FloatingMobileBar extends ConsumerWidget {
                   icon: Icons.notifications_outlined,
                   onTap: () => GoRouter.of(context).go(AppRoutes.tickets),
                   tooltip: UiText.notifications,
+                ),
+              ),
+              const SizedBox(width: 2),
+              // Tasks shortcut with badge
+              badges.Badge(
+                showBadge: taskCount > 0,
+                badgeStyle: const badges.BadgeStyle(
+                  badgeColor: AppColors.warning,
+                  padding: EdgeInsets.all(4),
+                ),
+                badgeContent: Text(
+                  taskCount > 9 ? '9+' : taskCount.toString(),
+                  style: const TextStyle(color: Colors.white, fontSize: 9),
+                ),
+                child: _BarIconButton(
+                  icon: Icons.task_alt_outlined,
+                  onTap: () => GoRouter.of(context).go(AppRoutes.tasks),
+                  tooltip: 'My Tasks',
                 ),
               ),
               const SizedBox(width: 4),
@@ -427,6 +483,7 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
     final cs = Theme.of(context).colorScheme;
     final user = ref.watch(currentUserProvider);
     final unread = ref.watch(unreadTicketCountProvider);
+    final taskCount = ref.watch(pendingTaskCountProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final glassMode = ref.watch(glassModeProvider);
 
@@ -513,6 +570,25 @@ class _TopBar extends ConsumerWidget implements PreferredSizeWidget {
                 icon: const Icon(Icons.notifications_outlined, size: 20),
                 onPressed: () => GoRouter.of(context).go(AppRoutes.tickets),
                 tooltip: UiText.tickets,
+                style: IconButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+            // Task shortcut with badge
+            badges.Badge(
+              showBadge: taskCount > 0,
+              badgeStyle: const badges.BadgeStyle(
+                  badgeColor: AppColors.warning, padding: EdgeInsets.all(4)),
+              badgeContent: Text(
+                taskCount > 9 ? '9+' : taskCount.toString(),
+                style: const TextStyle(color: Colors.white, fontSize: 9),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.task_alt_outlined, size: 20),
+                onPressed: () => GoRouter.of(context).go(AppRoutes.tasks),
+                tooltip: 'My Tasks',
                 style: IconButton.styleFrom(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -689,6 +765,7 @@ class _CollapsedSidebar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final unread = ref.watch(unreadTicketCountProvider);
+    final taskCount = ref.watch(pendingTaskCountProvider);
     final user = ref.watch(currentUserProvider);
     final glassMode = ref.watch(glassModeProvider);
 
@@ -723,16 +800,21 @@ class _CollapsedSidebar extends ConsumerWidget {
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 4),
               itemCount: _navItems.length,
-              itemBuilder: (context, i) => Tooltip(
-                message: _navItems[i].label,
-                preferBelow: false,
-                child: _NavIcon(
-                  item: _navItems[i],
-                  selected: selectedIndex == i,
-                  badgeCount: _navItems[i].hasBadge ? unread : 0,
-                  onTap: () => onNavigate(i),
-                ),
-              ),
+              itemBuilder: (context, i) {
+                final badgeCount = _navItems[i].hasBadge
+                    ? (_navItems[i].route == AppRoutes.tasks ? taskCount : unread)
+                    : 0;
+                return Tooltip(
+                  message: _navItems[i].label,
+                  preferBelow: false,
+                  child: _NavIcon(
+                    item: _navItems[i],
+                    selected: selectedIndex == i,
+                    badgeCount: badgeCount,
+                    onTap: () => onNavigate(i),
+                  ),
+                );
+              },
             ),
           ),
           const Divider(height: 1),
@@ -1059,7 +1141,7 @@ class _SidebarUserCard extends ConsumerWidget {
   }
 }
 
-class _SidebarNavList extends StatelessWidget {
+class _SidebarNavList extends ConsumerWidget {
   final int selectedIndex;
   final int unread;
   final ValueChanged<int> onNavigate;
@@ -1073,8 +1155,9 @@ class _SidebarNavList extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final taskCount = ref.watch(pendingTaskCountProvider);
     String? lastSection;
     final widgets = <Widget>[];
 
@@ -1098,10 +1181,13 @@ class _SidebarNavList extends StatelessWidget {
           ));
         }
       }
+      final badgeCount = item.hasBadge
+          ? (item.route == AppRoutes.tasks ? taskCount : unread)
+          : 0;
       widgets.add(_NavTile(
         item: item,
         selected: selectedIndex == i,
-        badgeCount: item.hasBadge ? unread : 0,
+        badgeCount: badgeCount,
         onTap: () => onNavigate(i),
       ));
     }

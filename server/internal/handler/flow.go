@@ -413,16 +413,80 @@ func (h *FlowHandler) GetMyTasks(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
 		return
 	}
-	roleIDVal, exists := c.Get(middleware.ContextRoleID)
-	if !exists {
-		c.JSON(http.StatusForbidden, gin.H{"error": "no role assigned"})
-		return
+	userID := c.MustGet(middleware.ContextUserID).(uuid.UUID)
+	var roleID *uuid.UUID
+	if v, exists := c.Get(middleware.ContextRoleID); exists {
+		rid := v.(uuid.UUID)
+		roleID = &rid
 	}
-	roleID := roleIDVal.(uuid.UUID)
-	tasks, err := h.svc.GetMyTasks(c.Request.Context(), cid, roleID)
+	tasks, err := h.svc.GetMyTasksFull(c.Request.Context(), cid, userID, roleID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, tasks)
+}
+
+func (h *FlowHandler) GetMyTasksFull(c *gin.Context) {
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
+	userID := c.MustGet(middleware.ContextUserID).(uuid.UUID)
+	var roleID *uuid.UUID
+	if v, exists := c.Get(middleware.ContextRoleID); exists {
+		rid := v.(uuid.UUID)
+		roleID = &rid
+	}
+	tasks, err := h.svc.GetMyTasksFull(c.Request.Context(), cid, userID, roleID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, tasks)
+}
+
+func (h *FlowHandler) GetTaskDetails(c *gin.Context) {
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
+	instanceIDStr := c.Query("instanceId")
+	nodeIDStr := c.Query("nodeId")
+	if instanceIDStr == "" || nodeIDStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "instanceId and nodeId query params required"})
+		return
+	}
+	instanceID, err := uuid.Parse(instanceIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid instanceId"})
+		return
+	}
+	nodeID, err := uuid.Parse(nodeIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid nodeId"})
+		return
+	}
+	task, err := h.svc.GetTaskDetail(c.Request.Context(), cid, instanceID, nodeID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, task)
+}
+
+func (h *FlowHandler) GetUsersForRole(c *gin.Context) {
+	roleID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid role id"})
+		return
+	}
+	users, err := h.svc.GetUsersForRole(c.Request.Context(), roleID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, users)
 }
