@@ -99,6 +99,45 @@ class StepHistoryItem {
   }
 }
 
+class StartableFlow {
+  final String flowId;
+  final String flowName;
+  final String flowDescription;
+  final String startNodeId;
+  final String startNodeLabel;
+  final String? formId;
+  final String formName;
+  final List<Map<String, dynamic>> formFields;
+
+  const StartableFlow({
+    required this.flowId,
+    required this.flowName,
+    this.flowDescription = '',
+    required this.startNodeId,
+    this.startNodeLabel = '',
+    this.formId,
+    this.formName = '',
+    this.formFields = const [],
+  });
+
+  factory StartableFlow.fromJson(Map<String, dynamic> json) {
+    final rawFields = json['formFields'];
+    final List<Map<String, dynamic>> formFields = rawFields is List
+        ? rawFields.whereType<Map<String, dynamic>>().toList()
+        : [];
+    return StartableFlow(
+      flowId: json['flowId']?.toString() ?? '',
+      flowName: json['flowName']?.toString() ?? '',
+      flowDescription: json['flowDescription']?.toString() ?? '',
+      startNodeId: json['startNodeId']?.toString() ?? '',
+      startNodeLabel: json['startNodeLabel']?.toString() ?? '',
+      formId: json['formId']?.toString(),
+      formName: json['formName']?.toString() ?? '',
+      formFields: formFields,
+    );
+  }
+}
+
 class MyTask {
   final String stepId;
   final String instanceId;

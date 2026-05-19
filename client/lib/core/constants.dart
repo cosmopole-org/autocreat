@@ -28,6 +28,7 @@ class AppConstants {
   static const String instancesEndpoint = '/instances';
   static const String myTasksEndpoint = '/instances/my-tasks/full';
   static const String taskDetailEndpoint = '/instances/task-detail';
+  static const String startableFlowsEndpoint = '/flows/startable';
 
   // WebSocket — derived from baseUrl so https→wss and http→ws stay in sync.
   static String get wsBaseUrl {
@@ -79,4 +80,5 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String tasks = '/tasks';
   static const String taskDetail = '/tasks/:instanceId/:nodeId';
+  static const String startFlow = '/flows/start/:flowId';
 }

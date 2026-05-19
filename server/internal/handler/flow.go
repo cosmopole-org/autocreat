@@ -490,3 +490,22 @@ func (h *FlowHandler) GetUsersForRole(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, users)
 }
+
+func (h *FlowHandler) GetStartableFlows(c *gin.Context) {
+	cid := companyIDFromContext(c)
+	if cid == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
+		return
+	}
+	var roleID *uuid.UUID
+	if v, exists := c.Get(middleware.ContextRoleID); exists {
+		rid := v.(uuid.UUID)
+		roleID = &rid
+	}
+	flows, err := h.svc.GetStartableFlows(c.Request.Context(), cid, roleID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, flows)
+}

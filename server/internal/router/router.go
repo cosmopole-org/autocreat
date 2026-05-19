@@ -122,6 +122,7 @@ func New(opts Options) *gin.Engine {
 
 	flat.GET("/flows", opts.FlowHandler.List)
 	flat.POST("/flows", opts.FlowHandler.Create)
+	flat.GET("/flows/startable", opts.FlowHandler.GetStartableFlows)
 	flat.GET("/flows/:id", opts.FlowHandler.GetByID)
 	flat.PUT("/flows/:id", opts.FlowHandler.Update)
 	flat.DELETE("/flows/:id", opts.FlowHandler.Delete)

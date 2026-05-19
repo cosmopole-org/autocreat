@@ -568,6 +568,46 @@ func (s *FlowService) GetTaskDetail(ctx context.Context, companyID uuid.UUID, in
 	return nil, fmt.Errorf("pending step not found for instance %s node %s", instanceID, nodeID)
 }
 
+// GetStartableFlows returns flows that the given role can initiate, with the
+// form fields for the start node so the client can render the form immediately.
+func (s *FlowService) GetStartableFlows(ctx context.Context, companyID uuid.UUID, roleID *uuid.UUID) ([]dto.StartableFlowResponse, error) {
+	if roleID == nil {
+		return []dto.StartableFlowResponse{}, nil
+	}
+	rows, err := s.repo.FindStartableFlowsByRole(ctx, companyID, *roleID)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]dto.StartableFlowResponse, 0, len(rows))
+	for _, row := range rows {
+		r := dto.StartableFlowResponse{
+			FlowID:          row.FlowID,
+			FlowName:        row.FlowName,
+			FlowDescription: row.FlowDescription,
+			StartNodeID:     row.StartNodeID,
+			StartNodeLabel:  row.StartNodeLabel,
+			FormID:          row.AssignedFormID,
+			FormName:        "",
+			FormFields:      []map[string]interface{}{},
+		}
+		if row.AssignedFormID != nil {
+			form, err := s.repo.FindFormByID(ctx, *row.AssignedFormID)
+			if err == nil && form != nil {
+				r.FormName = form.Name
+				var fields []map[string]interface{}
+				if form.Fields != "" && form.Fields != "[]" {
+					_ = json.Unmarshal([]byte(form.Fields), &fields)
+				}
+				if fields != nil {
+					r.FormFields = fields
+				}
+			}
+		}
+		result = append(result, r)
+	}
+	return result, nil
+}
+
 // GetUsersForRole returns brief user info for all users with the given role.
 func (s *FlowService) GetUsersForRole(ctx context.Context, roleID uuid.UUID) ([]dto.UserBriefResponse, error) {
 	users, err := s.repo.FindUsersByRole(ctx, roleID)
