@@ -8,6 +8,39 @@ class TaskRepository {
 
   TaskRepository(this._apiClient);
 
+  Future<List<StartableFlow>> getStartableFlows({String? companyId}) async {
+    try {
+      final response = await _apiClient.get(
+        AppConstants.startableFlowsEndpoint,
+        queryParameters: companyId != null ? {'companyId': companyId} : null,
+      );
+      final list = response.data as List<dynamic>;
+      return list
+          .map((e) => StartableFlow.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw ApiException.fromDioError(e);
+    }
+  }
+
+  Future<String> startFlow({
+    required String flowId,
+    String? companyId,
+  }) async {
+    try {
+      final response = await _apiClient.post(
+        AppConstants.instancesEndpoint,
+        data: {
+          'flowId': flowId,
+          if (companyId != null) 'companyId': companyId,
+        },
+      );
+      return (response.data as Map<String, dynamic>)['id']?.toString() ?? '';
+    } on DioException catch (e) {
+      throw ApiException.fromDioError(e);
+    }
+  }
+
   Future<List<MyTask>> getMyTasks({String? companyId}) async {
     try {
       final response = await _apiClient.get(

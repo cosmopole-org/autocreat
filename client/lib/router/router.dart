@@ -24,6 +24,7 @@ import '../screens/tickets/tickets_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/tasks/tasks_screen.dart';
 import '../screens/tasks/task_detail_screen.dart';
+import '../screens/flows/start_flow_screen.dart';
 import '../screens/users/user_editor_screen.dart';
 import '../screens/users/users_screen.dart';
 import '../widgets/responsive_shell.dart';
@@ -244,6 +245,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           context,
           state,
           TicketDetailScreen(ticketId: state.pathParameters['id']!),
+        ),
+      ),
+      GoRoute(
+        path: '/flows/start/:flowId',
+        name: 'start-flow',
+        builder: (context, state) => StartFlowScreen(
+          flowId: state.pathParameters['flowId']!,
         ),
       ),
       GoRoute(

@@ -255,6 +255,79 @@ func (r *FlowRepository) FindRoleByID(ctx context.Context, id uuid.UUID) (*model
 	return &role, nil
 }
 
+// StartableFlowInfo is an intermediate result from FindStartableFlowsByRole.
+type StartableFlowInfo struct {
+	FlowID          uuid.UUID
+	FlowName        string
+	FlowDescription string
+	StartNodeID     uuid.UUID
+	StartNodeLabel  string
+	AssignedFormID  *uuid.UUID
+}
+
+// FindStartableFlowsByRole returns flows where the given role is either:
+//  - assigned to the flow's START node directly (FlowNode.AssignedRoleID), or
+//  - granted start permission via FlowAssignment.
+func (r *FlowRepository) FindStartableFlowsByRole(ctx context.Context, companyID, roleID uuid.UUID) ([]StartableFlowInfo, error) {
+	type scanRow struct {
+		FlowID          string
+		FlowName        string
+		FlowDescription string
+		StartNodeID     string
+		StartNodeLabel  string
+		AssignedFormID  *string
+	}
+	var rows []scanRow
+	err := r.db.WithContext(ctx).Raw(`
+		SELECT DISTINCT
+			f.id          AS flow_id,
+			f.name        AS flow_name,
+			f.description AS flow_description,
+			n.id          AS start_node_id,
+			n.label       AS start_node_label,
+			n.assigned_form_id
+		FROM flows f
+		JOIN flow_nodes n ON n.flow_id = f.id AND n.type = 'start'
+		LEFT JOIN flow_assignments fa
+			ON fa.flow_id = f.id
+			AND fa.start_node_id = n.id
+			AND fa.role_id = ?
+			AND fa.is_active = true
+		WHERE f.company_id = ?
+		  AND (n.assigned_role_id = ? OR fa.id IS NOT NULL)
+	`, roleID, companyID, roleID).Scan(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]StartableFlowInfo, 0, len(rows))
+	for _, row := range rows {
+		flowID, err := uuid.Parse(row.FlowID)
+		if err != nil {
+			continue
+		}
+		nodeID, err := uuid.Parse(row.StartNodeID)
+		if err != nil {
+			continue
+		}
+		info := StartableFlowInfo{
+			FlowID:          flowID,
+			FlowName:        row.FlowName,
+			FlowDescription: row.FlowDescription,
+			StartNodeID:     nodeID,
+			StartNodeLabel:  row.StartNodeLabel,
+		}
+		if row.AssignedFormID != nil && *row.AssignedFormID != "" {
+			fid, err := uuid.Parse(*row.AssignedFormID)
+			if err == nil {
+				info.AssignedFormID = &fid
+			}
+		}
+		result = append(result, info)
+	}
+	return result, nil
+}
+
 // CountCompletedStepsByUser counts how many COMPLETED steps a user has handled in a company.
 func (r *FlowRepository) CountCompletedStepsByUser(ctx context.Context, userID, companyID uuid.UUID) (int64, error) {
 	var count int64

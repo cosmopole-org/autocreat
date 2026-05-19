@@ -9,6 +9,7 @@ import '../core/constants.dart';
 import '../providers/auth_provider.dart';
 import '../providers/company_provider.dart';
 import '../providers/realtime_provider.dart';
+import '../models/task.dart';
 import '../providers/task_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/ticket_provider.dart';
@@ -1158,6 +1159,7 @@ class _SidebarNavList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final taskCount = ref.watch(pendingTaskCountProvider);
+    final startableAsync = ref.watch(startableFlowsProvider);
     String? lastSection;
     final widgets = <Widget>[];
 
@@ -1190,6 +1192,28 @@ class _SidebarNavList extends ConsumerWidget {
         badgeCount: badgeCount,
         onTap: () => onNavigate(i),
       ));
+    }
+
+    // Startable flows section
+    final startable = startableAsync.valueOrNull ?? [];
+    if (startable.isNotEmpty) {
+      if (expanded) {
+        widgets.add(Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 6),
+          child: Text(
+            'QUICK START',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: cs.onSurface.withValues(alpha: 0.35),
+              letterSpacing: 1.0,
+            ),
+          ),
+        ));
+      }
+      for (final flow in startable) {
+        widgets.add(_StartFlowTile(flow: flow, expanded: expanded));
+      }
     }
 
     return ListView(
@@ -1289,6 +1313,116 @@ class _NavTile extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+class _StartFlowTile extends ConsumerWidget {
+  final StartableFlow flow;
+  final bool expanded;
+
+  const _StartFlowTile({required this.flow, required this.expanded});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+    final glassMode = ref.watch(glassModeProvider);
+
+    final tile = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () => context.go('/flows/start/${flow.flowId}'),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: glassMode
+                  ? Colors.white.withValues(alpha: 0.02)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.accent],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow_rounded,
+                    size: 14,
+                    color: Colors.white,
+                  ),
+                ),
+                if (expanded) ...[
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          flow.flowName,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: cs.onSurface.withValues(alpha: 0.85),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (flow.formName.isNotEmpty)
+                          Text(
+                            flow.formName,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: cs.onSurface.withValues(alpha: 0.45),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'START',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (!expanded) {
+      return Tooltip(
+        message: 'Start: ${flow.flowName}',
+        preferBelow: false,
+        child: tile,
+      );
+    }
+    return tile;
   }
 }
 

@@ -70,6 +70,24 @@ class TaskListNotifier extends AsyncNotifier<List<MyTask>> {
         );
     await refresh();
   }
+
+  Future<void> startFlow({
+    required String flowId,
+    required Map<String, dynamic> formData,
+  }) async {
+    final companyId = ref.read(selectedCompanyIdProvider);
+    final instanceId = await ref.read(taskRepositoryProvider).startFlow(
+          flowId: flowId,
+          companyId: companyId,
+        );
+    if (instanceId.isNotEmpty) {
+      await ref.read(taskRepositoryProvider).submitTask(
+            instanceId: instanceId,
+            formData: formData,
+          );
+    }
+    await refresh();
+  }
 }
 
 final taskListProvider =
@@ -100,3 +118,37 @@ final roleUsersProvider =
   if (roleId.isEmpty) return [];
   return ref.read(taskRepositoryProvider).getUsersForRole(roleId);
 });
+
+class StartableFlowsNotifier extends AsyncNotifier<List<StartableFlow>> {
+  StreamSubscription<Map<String, dynamic>>? _wsSub;
+
+  @override
+  Future<List<StartableFlow>> build() async {
+    final isDemo = ref.watch(isDemoModeProvider);
+    if (isDemo) return [];
+
+    _wsSub?.cancel();
+    _wsSub = ref.watch(realtimeServiceProvider).messages.listen(_onWsMessage);
+    ref.onDispose(() => _wsSub?.cancel());
+
+    return _fetch();
+  }
+
+  Future<List<StartableFlow>> _fetch() async {
+    final companyId = ref.read(selectedCompanyIdProvider);
+    return ref
+        .read(taskRepositoryProvider)
+        .getStartableFlows(companyId: companyId);
+  }
+
+  void _onWsMessage(Map<String, dynamic> msg) {
+    final type = msg['type'] as String?;
+    if (type == 'flow.assignments_updated' || type == 'flow.graph_saved') {
+      ref.invalidateSelf();
+    }
+  }
+}
+
+final startableFlowsProvider =
+    AsyncNotifierProvider<StartableFlowsNotifier, List<StartableFlow>>(
+        StartableFlowsNotifier.new);

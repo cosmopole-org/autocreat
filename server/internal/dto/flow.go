@@ -274,3 +274,15 @@ type MyTaskResponse struct {
 	PreviousSteps     []StepHistoryItem      `json:"previousSteps"`
 	NextNodeRoleUsers []UserBriefResponse    `json:"nextNodeRoleUsers"`
 }
+
+// StartableFlowResponse describes a flow that the current user can initiate.
+type StartableFlowResponse struct {
+	FlowID          uuid.UUID              `json:"flowId"`
+	FlowName        string                 `json:"flowName"`
+	FlowDescription string                 `json:"flowDescription"`
+	StartNodeID     uuid.UUID              `json:"startNodeId"`
+	StartNodeLabel  string                 `json:"startNodeLabel"`
+	FormID          *uuid.UUID             `json:"formId"`
+	FormName        string                 `json:"formName"`
+	FormFields      []map[string]interface{} `json:"formFields"`
+}
