@@ -120,6 +120,21 @@ func (h *BindingHandler) DeleteLetterAssignment(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+// GET /nodes/:nodeId/accessible-form-fields
+func (h *BindingHandler) GetAccessibleFormFields(c *gin.Context) {
+	nodeID, err := uuid.Parse(c.Param("nodeId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid nodeId"})
+		return
+	}
+	result, err := h.svc.GetAccessibleFormFields(c.Request.Context(), nodeID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
 // ---------- Step Letter Generation ----------
 
 // POST /instances/:id/steps/:stepId/generate-letter

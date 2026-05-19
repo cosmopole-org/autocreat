@@ -37,3 +37,11 @@ final stepGeneratedLettersProvider =
         stepId: args.stepId,
       );
 });
+
+// ---------- Accessible Form Fields ----------
+
+final nodeAccessibleFieldsProvider =
+    FutureProvider.family<List<AccessibleNodeFields>, String>((ref, nodeId) async {
+  if (nodeId.isEmpty) return [];
+  return ref.watch(bindingRepositoryProvider).getAccessibleFormFields(nodeId);
+});

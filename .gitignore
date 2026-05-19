@@ -42,6 +42,9 @@ e2e_tests/__pycache__/
 e2e_tests/.pytest_cache/
 e2e_tests/screenshots/
 
+# Claude Code internal
+.claude/
+
 # IDE
 .vscode/
 .idea/

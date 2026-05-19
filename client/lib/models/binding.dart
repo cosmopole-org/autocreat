@@ -265,3 +265,52 @@ class StepGeneratedLetter {
             : DateTime.now(),
       );
 }
+
+class AccessibleFormField {
+  final String key;
+  final String label;
+
+  const AccessibleFormField({required this.key, required this.label});
+
+  factory AccessibleFormField.fromJson(Map<String, dynamic> json) =>
+      AccessibleFormField(
+        key: json['key']?.toString() ?? '',
+        label: json['label']?.toString() ?? '',
+      );
+}
+
+class AccessibleNodeFields {
+  final String nodeId;
+  final String nodeLabel;
+  final bool isCurrent;
+  final String formId;
+  final String formName;
+  final List<AccessibleFormField> fields;
+
+  const AccessibleNodeFields({
+    required this.nodeId,
+    required this.nodeLabel,
+    required this.isCurrent,
+    required this.formId,
+    required this.formName,
+    required this.fields,
+  });
+
+  factory AccessibleNodeFields.fromJson(Map<String, dynamic> json) {
+    final rawFields = json['fields'];
+    final fields = rawFields is List
+        ? rawFields
+            .whereType<Map<String, dynamic>>()
+            .map(AccessibleFormField.fromJson)
+            .toList()
+        : <AccessibleFormField>[];
+    return AccessibleNodeFields(
+      nodeId: json['nodeId']?.toString() ?? '',
+      nodeLabel: json['nodeLabel']?.toString() ?? '',
+      isCurrent: json['isCurrent'] == true,
+      formId: json['formId']?.toString() ?? '',
+      formName: json['formName']?.toString() ?? '',
+      fields: fields,
+    );
+  }
+}

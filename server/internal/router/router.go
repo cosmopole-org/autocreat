@@ -191,6 +191,7 @@ func New(opts Options) *gin.Engine {
 		flat.GET("/nodes/:nodeId/letter-assignments", opts.BindingHandler.ListLetterAssignments)
 		flat.POST("/nodes/:nodeId/letter-assignments", opts.BindingHandler.SaveLetterAssignment)
 		flat.DELETE("/letter-assignments/:id", opts.BindingHandler.DeleteLetterAssignment)
+		flat.GET("/nodes/:nodeId/accessible-form-fields", opts.BindingHandler.GetAccessibleFormFields)
 
 		flat.POST("/instances/:id/steps/:stepId/generate-letter", opts.BindingHandler.GenerateStepLetter)
 		flat.GET("/instances/:id/steps/:stepId/generated-letters", opts.BindingHandler.ListStepGeneratedLetters)

@@ -90,3 +90,19 @@ type StepGeneratedLetterResponse struct {
 	GeneratedByID    uuid.UUID `json:"generatedById"`
 	CreatedAt        time.Time `json:"createdAt"`
 }
+
+// ---------- Accessible Form Fields ----------
+
+type AccessibleFormField struct {
+	Key   string `json:"key"`
+	Label string `json:"label"`
+}
+
+type AccessibleNodeFormFields struct {
+	NodeID    uuid.UUID             `json:"nodeId"`
+	NodeLabel string                `json:"nodeLabel"`
+	IsCurrent bool                  `json:"isCurrent"`
+	FormID    uuid.UUID             `json:"formId"`
+	FormName  string                `json:"formName"`
+	Fields    []AccessibleFormField `json:"fields"`
+}

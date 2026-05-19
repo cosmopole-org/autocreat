@@ -121,4 +121,17 @@ class BindingRepository {
       throw ApiException.fromDioError(e);
     }
   }
+
+  Future<List<AccessibleNodeFields>> getAccessibleFormFields(String nodeId) async {
+    try {
+      final response = await _apiClient.get('/nodes/$nodeId/accessible-form-fields');
+      final list = response.data as List<dynamic>;
+      return list
+          .whereType<Map<String, dynamic>>()
+          .map(AccessibleNodeFields.fromJson)
+          .toList();
+    } on DioException catch (e) {
+      throw ApiException.fromDioError(e);
+    }
+  }
 }
