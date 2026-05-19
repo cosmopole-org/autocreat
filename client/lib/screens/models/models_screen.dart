@@ -33,7 +33,11 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
         'name': UiText.newModel,
         'fields': [],
       });
-      if (context.mounted) context.push('/models/${model.id}/edit');
+      ref.invalidate(modelsProvider);
+      if (context.mounted) {
+        await context.push('/models/${model.id}/edit');
+        ref.invalidate(modelsProvider);
+      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -149,8 +153,10 @@ class _ModelsScreenState extends ConsumerState<ModelsScreen> {
                   padding: const EdgeInsets.only(bottom: 12),
                   child: _ModelCard(
                     model: filtered[i],
-                    onEdit: () =>
-                        context.push('/models/${filtered[i].id}/edit'),
+                    onEdit: () async {
+                      await context.push('/models/${filtered[i].id}/edit');
+                      ref.invalidate(modelsProvider);
+                    },
                     onDelete: () async {
                       final confirmed = await showDialog<bool>(
                         context: context,

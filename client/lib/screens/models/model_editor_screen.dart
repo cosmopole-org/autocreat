@@ -59,6 +59,7 @@ class _ModelEditorScreenState extends ConsumerState<ModelEditorScreen> {
               content: Text(UiText.modelSaved),
               backgroundColor: AppColors.success),
         );
+        context.pop();
       }
     } catch (e) {
       if (mounted) {

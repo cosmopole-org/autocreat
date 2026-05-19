@@ -57,6 +57,7 @@ class _FormEditorScreenState extends ConsumerState<FormEditorScreen> {
               content: Text(UiText.formSaved),
               backgroundColor: AppColors.success),
         );
+        context.pop();
       }
     } catch (e) {
       if (mounted) {

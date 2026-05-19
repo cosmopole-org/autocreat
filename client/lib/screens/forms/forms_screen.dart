@@ -34,8 +34,10 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
         'status': 'draft',
         'fields': [],
       });
+      ref.invalidate(formsProvider);
       if (context.mounted) {
-        context.push('/forms/${form.id}/edit');
+        await context.push('/forms/${form.id}/edit');
+        ref.invalidate(formsProvider);
       }
     } catch (e) {
       if (context.mounted) {
@@ -141,7 +143,10 @@ class _FormsScreenState extends ConsumerState<FormsScreen> {
               delegate: SliverChildBuilderDelegate(
                 (context, i) => _FormCard(
                   form: filtered[i],
-                  onEdit: () => context.push('/forms/${filtered[i].id}/edit'),
+                  onEdit: () async {
+                      await context.push('/forms/${filtered[i].id}/edit');
+                      ref.invalidate(formsProvider);
+                    },
                   onDelete: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,

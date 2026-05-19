@@ -83,6 +83,7 @@ class _FlowEditorScreenState extends ConsumerState<FlowEditorScreen> {
             backgroundColor: AppColors.success,
           ),
         );
+        context.pop();
       }
     } catch (e) {
       if (mounted) {
