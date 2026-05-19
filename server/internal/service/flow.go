@@ -305,7 +305,7 @@ func (s *FlowService) CreateAssignment(ctx context.Context, flowID uuid.UUID, re
 		FlowID:      flowID,
 		StartNodeID: req.StartNodeID,
 		RoleID:      req.RoleID,
-		IsActive:    req.IsActive,
+		IsActive:    true, // always active on creation; use the update/delete endpoint to deactivate
 	}
 	if err := s.repo.CreateAssignment(ctx, a); err != nil {
 		return nil, err
@@ -606,6 +606,12 @@ func (s *FlowService) GetStartableFlows(ctx context.Context, companyID uuid.UUID
 		result = append(result, r)
 	}
 	return result, nil
+}
+
+// GetCurrentUserRoleID looks up a user's current role from the DB.
+// Used as a fallback when the JWT claim is missing (e.g. stale token).
+func (s *FlowService) GetCurrentUserRoleID(ctx context.Context, userID uuid.UUID) *uuid.UUID {
+	return s.repo.FindRoleIDForUser(ctx, userID)
 }
 
 // GetUsersForRole returns brief user info for all users with the given role.

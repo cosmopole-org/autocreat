@@ -414,11 +414,7 @@ func (h *FlowHandler) GetMyTasks(c *gin.Context) {
 		return
 	}
 	userID := c.MustGet(middleware.ContextUserID).(uuid.UUID)
-	var roleID *uuid.UUID
-	if v, exists := c.Get(middleware.ContextRoleID); exists {
-		rid := v.(uuid.UUID)
-		roleID = &rid
-	}
+	roleID := roleIDFromContext(c, h.svc, userID)
 	tasks, err := h.svc.GetMyTasksFull(c.Request.Context(), cid, userID, roleID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -434,11 +430,7 @@ func (h *FlowHandler) GetMyTasksFull(c *gin.Context) {
 		return
 	}
 	userID := c.MustGet(middleware.ContextUserID).(uuid.UUID)
-	var roleID *uuid.UUID
-	if v, exists := c.Get(middleware.ContextRoleID); exists {
-		rid := v.(uuid.UUID)
-		roleID = &rid
-	}
+	roleID := roleIDFromContext(c, h.svc, userID)
 	tasks, err := h.svc.GetMyTasksFull(c.Request.Context(), cid, userID, roleID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -497,11 +489,8 @@ func (h *FlowHandler) GetStartableFlows(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "missing companyId"})
 		return
 	}
-	var roleID *uuid.UUID
-	if v, exists := c.Get(middleware.ContextRoleID); exists {
-		rid := v.(uuid.UUID)
-		roleID = &rid
-	}
+	userID := c.MustGet(middleware.ContextUserID).(uuid.UUID)
+	roleID := roleIDFromContext(c, h.svc, userID)
 	flows, err := h.svc.GetStartableFlows(c.Request.Context(), cid, roleID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

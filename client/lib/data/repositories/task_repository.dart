@@ -30,10 +30,8 @@ class TaskRepository {
     try {
       final response = await _apiClient.post(
         AppConstants.instancesEndpoint,
-        data: {
-          'flowId': flowId,
-          if (companyId != null) 'companyId': companyId,
-        },
+        queryParameters: companyId != null ? {'companyId': companyId} : null,
+        data: {'flowId': flowId},
       );
       return (response.data as Map<String, dynamic>)['id']?.toString() ?? '';
     } on DioException catch (e) {
