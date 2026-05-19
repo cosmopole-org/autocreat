@@ -192,8 +192,8 @@ func New(opts Options) *gin.Engine {
 		flat.POST("/nodes/:nodeId/letter-assignments", opts.BindingHandler.SaveLetterAssignment)
 		flat.DELETE("/letter-assignments/:id", opts.BindingHandler.DeleteLetterAssignment)
 
-		flat.POST("/instances/:instanceId/steps/:stepId/generate-letter", opts.BindingHandler.GenerateStepLetter)
-		flat.GET("/instances/:instanceId/steps/:stepId/generated-letters", opts.BindingHandler.ListStepGeneratedLetters)
+		flat.POST("/instances/:id/steps/:stepId/generate-letter", opts.BindingHandler.GenerateStepLetter)
+		flat.GET("/instances/:id/steps/:stepId/generated-letters", opts.BindingHandler.ListStepGeneratedLetters)
 	}
 
 	// Realtime WebSocket
