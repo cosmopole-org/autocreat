@@ -22,6 +22,8 @@ import '../screens/roles/roles_screen.dart';
 import '../screens/tickets/ticket_detail_screen.dart';
 import '../screens/tickets/tickets_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/tasks/tasks_screen.dart';
+import '../screens/tasks/task_detail_screen.dart';
 import '../screens/users/user_editor_screen.dart';
 import '../screens/users/users_screen.dart';
 import '../widgets/responsive_shell.dart';
@@ -155,6 +157,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: 'settings',
             builder: (context, state) => const SettingsScreen(),
           ),
+          GoRoute(
+            path: AppRoutes.tasks,
+            name: 'tasks',
+            builder: (context, state) => const TasksScreen(),
+          ),
         ],
       ),
       // SECONDARY ROUTES - outside shell, with modal/fullscreen behavior
@@ -237,6 +244,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           context,
           state,
           TicketDetailScreen(ticketId: state.pathParameters['id']!),
+        ),
+      ),
+      GoRoute(
+        path: '/tasks/:instanceId/:nodeId',
+        name: 'task-detail',
+        builder: (context, state) => TaskDetailScreen(
+          instanceId: state.pathParameters['instanceId']!,
+          nodeId: state.pathParameters['nodeId']!,
         ),
       ),
     ],

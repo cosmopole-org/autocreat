@@ -117,7 +117,9 @@ type StartFlowRequest struct {
 }
 
 type AdvanceFlowRequest struct {
-	FormData json.RawMessage `json:"formData"`
+	FormData      json.RawMessage `json:"formData"`
+	NextUserID    *uuid.UUID      `json:"nextUserId"`
+	UseRoundRobin bool            `json:"useRoundRobin"`
 }
 
 type RejectFlowRequest struct {
@@ -223,4 +225,52 @@ func EdgeFromModel(e models.FlowEdge) FlowEdgeResponse {
 		Label:        e.Label,
 		ConditionID:  e.ConditionID,
 	}
+}
+
+// UserBriefResponse is a minimal user representation for dropdowns and task responses.
+type UserBriefResponse struct {
+	ID        uuid.UUID `json:"id"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"lastName"`
+	Email     string    `json:"email"`
+	Avatar    string    `json:"avatar"`
+}
+
+// StepHistoryItem shows a completed or rejected step with user and form data.
+type StepHistoryItem struct {
+	StepID      uuid.UUID              `json:"stepId"`
+	NodeID      uuid.UUID              `json:"nodeId"`
+	NodeLabel   string                 `json:"nodeLabel"`
+	NodeType    string                 `json:"nodeType"`
+	Status      string                 `json:"status"`
+	FilledByUser *UserBriefResponse    `json:"filledByUser"`
+	RoleName    string                 `json:"roleName"`
+	FormData    map[string]interface{} `json:"formData"`
+	FormFields  []map[string]interface{} `json:"formFields"`
+	CompletedAt *time.Time             `json:"completedAt"`
+	RejectedAt  *time.Time             `json:"rejectedAt"`
+	Comment     string                 `json:"rejectionComment"`
+}
+
+// MyTaskResponse is the full enriched task for the tasks panel.
+type MyTaskResponse struct {
+	StepID            uuid.UUID              `json:"stepId"`
+	InstanceID        uuid.UUID              `json:"instanceId"`
+	FlowID            uuid.UUID              `json:"flowId"`
+	FlowName          string                 `json:"flowName"`
+	NodeID            uuid.UUID              `json:"nodeId"`
+	NodeLabel         string                 `json:"nodeLabel"`
+	NodeDescription   string                 `json:"nodeDescription"`
+	AssignedRoleID    *uuid.UUID             `json:"assignedRoleId"`
+	RoleName          string                 `json:"roleName"`
+	FormID            *uuid.UUID             `json:"formId"`
+	FormName          string                 `json:"formName"`
+	FormFields        []map[string]interface{} `json:"formFields"`
+	AssignedToUserID  *uuid.UUID             `json:"assignedToUserId"`
+	StartedByUser     *UserBriefResponse     `json:"startedByUser"`
+	CompanyID         uuid.UUID              `json:"companyId"`
+	CreatedAt         time.Time              `json:"createdAt"`
+	InstanceCreatedAt time.Time              `json:"instanceCreatedAt"`
+	PreviousSteps     []StepHistoryItem      `json:"previousSteps"`
+	NextNodeRoleUsers []UserBriefResponse    `json:"nextNodeRoleUsers"`
 }

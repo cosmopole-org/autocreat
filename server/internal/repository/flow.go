@@ -178,3 +178,91 @@ func (r *FlowRepository) FindPendingStepsForRole(ctx context.Context, companyID,
 		Find(&steps).Error
 	return steps, err
 }
+
+// FindPendingStepsForUser returns active pending steps assigned to the specific user
+// or to the user's role (where no specific user is assigned).
+func (r *FlowRepository) FindPendingStepsForUser(ctx context.Context, companyID, userID uuid.UUID, roleID *uuid.UUID) ([]models.FlowInstanceStep, error) {
+	var steps []models.FlowInstanceStep
+	q := r.db.WithContext(ctx).
+		Joins("JOIN flow_instances ON flow_instances.id = flow_instance_steps.flow_instance_id").
+		Where("flow_instances.company_id = ? AND flow_instances.status = 'ACTIVE' AND flow_instance_steps.status = 'PENDING'", companyID)
+
+	if roleID != nil {
+		q = q.Where(
+			"(flow_instance_steps.assigned_to_user_id = ? OR (flow_instance_steps.assigned_to_user_id IS NULL AND flow_instance_steps.assigned_to_role_id = ?))",
+			userID, *roleID,
+		)
+	} else {
+		q = q.Where("flow_instance_steps.assigned_to_user_id = ?", userID)
+	}
+
+	err := q.Find(&steps).Error
+	return steps, err
+}
+
+// FindUsersByRole returns all active users that have the given roleID.
+func (r *FlowRepository) FindUsersByRole(ctx context.Context, roleID uuid.UUID) ([]models.User, error) {
+	var users []models.User
+	err := r.db.WithContext(ctx).
+		Where("role_id = ? AND is_active = true", roleID).
+		Find(&users).Error
+	return users, err
+}
+
+// FindInstanceStepsWithDetails returns all steps for a given instance ordered by creation time.
+func (r *FlowRepository) FindInstanceStepsWithDetails(ctx context.Context, instanceID uuid.UUID) ([]models.FlowInstanceStep, error) {
+	var steps []models.FlowInstanceStep
+	err := r.db.WithContext(ctx).
+		Where("flow_instance_id = ?", instanceID).
+		Order("created_at ASC").
+		Find(&steps).Error
+	return steps, err
+}
+
+// FindFormByID fetches a form definition by ID.
+func (r *FlowRepository) FindFormByID(ctx context.Context, formID uuid.UUID) (*models.FormDefinition, error) {
+	var form models.FormDefinition
+	if err := r.db.WithContext(ctx).First(&form, "id = ?", formID).Error; err != nil {
+		return nil, err
+	}
+	return &form, nil
+}
+
+// FindFormSubmissionByID fetches a form submission by ID.
+func (r *FlowRepository) FindFormSubmissionByID(ctx context.Context, id uuid.UUID) (*models.FormSubmission, error) {
+	var sub models.FormSubmission
+	if err := r.db.WithContext(ctx).First(&sub, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &sub, nil
+}
+
+// FindUserByID fetches a user by ID.
+func (r *FlowRepository) FindUserByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
+	var user models.User
+	if err := r.db.WithContext(ctx).First(&user, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+// FindRoleByID fetches a role by ID.
+func (r *FlowRepository) FindRoleByID(ctx context.Context, id uuid.UUID) (*models.Role, error) {
+	var role models.Role
+	if err := r.db.WithContext(ctx).First(&role, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &role, nil
+}
+
+// CountCompletedStepsByUser counts how many COMPLETED steps a user has handled in a company.
+func (r *FlowRepository) CountCompletedStepsByUser(ctx context.Context, userID, companyID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.WithContext(ctx).
+		Model(&models.FlowInstanceStep{}).
+		Joins("JOIN flow_instances ON flow_instances.id = flow_instance_steps.flow_instance_id").
+		Where("flow_instances.company_id = ? AND flow_instance_steps.assigned_to_user_id = ? AND flow_instance_steps.status = 'COMPLETED'",
+			companyID, userID).
+		Count(&count).Error
+	return count, err
+}
