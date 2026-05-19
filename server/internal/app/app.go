@@ -43,6 +43,7 @@ func New(cfg *config.Config, db *gorm.DB, rdb *redis.Client, log *zap.Logger) *A
 	modelRepo := repository.NewModelRepository(db)
 	letterRepo := repository.NewLetterRepository(db)
 	ticketRepo := repository.NewTicketRepository(db)
+	bindingRepo := repository.NewBindingRepository(db)
 
 	// Services
 	authSvc := service.NewAuthService(authRepo, cfg)
@@ -54,6 +55,9 @@ func New(cfg *config.Config, db *gorm.DB, rdb *redis.Client, log *zap.Logger) *A
 	modelSvc := service.NewModelService(modelRepo)
 	letterSvc := service.NewLetterService(letterRepo)
 	ticketSvc := service.NewTicketService(ticketRepo, hub)
+	bindingSvc := service.NewBindingService(bindingRepo, letterRepo, modelRepo)
+	// Inject after construction to avoid circular deps.
+	flowSvc.SetBindingService(bindingSvc)
 
 	// Handlers
 	authH := handler.NewAuthHandler(authSvc)
@@ -67,6 +71,7 @@ func New(cfg *config.Config, db *gorm.DB, rdb *redis.Client, log *zap.Logger) *A
 	ticketH := handler.NewTicketHandler(ticketSvc)
 	statsH := handler.NewStatsHandler(db)
 	realtimeH := handler.NewRealtimeHandler(hub, log)
+	bindingH := handler.NewBindingHandler(bindingSvc)
 
 	engine := router.New(router.Options{
 		AuthHandler:     authH,
@@ -80,6 +85,7 @@ func New(cfg *config.Config, db *gorm.DB, rdb *redis.Client, log *zap.Logger) *A
 		TicketHandler:   ticketH,
 		StatsHandler:    statsH,
 		RealtimeHandler: realtimeH,
+		BindingHandler:  bindingH,
 		AuthService:     authSvc,
 		AllowedOrigins:  cfg.AllowedOrigins,
 		RateLimitRPS:    cfg.RateLimit,

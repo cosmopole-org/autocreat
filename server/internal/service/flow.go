@@ -14,13 +14,20 @@ import (
 )
 
 type FlowService struct {
-	repo *repository.FlowRepository
-	db   *gorm.DB
-	hub  *Hub
+	repo       *repository.FlowRepository
+	db         *gorm.DB
+	hub        *Hub
+	bindingSvc *BindingService
 }
 
 func NewFlowService(repo *repository.FlowRepository, db *gorm.DB, hub *Hub) *FlowService {
 	return &FlowService{repo: repo, db: db, hub: hub}
+}
+
+// SetBindingService injects the BindingService after construction to avoid
+// circular dependency between the two services.
+func (s *FlowService) SetBindingService(svc *BindingService) {
+	s.bindingSvc = svc
 }
 
 // ---------- Flow CRUD ----------
@@ -418,6 +425,7 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID, userID uu
 
 	// Mark current pending step as completed.
 	now := time.Now()
+	var completedStep *models.FlowInstanceStep
 	for i := range instance.Steps {
 		st := &instance.Steps[i]
 		if st.NodeID == *instance.CurrentNodeID && st.Status == models.StepStatusPending {
@@ -427,8 +435,23 @@ func (s *FlowService) AdvanceInstance(ctx context.Context, instanceID, userID uu
 			if err := s.repo.UpdateInstanceStep(ctx, st); err != nil {
 				return nil, err
 			}
+			completedStep = st
 			break
 		}
+	}
+
+	// Execute form→model bindings and auto-generate letters for the completed node.
+	if s.bindingSvc != nil && completedStep != nil {
+		completedNodeID := *instance.CurrentNodeID
+		var currentFormData map[string]interface{}
+		if len(req.FormData) > 0 {
+			_ = json.Unmarshal(req.FormData, &currentFormData)
+		}
+		_ = s.bindingSvc.ExecuteBindingsForNode(
+			ctx, completedNodeID, instance.ID, instance.CompanyID, userID,
+			currentFormData, completedNodeID,
+		)
+		s.bindingSvc.AutoGenerateLettersForNode(ctx, completedNodeID, instance.ID, completedStep.ID, userID)
 	}
 
 	// No next node — instance is complete.

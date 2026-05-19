@@ -23,6 +23,7 @@ func TestRouterBuildsWithoutPanic(t *testing.T) {
 		TicketHandler:   nil,
 		StatsHandler:    nil,
 		RealtimeHandler: nil,
+		BindingHandler:  nil,
 		AuthService:     nil,
 		AllowedOrigins:  []string{"*"},
 		RateLimitRPS:    10,
