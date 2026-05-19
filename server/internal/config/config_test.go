@@ -19,7 +19,7 @@ func TestLoad_Defaults(t *testing.T) {
 		"DB_MAX_IDLE_CONNS", "DB_MAX_OPEN_CONNS", "DB_CONN_MAX_LIFETIME",
 	}
 	for _, v := range vars {
-		os.Unsetenv(v)
+		_ = os.Unsetenv(v)
 	}
 
 	cfg, err := config.Load()

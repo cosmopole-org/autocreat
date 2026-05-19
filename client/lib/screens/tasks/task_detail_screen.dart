@@ -347,7 +347,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
               style: TextStyle(fontSize: 13.5, color: cs.onSurface)),
           value: _formValues[fieldId] == true,
           onChanged: (v) => setState(() => _formValues[fieldId] = v),
-          activeColor: AppColors.primary,
+          activeThumbColor: AppColors.primary,
           contentPadding: EdgeInsets.zero,
         );
         break;
@@ -454,7 +454,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
                   _useRoundRobin = v;
                   if (v) _selectedNextUserId = null;
                 }),
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -1261,14 +1261,14 @@ class _LetterAssignmentTaskCardState
                       Row(
                         children: [
                           if (a.autoGenerateOnApprove)
-                            _InfoChip(
+                            const _InfoChip(
                               label: 'Auto after approval',
                               icon: Icons.auto_awesome_rounded,
                               color: AppColors.success,
                             ),
                           if (!a.autoGenerateOnApprove &&
                               a.allowBeforeApprove) ...[
-                            _InfoChip(
+                            const _InfoChip(
                               label: 'Manual',
                               icon: Icons.edit_note_rounded,
                               color: AppColors.primary,

@@ -72,6 +72,8 @@ func setupTestApp(t *testing.T) (*App, func()) {
 func truncateAll(t *testing.T, db *gorm.DB) {
 	t.Helper()
 	tables := []string{
+		"step_generated_letters", "node_letter_assignments",
+		"form_model_binding_rules", "form_model_bindings",
 		"flow_instance_steps", "flow_instances", "flow_assignments",
 		"flow_edges", "flow_nodes", "flows",
 		"form_submissions", "form_definitions",
