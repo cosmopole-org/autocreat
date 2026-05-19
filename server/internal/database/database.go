@@ -21,6 +21,9 @@ var bootstrapSQL string
 //go:embed migrations/002_fix_users_columns.sql
 var fixUsersColumnsSQL string
 
+//go:embed migrations/003_fix_flow_schema.sql
+var fixFlowSchemaSQL string
+
 // maxDBRetries returns how many connection attempts to make.
 // Defaults to 1 (fail-fast) so Vercel serverless cold starts don't time out.
 // Set DB_CONNECT_RETRIES=10 in long-running server environments to restore the
@@ -107,5 +110,9 @@ func Migrate(db *gorm.DB) error {
 		return err
 	}
 
-	return db.Exec(fixUsersColumnsSQL).Error
+	if err := db.Exec(fixUsersColumnsSQL).Error; err != nil {
+		return err
+	}
+
+	return db.Exec(fixFlowSchemaSQL).Error
 }

@@ -135,7 +135,8 @@ CREATE TABLE IF NOT EXISTS flows (
     company_id  UUID        NOT NULL,
     name        VARCHAR     NOT NULL,
     description VARCHAR,
-    is_active   BOOLEAN     NOT NULL DEFAULT TRUE,
+    status      VARCHAR     NOT NULL DEFAULT 'draft',
+    settings    JSONB                DEFAULT '{}',
     CONSTRAINT pk_flows PRIMARY KEY (id),
     CONSTRAINT fk_flows_company FOREIGN KEY (company_id)
         REFERENCES companies (id) ON DELETE CASCADE
@@ -173,13 +174,17 @@ CREATE TABLE IF NOT EXISTS flow_nodes (
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     flow_id          UUID        NOT NULL,
-    node_type        VARCHAR     NOT NULL,
-    name             VARCHAR     NOT NULL,
-    position_x       FLOAT8      NOT NULL DEFAULT 0,
-    position_y       FLOAT8      NOT NULL DEFAULT 0,
+    "type"           VARCHAR     NOT NULL,
+    label            VARCHAR     NOT NULL,
+    x                FLOAT8      NOT NULL DEFAULT 0,
+    y                FLOAT8      NOT NULL DEFAULT 0,
+    width            FLOAT8      NOT NULL DEFAULT 160,
+    height           FLOAT8      NOT NULL DEFAULT 60,
     assigned_role_id UUID,
     assigned_form_id UUID,
-    properties       JSONB,
+    description      VARCHAR,
+    branches         JSONB                DEFAULT '[]',
+    metadata         JSONB                DEFAULT '{}',
     CONSTRAINT pk_flow_nodes PRIMARY KEY (id),
     CONSTRAINT fk_flow_nodes_flow FOREIGN KEY (flow_id)
         REFERENCES flows (id) ON DELETE CASCADE,
@@ -187,8 +192,8 @@ CREATE TABLE IF NOT EXISTS flow_nodes (
         REFERENCES roles (id) ON DELETE SET NULL,
     CONSTRAINT fk_flow_nodes_form FOREIGN KEY (assigned_form_id)
         REFERENCES form_definitions (id) ON DELETE SET NULL,
-    CONSTRAINT chk_flow_nodes_node_type CHECK (
-        node_type IN ('START', 'STEP', 'DECISION', 'END')
+    CONSTRAINT chk_flow_nodes_type CHECK (
+        "type" IN ('start', 'step', 'decision', 'end')
     )
 );
 
@@ -208,7 +213,7 @@ CREATE TABLE IF NOT EXISTS flow_edges (
     source_node_id UUID        NOT NULL,
     target_node_id UUID        NOT NULL,
     label          VARCHAR,
-    condition      JSONB,
+    condition_id   VARCHAR,
     CONSTRAINT pk_flow_edges PRIMARY KEY (id),
     CONSTRAINT fk_flow_edges_flow        FOREIGN KEY (flow_id)
         REFERENCES flows (id) ON DELETE CASCADE,
