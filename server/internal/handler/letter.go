@@ -119,5 +119,13 @@ func (h *LetterHandler) Generate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, g)
+	c.JSON(http.StatusCreated, dto.GeneratedLetterResponse{
+		ID:               g.ID,
+		TemplateID:       g.TemplateID,
+		FlowInstanceID:   g.FlowInstanceID,
+		Data:             g.Data,
+		GeneratedContent: g.GeneratedContent,
+		CreatedByID:      g.CreatedByID,
+		CreatedAt:        g.CreatedAt,
+	})
 }

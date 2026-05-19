@@ -5,6 +5,7 @@ import (
 
 	"github.com/autocreat/server/internal/dto"
 	"github.com/autocreat/server/internal/middleware"
+	"github.com/autocreat/server/internal/models"
 	"github.com/autocreat/server/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -104,6 +105,15 @@ func (h *TicketHandler) UpdateStatus(c *gin.Context) {
 	var req dto.UpdateTicketStatusRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	switch req.Status {
+	case models.TicketStatusOpen, models.TicketStatusInProgress,
+		models.TicketStatusResolved, models.TicketStatusClosed:
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid status: must be one of open, inProgress, resolved, closed",
+		})
 		return
 	}
 	ticket, err := h.svc.UpdateStatus(c.Request.Context(), id, req)

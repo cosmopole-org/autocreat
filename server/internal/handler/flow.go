@@ -5,6 +5,7 @@ import (
 
 	"github.com/autocreat/server/internal/dto"
 	"github.com/autocreat/server/internal/middleware"
+	"github.com/autocreat/server/internal/models"
 	"github.com/autocreat/server/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -299,6 +300,27 @@ func (h *FlowHandler) DeleteAssignment(c *gin.Context) {
 
 // ---------- Flow Instances ----------
 
+func instanceToDTO(inst *models.FlowInstance) dto.FlowInstanceResponse {
+	return dto.FlowInstanceResponse{
+		ID:            inst.ID,
+		FlowID:        inst.FlowID,
+		CompanyID:     inst.CompanyID,
+		CurrentNodeID: inst.CurrentNodeID,
+		Status:        inst.Status,
+		StartedByID:   inst.StartedByID,
+		CreatedAt:     inst.CreatedAt,
+		UpdatedAt:     inst.UpdatedAt,
+	}
+}
+
+func instancesToDTO(instances []models.FlowInstance) []dto.FlowInstanceResponse {
+	resp := make([]dto.FlowInstanceResponse, len(instances))
+	for i := range instances {
+		resp[i] = instanceToDTO(&instances[i])
+	}
+	return resp
+}
+
 func (h *FlowHandler) ListInstances(c *gin.Context) {
 	cid := companyIDFromContext(c)
 	if cid == uuid.Nil {
@@ -310,7 +332,7 @@ func (h *FlowHandler) ListInstances(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, instances)
+	c.JSON(http.StatusOK, instancesToDTO(instances))
 }
 
 func (h *FlowHandler) StartInstance(c *gin.Context) {
@@ -330,7 +352,7 @@ func (h *FlowHandler) StartInstance(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, instance)
+	c.JSON(http.StatusCreated, instanceToDTO(instance))
 }
 
 func (h *FlowHandler) GetInstance(c *gin.Context) {
@@ -344,7 +366,7 @@ func (h *FlowHandler) GetInstance(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "instance not found"})
 		return
 	}
-	c.JSON(http.StatusOK, instance)
+	c.JSON(http.StatusOK, instanceToDTO(instance))
 }
 
 func (h *FlowHandler) AdvanceInstance(c *gin.Context) {
@@ -363,7 +385,7 @@ func (h *FlowHandler) AdvanceInstance(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, instance)
+	c.JSON(http.StatusOK, instanceToDTO(instance))
 }
 
 func (h *FlowHandler) RejectInstance(c *gin.Context) {
@@ -382,7 +404,7 @@ func (h *FlowHandler) RejectInstance(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, instance)
+	c.JSON(http.StatusOK, instanceToDTO(instance))
 }
 
 func (h *FlowHandler) GetMyTasks(c *gin.Context) {

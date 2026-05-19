@@ -338,53 +338,65 @@ func SeedDatabase(db *gorm.DB, log *zap.Logger) error {
 	}
 
 	// ------------------------------------------------------------------ Forms
+	type fieldOption struct {
+		Value string `json:"value"`
+		Label string `json:"label"`
+	}
 	type formField struct {
-		ID          string   `json:"id"`
-		Name        string   `json:"name"`
-		Label       string   `json:"label"`
-		FieldType   string   `json:"fieldType"`
-		Required    bool     `json:"required"`
-		Placeholder string   `json:"placeholder,omitempty"`
-		Options     []string `json:"options,omitempty"`
-		HelpText    string   `json:"helpText,omitempty"`
+		ID          string        `json:"id"`
+		Name        string        `json:"name"`
+		Label       string        `json:"label"`
+		Type        string        `json:"type"`
+		Required    bool          `json:"required"`
+		Placeholder string        `json:"placeholder,omitempty"`
+		Options     []fieldOption `json:"options,omitempty"`
+		HelpText    string        `json:"helpText,omitempty"`
+	}
+
+	opts := func(vals ...string) []fieldOption {
+		out := make([]fieldOption, len(vals))
+		for i, v := range vals {
+			out[i] = fieldOption{Value: v, Label: v}
+		}
+		return out
 	}
 
 	onboardingFields := []formField{
-		{ID: "ff-onb-001", Name: "full_name", Label: "Full Name", FieldType: "text", Required: true, Placeholder: "Enter your full name"},
-		{ID: "ff-onb-002", Name: "department", Label: "Department", FieldType: "select", Required: true, Options: []string{"Engineering", "HR", "Sales", "Marketing", "Operations"}, Placeholder: "Select department"},
-		{ID: "ff-onb-003", Name: "start_date", Label: "Start Date", FieldType: "date", Required: true},
-		{ID: "ff-onb-004", Name: "remote_work", Label: "Remote Work", FieldType: "checkbox", HelpText: "Check if the employee will work remotely"},
-		{ID: "ff-onb-005", Name: "equipment_needs", Label: "Equipment Needs", FieldType: "multiselect", Options: []string{"Laptop", "Monitor", "Headset", "Keyboard", "Mouse"}, HelpText: "Select all required equipment"},
-		{ID: "ff-onb-006", Name: "emergency_contact", Label: "Emergency Contact", FieldType: "text", Placeholder: "Name and phone number"},
-		{ID: "ff-onb-007", Name: "notes", Label: "Notes", FieldType: "textarea", Placeholder: "Any additional notes…"},
+		{ID: "ff-onb-001", Name: "full_name", Label: "Full Name", Type: "text", Required: true, Placeholder: "Enter your full name"},
+		{ID: "ff-onb-002", Name: "department", Label: "Department", Type: "dropdown", Required: true, Options: opts("Engineering", "HR", "Sales", "Marketing", "Operations"), Placeholder: "Select department"},
+		{ID: "ff-onb-003", Name: "start_date", Label: "Start Date", Type: "date", Required: true},
+		{ID: "ff-onb-004", Name: "remote_work", Label: "Remote Work", Type: "checkbox", HelpText: "Check if the employee will work remotely"},
+		{ID: "ff-onb-005", Name: "equipment_needs", Label: "Equipment Needs", Type: "multiselect", Options: opts("Laptop", "Monitor", "Headset", "Keyboard", "Mouse"), HelpText: "Select all required equipment"},
+		{ID: "ff-onb-006", Name: "emergency_contact", Label: "Emergency Contact", Type: "text", Placeholder: "Name and phone number"},
+		{ID: "ff-onb-007", Name: "notes", Label: "Notes", Type: "textarea", Placeholder: "Any additional notes…"},
 	}
 	projectFields := []formField{
-		{ID: "ff-proj-001", Name: "project_title", Label: "Project Title", FieldType: "text", Required: true, Placeholder: "Enter project title"},
-		{ID: "ff-proj-002", Name: "budget_estimate", Label: "Budget Estimate ($)", FieldType: "number", Required: true, Placeholder: "0"},
-		{ID: "ff-proj-003", Name: "timeline", Label: "Timeline", FieldType: "select", Required: true, Options: []string{"1 week", "2 weeks", "1 month", "3 months", "6 months"}},
-		{ID: "ff-proj-004", Name: "team_size", Label: "Team Size", FieldType: "number", Placeholder: "Number of people"},
-		{ID: "ff-proj-005", Name: "risk_level", Label: "Risk Level", FieldType: "radio", Required: true, Options: []string{"Low", "Medium", "High"}},
-		{ID: "ff-proj-006", Name: "description", Label: "Description", FieldType: "textarea", Required: true, Placeholder: "Describe the project…"},
-		{ID: "ff-proj-007", Name: "attachments_required", Label: "Attachments Required", FieldType: "checkbox"},
+		{ID: "ff-proj-001", Name: "project_title", Label: "Project Title", Type: "text", Required: true, Placeholder: "Enter project title"},
+		{ID: "ff-proj-002", Name: "budget_estimate", Label: "Budget Estimate ($)", Type: "number", Required: true, Placeholder: "0"},
+		{ID: "ff-proj-003", Name: "timeline", Label: "Timeline", Type: "dropdown", Required: true, Options: opts("1 week", "2 weeks", "1 month", "3 months", "6 months")},
+		{ID: "ff-proj-004", Name: "team_size", Label: "Team Size", Type: "number", Placeholder: "Number of people"},
+		{ID: "ff-proj-005", Name: "risk_level", Label: "Risk Level", Type: "radio", Required: true, Options: opts("Low", "Medium", "High")},
+		{ID: "ff-proj-006", Name: "description", Label: "Description", Type: "textarea", Required: true, Placeholder: "Describe the project…"},
+		{ID: "ff-proj-007", Name: "attachments_required", Label: "Attachments Required", Type: "checkbox"},
 	}
 	bugFields := []formField{
-		{ID: "ff-bug-001", Name: "bug_title", Label: "Bug Title", FieldType: "text", Required: true, Placeholder: "Brief description of the bug"},
-		{ID: "ff-bug-002", Name: "severity", Label: "Severity", FieldType: "select", Required: true, Options: []string{"Critical", "High", "Medium", "Low"}},
-		{ID: "ff-bug-003", Name: "module", Label: "Affected Module", FieldType: "select", Options: []string{"Frontend", "Backend", "Database", "API", "Mobile"}},
-		{ID: "ff-bug-004", Name: "steps_to_reproduce", Label: "Steps to Reproduce", FieldType: "textarea", Required: true, Placeholder: "1. Go to…\n2. Click…\n3. Observe…"},
-		{ID: "ff-bug-005", Name: "expected_behavior", Label: "Expected Behavior", FieldType: "textarea", Placeholder: "What should happen?"},
-		{ID: "ff-bug-006", Name: "actual_behavior", Label: "Actual Behavior", FieldType: "textarea", Placeholder: "What actually happens?"},
-		{ID: "ff-bug-007", Name: "browser_os", Label: "Browser / OS", FieldType: "text", Placeholder: "Chrome 120 / macOS Sonoma"},
-		{ID: "ff-bug-008", Name: "screenshot_url", Label: "Screenshot URL", FieldType: "text", Placeholder: "https://…"},
+		{ID: "ff-bug-001", Name: "bug_title", Label: "Bug Title", Type: "text", Required: true, Placeholder: "Brief description of the bug"},
+		{ID: "ff-bug-002", Name: "severity", Label: "Severity", Type: "dropdown", Required: true, Options: opts("Critical", "High", "Medium", "Low")},
+		{ID: "ff-bug-003", Name: "module", Label: "Affected Module", Type: "dropdown", Options: opts("Frontend", "Backend", "Database", "API", "Mobile")},
+		{ID: "ff-bug-004", Name: "steps_to_reproduce", Label: "Steps to Reproduce", Type: "textarea", Required: true, Placeholder: "1. Go to…\n2. Click…\n3. Observe…"},
+		{ID: "ff-bug-005", Name: "expected_behavior", Label: "Expected Behavior", Type: "textarea", Placeholder: "What should happen?"},
+		{ID: "ff-bug-006", Name: "actual_behavior", Label: "Actual Behavior", Type: "textarea", Placeholder: "What actually happens?"},
+		{ID: "ff-bug-007", Name: "browser_os", Label: "Browser / OS", Type: "text", Placeholder: "Chrome 120 / macOS Sonoma"},
+		{ID: "ff-bug-008", Name: "screenshot_url", Label: "Screenshot URL", Type: "text", Placeholder: "https://…"},
 	}
 	feedbackFields := []formField{
-		{ID: "ff-fb-001", Name: "client_name", Label: "Client Name", FieldType: "text", Placeholder: "Your name or company"},
-		{ID: "ff-fb-002", Name: "rating", Label: "Overall Rating", FieldType: "radio", Required: true, Options: []string{"1 star", "2 stars", "3 stars", "4 stars", "5 stars"}},
-		{ID: "ff-fb-003", Name: "service_quality", Label: "Service Quality", FieldType: "select", Options: []string{"Excellent", "Good", "Average", "Poor"}},
-		{ID: "ff-fb-004", Name: "response_time", Label: "Response Time", FieldType: "select", Options: []string{"Excellent", "Good", "Average", "Poor"}},
-		{ID: "ff-fb-005", Name: "would_recommend", Label: "Would Recommend", FieldType: "checkbox", HelpText: "Check if you would recommend us to others"},
-		{ID: "ff-fb-006", Name: "comments", Label: "Comments", FieldType: "textarea", Placeholder: "Share your experience…"},
-		{ID: "ff-fb-007", Name: "contact_permission", Label: "May we contact you?", FieldType: "checkbox"},
+		{ID: "ff-fb-001", Name: "client_name", Label: "Client Name", Type: "text", Placeholder: "Your name or company"},
+		{ID: "ff-fb-002", Name: "rating", Label: "Overall Rating", Type: "radio", Required: true, Options: opts("1 star", "2 stars", "3 stars", "4 stars", "5 stars")},
+		{ID: "ff-fb-003", Name: "service_quality", Label: "Service Quality", Type: "dropdown", Options: opts("Excellent", "Good", "Average", "Poor")},
+		{ID: "ff-fb-004", Name: "response_time", Label: "Response Time", Type: "dropdown", Options: opts("Excellent", "Good", "Average", "Poor")},
+		{ID: "ff-fb-005", Name: "would_recommend", Label: "Would Recommend", Type: "checkbox", HelpText: "Check if you would recommend us to others"},
+		{ID: "ff-fb-006", Name: "comments", Label: "Comments", Type: "textarea", Placeholder: "Share your experience…"},
+		{ID: "ff-fb-007", Name: "contact_permission", Label: "May we contact you?", Type: "checkbox"},
 	}
 
 	forms := []models.FormDefinition{
@@ -600,23 +612,23 @@ func SeedDatabase(db *gorm.DB, log *zap.Logger) error {
 		Required bool   `json:"required"`
 	}
 	clientFields := []modelField{
-		{ID: "mf-cl-001", Name: "company_name", Label: "Company Name", Type: "text", Required: true},
-		{ID: "mf-cl-002", Name: "industry", Label: "Industry", Type: "text"},
-		{ID: "mf-cl-003", Name: "contact_email", Label: "Contact Email", Type: "email"},
-		{ID: "mf-cl-004", Name: "annual_revenue", Label: "Annual Revenue ($)", Type: "number"},
-		{ID: "mf-cl-005", Name: "contract_value", Label: "Contract Value ($)", Type: "number"},
-		{ID: "mf-cl-006", Name: "status", Label: "Status", Type: "text"},
-		{ID: "mf-cl-007", Name: "notes", Label: "Notes", Type: "text"},
+		{ID: "mf-cl-001", Name: "company_name", Label: "Company Name", Type: "string", Required: true},
+		{ID: "mf-cl-002", Name: "industry", Label: "Industry", Type: "string"},
+		{ID: "mf-cl-003", Name: "contact_email", Label: "Contact Email", Type: "string"},
+		{ID: "mf-cl-004", Name: "annual_revenue", Label: "Annual Revenue ($)", Type: "float"},
+		{ID: "mf-cl-005", Name: "contract_value", Label: "Contract Value ($)", Type: "float"},
+		{ID: "mf-cl-006", Name: "status", Label: "Status", Type: "string"},
+		{ID: "mf-cl-007", Name: "notes", Label: "Notes", Type: "string"},
 	}
 	assetFields := []modelField{
-		{ID: "mf-as-001", Name: "asset_name", Label: "Asset Name", Type: "text", Required: true},
-		{ID: "mf-as-002", Name: "asset_type", Label: "Asset Type", Type: "text"},
-		{ID: "mf-as-003", Name: "serial_number", Label: "Serial Number", Type: "text"},
-		{ID: "mf-as-004", Name: "assigned_to", Label: "Assigned To", Type: "text"},
+		{ID: "mf-as-001", Name: "asset_name", Label: "Asset Name", Type: "string", Required: true},
+		{ID: "mf-as-002", Name: "asset_type", Label: "Asset Type", Type: "string"},
+		{ID: "mf-as-003", Name: "serial_number", Label: "Serial Number", Type: "string"},
+		{ID: "mf-as-004", Name: "assigned_to", Label: "Assigned To", Type: "string"},
 		{ID: "mf-as-005", Name: "purchase_date", Label: "Purchase Date", Type: "date"},
 		{ID: "mf-as-006", Name: "warranty_expiry", Label: "Warranty Expiry", Type: "date"},
-		{ID: "mf-as-007", Name: "value", Label: "Value ($)", Type: "number"},
-		{ID: "mf-as-008", Name: "location", Label: "Location", Type: "text"},
+		{ID: "mf-as-007", Name: "value", Label: "Value ($)", Type: "float"},
+		{ID: "mf-as-008", Name: "location", Label: "Location", Type: "string"},
 	}
 
 	modelDefs := []models.ModelDefinition{

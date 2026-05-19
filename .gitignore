@@ -1,6 +1,13 @@
-# Flutter
-client/.dart_tool/
-client/.packages
+# Dart / Flutter — applies to client/, api_cli/, and any future Dart packages
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Flutter client specific
 client/build/
 client/.flutter-plugins
 client/.flutter-plugins-dependencies
@@ -15,11 +22,10 @@ client/ios/.symlinks/
 client/macos/Pods/
 client/linux/flutter/ephemeral/
 client/windows/flutter/ephemeral/
-client/web/.dart_tool/
 client/coverage/
-*.g.dart
-*.freezed.dart
-*.mocks.dart
+
+# Dart CLI (api_cli)
+api_cli/build/
 
 # Go
 server/autocreat-server

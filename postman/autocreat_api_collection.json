@@ -1,0 +1,2118 @@
+{
+  "info": {
+    "_postman_id": "autocreat-api-test-collection",
+    "name": "AutoCreat API - Full Test Suite",
+    "description": "Complete API test suite for the AutoCreat Go server. Tests all endpoints in dependency order: Auth → Companies → Roles → Users → Forms → Models → Flows → Instances → Letters → Tickets → Stats",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8081", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "refreshToken", "value": "", "type": "string" },
+    { "key": "companyId", "value": "a1b2c3d4-e5f6-7890-abcd-ef1234567890", "type": "string" },
+    { "key": "userId", "value": "", "type": "string" },
+    { "key": "roleId", "value": "", "type": "string" },
+    { "key": "flowId", "value": "", "type": "string" },
+    { "key": "nodeId", "value": "", "type": "string" },
+    { "key": "node2Id", "value": "", "type": "string" },
+    { "key": "edgeId", "value": "", "type": "string" },
+    { "key": "formId", "value": "", "type": "string" },
+    { "key": "modelId", "value": "", "type": "string" },
+    { "key": "entityId", "value": "", "type": "string" },
+    { "key": "letterId", "value": "", "type": "string" },
+    { "key": "ticketId", "value": "", "type": "string" },
+    { "key": "instanceId", "value": "", "type": "string" },
+    { "key": "assignmentId", "value": "", "type": "string" },
+    { "key": "createdUserId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "01 - Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Service is autocreat', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.eql('ok');",
+                  "  pm.expect(body.service).to.eql('autocreat');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Auth",
+      "item": [
+        {
+          "name": "Register New User",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser_{{$timestamp}}@test.com\",\n  \"password\": \"TestPass123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"companyName\": \"Test Company {{$timestamp}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns tokens and user', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('accessToken');",
+                  "  pm.expect(body).to.have.property('refreshToken');",
+                  "  pm.expect(body).to.have.property('user');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@horizondigital.com\",\n  \"password\": \"Demo123!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns tokens', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('accessToken');",
+                  "  pm.expect(body).to.have.property('refreshToken');",
+                  "  pm.expect(body.user).to.have.property('id');",
+                  "  pm.collectionVariables.set('accessToken', body.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', body.refreshToken);",
+                  "  pm.collectionVariables.set('userId', body.user.id);",
+                  "  pm.collectionVariables.set('companyId', body.user.companyId);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns user profile', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('email');",
+                  "  pm.expect(body.email).to.eql('admin@horizondigital.com');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/refresh",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns new tokens', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('access_token');",
+                  "  pm.expect(body).to.have.property('refresh_token');",
+                  "  pm.collectionVariables.set('accessToken', body.access_token);",
+                  "  pm.collectionVariables.set('refreshToken', body.refresh_token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/logout",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns logout message', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.message).to.eql('logged out');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Re-Login After Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@horizondigital.com\",\n  \"password\": \"Demo123!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('accessToken', body.accessToken);",
+                  "pm.collectionVariables.set('refreshToken', body.refreshToken);",
+                  "pm.collectionVariables.set('companyId', body.user.companyId);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Companies",
+      "item": [
+        {
+          "name": "List Companies",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/companies",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  pm.expect(body.length).to.be.at.least(1);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Company",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/companies",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Company API\",\n  \"description\": \"Created by API test\",\n  \"industry\": \"Technology\",\n  \"website\": \"https://testcompany.io\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns company with id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.name).to.eql('Test Company API');",
+                  "  pm.collectionVariables.set('newCompanyId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Company by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/companies/{{companyId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns company', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('name');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Company",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/companies/{{companyId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated description from API test\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Description updated', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.description).to.eql('Updated description from API test');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Company Members",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/companies/{{companyId}}/members",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns members array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Roles",
+      "item": [
+        {
+          "name": "List Roles",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/roles?companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "roles"],
+              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns roles array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  pm.expect(body.length).to.be.at.least(1);",
+                  "  pm.collectionVariables.set('roleId', body[0].id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/roles",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API Test Role\",\n  \"description\": \"Created by API test\",\n  \"level\": \"member\",\n  \"companyId\": \"{{companyId}}\",\n  \"permissions\": [\n    {\n      \"resource\": \"tickets\",\n      \"canCreate\": true,\n      \"canRead\": true,\n      \"canUpdate\": false,\n      \"canDelete\": false,\n      \"customActions\": []\n    }\n  ],\n  \"isActive\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns role with id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.name).to.eql('API Test Role');",
+                  "  pm.collectionVariables.set('newRoleId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Role by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/roles/{{roleId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns role', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('name');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/roles/{{newRoleId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API Test Role Updated\",\n  \"description\": \"Updated by test\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Name updated', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.name).to.eql('API Test Role Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/roles/{{newRoleId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204 or 200', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 - Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users?companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "users"],
+              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns users array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  pm.expect(body.length).to.be.at.least(1);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/users",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser_test@horizondigital.com\",\n  \"password\": \"TestPass123!\",\n  \"firstName\": \"New\",\n  \"lastName\": \"TestUser\",\n  \"companyId\": \"{{companyId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns user with id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.email).to.eql('newuser_test@horizondigital.com');",
+                  "  pm.collectionVariables.set('createdUserId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/users/{{createdUserId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns user', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.email).to.eql('newuser_test@horizondigital.com');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/users/{{createdUserId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated\",\n  \"lastName\": \"Name\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Name updated', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.firstName).to.eql('Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Assign Role to User",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/users/{{createdUserId}}/role",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleId\": \"{{roleId}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/users/{{createdUserId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 204', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 - Forms",
+      "item": [
+        {
+          "name": "List Forms",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/forms?companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "forms"],
+              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns forms array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  pm.expect(body.length).to.be.at.least(1);",
+                  "  pm.collectionVariables.set('formId', body[0].id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Form",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/forms",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API Test Form\",\n  \"description\": \"Created by API test\",\n  \"companyId\": \"{{companyId}}\",\n  \"status\": \"active\",\n  \"fields\": [\n    {\n      \"id\": \"f1\",\n      \"type\": \"text\",\n      \"label\": \"Full Name\",\n      \"required\": true\n    },\n    {\n      \"id\": \"f2\",\n      \"type\": \"email\",\n      \"label\": \"Email Address\",\n      \"required\": true\n    }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns form with id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.name).to.eql('API Test Form');",
+                  "  pm.collectionVariables.set('newFormId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Form by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/forms/{{newFormId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns form', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.name).to.eql('API Test Form');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Form",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/forms/{{newFormId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API Test Form Updated\",\n  \"description\": \"Updated by test\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Name updated', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.name).to.eql('API Test Form Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Form",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/forms/{{newFormId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 204', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 - Models",
+      "item": [
+        {
+          "name": "List Models",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/models?companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "models"],
+              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns models array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  pm.expect(body.length).to.be.at.least(1);",
+                  "  pm.collectionVariables.set('modelId', body[0].id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Model",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/models",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API Test Model\",\n  \"description\": \"Created by API test\",\n  \"companyId\": \"{{companyId}}\",\n  \"fields\": [\n    {\n      \"id\": \"mf1\",\n      \"name\": \"customer_name\",\n      \"type\": \"text\",\n      \"required\": true\n    },\n    {\n      \"id\": \"mf2\",\n      \"name\": \"value\",\n      \"type\": \"number\",\n      \"required\": false\n    }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns model with id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.name).to.eql('API Test Model');",
+                  "  pm.collectionVariables.set('newModelId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Model by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/models/{{newModelId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns model', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.name).to.eql('API Test Model');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Model",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/models/{{newModelId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API Test Model Updated\",\n  \"description\": \"Updated description\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Name updated', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.name).to.eql('API Test Model Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Entity",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/models/{{newModelId}}/entities",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"customer_name\": \"Acme Corporation\",\n    \"value\": 50000\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns entity with id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.collectionVariables.set('entityId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Entities",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/models/{{newModelId}}/entities",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns entities array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Entity by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/models/{{newModelId}}/entities/{{entityId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns entity', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('data');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Entity",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/models/{{newModelId}}/entities/{{entityId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"customer_name\": \"Acme Corporation Updated\",\n    \"value\": 75000\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Entity",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/models/{{newModelId}}/entities/{{entityId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 204', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Model",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/models/{{newModelId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 204', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08 - Flows",
+      "item": [
+        {
+          "name": "List Flows",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/flows?companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "flows"],
+              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns flows array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  pm.expect(body.length).to.be.at.least(1);",
+                  "  pm.collectionVariables.set('flowId', body[0].id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Flow",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/flows",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API Test Flow\",\n  \"description\": \"Flow created by API test\",\n  \"companyId\": \"{{companyId}}\",\n  \"status\": \"draft\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns flow with id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.name).to.eql('API Test Flow');",
+                  "  pm.collectionVariables.set('newFlowId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Flow by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns flow', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.name).to.eql('API Test Flow');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Flow",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API Test Flow Updated\",\n  \"status\": \"active\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Name updated', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.name).to.eql('API Test Flow Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Node (Start)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/nodes",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Start\",\n  \"type\": \"start\",\n  \"x\": 100,\n  \"y\": 200,\n  \"width\": 160,\n  \"height\": 60\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns node', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.collectionVariables.set('nodeId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Node (End)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/nodes",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"End\",\n  \"type\": \"end\",\n  \"x\": 500,\n  \"y\": 200,\n  \"width\": 160,\n  \"height\": 60\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns node', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.collectionVariables.set('node2Id', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Nodes",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/nodes",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns nodes array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  pm.expect(body.length).to.be.at.least(2);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Node",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/nodes/{{nodeId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Start Updated\",\n  \"x\": 150,\n  \"y\": 250\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Edge",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/edges",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceNodeId\": \"{{nodeId}}\",\n  \"targetNodeId\": \"{{node2Id}}\",\n  \"label\": \"Go\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns edge', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.collectionVariables.set('edgeId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Edges",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/edges",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns edges array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Save Graph",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/graph",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nodes\": [\n    {\n      \"id\": \"{{nodeId}}\",\n      \"label\": \"Start\",\n      \"type\": \"start\",\n      \"x\": 100,\n      \"y\": 200,\n      \"width\": 160,\n      \"height\": 60\n    },\n    {\n      \"id\": \"{{node2Id}}\",\n      \"label\": \"End\",\n      \"type\": \"end\",\n      \"x\": 500,\n      \"y\": 200,\n      \"width\": 160,\n      \"height\": 60\n    }\n  ],\n  \"edges\": [\n    {\n      \"id\": \"{{edgeId}}\",\n      \"sourceNodeId\": \"{{nodeId}}\",\n      \"targetNodeId\": \"{{node2Id}}\",\n      \"label\": \"Go\"\n    }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Assignment",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/assignments",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startNodeId\": \"{{nodeId}}\",\n  \"roleId\": \"{{roleId}}\",\n  \"isActive\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns assignment', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.collectionVariables.set('assignmentId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Assignments",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/assignments",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns assignments array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Assignment",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/assignments/{{assignmentId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 204', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Edge",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/edges/{{edgeId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 204', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Node",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}/nodes/{{nodeId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 204', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Flow",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/flows/{{newFlowId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 204', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "09 - Flow Instances",
+      "item": [
+        {
+          "name": "List Instances",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/instances?companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "instances"],
+              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns instances array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  if (body.length > 0) {",
+                  "    pm.collectionVariables.set('instanceId', body[0].id);",
+                  "  }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Start Flow Instance",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/instances",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flowId\": \"e0000001-0000-0000-0000-000000000002\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns instance', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.collectionVariables.set('newInstanceId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get My Tasks",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/instances/my-tasks?companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "instances", "my-tasks"],
+              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns tasks array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Instance by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/instances/{{newInstanceId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns instance', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('status');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Advance Instance",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/instances/{{newInstanceId}}/advance",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"formData\": {\"notes\": \"Test advance\"}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 400', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject Instance",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/instances/a3000001-0000-0000-0000-000000000001/reject",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": \"Test rejection from API test\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 400', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "10 - Letters",
+      "item": [
+        {
+          "name": "List Letters",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/letters?companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "letters"],
+              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns letters array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  pm.expect(body.length).to.be.at.least(1);",
+                  "  pm.collectionVariables.set('letterId', body[0].id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Letter",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/letters",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API Test Letter\",\n  \"description\": \"Created by API test\",\n  \"companyId\": \"{{companyId}}\",\n  \"content\": \"Dear {{name}},\\n\\nThis is a test letter.\\n\\nRegards,\\nTest\",\n  \"variables\": [\"name\"],\n  \"status\": \"active\",\n  \"category\": \"test\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns letter with id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.name).to.eql('API Test Letter');",
+                  "  pm.collectionVariables.set('newLetterId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Letter by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/letters/{{newLetterId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns letter', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.name).to.eql('API Test Letter');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Letter",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/letters/{{newLetterId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"API Test Letter Updated\",\n  \"content\": \"Dear {{name}},\\n\\nUpdated content.\\n\\nRegards\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Name updated', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.name).to.eql('API Test Letter Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generate Letter",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/letters/{{newLetterId}}/generate",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"name\": \"John Doe\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 201', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "pm.test('Returns generated content', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('generatedContent');",
+                  "  pm.expect(body.generatedContent).to.include('John Doe');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Letter",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/letters/{{newLetterId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 204', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "11 - Tickets",
+      "item": [
+        {
+          "name": "List Tickets",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tickets?companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "tickets"],
+              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns tickets array', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "  pm.expect(body.length).to.be.at.least(1);",
+                  "  pm.collectionVariables.set('ticketId', body[0].id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Ticket",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/tickets",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"API Test Ticket\",\n  \"description\": \"This ticket was created by the API test suite\",\n  \"companyId\": \"{{companyId}}\",\n  \"priority\": \"medium\",\n  \"tags\": [\"api-test\", \"automated\"]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns ticket with id', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.title).to.eql('API Test Ticket');",
+                  "  pm.collectionVariables.set('newTicketId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Ticket by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/tickets/{{newTicketId}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns ticket', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.title).to.eql('API Test Ticket');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Ticket",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/v1/tickets/{{newTicketId}}",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"API Test Ticket Updated\",\n  \"priority\": \"high\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Title updated', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.title).to.eql('API Test Ticket Updated');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Ticket Status",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/tickets/{{newTicketId}}/status",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"inProgress\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Status updated', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.eql('inProgress');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send Ticket Message",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/tickets/{{newTicketId}}/messages",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"This is a test message from the API test suite.\",\n  \"attachments\": []\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Returns message', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.content).to.include('test message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "12 - Stats",
+      "item": [
+        {
+          "name": "Get Stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stats?companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stats"],
+              "query": [{ "key": "companyId", "value": "{{companyId}}" }]
+            },
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns stats object', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('total_users');",
+                  "  pm.expect(body).to.have.property('total_flows');",
+                  "  pm.expect(body).to.have.property('total_tickets');",
+                  "  pm.expect(body.total_users).to.be.at.least(1);",
+                  "  pm.expect(body.total_tickets).to.be.at.least(1);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "13 - Error Cases",
+      "item": [
+        {
+          "name": "401 - No Auth Token",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/companies",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401 Unauthorized', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "400 - Invalid Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"notexist@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "404 - Non-Existent Resource",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/companies/00000000-0000-0000-0000-000000000000",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "400 - Register with Invalid Email",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"TestPass123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 Bad Request', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
