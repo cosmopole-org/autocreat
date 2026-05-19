@@ -19,6 +19,10 @@ class TaskListNotifier extends AsyncNotifier<List<MyTask>> {
     final isDemo = ref.watch(isDemoModeProvider);
     if (isDemo) return [];
 
+    // Rebuild on login/logout so the list reflects the current user.
+    final user = ref.watch(authProvider).valueOrNull;
+    if (user == null) return [];
+
     _wsSub?.cancel();
     _wsSub = ref.watch(realtimeServiceProvider).messages.listen(_onWsMessage);
     ref.onDispose(() => _wsSub?.cancel());
@@ -126,6 +130,10 @@ class StartableFlowsNotifier extends AsyncNotifier<List<StartableFlow>> {
   Future<List<StartableFlow>> build() async {
     final isDemo = ref.watch(isDemoModeProvider);
     if (isDemo) return [];
+
+    // Rebuild on login/logout so the quick-start section reflects the current user's role.
+    final user = ref.watch(authProvider).valueOrNull;
+    if (user == null) return [];
 
     _wsSub?.cancel();
     _wsSub = ref.watch(realtimeServiceProvider).messages.listen(_onWsMessage);
