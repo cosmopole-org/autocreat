@@ -28,6 +28,7 @@ type Options struct {
 	TicketHandler   *handler.TicketHandler
 	StatsHandler    *handler.StatsHandler
 	RealtimeHandler *handler.RealtimeHandler
+	BindingHandler  *handler.BindingHandler
 	AuthService     *service.AuthService
 	AllowedOrigins  []string
 	RateLimitRPS    int
@@ -180,6 +181,20 @@ func New(opts Options) *gin.Engine {
 	flat.POST("/tickets/:id/messages", opts.TicketHandler.SendMessage)
 
 	flat.GET("/stats", opts.StatsHandler.GetStats)
+
+	// ---------- Binding & Letter Assignment routes ----------
+	if opts.BindingHandler != nil {
+		flat.GET("/nodes/:nodeId/bindings", opts.BindingHandler.ListBindings)
+		flat.POST("/nodes/:nodeId/bindings", opts.BindingHandler.SaveBinding)
+		flat.DELETE("/bindings/:id", opts.BindingHandler.DeleteBinding)
+
+		flat.GET("/nodes/:nodeId/letter-assignments", opts.BindingHandler.ListLetterAssignments)
+		flat.POST("/nodes/:nodeId/letter-assignments", opts.BindingHandler.SaveLetterAssignment)
+		flat.DELETE("/letter-assignments/:id", opts.BindingHandler.DeleteLetterAssignment)
+
+		flat.POST("/instances/:instanceId/steps/:stepId/generate-letter", opts.BindingHandler.GenerateStepLetter)
+		flat.GET("/instances/:instanceId/steps/:stepId/generated-letters", opts.BindingHandler.ListStepGeneratedLetters)
+	}
 
 	// Realtime WebSocket
 	rt := v1.Group("/realtime")

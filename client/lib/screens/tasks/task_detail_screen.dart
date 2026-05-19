@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../models/binding.dart';
 import '../../models/task.dart';
+import '../../providers/binding_provider.dart';
 import '../../providers/task_provider.dart';
 import '../../theme/app_colors.dart';
 
@@ -33,7 +35,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -91,6 +93,7 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
               children: [
                 _buildFormTab(context, task, cs, isDark),
                 _buildHistoryTab(context, task, cs, isDark),
+                _buildLettersTab(context, task, cs, isDark),
               ],
             ),
           ),
@@ -234,6 +237,16 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
                 Icon(Icons.history_rounded, size: 16),
                 SizedBox(width: 6),
                 Text('Step History'),
+              ],
+            ),
+          ),
+          Tab(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.mail_rounded, size: 16),
+                SizedBox(width: 6),
+                Text('Letters'),
               ],
             ),
           ),
@@ -723,6 +736,73 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen>
     }
   }
 
+  Widget _buildLettersTab(
+      BuildContext context, MyTask task, ColorScheme cs, bool isDark) {
+    final stepId = task.stepId;
+    final instanceId = task.instanceId;
+
+    final assignmentsAsync =
+        ref.watch(nodeLetterAssignmentsProvider(task.nodeId));
+    final generatedAsync = ref.watch(stepGeneratedLettersProvider(
+        (instanceId: instanceId, stepId: stepId)));
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: assignmentsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (assignments) {
+          if (assignments.isEmpty) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 60),
+                Icon(Icons.mail_outline_rounded,
+                    size: 56, color: cs.onSurface.withValues(alpha: 0.2)),
+                const SizedBox(height: 16),
+                Text('No letters assigned to this step',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: cs.onSurface.withValues(alpha: 0.4))),
+                const SizedBox(height: 8),
+                Text('The flow admin can assign letter templates to this node.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: cs.onSurface.withValues(alpha: 0.3))),
+              ],
+            );
+          }
+
+          return generatedAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => const SizedBox.shrink(),
+            data: (generatedLetters) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: assignments.map((assignment) {
+                final alreadyGenerated = generatedLetters
+                    .where((g) => g.assignmentId == assignment.id)
+                    .toList();
+                return _LetterAssignmentTaskCard(
+                  assignment: assignment,
+                  generatedLetters: alreadyGenerated,
+                  instanceId: instanceId,
+                  stepId: stepId,
+                  nodeId: task.nodeId,
+                  onGenerated: () {
+                    ref.invalidate(stepGeneratedLettersProvider(
+                        (instanceId: instanceId, stepId: stepId)));
+                  },
+                );
+              }).toList(),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   String _formatDate(DateTime? dt) {
     if (dt == null) return '';
     return DateFormat('MMM d, yyyy').format(dt);
@@ -1074,6 +1154,300 @@ class _RoleBadge extends StatelessWidget {
               color: AppColors.accent,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Letter assignment card shown in the task's Letters tab ───────────────────
+
+class _LetterAssignmentTaskCard extends ConsumerStatefulWidget {
+  final NodeLetterAssignment assignment;
+  final List<StepGeneratedLetter> generatedLetters;
+  final String instanceId;
+  final String stepId;
+  final String nodeId;
+  final VoidCallback onGenerated;
+
+  const _LetterAssignmentTaskCard({
+    required this.assignment,
+    required this.generatedLetters,
+    required this.instanceId,
+    required this.stepId,
+    required this.nodeId,
+    required this.onGenerated,
+  });
+
+  @override
+  ConsumerState<_LetterAssignmentTaskCard> createState() =>
+      _LetterAssignmentTaskCardState();
+}
+
+class _LetterAssignmentTaskCardState
+    extends ConsumerState<_LetterAssignmentTaskCard> {
+  bool _generating = false;
+  String? _expandedLetterId;
+
+  Future<void> _generate(String trigger) async {
+    setState(() => _generating = true);
+    try {
+      await ref.read(bindingRepositoryProvider).generateLetterForStep(
+            instanceId: widget.instanceId,
+            stepId: widget.stepId,
+            assignmentId: widget.assignment.id,
+            trigger: trigger,
+          );
+      widget.onGenerated();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error generating letter: $e'),
+                backgroundColor: AppColors.error));
+      }
+    } finally {
+      if (mounted) setState(() => _generating = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final a = widget.assignment;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.mail_rounded,
+                      size: 18, color: AppColors.primary),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(a.letterName,
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: cs.onSurface)),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          if (a.autoGenerateOnApprove)
+                            _InfoChip(
+                              label: 'Auto after approval',
+                              icon: Icons.auto_awesome_rounded,
+                              color: AppColors.success,
+                            ),
+                          if (!a.autoGenerateOnApprove &&
+                              a.allowBeforeApprove) ...[
+                            _InfoChip(
+                              label: 'Manual',
+                              icon: Icons.edit_note_rounded,
+                              color: AppColors.primary,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                if (a.allowBeforeApprove && !a.autoGenerateOnApprove)
+                  ElevatedButton.icon(
+                    onPressed: _generating
+                        ? null
+                        : () => _generate('before_approve'),
+                    icon: _generating
+                        ? const SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.auto_fix_high_rounded, size: 14),
+                    label: const Text('Generate'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      textStyle: const TextStyle(fontSize: 12),
+                      minimumSize: const Size(0, 32),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          // Generated letters list
+          if (widget.generatedLetters.isNotEmpty) ...[
+            Divider(
+                height: 1,
+                color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+              child: Text('Generated (${widget.generatedLetters.length})',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: cs.onSurface.withValues(alpha: 0.5),
+                      letterSpacing: 0.5)),
+            ),
+            ...widget.generatedLetters.map((gl) {
+              final isExpanded = _expandedLetterId == gl.id;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InkWell(
+                    onTap: () => setState(() =>
+                        _expandedLetterId = isExpanded ? null : gl.id),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+                      child: Row(
+                        children: [
+                          Icon(Icons.description_outlined,
+                              size: 14,
+                              color: cs.onSurface.withValues(alpha: 0.5)),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _triggerLabel(gl.trigger),
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: cs.onSurface),
+                                ),
+                                Text(
+                                  DateFormat('MMM d, HH:mm').format(gl.createdAt),
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: cs.onSurface.withValues(alpha: 0.45)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(
+                            isExpanded
+                                ? Icons.keyboard_arrow_up_rounded
+                                : Icons.keyboard_arrow_down_rounded,
+                            size: 18,
+                            color: cs.onSurface.withValues(alpha: 0.4),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (isExpanded)
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.03)
+                            : Colors.grey.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.lightBorder),
+                      ),
+                      child: SelectableText(
+                        gl.generatedContent,
+                        style: TextStyle(
+                            fontSize: 12.5,
+                            height: 1.6,
+                            color: cs.onSurface.withValues(alpha: 0.85),
+                            fontFamily: 'monospace'),
+                      ),
+                    ),
+                ],
+              );
+            }),
+            const SizedBox(height: 6),
+          ] else ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
+              child: Text(
+                a.autoGenerateOnApprove
+                    ? 'Will be generated automatically when you approve this task.'
+                    : 'No letter generated yet.',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: cs.onSurface.withValues(alpha: 0.45)),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _triggerLabel(String trigger) {
+    switch (trigger) {
+      case 'before_approve':
+        return 'Generated before approval';
+      case 'after_approve':
+        return 'Auto-generated on approval';
+      default:
+        return 'Manually generated';
+    }
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+
+  const _InfoChip(
+      {required this.label, required this.icon, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 10, color: color),
+          const SizedBox(width: 4),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 10, fontWeight: FontWeight.w600, color: color)),
         ],
       ),
     );
