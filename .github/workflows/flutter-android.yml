@@ -85,7 +85,7 @@ jobs:
         run: |
           flutter build apk \
             --release \
-            --dart-define=API_BASE_URL=${{ vars.API_BASE_URL || 'https://autocreat-api.vercel.app' }} \
+            --dart-define=API_BASE_URL=${{ vars.API_BASE_URL || 'https://autocreat.onrender.com' }} \
             --split-per-abi
 
       - name: Build APK (debug)
@@ -94,7 +94,7 @@ jobs:
         run: |
           flutter build apk \
             --debug \
-            --dart-define=API_BASE_URL=${{ vars.API_BASE_URL || 'https://autocreat-api.vercel.app' }}
+            --dart-define=API_BASE_URL=${{ vars.API_BASE_URL || 'https://autocreat.onrender.com' }}
 
       - name: Stage APKs in repository root
         shell: bash
